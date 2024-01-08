@@ -1,0 +1,103 @@
+﻿#include "D1AbilitySystemData.h"
+
+#include "ActiveGameplayEffectHandle.h"
+#include "GameplayAbilitySpecHandle.h"
+#include "AbilitySystem/D1AbilitySystemComponent.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1AbilitySystemData)
+
+void FD1AbilitySystemData_GrantedHandles::AddAbilitySpecHandle(const FGameplayAbilitySpecHandle& Handle)
+{
+	if (Handle.IsValid())
+	{
+		AbilitySpecHandles.Add(Handle);
+	}
+}
+
+void FD1AbilitySystemData_GrantedHandles::AddEffectHandle(const FActiveGameplayEffectHandle& Handle)
+{
+	if (Handle.IsValid())
+	{
+		EffectHandles.Add(Handle);
+	}
+}
+
+void FD1AbilitySystemData_GrantedHandles::TakeFromAbilitySystem(UD1AbilitySystemComponent* D1ASC)
+{
+	check(D1ASC);
+
+	if (D1ASC->IsOwnerActorAuthoritative() == false)
+		return;
+
+	for (const FGameplayAbilitySpecHandle& Handle : AbilitySpecHandles)
+	{
+		if (Handle.IsValid())
+		{
+			D1ASC->ClearAbility(Handle);
+		}
+	}
+
+	for (const FActiveGameplayEffectHandle& Handle : EffectHandles)
+	{
+		if (Handle.IsValid())
+		{
+			D1ASC->RemoveActiveGameplayEffect(Handle);
+		}
+	}
+
+	AbilitySpecHandles.Reset();
+	EffectHandles.Reset();
+}
+
+UD1AbilitySystemData::UD1AbilitySystemData(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+    
+}
+
+void UD1AbilitySystemData::GiveToAbilitySystem(UD1AbilitySystemComponent* D1ASC, FD1AbilitySystemData_GrantedHandles* OutGrantedHandles, UObject* SourceObject) const
+{
+	check(D1ASC);
+
+	if (D1ASC->IsOwnerActorAuthoritative() == false)
+		return;
+
+	for (int32 AbilityIndex = 0; AbilityIndex < GrantedAbilities.Num(); AbilityIndex++)
+	{
+		const FD1AbilitySystemData_Ability& AbilityToGrant = GrantedAbilities[AbilityIndex];
+		if (IsValid(AbilityToGrant.Ability) == false)
+		{
+			UE_LOG(LogAbilitySystemComponent, Error, TEXT("GrantedAbilities[%d] on ability system data [%s] is not vaild."), AbilityIndex, *GetNameSafe(this));
+			continue;
+		}
+
+		UD1Ability* AbilityCDO = AbilityToGrant.Ability->GetDefaultObject<UD1Ability>();
+
+		FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityToGrant.AbilityLevel);
+		AbilitySpec.SourceObject = SourceObject;
+		AbilitySpec.DynamicAbilityTags.AddTag(AbilityToGrant.InputTag);
+
+		const FGameplayAbilitySpecHandle AbilitySpecHandle = D1ASC->GiveAbility(AbilitySpec);
+		if (OutGrantedHandles)
+		{
+			OutGrantedHandles->AddAbilitySpecHandle(AbilitySpecHandle);
+		}
+	}
+
+	for (int32 EffectIndex = 0; EffectIndex < GrantedEffects.Num(); EffectIndex++)
+	{
+		const FD1AbilitySystemData_Effect& EffectToGrant = GrantedEffects[EffectIndex];
+		if (IsValid(EffectToGrant.Effect) == false)
+		{
+			UE_LOG(LogAbilitySystemComponent, Error, TEXT("GrantedEffect[%d] on ability system data [%s] is not vaild."), EffectIndex, *GetNameSafe(this));
+			continue;
+		}
+
+		const UGameplayEffect* Effect = EffectToGrant.Effect->GetDefaultObject<UGameplayEffect>();
+		const FActiveGameplayEffectHandle EffectHandle = D1ASC->ApplyGameplayEffectToSelf(Effect, EffectToGrant.EffectLevel, D1ASC->MakeEffectContext());
+		if (OutGrantedHandles)
+		{
+			OutGrantedHandles->AddEffectHandle(EffectHandle);
+		}
+	}
+}

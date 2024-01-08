@@ -1,0 +1,5 @@
+﻿#include "D1LogChannels.h"
+
+DEFINE_LOG_CATEGORY(LogD1);
+DEFINE_LOG_CATEGORY(LogD1Asset);
+DEFINE_LOG_CATEGORY(LogD1AbilitySystem);

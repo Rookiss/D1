@@ -1,0 +1,5 @@
+﻿#pragma once
+
+DECLARE_LOG_CATEGORY_EXTERN(LogD1, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogD1Asset, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogD1AbilitySystem, Log, All);
