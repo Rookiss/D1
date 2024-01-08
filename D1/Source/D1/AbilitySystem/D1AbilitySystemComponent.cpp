@@ -3,8 +3,9 @@
 #include "D1GameplayTags.h"
 #include "D1GlobalAbilitySystem.h"
 #include "D1LogChannels.h"
-#include "Abilities/D1Ability.h"
+#include "Abilities/D1GameplayAbility.h"
 #include "Animation/D1AnimInstance.h"
+#include "Data/D1AbilitySystemData.h"
 #include "Data/D1GameData.h"
 #include "System/D1AssetManager.h"
 
@@ -13,7 +14,7 @@
 UD1AbilitySystemComponent::UD1AbilitySystemComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	ClearAbilityInput();
+	
 }
 
 void UD1AbilitySystemComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -52,12 +53,40 @@ void UD1AbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AActo
 	}
 }
 
+void UD1AbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& AbilitySpec)
+{
+	Super::OnGiveAbility(AbilitySpec);
+
+	for (const FGameplayTag& AbilityTag : AbilitySpec.Ability->AbilityTags)
+	{
+		if (AbilityTag.MatchesTag(FGameplayTag::RequestGameplayTag("Ability")) && AbilityChangedDelegate.IsBound())
+		{
+			AbilityChangedDelegate.Broadcast(true, AbilityTag);
+			return;
+		}
+	}
+}
+
+void UD1AbilitySystemComponent::OnRemoveAbility(FGameplayAbilitySpec& AbilitySpec)
+{
+	Super::OnRemoveAbility(AbilitySpec);
+
+	for (const FGameplayTag& Tag : AbilitySpec.Ability->AbilityTags)
+	{
+		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag("Ability")) && AbilityChangedDelegate.IsBound())
+		{
+			AbilityChangedDelegate.Broadcast(false, Tag);
+			return;
+		}
+	}
+}
+
 void UD1AbilitySystemComponent::TryActivateAbilitiesOnSpawn()
 {
 	ABILITYLIST_SCOPE_LOCK();
 	for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 	{
-		const UD1Ability* D1AbilityCDO = CastChecked<UD1Ability>(AbilitySpec.Ability);
+		const UD1GameplayAbility* D1AbilityCDO = CastChecked<UD1GameplayAbility>(AbilitySpec.Ability);
 		D1AbilityCDO->TryActivateAbilityOnSpawn(AbilityActorInfo.Get(), AbilitySpec);
 	}
 }
@@ -70,13 +99,13 @@ void UD1AbilitySystemComponent::CancelAbilitiesByFunc(TShouldCancelAbilityFunc S
 		if (AbilitySpec.IsActive() == false)
 			continue;
 
-		UD1Ability* D1AbilityCDO = CastChecked<UD1Ability>(AbilitySpec.Ability);
+		UD1GameplayAbility* D1AbilityCDO = CastChecked<UD1GameplayAbility>(AbilitySpec.Ability);
 		if (D1AbilityCDO->GetInstancingPolicy() != EGameplayAbilityInstancingPolicy::NonInstanced)
 		{
 			TArray<UGameplayAbility*> Instances = AbilitySpec.GetAbilityInstances();
 			for (UGameplayAbility* AbilityInstance : Instances)
 			{
-				UD1Ability* D1AbilityInstance = CastChecked<UD1Ability>(AbilityInstance);
+				UD1GameplayAbility* D1AbilityInstance = CastChecked<UD1GameplayAbility>(AbilityInstance);
 				if (ShouldCancelFunc(D1AbilityInstance, AbilitySpec.Handle))
 				{
 					if (D1AbilityInstance->CanBeCanceled())
@@ -103,7 +132,7 @@ void UD1AbilitySystemComponent::CancelAbilitiesByFunc(TShouldCancelAbilityFunc S
 
 void UD1AbilitySystemComponent::CancelInputActivatedAbilities(bool bReplicateCancelAbility)
 {
-	auto ShouldCancelFunc = [this](const UD1Ability* D1Ability, FGameplayAbilitySpecHandle Handle)
+	auto ShouldCancelFunc = [this](const UD1GameplayAbility* D1Ability, FGameplayAbilitySpecHandle Handle)
 	{
 		const ED1AbilityActivationPolicy ActivationPolicy = D1Ability->GetActivationPolicy();
 		return ((ActivationPolicy == ED1AbilityActivationPolicy::InputPressed) || (ActivationPolicy == ED1AbilityActivationPolicy::InputHeld));
@@ -179,7 +208,7 @@ void UD1AbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGameP
 		{
 			if (AbilitySpec->Ability && AbilitySpec->IsActive() == false)
 			{
-				const UD1Ability* D1AbilityCDO = CastChecked<UD1Ability>(AbilitySpec->Ability);
+				const UD1GameplayAbility* D1AbilityCDO = CastChecked<UD1GameplayAbility>(AbilitySpec->Ability);
 				if (D1AbilityCDO->GetActivationPolicy() == ED1AbilityActivationPolicy::InputHeld)
 				{
 					AbilitiesToActivate.AddUnique(AbilitySpec->Handle);
@@ -202,7 +231,7 @@ void UD1AbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGameP
 				}
 				else
 				{
-					const UD1Ability* D1AbilityCDO = CastChecked<UD1Ability>(AbilitySpec->Ability);
+					const UD1GameplayAbility* D1AbilityCDO = CastChecked<UD1GameplayAbility>(AbilitySpec->Ability);
 					if (D1AbilityCDO->GetActivationPolicy() == ED1AbilityActivationPolicy::InputPressed)
 					{
 						AbilitiesToActivate.AddUnique(AbilitySpec->Handle);

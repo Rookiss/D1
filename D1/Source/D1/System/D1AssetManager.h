@@ -6,7 +6,7 @@
 #include "D1AssetManager.generated.h"
 
 DECLARE_DELEGATE_OneParam(FAsyncLoadUpdateDelegate, float/*Progress*/);
-DECLARE_DELEGATE_OneParam(FAsyncLoadCompleteDelegate, const FName&/*AssetName or Label*/);
+DECLARE_DELEGATE_OneParam(FAsyncLoadCompletedDelegate, const FName&/*AssetName or Label*/);
 
 UCLASS()
 class UD1AssetManager : public UAssetManager
@@ -30,15 +30,15 @@ public:
 	static void LoadSyncByName(const FName& AssetName);
 	static void LoadSyncByLabel(const FName& Label);
 	
-	static void LoadAsyncByName(const FName& AssetName, FAsyncLoadCompleteDelegate CompleteDelegate = FAsyncLoadCompleteDelegate());
-	static void LoadAsyncByLabel(const FName& Label, FAsyncLoadCompleteDelegate CompleteDelegate = FAsyncLoadCompleteDelegate(), FAsyncLoadUpdateDelegate UpdateDelegate = FAsyncLoadUpdateDelegate());
+	static void LoadAsyncByName(const FName& AssetName, FAsyncLoadCompletedDelegate CompletedDelegate = FAsyncLoadCompletedDelegate());
+	static void LoadAsyncByLabel(const FName& Label, FAsyncLoadCompletedDelegate CompletedDelegate = FAsyncLoadCompletedDelegate(), FAsyncLoadUpdateDelegate UpdateDelegate = FAsyncLoadUpdateDelegate());
 	
 	static void ReleaseByName(const FName& AssetName);
 	static void ReleaseByLabel(const FName& Label);
 	static void ReleaseAll();
 	
 private:
-	void LoadAssetData();
+	void LoadDataAssets();
 	void AddLoadedAsset(const FName& AssetName, const UObject* Asset);
 	
 private:

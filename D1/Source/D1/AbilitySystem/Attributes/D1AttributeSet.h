@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "AttributeSet.h"
+#include "GameplayTagContainer.h"
 #include "D1AttributeSet.generated.h"
 
 class UD1AbilitySystemComponent;
@@ -21,4 +22,7 @@ public:
 	
 public:
 	UD1AbilitySystemComponent* GetD1AbilitySystemComponent() const;
+
+public:
+	TMap<FGameplayTag, FGameplayAttribute> TagToAttribute;
 };

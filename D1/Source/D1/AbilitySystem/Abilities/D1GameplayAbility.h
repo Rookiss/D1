@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Abilities/GameplayAbility.h"
-#include "D1Ability.generated.h"
+#include "D1GameplayAbility.generated.h"
 
 class AD1Character;
 class UD1AbilitySystemComponent;
@@ -16,12 +16,12 @@ enum class ED1AbilityActivationPolicy : uint8
 };
 
 UCLASS(Abstract)
-class UD1Ability : public UGameplayAbility
+class UD1GameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 	
 public:
-	UD1Ability(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UD1GameplayAbility(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
 	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;

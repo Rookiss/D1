@@ -1,12 +1,19 @@
 ﻿#include "D1SecondarySet.h"
 
+#include "D1GameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1SecondarySet)
 
 UD1SecondarySet::UD1SecondarySet()
 {
-	
+	TagToAttribute.Add(D1GameplayTags::Attribute_Secondary_Strength, GetStrengthAttribute());
+	TagToAttribute.Add(D1GameplayTags::Attribute_Secondary_Vigor, GetVigorAttribute());
+	TagToAttribute.Add(D1GameplayTags::Attribute_Secondary_Agility, GetAgilityAttribute());
+	TagToAttribute.Add(D1GameplayTags::Attribute_Secondary_Dexterity, GetDexterityAttribute());
+	TagToAttribute.Add(D1GameplayTags::Attribute_Secondary_Will, GetWillAttribute());
+	TagToAttribute.Add(D1GameplayTags::Attribute_Secondary_Knowledge, GetKnowledgeAttribute());
+	TagToAttribute.Add(D1GameplayTags::Attribute_Secondary_Resourcefulness, GetResourcefulnessAttribute());
 }
 
 void UD1SecondarySet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

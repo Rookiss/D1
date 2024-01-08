@@ -1,10 +1,11 @@
 ﻿#pragma once
 
 #include "AbilitySystemComponent.h"
-#include "Abilities/D1Ability.h"
 #include "D1AbilitySystemComponent.generated.h"
 
 class UD1GameplayAbility;
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FAbilityChangedDelegate, bool, const FGameplayTag&);
 
 UCLASS()
 class UD1AbilitySystemComponent : public UAbilitySystemComponent
@@ -18,9 +19,12 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void InitAbilityActorInfo(AActor* InOwnerActor, AActor* InAvatarActor) override;
 
-	void TryActivateAbilitiesOnSpawn();
+	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec) override;
+	virtual void OnRemoveAbility(FGameplayAbilitySpec& AbilitySpec) override;
 	
-	typedef TFunctionRef<bool(const UD1Ability* D1Ability, FGameplayAbilitySpecHandle Handle)> TShouldCancelAbilityFunc;
+	void TryActivateAbilitiesOnSpawn();
+
+	typedef TFunctionRef<bool(const UD1GameplayAbility* D1Ability, FGameplayAbilitySpecHandle Handle)> TShouldCancelAbilityFunc;
 	void CancelAbilitiesByFunc(TShouldCancelAbilityFunc ShouldCancelFunc, bool bReplicateCancelAbility);
 
 	void CancelInputActivatedAbilities(bool bReplicateCancelAbility);
@@ -36,6 +40,9 @@ public:
 
 	void AddDynamicTagGameplayEffect(const FGameplayTag& Tag);
 	void RemoveDynamicTagGameplayEffect(const FGameplayTag& Tag);
+	
+public:
+	FAbilityChangedDelegate AbilityChangedDelegate;
 	
 private:
 	TArray<FGameplayAbilitySpecHandle> InputPressedSpecHandles;

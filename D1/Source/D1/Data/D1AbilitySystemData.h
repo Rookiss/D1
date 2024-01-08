@@ -7,7 +7,7 @@ class UD1AbilitySystemComponent;
 struct FActiveGameplayEffectHandle;
 struct FGameplayAbilitySpecHandle;
 class UGameplayEffect;
-class UD1Ability;
+class UD1GameplayAbility;
 
 USTRUCT(BlueprintType)
 struct FD1AbilitySystemData_Ability
@@ -16,11 +16,14 @@ struct FD1AbilitySystemData_Ability
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UD1Ability> Ability = nullptr;
+	TSubclassOf<UD1GameplayAbility> Ability = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 AbilityLevel = 1;
 
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag AbilityTag = FGameplayTag::EmptyTag;
+	
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayTag InputTag = FGameplayTag::EmptyTag;
 };
@@ -65,12 +68,13 @@ class UD1AbilitySystemData : public UDataAsset
 public:
 	UD1AbilitySystemData(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+public:
 	void GiveToAbilitySystem(UD1AbilitySystemComponent* D1ASC, FD1AbilitySystemData_GrantedHandles* OutGrantedHandles, UObject* SourceObject = nullptr) const;
 
-protected:
+public:
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FD1AbilitySystemData_Ability> GrantedAbilities;
+	TArray<FD1AbilitySystemData_Ability> Abilities;
 
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FD1AbilitySystemData_Effect> GrantedEffects;
+	TArray<FD1AbilitySystemData_Effect> Effects;
 };

@@ -25,5 +25,5 @@ public:
 	TObjectPtr<UCameraComponent> CameraComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USkeletalMeshComponent> FirstPersonMesh;
+	TObjectPtr<USkeletalMeshComponent> FirstPersonMeshComponent;
 };

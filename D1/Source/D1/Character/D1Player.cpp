@@ -2,8 +2,10 @@
 
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Player/D1PlayerController.h"
 #include "Player/D1PlayerState.h"
 #include "System/D1AssetManager.h"
+#include "UI/D1HUD.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1Player)
 
@@ -15,12 +17,12 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 62.f));
 	CameraComponent->bUsePawnControlRotation = true;
 	
-	FirstPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>("FirstPersonMesh");
-	FirstPersonMesh->SetupAttachment(CameraComponent);
-	FirstPersonMesh->SetOwnerNoSee(false);
-	FirstPersonMesh->SetOnlyOwnerSee(true);
-	FirstPersonMesh->SetRelativeLocation(FVector(-16.6f, -7.1f, -141.4f));
-	FirstPersonMesh->SetCastShadow(false);
+	FirstPersonMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("FirstPersonMeshComponent");
+	FirstPersonMeshComponent->SetupAttachment(CameraComponent);
+	FirstPersonMeshComponent->SetOwnerNoSee(false);
+	FirstPersonMeshComponent->SetOnlyOwnerSee(true);
+	FirstPersonMeshComponent->SetRelativeLocation(FVector(-16.6f, -7.1f, -141.4f));
+	FirstPersonMeshComponent->SetCastShadow(false);
 
 	GetMesh()->SetOwnerNoSee(true);
 	GetMesh()->SetOnlyOwnerSee(false);
@@ -54,6 +56,14 @@ void AD1Player::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 
 	InitAbilityActorInfo();
+	
+	if (AD1PlayerController* D1PC = Cast<AD1PlayerController>(GetController()))
+	{
+		if (AD1HUD* D1HUD = Cast<AD1HUD>(D1PC->GetHUD()))
+		{
+			D1HUD->ShowSceneWidget();
+		}
+	}
 }
 
 void AD1Player::InitAbilityActorInfo()

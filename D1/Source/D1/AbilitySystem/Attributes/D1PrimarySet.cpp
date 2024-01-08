@@ -9,7 +9,10 @@
 
 UD1PrimarySet::UD1PrimarySet()
 {
-	
+	TagToAttribute.Add(D1GameplayTags::Attribute_Primary_Health, GetHealthAttribute());
+	TagToAttribute.Add(D1GameplayTags::Attribute_Primary_MaxHealth, GetMaxHealthAttribute());
+	TagToAttribute.Add(D1GameplayTags::Attribute_Primary_Mana, GetManaAttribute());
+	TagToAttribute.Add(D1GameplayTags::Attribute_Primary_MaxMana, GetMaxManaAttribute());
 }
 
 void UD1PrimarySet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

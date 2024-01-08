@@ -1,12 +1,12 @@
-﻿#include "D1Ability.h"
+﻿#include "D1GameplayAbility.h"
 
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Character/D1Character.h"
 #include "Player/D1PlayerController.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1Ability)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility)
 
-UD1Ability::UD1Ability(const FObjectInitializer& ObjectInitializer)
+UD1GameplayAbility::UD1GameplayAbility(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateNo;
@@ -16,14 +16,14 @@ UD1Ability::UD1Ability(const FObjectInitializer& ObjectInitializer)
 	ActivationPolicy = ED1AbilityActivationPolicy::Manual;
 }
 
-void UD1Ability::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void UD1GameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnGiveAbility(ActorInfo, Spec);
 
 	TryActivateAbilityOnSpawn(ActorInfo, Spec);
 }
 
-void UD1Ability::TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const
+void UD1GameplayAbility::TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const
 {
 	const bool bIsPredicting = (Spec.ActivationInfo.ActivationMode == EGameplayAbilityActivationMode::Predicting);
 	if (ActorInfo && Spec.IsActive() == false && bIsPredicting == false && ActivationPolicy == ED1AbilityActivationPolicy::OnSpawn)
@@ -45,12 +45,12 @@ void UD1Ability::TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* Acto
 	}
 }
 
-UD1AbilitySystemComponent* UD1Ability::GetD1AbilitySystemComponent() const
+UD1AbilitySystemComponent* UD1GameplayAbility::GetD1AbilitySystemComponent() const
 {
 	return (CurrentActorInfo ? Cast<UD1AbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent.Get()) : nullptr);
 }
 
-AD1Character* UD1Ability::GetD1Character() const
+AD1Character* UD1GameplayAbility::GetD1Character() const
 {
 	return (CurrentActorInfo ? Cast<AD1Character>(CurrentActorInfo->AvatarActor.Get()) : nullptr);
 }

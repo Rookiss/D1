@@ -28,7 +28,7 @@ UD1AssetManager& UD1AssetManager::Get()
 
 void UD1AssetManager::Initialize()
 {
-	Get().LoadAssetData();
+	Get().LoadDataAssets();
 }
 
 void UD1AssetManager::LoadSyncByName(const FName& AssetName)
@@ -105,7 +105,7 @@ void UD1AssetManager::LoadSyncByLabel(const FName& Label)
 	}
 }
 
-void UD1AssetManager::LoadAsyncByName(const FName& AssetName, FAsyncLoadCompleteDelegate CompleteDelegate)
+void UD1AssetManager::LoadAsyncByName(const FName& AssetName, FAsyncLoadCompletedDelegate CompletedDelegate)
 {
 	if (UAssetManager::IsInitialized() == false)
 	{
@@ -129,7 +129,7 @@ void UD1AssetManager::LoadAsyncByName(const FName& AssetName, FAsyncLoadComplete
 			AssetPaths.Add(AssetPath);
 			
 			TSharedPtr<FStreamableHandle> Handle = GetStreamableManager().RequestAsyncLoad(AssetPaths);
-			Handle->BindCompleteDelegate(FStreamableDelegate::CreateLambda([AssetName, AssetPath, CompleteDelegate = MoveTemp(CompleteDelegate)]()
+			Handle->BindCompleteDelegate(FStreamableDelegate::CreateLambda([AssetName, AssetPath, CompleteDelegate = MoveTemp(CompletedDelegate)]()
 			{
 				Get().AddLoadedAsset(AssetName, AssetPath.ResolveObject());
 				if (CompleteDelegate.IsBound())
@@ -139,7 +139,7 @@ void UD1AssetManager::LoadAsyncByName(const FName& AssetName, FAsyncLoadComplete
 	}
 }
 
-void UD1AssetManager::LoadAsyncByLabel(const FName& Label, FAsyncLoadCompleteDelegate CompleteDelegate, FAsyncLoadUpdateDelegate UpdateDelegate)
+void UD1AssetManager::LoadAsyncByLabel(const FName& Label, FAsyncLoadCompletedDelegate CompletedDelegate, FAsyncLoadUpdateDelegate UpdateDelegate)
 {
 	if (UAssetManager::IsInitialized() == false)
 	{
@@ -164,7 +164,7 @@ void UD1AssetManager::LoadAsyncByLabel(const FName& Label, FAsyncLoadCompleteDel
 	
 	TSharedPtr<FStreamableHandle> Handle = GetStreamableManager().RequestAsyncLoad(AssetPaths);
 
-	Handle->BindCompleteDelegate(FStreamableDelegate::CreateLambda([&AssetEntries = AssetSet.AssetEntries, Label, CompleteDelegate = MoveTemp(CompleteDelegate)]()
+	Handle->BindCompleteDelegate(FStreamableDelegate::CreateLambda([&AssetEntries = AssetSet.AssetEntries, Label, CompleteDelegate = MoveTemp(CompletedDelegate)]()
 	{
 		for (const FAssetEntry& AssetEntry : AssetEntries)
 		{
@@ -235,7 +235,7 @@ void UD1AssetManager::ReleaseAll()
 	AssetManager.NameToLoadedAsset.Reset();
 }
 
-void UD1AssetManager::LoadAssetData()
+void UD1AssetManager::LoadDataAssets()
 {
 	if (LoadedAssetData)
 		return;
@@ -252,6 +252,7 @@ void UD1AssetManager::LoadAssetData()
 	if (AssetData)
 	{
 		LoadedAssetData = AssetData;
+		LoadSyncByLabel("Data");
 	}
 	else
 	{

@@ -21,6 +21,8 @@ AD1PlayerController::AD1PlayerController(const FObjectInitializer& ObjectInitial
 void AD1PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ResetInput();
 	
 	if (const UD1InputData* InputData = UD1AssetManager::GetAssetByName<UD1InputData>("InputData_Default"))
 	{

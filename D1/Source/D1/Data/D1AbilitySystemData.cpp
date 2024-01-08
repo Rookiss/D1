@@ -3,6 +3,7 @@
 #include "ActiveGameplayEffectHandle.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
+#include "AbilitySystem/Abilities/D1GameplayAbility.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AbilitySystemData)
 
@@ -62,16 +63,16 @@ void UD1AbilitySystemData::GiveToAbilitySystem(UD1AbilitySystemComponent* D1ASC,
 	if (D1ASC->IsOwnerActorAuthoritative() == false)
 		return;
 
-	for (int32 AbilityIndex = 0; AbilityIndex < GrantedAbilities.Num(); AbilityIndex++)
+	for (int32 AbilityIndex = 0; AbilityIndex < Abilities.Num(); AbilityIndex++)
 	{
-		const FD1AbilitySystemData_Ability& AbilityToGrant = GrantedAbilities[AbilityIndex];
+		const FD1AbilitySystemData_Ability& AbilityToGrant = Abilities[AbilityIndex];
 		if (IsValid(AbilityToGrant.Ability) == false)
 		{
 			UE_LOG(LogAbilitySystemComponent, Error, TEXT("GrantedAbilities[%d] on ability system data [%s] is not vaild."), AbilityIndex, *GetNameSafe(this));
 			continue;
 		}
 
-		UD1Ability* AbilityCDO = AbilityToGrant.Ability->GetDefaultObject<UD1Ability>();
+		UD1GameplayAbility* AbilityCDO = AbilityToGrant.Ability->GetDefaultObject<UD1GameplayAbility>();
 
 		FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityToGrant.AbilityLevel);
 		AbilitySpec.SourceObject = SourceObject;
@@ -84,9 +85,9 @@ void UD1AbilitySystemData::GiveToAbilitySystem(UD1AbilitySystemComponent* D1ASC,
 		}
 	}
 
-	for (int32 EffectIndex = 0; EffectIndex < GrantedEffects.Num(); EffectIndex++)
+	for (int32 EffectIndex = 0; EffectIndex < Effects.Num(); EffectIndex++)
 	{
-		const FD1AbilitySystemData_Effect& EffectToGrant = GrantedEffects[EffectIndex];
+		const FD1AbilitySystemData_Effect& EffectToGrant = Effects[EffectIndex];
 		if (IsValid(EffectToGrant.Effect) == false)
 		{
 			UE_LOG(LogAbilitySystemComponent, Error, TEXT("GrantedEffect[%d] on ability system data [%s] is not vaild."), EffectIndex, *GetNameSafe(this));
