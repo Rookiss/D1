@@ -1,13 +1,30 @@
 ﻿#pragma once
 
-#include "AttributeSet.h"
 #include "GameplayTags.h"
 #include "Blueprint/UserWidget.h"
 #include "D1UserWidget.generated.h"
 
-#define BIND_ATTRIBUTE_CHANGED_SEPARATE_FUNCTION(PropertyName)		\
-	On##PropertyName##Changed(AttributeSet->Get##PropertyName());	\
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->Get##PropertyName##Attribute()).AddLambda([this](const FOnAttributeChangeData& Data){ On##PropertyName##Changed(Data.NewValue); });
+#define BIND_ATTRIBUTE_CHANGED_DELEGATE(AttributeSetClassName, AttributeTag, PropertyName)												\
+	if (##AttributeSetClassName##* AttributeSet = const_cast<##AttributeSetClassName##*>(Cast<##AttributeSetClassName##>(				\
+		AbilitySystemComponent->GetAttributeSet(##AttributeSetClassName##::StaticClass())))) 											\
+	{																																	\
+		FGameplayTag Tag = AttributeTag;																								\
+		float CurrentValue = AttributeSet->Get##PropertyName##();																		\
+		On##PropertyName##Changed(nullptr, CurrentValue, CurrentValue);																	\
+		FDelegateHandle Handle = AttributeSet->##PropertyName##ChangedDelegate.AddUObject(this, &ThisClass::On##PropertyName##Changed);	\
+		AttributeDelegateHandles.Emplace(Tag, Handle);																					\
+	}		
+		
+#define UNBIND_ATTRIBUTE_CHANGED_DELEGATE(AttributeSetClassName, AttributeTag, PropertyName)											\
+	FGameplayTag Tag = AttributeTag;																									\
+	if (FDelegateHandle* Handle = AttributeDelegateHandles.Find(Tag))																	\
+	{																																	\
+		if (##AttributeSetClassName##* AttributeSet = const_cast<##AttributeSetClassName##*>(Cast<##AttributeSetClassName##>(			\
+			AbilitySystemComponent->GetAttributeSet(##AttributeSetClassName##::StaticClass())))) 										\
+		{																																\
+			AttributeSet->##PropertyName##ChangedDelegate.Remove(*Handle);																\
+		}																																\
+	}
 
 class UD1AttributeSet;
 class UAbilitySystemComponent;
@@ -26,30 +43,21 @@ public:
 	
 private:
 	void BindAbilityChangedDelegate();
-	void BindAttributeChangedDelegates();
+	void UnbindAbilityChangedDelegate();
 
 protected:
-	void BindUnitedAttributeChangedDelegates();
-	virtual void BindSeparatedAttributeChangedDelegates();
+	virtual void BindAttributeChangedDelegates();
+	virtual void UnbindAttributeChangedDelegates();
 	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnAttributeChanged(const FGameplayTag& Tag, float NewValue);
-	
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnAbilityChanged(bool bGiven, const FGameplayTag& AbilityTag);
-	
-protected:
-	TMap<FGameplayTag, TSubclassOf<UD1AttributeSet>> WatchingAttributeTagToSetClass;
+	void OnAbilityChanged(bool bIsGiven, const FGameplayTag& AbilityTag);
 
 private:
 	FDelegateHandle AbilityDelegateHandle;
-	TArray<TKeyValuePair<const FGameplayAttribute, FDelegateHandle>> AttributeDelegateHandles;
+	TMap<FGameplayTag, FDelegateHandle> AttributeDelegateHandles;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<TObjectPtr<const UD1AttributeSet>> AttributeSets;
 };

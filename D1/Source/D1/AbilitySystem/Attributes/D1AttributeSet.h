@@ -12,6 +12,8 @@ class UD1AbilitySystemComponent;
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName)				\
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FAttributeChangedDelegate, AActor*, float, float);
+
 UCLASS(Abstract)
 class UD1AttributeSet : public UAttributeSet
 {
@@ -24,5 +26,5 @@ public:
 	UD1AbilitySystemComponent* GetD1AbilitySystemComponent() const;
 
 public:
-	TMap<FGameplayTag, FGameplayAttribute> TagToAttribute;
+	TMap<FGameplayTag, float> TagToOldValue;
 };

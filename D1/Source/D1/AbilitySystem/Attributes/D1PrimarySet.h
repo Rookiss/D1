@@ -38,25 +38,52 @@ protected:
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldValue);
 
+protected:
+	UFUNCTION()
+	void OnRep_BaseDamage(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_BaseHeal(const FGameplayAttributeData& OldValue);
+	
 public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Health, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Health;
-	ATTRIBUTE_ACCESSORS(UD1PrimarySet, Health);
+	ATTRIBUTE_ACCESSORS(ThisClass, Health);
+	FAttributeChangedDelegate HealthChangedDelegate;
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxHealth, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MaxHealth;
-	ATTRIBUTE_ACCESSORS(UD1PrimarySet, MaxHealth);
+	ATTRIBUTE_ACCESSORS(ThisClass, MaxHealth);
+	FAttributeChangedDelegate MaxHealthChangedDelegate;
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Mana, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Mana;
-	ATTRIBUTE_ACCESSORS(UD1PrimarySet, Mana);
+	ATTRIBUTE_ACCESSORS(ThisClass, Mana);
+	FAttributeChangedDelegate ManaChangedDelegate;
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxMana, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MaxMana;
-	ATTRIBUTE_ACCESSORS(UD1PrimarySet, MaxMana);
+	ATTRIBUTE_ACCESSORS(ThisClass, MaxMana);
+	FAttributeChangedDelegate MaxManaChangedDelegate;
 
+	bool bOutOfHealth = false;
+	FAttributeChangedDelegate OutOfHealthDelegate;
+
+public:
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_BaseDamage, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData BaseDamage;
+	ATTRIBUTE_ACCESSORS(ThisClass, BaseDamage);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_BaseHeal, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData BaseHeal;
+	ATTRIBUTE_ACCESSORS(ThisClass, BaseHeal);
+	
 public:
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Damage;
-	ATTRIBUTE_ACCESSORS(UD1PrimarySet, Damage);
+	ATTRIBUTE_ACCESSORS(ThisClass, Damage);
+
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData Heal;
+	ATTRIBUTE_ACCESSORS(ThisClass, Heal);
 };

@@ -16,6 +16,7 @@ public class D1 : ModuleRules
 			"Core", 
 			"CoreUObject", 
 			"Engine", 
+			"NetCore",
 			"InputCore",
 			"EnhancedInput",
 			"Slate",

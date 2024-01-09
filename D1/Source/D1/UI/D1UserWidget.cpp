@@ -2,7 +2,6 @@
 
 #include "AbilitySystemGlobals.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
-#include "AbilitySystem/Attributes/D1AttributeSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1UserWidget)
 
@@ -28,15 +27,8 @@ void UD1UserWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 
-	if (UD1AbilitySystemComponent* D1ASC = Cast<UD1AbilitySystemComponent>(AbilitySystemComponent))
-	{
-		D1ASC->AbilityChangedDelegate.Remove(AbilityDelegateHandle);
-
-		for (const auto& Pair : AttributeDelegateHandles)
-		{
-			D1ASC->GetGameplayAttributeValueChangeDelegate(Pair.Key).Remove(Pair.Value);
-		}
-	}
+	UnbindAbilityChangedDelegate();
+	UnbindAttributeChangedDelegates();
 }
 
 void UD1UserWidget::BindAbilityChangedDelegate()
@@ -58,35 +50,21 @@ void UD1UserWidget::BindAbilityChangedDelegate()
 	}
 }
 
-void UD1UserWidget::BindAttributeChangedDelegates()
+void UD1UserWidget::UnbindAbilityChangedDelegate()
 {
-	BindUnitedAttributeChangedDelegates();
-	BindSeparatedAttributeChangedDelegates();
-}
-
-void UD1UserWidget::BindUnitedAttributeChangedDelegates()
-{
-	for (const auto& Pair : WatchingAttributeTagToSetClass)
+	if (UD1AbilitySystemComponent* D1ASC = Cast<UD1AbilitySystemComponent>(AbilitySystemComponent))
 	{
-		const FGameplayTag& AttributeTag = Pair.Key;
-		const TSubclassOf<UD1AttributeSet> AttributeSetClass = Pair.Value;
-		
-		if (const UD1AttributeSet* AttributeSet = Cast<UD1AttributeSet>(AbilitySystemComponent->GetAttributeSet(AttributeSetClass)))
-		{
-			if (const FGameplayAttribute* Attribute = AttributeSet->TagToAttribute.Find(AttributeTag))
-			{
-				OnAttributeChanged(AttributeTag, Attribute->GetNumericValue(AttributeSet));
-				FDelegateHandle Handle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(*Attribute).AddLambda([this, AttributeTag](const FOnAttributeChangeData& Data)
-				{
-					OnAttributeChanged(AttributeTag, Data.NewValue);
-				});
-				AttributeDelegateHandles.Emplace(*Attribute, Handle);
-			}
-		}
+		D1ASC->AbilityChangedDelegate.Remove(AbilityDelegateHandle);
+		AbilityDelegateHandle.Reset();
 	}
 }
 
-void UD1UserWidget::BindSeparatedAttributeChangedDelegates()
+void UD1UserWidget::BindAttributeChangedDelegates()
 {
-	// TODO: Remove Handles
+	
+}
+
+void UD1UserWidget::UnbindAttributeChangedDelegates()
+{
+	
 }
