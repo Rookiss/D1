@@ -41,35 +41,28 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Strength, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Strength;
 	ATTRIBUTE_ACCESSORS(UD1SecondarySet, Strength);
-	FAttributeChangedDelegate StrengthChangedDelegate;
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Vigor, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Vigor;
 	ATTRIBUTE_ACCESSORS(UD1SecondarySet, Vigor);
-	FAttributeChangedDelegate VigorChangedDelegate;
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Agility, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Agility;
 	ATTRIBUTE_ACCESSORS(UD1SecondarySet, Agility);
-	FAttributeChangedDelegate AgilityChangedDelegate;
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Dexterity, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Dexterity;
 	ATTRIBUTE_ACCESSORS(UD1SecondarySet, Dexterity);
-	FAttributeChangedDelegate DexterityChangedDelegate;
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Will, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Will;
 	ATTRIBUTE_ACCESSORS(UD1SecondarySet, Will);
-	FAttributeChangedDelegate WillChangedDelegate;
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Knowledge, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Knowledge;
 	ATTRIBUTE_ACCESSORS(UD1SecondarySet, Knowledge);
-	FAttributeChangedDelegate KnowledgeChangedDelegate;
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Resourcefulness, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Resourcefulness;
 	ATTRIBUTE_ACCESSORS(UD1SecondarySet, Resourcefulness);
-	FAttributeChangedDelegate ResourcefulnessChangedDelegate;
 };

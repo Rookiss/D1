@@ -2,6 +2,8 @@
 
 #include "AbilitySystemGlobals.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
+#include "AbilitySystem/Attributes/D1AttributeSet.h"
+#include "AbilitySystem/Attributes/D1PrimarySet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1UserWidget)
 
@@ -61,10 +63,43 @@ void UD1UserWidget::UnbindAbilityChangedDelegate()
 
 void UD1UserWidget::BindAttributeChangedDelegates()
 {
-	
+	for (const auto& Pair : WatchingAttributes)
+	{
+		const FGameplayTag& AttributeTag = Pair.Key;
+		const TSubclassOf<UD1AttributeSet> AttributeSetClass = Pair.Value;
+		
+		if (const UD1AttributeSet* AttributeSet = Cast<UD1AttributeSet>(AbilitySystemComponent->GetAttributeSet(AttributeSetClass)))
+		{
+			if (const auto& AttributeFunc = AttributeSet->GetAttributeFuncByTag(AttributeTag))
+			{
+				const FGameplayAttribute& Attribute = AttributeFunc();
+				OnAttributeChanged(AttributeTag, Attribute.GetNumericValue(AttributeSet));
+				FDelegateHandle Handle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attribute).AddLambda(
+				[this, AttributeTag](const FOnAttributeChangeData& Data)
+				{
+					OnAttributeChanged(AttributeTag, Data.NewValue);
+				});
+				AttributeDelegateHandles.Emplace(AttributeTag, AttributeSetClass, Handle);
+			}
+		}
+	}
 }
 
 void UD1UserWidget::UnbindAttributeChangedDelegates()
 {
-	
+	for (const auto& Tuple : AttributeDelegateHandles)
+	{
+		const FGameplayTag& AttributeTag = Tuple.Get<0>();
+		const TSubclassOf<UD1AttributeSet> AttributeSetClass = Tuple.Get<1>();
+		const FDelegateHandle& DelegateHandle = Tuple.Get<2>();
+		
+		if (const UD1AttributeSet* AttributeSet = Cast<UD1AttributeSet>(AbilitySystemComponent->GetAttributeSet(AttributeSetClass)))
+		{
+			if (const auto& AttributeFunc = AttributeSet->GetAttributeFuncByTag(AttributeTag))
+			{
+				AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeFunc()).Remove(DelegateHandle);
+			}
+		}
+	}
+	AttributeDelegateHandles.Empty();
 }

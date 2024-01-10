@@ -18,6 +18,9 @@ public:
 	FString GetDebugString() const;
 
 private:
+	friend struct FD1InventoryList;
+	friend class UD1InventoryManagerComponent;
+	
 	UPROPERTY()
 	TObjectPtr<UD1InventoryItemInstance> Instance = nullptr;
 
@@ -38,18 +41,13 @@ public:
 	FD1InventoryList(UActorComponent* InOwnerComponent) : OwnerComponent(InOwnerComponent) { }
 
 public:
+	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
+	
 	void PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize);
 	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
 
-	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
-	{
-		return FFastArraySerializer::FastArrayDeltaSerialize<FD1InventoryEntry, FD1InventoryList>(Entries, DeltaParams, *this);
-	}
-
-	UD1InventoryItemInstance* AddEntry(TSubclassOf<UD1InventoryItemDefinition> ItemClass, int32 StackCount);
-	void AddEntry(UD1InventoryItemInstance* Instance);
-
+	UD1InventoryItemInstance* AddEntry(TSubclassOf<UD1InventoryItemDefinition> ItemDef, int32 StackCount);
 	void RemoveEntry(UD1InventoryItemInstance* Instance);
 	
 public:
@@ -66,7 +64,10 @@ private:
 template<>
 struct TStructOpsTypeTraits<FD1InventoryList> : public TStructOpsTypeTraitsBase2<FD1InventoryList>
 {
-	enum { WithNetDeltaSerializer = true };
+	enum
+	{
+		WithNetDeltaSerializer = true
+	};
 };
 
 UCLASS(BlueprintType)
@@ -79,10 +80,12 @@ public:
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
+	virtual void ReadyForReplication() override;
+	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool CanAddItem(TSubclassOf<UD1InventoryItemDefinition> ItemDef, int32 StackCount = 1);
+	bool CanAddItemByDefinition(TSubclassOf<UD1InventoryItemDefinition> ItemDef, int32 StackCount = 1);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	UD1InventoryItemInstance* AddItemByDefinition(TSubclassOf<UD1InventoryItemDefinition> ItemDef, int32 StackCount = 1);
@@ -91,14 +94,14 @@ public:
 	void AddItemByInstance(UD1InventoryItemInstance* ItemInstance);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void RemoveItem(UD1InventoryItemInstance* ItemInstance);
+	void RemoveItemByInstance(UD1InventoryItemInstance* ItemInstance);
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintPure="false")	
+	UFUNCTION(BlueprintCallable, BlueprintPure="false")
 	TArray<UD1InventoryItemInstance*> GetAllItems() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UD1InventoryItemInstance* FindFirstItemStackByDefinition(TSubclassOf<UD1InventoryItemDefinition> ItemDef) const;
+	UD1InventoryItemInstance* FindFirstItemByDefinition(TSubclassOf<UD1InventoryItemDefinition> ItemDef) const;
 
 	int32 GetTotalItemCountByDefinition(TSubclassOf<UD1InventoryItemDefinition> ItemDef) const;
 	bool ConsumeItemsByDefinition(TSubclassOf<UD1InventoryItemDefinition> ItemDef, int32 Count);

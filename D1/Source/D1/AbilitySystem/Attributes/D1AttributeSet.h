@@ -1,7 +1,7 @@
 ﻿#pragma once
 
+#include "GameplayTags.h"
 #include "AttributeSet.h"
-#include "GameplayTagContainer.h"
 #include "D1AttributeSet.generated.h"
 
 class UD1AbilitySystemComponent;
@@ -12,7 +12,7 @@ class UD1AbilitySystemComponent;
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName)				\
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FAttributeChangedDelegate, AActor*, float, float);
+DECLARE_MULTICAST_DELEGATE(FOutOfHealthDelegate);
 
 UCLASS(Abstract)
 class UD1AttributeSet : public UAttributeSet
@@ -23,8 +23,9 @@ public:
 	UD1AttributeSet();
 	
 public:
+	TFunction<FGameplayAttribute()> GetAttributeFuncByTag(const FGameplayTag& AttributeTag) const;
 	UD1AbilitySystemComponent* GetD1AbilitySystemComponent() const;
 
-public:
-	TMap<FGameplayTag, float> TagToOldValue;
+protected:
+	TMap<FGameplayTag, TFunction<FGameplayAttribute()>> TagToAttributeFunc;
 };

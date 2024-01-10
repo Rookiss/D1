@@ -11,6 +11,11 @@ UD1PrimarySet::UD1PrimarySet()
 {
 	InitHealth(1.f);
 	InitMaxHealth(1.f);
+
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_Health, GetHealthAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MaxHealth, GetMaxHealthAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_Mana, GetManaAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MaxMana, GetMaxManaAttribute);
 }
 
 void UD1PrimarySet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -42,21 +47,12 @@ bool UD1PrimarySet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Dat
 			}
 		}
 	}
-
-	TagToOldValue.FindOrAdd(D1GameplayTags::Attribute_Primary_Health) = GetHealth();
-	TagToOldValue.FindOrAdd(D1GameplayTags::Attribute_Primary_MaxHealth) = GetMaxHealth();
-	TagToOldValue.FindOrAdd(D1GameplayTags::Attribute_Primary_Mana) = GetMana();
-	TagToOldValue.FindOrAdd(D1GameplayTags::Attribute_Primary_MaxMana) = GetMaxMana();
-	
 	return true;
 }
 
 void UD1PrimarySet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
-
-	const FGameplayEffectContextHandle& EffectContextHandle = Data.EffectSpec.GetEffectContext();
-	AActor* Instigator = EffectContextHandle.GetOriginalInstigator();
 	
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
@@ -75,7 +71,6 @@ void UD1PrimarySet::PostGameplayEffectExecute(const FGameplayEffectModCallbackDa
 	else if (Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
-		MaxHealthChangedDelegate.Broadcast(Instigator, TagToOldValue.FindOrAdd(D1GameplayTags::Attribute_Primary_MaxHealth), GetMaxHealth());
 	}
 	else if (Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
@@ -84,24 +79,11 @@ void UD1PrimarySet::PostGameplayEffectExecute(const FGameplayEffectModCallbackDa
 	else if (Data.EvaluatedData.Attribute == GetMaxManaAttribute())
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
-		MaxManaChangedDelegate.Broadcast(Instigator, TagToOldValue.FindOrAdd(D1GameplayTags::Attribute_Primary_MaxMana), GetMaxMana());
-	}
-
-	float OldHealth = TagToOldValue.FindOrAdd(D1GameplayTags::Attribute_Primary_Health);
-	if (GetHealth() != OldHealth)
-	{
-		HealthChangedDelegate.Broadcast(Instigator, OldHealth, GetHealth());
-	}
-
-	float OldMana = TagToOldValue.FindOrAdd(D1GameplayTags::Attribute_Primary_Mana);
-	if (GetMana() != OldMana)
-	{
-		ManaChangedDelegate.Broadcast(Instigator, OldMana, GetMana());
 	}
 
 	if (GetHealth() <= 0.f || bOutOfHealth == false)
 	{
-		OutOfHealthDelegate.Broadcast(Instigator, OldHealth, GetHealth());
+		OutOfHealthDelegate.Broadcast();
 	}
 	bOutOfHealth = (GetHealth() <= 0.f);
 }
@@ -174,39 +156,27 @@ void UD1PrimarySet::ClampAttribute(const FGameplayAttribute& Attribute, float& N
 void UD1PrimarySet::OnRep_Health(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Health, OldValue);
-
-	const float OldHealth = OldValue.GetCurrentValue();
-	const float CurrentHealth = GetHealth();
-	HealthChangedDelegate.Broadcast(nullptr, OldHealth, CurrentHealth);
 	
-	if (bOutOfHealth == false && CurrentHealth <= 0.f)
+	if (bOutOfHealth == false && GetHealth() <= 0.f)
 	{
-		OutOfHealthDelegate.Broadcast(nullptr, OldHealth, CurrentHealth);
+		OutOfHealthDelegate.Broadcast();
 	}
-	bOutOfHealth = (CurrentHealth <= 0.f);
+	bOutOfHealth = (GetHealth() <= 0.f);
 }
 
 void UD1PrimarySet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MaxHealth, OldValue);
-
-	MaxHealthChangedDelegate.Broadcast(nullptr, OldValue.GetCurrentValue(), GetMaxHealth());
 }
 
 void UD1PrimarySet::OnRep_Mana(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Mana, OldValue);
-
-	const float OldMana = OldValue.GetCurrentValue();
-	const float CurrentMana = GetMana();
-	ManaChangedDelegate.Broadcast(nullptr, OldMana, CurrentMana);
 }
 
 void UD1PrimarySet::OnRep_MaxMana(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MaxMana, OldValue);
-	
-	MaxManaChangedDelegate.Broadcast(nullptr, OldValue.GetCurrentValue(), GetMaxMana());
 }
 
 void UD1PrimarySet::OnRep_BaseDamage(const FGameplayAttributeData& OldValue)

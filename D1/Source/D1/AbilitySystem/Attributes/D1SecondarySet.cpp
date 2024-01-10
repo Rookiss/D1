@@ -7,7 +7,13 @@
 
 UD1SecondarySet::UD1SecondarySet()
 {
-	
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Secondary_Strength, GetStrengthAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Secondary_Vigor, GetVigorAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Secondary_Agility, GetAgilityAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Secondary_Dexterity, GetDexterityAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Secondary_Will, GetWillAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Secondary_Knowledge, GetKnowledgeAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Secondary_Resourcefulness, GetResourcefulnessAttribute);
 }
 
 void UD1SecondarySet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
