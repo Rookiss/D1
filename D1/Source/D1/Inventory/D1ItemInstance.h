@@ -1,24 +1,27 @@
 ﻿#pragma once
+
 #include "System/GameplayTagStack.h"
 
-#include "D1InventoryItemInstance.generated.h"
+#include "D1ItemInstance.generated.h"
 
 struct FGameplayTag;
-class UInventoryItemFragment;
-class UD1InventoryItemDefinition;
+class UD1ItemFragment;
 
 UCLASS(BlueprintType)
-class UD1InventoryItemInstance : public UObject
+class UD1ItemInstance : public UObject
 {
 	GENERATED_BODY()
 	
 public:
-	UD1InventoryItemInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UD1ItemInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void SetItemID(int32 InItemID) { ItemID = InItemID; }
+	
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void AddStatTagStack(const FGameplayTag& StatTag, int32 StackCount);
 
@@ -27,6 +30,9 @@ public:
 	
 public:
 	virtual bool IsSupportedForNetworking() const override { return true; }
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetItemID() { return ItemID; }
 	
 	UFUNCTION(BlueprintCallable)
 	int32 GetStackCountByTag(const FGameplayTag& StatTag) const;
@@ -35,18 +41,15 @@ public:
 	bool HasStatTag(const FGameplayTag& StatTag) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure="false", meta=(DeterminesOutputType=FragmentClass))
-	const UInventoryItemFragment* FindFragmentByClass(TSubclassOf<UInventoryItemFragment> FragmentClass) const;
+	const UD1ItemFragment* FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const;
 	
 	template <typename FragmentClass>
 	const FragmentClass* FindFragmentByClass() const { return (FragmentClass*)FindFragmentByClass(FragmentClass::StaticClass()); }
-	
-	TSubclassOf<UD1InventoryItemDefinition> GetItemDef() const { return ItemDef; }
-	void SetItemDef(TSubclassOf<UD1InventoryItemDefinition> InDef) { ItemDef = InDef; }
 
 private:
 	UPROPERTY(Replicated)
-	FGameplayTagStackContainer StatTags;
+	int32 ItemID = 0;
 	
 	UPROPERTY(Replicated)
-	TSubclassOf<UD1InventoryItemDefinition> ItemDef;
+	FGameplayTagStackContainer StatTags;
 };
