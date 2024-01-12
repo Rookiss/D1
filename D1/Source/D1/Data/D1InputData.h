@@ -23,7 +23,7 @@ UCLASS(BlueprintType, Const)
 class UD1InputData : public UDataAsset
 {
 	GENERATED_BODY()
-
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	const UInputAction* FindNativeInputActionForTag(const FGameplayTag& InputTag) const;

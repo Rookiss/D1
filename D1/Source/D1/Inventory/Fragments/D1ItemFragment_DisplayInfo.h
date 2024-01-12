@@ -3,7 +3,7 @@
 #include "D1ItemFragment.h"
 #include "D1ItemFragment_DisplayInfo.generated.h"
 
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, CollapseCategories)
 class UD1ItemFragment_DisplayInfo : public UD1ItemFragment
 {
 	GENERATED_BODY()
@@ -13,8 +13,11 @@ public:
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText DisplayName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText Description;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FSlateBrush IconBrush;
+	TObjectPtr<UTexture2D> IconTexture;
 };

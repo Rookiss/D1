@@ -5,7 +5,7 @@
 #include "Net/UnrealNetwork.h"
 #include "System/D1AssetManager.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1InventoryItemInstance)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemInstance)
 
 UD1ItemInstance::UD1ItemInstance(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -43,7 +43,7 @@ bool UD1ItemInstance::HasStatTag(const FGameplayTag& StatTag) const
 
 const UD1ItemFragment* UD1ItemInstance::FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const
 {
-	if (const UD1ItemData* ItemData = UD1AssetManager::GetAssetByName<UD1ItemData>("ItemData"))
+	if (const UD1ItemData* ItemData = UD1AssetManager::GetAssetByName<UD1ItemData>(UD1ItemData::ItemDataName))
 	{
 		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemID);
 		return ItemDef.FindFragmentByClass(FragmentClass);

@@ -90,22 +90,22 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void SetInventorySize(int32 NewSize);
 	
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool CanAddItem(int32 ItemID, int32 StackCount = 1);
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	UD1ItemInstance* AddItemByDefinition(TSubclassOf<UD1ItemDefinition> ItemDef, int32 StackCount = 1);
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void AddItemByInstance(UD1ItemInstance* ItemInstance);
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void RemoveItemByInstance(UD1ItemInstance* ItemInstance);
-
-public:
-	UFUNCTION(BlueprintCallable)
-	int32 GetInventorySize() { return InventorySize; }
-	
+// 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+// 	bool CanAddItem(int32 ItemID, int32 StackCount = 1);
+//
+// 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+// 	UD1ItemInstance* AddItemByDefinition(TSubclassOf<UD1ItemDefinition> ItemDef, int32 StackCount = 1);
+//
+// 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+// 	void AddItemByInstance(UD1ItemInstance* ItemInstance);
+//
+// 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+// 	void RemoveItemByInstance(UD1ItemInstance* ItemInstance);
+//
+// public:
+// 	UFUNCTION(BlueprintCallable)
+// 	int32 GetInventorySize() { return InventorySize; }
+// 	
 // 	UFUNCTION(BlueprintCallable, BlueprintPure)
 // 	UD1InventoryItemInstance* FindFirstItemByDefinition(TSubclassOf<UD1ItemDefinition> ItemDef) const;
 //

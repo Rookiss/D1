@@ -45,7 +45,7 @@ USTRUCT(BlueprintType)
 struct FD1AbilitySystemData_GrantedHandles
 {
 	GENERATED_BODY()
-
+	
 public:
 	void AddAbilitySpecHandle(const FGameplayAbilitySpecHandle& Handle);
 	void AddEffectHandle(const FActiveGameplayEffectHandle& Handle);
@@ -70,7 +70,7 @@ public:
 
 public:
 	void GiveToAbilitySystem(UD1AbilitySystemComponent* D1ASC, FD1AbilitySystemData_GrantedHandles* OutGrantedHandles, UObject* SourceObject = nullptr) const;
-
+	
 public:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FD1AbilitySystemData_Ability> Abilities;

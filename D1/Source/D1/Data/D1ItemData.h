@@ -15,9 +15,6 @@ public:
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 ID = 0;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FText DisplayName;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	TArray<TObjectPtr<UD1ItemFragment>> Fragments;
@@ -28,6 +25,9 @@ class UD1ItemData : public UDataAsset
 {
 	GENERATED_BODY()
 
+public:
+	static const FName ItemDataName;
+	
 public:
 	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
 

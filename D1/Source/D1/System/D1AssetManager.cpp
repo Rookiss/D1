@@ -252,7 +252,7 @@ void UD1AssetManager::LoadDataAssets()
 	if (AssetData)
 	{
 		LoadedAssetData = AssetData;
-		LoadSyncByLabel("Data");
+		LoadSyncByLabel("Preload");
 	}
 	else
 	{

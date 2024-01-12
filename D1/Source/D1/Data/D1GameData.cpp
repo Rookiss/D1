@@ -3,3 +3,5 @@
 #include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameData)
+
+const FName UD1GameData::GameDataName = FName("GameData");

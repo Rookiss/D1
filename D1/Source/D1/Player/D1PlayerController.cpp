@@ -37,7 +37,7 @@ void AD1PlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (const UD1InputData* InputData = UD1AssetManager::GetAssetByName<UD1InputData>(FName("InputData_Default")))
+	if (const UD1InputData* InputData = UD1AssetManager::GetAssetByName<UD1InputData>("InputData_Default"))
 	{
 		UD1InputComponent* D1InputComponent = CastChecked<UD1InputComponent>(InputComponent);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move, InputBindHandles);

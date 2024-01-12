@@ -1,6 +1,6 @@
 ﻿#include "D1ItemData.h"
 
-#include "D1LogChannels.h"
+#include "EditorDialogLibrary.h"
 #include "Inventory/Fragments/D1ItemFragment.h"
 #include "UObject/ObjectSaveContext.h"
 
@@ -21,28 +21,41 @@ const UD1ItemFragment* FD1ItemDefinition::FindFragmentByClass(TSubclassOf<UD1Ite
 	return nullptr;
 }
 
+const FName UD1ItemData::ItemDataName = FName("ItemData");
+
 void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);
-
+	
 	ItemIDToDef.Empty();
 
+	ItemNameToDef.ValueSort([](const FD1ItemDefinition& A, const FD1ItemDefinition& B)
+	{
+		return A.ID < B.ID;
+	});
+	
+	FString ErrorMsg;
 	for (const auto& Pair : ItemNameToDef)
 	{
 		const FString& Name = Pair.Key;
 		const FD1ItemDefinition& ItemDef = Pair.Value;
 		const int32 ID = ItemDef.ID;
-		if (Name.IsEmpty() == false)
+		
+		if (ID <= 0 || ItemIDToDef.Contains(ID))
 		{
-			if (ID <= 0 || ItemIDToDef.Contains(ID))
-			{
-				UE_LOG(LogD1, Error, TEXT("Invalid ID or Duplicate ID [%d]"), ID);
-			}
-			else
-			{
-				ItemIDToDef.Emplace(ItemDef.ID, ItemDef);
-			}
+			ErrorMsg.Append(FString::Printf(TEXT("Invalid ID [Name : %s] [ID : %d]\n"), *Name, ID));
+			continue;
 		}
+
+		// TODO: Check Fragments
+		
+		ItemIDToDef.Emplace(ItemDef.ID, ItemDef);
+	}
+
+	if (ErrorMsg.IsEmpty() == false)
+	{
+		UEditorDialogLibrary::ShowMessage(FText::FromString(TEXT("Invalid Data Asset")), FText::FromString(ErrorMsg),
+			EAppMsgType::Ok, EAppReturnType::Ok, EAppMsgCategory::Error);
 	}
 }
 

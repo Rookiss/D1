@@ -5,12 +5,19 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AssetData)
 
+const FName UD1AssetData::AssetDataName = FName("AssetData");
+
 void UD1AssetData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
 	Super::PreSave(ObjectSaveContext);
 
 	AssetNameToPath.Empty();
 	AssetLabelToSet.Empty();
+
+	AssetGroupNameToSet.KeySort([](const FName& A, const FName& B)
+	{
+		return (A.Compare(B) < 0);
+	});
 	
 	for (const auto& Pair : AssetGroupNameToSet)
 	{

@@ -1,6 +1,6 @@
 ﻿#include "D1InputData.h"
 
-#include "..\D1LogChannels.h"
+#include "D1LogChannels.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1InputData)
 
