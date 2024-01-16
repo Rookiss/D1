@@ -1,7 +1,7 @@
 ﻿#include "D1Monster.h"
 
 #include "AbilitySystem/D1AbilitySystemComponent.h"
-#include "AbilitySystem/Attributes/D1PrimarySet.h"
+#include "AbilitySystem/Attributes/D1MonsterSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1Monster)
 
@@ -10,11 +10,11 @@ AD1Monster::AD1Monster(const FObjectInitializer& ObjectInitializer)
 {
 	NetUpdateFrequency = 100.f;
 
-	D1ASC = CreateDefaultSubobject<UD1AbilitySystemComponent>("D1AbilitySystemComponent");
-	D1ASC->SetIsReplicated(true);
-	D1ASC->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+	D1AbilitySystemComponent = CreateDefaultSubobject<UD1AbilitySystemComponent>("D1AbilitySystemComponent");
+	D1AbilitySystemComponent->SetIsReplicated(true);
+	D1AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	
-	PrimarySet = CreateDefaultSubobject<UD1PrimarySet>("PrimarySet");
+	MonsterSet = CreateDefaultSubobject<UD1MonsterSet>("D1MonsterSet");
 }
 
 void AD1Monster::BeginPlay()
@@ -33,10 +33,10 @@ void AD1Monster::InitAbilityActorInfo()
 {
 	Super::InitAbilityActorInfo();
 
-	D1ASC->InitAbilityActorInfo(this, this);
+	D1AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
-const UD1PrimarySet* AD1Monster::GetPrimarySet() const
+const UD1MonsterSet* AD1Monster::GetPrimarySet() const
 {
-	return PrimarySet;
+	return MonsterSet;
 }

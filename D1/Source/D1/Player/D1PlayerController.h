@@ -2,6 +2,7 @@
 
 #include "D1PlayerController.generated.h"
 
+class UD1InventoryManagerComponent;
 struct FInputActionValue;
 struct FGameplayTag;
 class AD1PlayerState;
@@ -29,6 +30,10 @@ private:
 	
 	void ResetInput();
 	
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
+
 private:
 	TArray<uint32> InputBindHandles;
 };

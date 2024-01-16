@@ -2,6 +2,9 @@
 .vs/
 .idea/
 
+# Blueprint-Assist Cache files
+Plugins/BlueprintAssist/NodeSizeCache/*
+
 # Compiled Object files
 *.slo
 *.lo

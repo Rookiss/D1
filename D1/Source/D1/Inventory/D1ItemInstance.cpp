@@ -1,9 +1,7 @@
 ﻿#include "D1ItemInstance.h"
 
-#include "Data/D1ItemData.h"
-#include "Fragments/D1ItemFragment.h"
+#include "Fragments/D1ItemFragment_Stackable.h"
 #include "Net/UnrealNetwork.h"
-#include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemInstance)
 
@@ -19,6 +17,11 @@ void UD1ItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	DOREPLIFETIME(ThisClass, ItemID);
 	DOREPLIFETIME(ThisClass, StatTags);
+}
+
+void UD1ItemInstance::SetItemID(int32 InItemID)
+{
+	ItemID = InItemID;
 }
 
 void UD1ItemInstance::AddStatTagStack(const FGameplayTag& StatTag, int32 StackCount)
@@ -41,12 +44,7 @@ bool UD1ItemInstance::HasStatTag(const FGameplayTag& StatTag) const
 	return StatTags.ContainsTag(StatTag);
 }
 
-const UD1ItemFragment* UD1ItemInstance::FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const
+FString UD1ItemInstance::GetDebugString() const
 {
-	if (const UD1ItemData* ItemData = UD1AssetManager::GetAssetByName<UD1ItemData>(UD1ItemData::ItemDataName))
-	{
-		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemID);
-		return ItemDef.FindFragmentByClass(FragmentClass);
-	}
-	return nullptr;
+	return FString::Printf(TEXT("[ID : %d] : [%s]"), ItemID, *StatTags.GetDebugString());
 }

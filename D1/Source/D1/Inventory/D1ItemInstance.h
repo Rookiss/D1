@@ -1,11 +1,12 @@
 ﻿#pragma once
 
+#include "Data/D1ItemData.h"
+#include "System/D1AssetManager.h"
 #include "System/GameplayTagStack.h"
 
 #include "D1ItemInstance.generated.h"
 
 struct FGameplayTag;
-class UD1ItemFragment;
 
 UCLASS(BlueprintType)
 class UD1ItemInstance : public UObject
@@ -15,41 +16,43 @@ class UD1ItemInstance : public UObject
 public:
 	UD1ItemInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-public:
+protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void SetItemID(int32 InItemID) { ItemID = InItemID; }
+	void SetItemID(int32 InItemID);
 	
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void AddStatTagStack(const FGameplayTag& StatTag, int32 StackCount);
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void RemoveStatTagStack(const FGameplayTag& StatTag, int32 StackCount);
 	
 public:
 	virtual bool IsSupportedForNetworking() const override { return true; }
 
-	UFUNCTION(BlueprintCallable)
-	int32 GetItemID() { return ItemID; }
-	
-	UFUNCTION(BlueprintCallable)
+	int32 GetItemID() const { return ItemID; }
 	int32 GetStackCountByTag(const FGameplayTag& StatTag) const;
-
-	UFUNCTION(BlueprintCallable)
 	bool HasStatTag(const FGameplayTag& StatTag) const;
+	FString GetDebugString() const;
 
-	UFUNCTION(BlueprintCallable, BlueprintPure="false", meta=(DeterminesOutputType=FragmentClass))
-	const UD1ItemFragment* FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const;
-	
 	template <typename FragmentClass>
-	const FragmentClass* FindFragmentByClass() const { return (FragmentClass*)FindFragmentByClass(FragmentClass::StaticClass()); }
-
+	const FragmentClass* FindFragmentByClass() const;
+	
 private:
+	friend struct FD1InventoryList;
+	
 	UPROPERTY(Replicated)
 	int32 ItemID = 0;
 	
 	UPROPERTY(Replicated)
 	FGameplayTagStackContainer StatTags;
 };
+
+template <typename FragmentClass>
+const FragmentClass* UD1ItemInstance::FindFragmentByClass() const
+{
+	if (const UD1ItemData* ItemData = UD1AssetManager::GetItemData())
+	{
+		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemID);
+		return ItemDef.FindFragmentByClass<FragmentClass>();
+	}
+	return nullptr;
+}

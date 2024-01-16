@@ -2,15 +2,15 @@
 
 #include "AbilitySystemComponent.h"
 #include "D1AttributeSet.h"
-#include "D1PrimarySet.generated.h"
+#include "D1MonsterSet.generated.h"
 
 UCLASS(BlueprintType)
-class UD1PrimarySet : public UD1AttributeSet
+class UD1MonsterSet : public UD1AttributeSet
 {
 	GENERATED_BODY()
 	
 public:
-	UD1PrimarySet();
+	UD1MonsterSet();
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

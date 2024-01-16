@@ -34,13 +34,13 @@ void AD1Player::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	// GetMesh()->SetSkeletalMesh(UD1AssetManager::GetAssetByName<USkeletalMesh>("Mannequin_ThirdPerson"));
-	// GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-	// GetMesh()->SetAnimation(UD1AssetManager::GetAssetByName<UAnimSequence>("ThirdPerson_Idle"));
-	//
-	// FirstPersonMesh->SetSkeletalMesh(UD1AssetManager::GetAssetByName<USkeletalMesh>("Mannequin_FirstPerson"));
-	// FirstPersonMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-	// FirstPersonMesh->SetAnimation(UD1AssetManager::GetAssetByName<UAnimSequence>("FirstPerson_Idle"));
+	GetMesh()->SetSkeletalMesh(UD1AssetManager::GetAssetByName<USkeletalMesh>("Mannequin_ThirdPerson"));
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+	GetMesh()->SetAnimation(UD1AssetManager::GetAssetByName<UAnimSequence>("ThirdPerson_Idle"));
+	
+	FirstPersonMeshComponent->SetSkeletalMesh(UD1AssetManager::GetAssetByName<USkeletalMesh>("Mannequin_FirstPerson"));
+	FirstPersonMeshComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+	FirstPersonMeshComponent->SetAnimation(UD1AssetManager::GetAssetByName<UAnimSequence>("FirstPerson_Idle"));
 }
 
 void AD1Player::PossessedBy(AController* NewController)
@@ -72,8 +72,8 @@ void AD1Player::InitAbilityActorInfo()
 
 	if (AD1PlayerState* D1PS = GetPlayerState<AD1PlayerState>())
 	{
-		D1ASC = Cast<UD1AbilitySystemComponent>(D1PS->GetAbilitySystemComponent());
-		check(D1ASC);
-		D1ASC->InitAbilityActorInfo(D1PS, this);
+		D1AbilitySystemComponent = Cast<UD1AbilitySystemComponent>(D1PS->GetAbilitySystemComponent());
+		check(D1AbilitySystemComponent);
+		D1AbilitySystemComponent->InitAbilityActorInfo(D1PS, this);
 	}
 }

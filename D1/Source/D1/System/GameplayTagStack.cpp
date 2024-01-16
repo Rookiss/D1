@@ -9,6 +9,38 @@ FString FGameplayTagStack::GetDebugString() const
 	return FString::Printf(TEXT("[%s x %d]"), *Tag.ToString(), StackCount);
 }
 
+bool FGameplayTagStackContainer::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
+{
+	return FFastArraySerializer::FastArrayDeltaSerialize<FGameplayTagStack, FGameplayTagStackContainer>(Stacks, DeltaParams, *this);
+}
+
+void FGameplayTagStackContainer::PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize)
+{
+	for (int32 Index : RemovedIndices)
+	{
+		const FGameplayTag& Tag = Stacks[Index].Tag;
+		TagToCount.Remove(Tag);
+	}
+}
+
+void FGameplayTagStackContainer::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize)
+{
+	for (int32 Index : AddedIndices)
+	{
+		const FGameplayTagStack& Stack = Stacks[Index];
+		TagToCount.Add(Stack.Tag, Stack.StackCount);
+	}
+}
+
+void FGameplayTagStackContainer::PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize)
+{
+	for (int32 Index : ChangedIndices)
+	{
+		const FGameplayTagStack& Stack = Stacks[Index];
+		TagToCount[Stack.Tag] = Stack.StackCount;
+	}
+}
+
 void FGameplayTagStackContainer::AddStack(const FGameplayTag& Tag, int32 StackCount)
 {
 	if (Tag.IsValid() == false)
@@ -76,34 +108,12 @@ void FGameplayTagStackContainer::RemoveStack(const FGameplayTag& Tag, int32 Stac
 	}
 }
 
-bool FGameplayTagStackContainer::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
+FString FGameplayTagStackContainer::GetDebugString() const
 {
-	return FFastArraySerializer::FastArrayDeltaSerialize<FGameplayTagStack, FGameplayTagStackContainer>(Stacks, DeltaParams, *this);
-}
-
-void FGameplayTagStackContainer::PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize)
-{
-	for (int32 Index : RemovedIndices)
+	FString Result;
+	for (const auto& Pair : TagToCount)
 	{
-		const FGameplayTag& Tag = Stacks[Index].Tag;
-		TagToCount.Remove(Tag);
+		Result.Append(FString::Printf(TEXT("(%s:%d)"), *Pair.Key.ToString(), Pair.Value));
 	}
-}
-
-void FGameplayTagStackContainer::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize)
-{
-	for (int32 Index : AddedIndices)
-	{
-		const FGameplayTagStack& Stack = Stacks[Index];
-		TagToCount.Add(Stack.Tag, Stack.StackCount);
-	}
-}
-
-void FGameplayTagStackContainer::PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize)
-{
-	for (int32 Index : ChangedIndices)
-	{
-		const FGameplayTagStack& Stack = Stacks[Index];
-		TagToCount[Stack.Tag] = Stack.StackCount;
-	}
+	return Result;
 }

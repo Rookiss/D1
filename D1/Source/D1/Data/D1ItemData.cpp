@@ -6,23 +6,6 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemData)
 
-const UD1ItemFragment* FD1ItemDefinition::FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const
-{
-	if (FragmentClass)
-	{
-		for (UD1ItemFragment* Fragment : Fragments)
-		{
-			if (Fragment && Fragment->IsA(FragmentClass))
-			{
-				return Fragment;
-			}
-		}
-	}
-	return nullptr;
-}
-
-const FName UD1ItemData::ItemDataName = FName("ItemData");
-
 void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);

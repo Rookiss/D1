@@ -4,8 +4,8 @@
 #include "GameFramework/PlayerState.h"
 #include "D1PlayerState.generated.h"
 
-class UD1SecondarySet;
-class UD1PrimarySet;
+class UD1PlayerSet;
+class UD1MonsterSet;
 class UD1AbilitySystemComponent;
 
 UCLASS()
@@ -19,16 +19,12 @@ public:
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
 	UD1AbilitySystemComponent* GetD1AbilitySystemComponent() const;
-	const UD1PrimarySet* GetPrimarySet() const;
-	const UD1SecondarySet* GetSecondarySet() const;
+	const UD1PlayerSet* GetPlayerSet() const;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UD1AbilitySystemComponent> D1ASC;
-	
-	UPROPERTY()
-	TObjectPtr<const UD1PrimarySet> PrimarySet;
+	TObjectPtr<UD1AbilitySystemComponent> D1AbilitySystemComponent;
 
 	UPROPERTY()
-	TObjectPtr<const UD1SecondarySet> SecondarySet;
+	TObjectPtr<const UD1PlayerSet> D1PlayerSet;
 };

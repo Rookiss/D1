@@ -8,9 +8,6 @@ UCLASS(BlueprintType, Const)
 class UD1GameData : public UDataAsset
 {
 	GENERATED_BODY()
-
-public:
-	static const FName GameDataName;
 	
 public:
 	UPROPERTY(EditDefaultsOnly)

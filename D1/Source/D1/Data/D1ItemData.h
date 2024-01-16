@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Inventory/Fragments/D1ItemFragment.h"
 
 #include "D1ItemData.generated.h"
 
@@ -10,23 +11,46 @@ struct FD1ItemDefinition
 	GENERATED_BODY()
 
 public:
-	const UD1ItemFragment* FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const;
+	template <typename FragmentClass>
+	const FragmentClass* FindFragmentByClass() const;
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 ID = 0;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FIntPoint SlotSize = FIntPoint::ZeroValue;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText DisplayName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText Description;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UTexture2D> IconTexture;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	TArray<TObjectPtr<UD1ItemFragment>> Fragments;
 };
 
+template <typename FragmentClass>
+const FragmentClass* FD1ItemDefinition::FindFragmentByClass() const
+{
+	for (UD1ItemFragment* Fragment : Fragments)
+	{
+		if (Fragment && Fragment->IsA(FragmentClass::StaticClass()))
+		{
+			return Cast<FragmentClass>(Fragment);
+		}
+	}
+	return nullptr;
+}
+
 UCLASS(BlueprintType, Const)
 class UD1ItemData : public UDataAsset
 {
 	GENERATED_BODY()
-
-public:
-	static const FName ItemDataName;
 	
 public:
 	virtual void PreSave(FObjectPreSaveContext SaveContext) override;

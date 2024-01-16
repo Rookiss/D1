@@ -3,7 +3,7 @@
 #include "AbilitySystemGlobals.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/D1AttributeSet.h"
-#include "AbilitySystem/Attributes/D1PrimarySet.h"
+#include "AbilitySystem/Attributes/D1MonsterSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1UserWidget)
 
@@ -20,6 +20,7 @@ void UD1UserWidget::NativeConstruct()
 	if (UAbilitySystemComponent* ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwningPlayerPawn()))
 	{
 		AbilitySystemComponent = ASC;
+		
 		BindAbilityChangedDelegate();
 		BindAttributeChangedDelegates();
 	}
@@ -35,6 +36,9 @@ void UD1UserWidget::NativeDestruct()
 
 void UD1UserWidget::BindAbilityChangedDelegate()
 {
+	if (bShouldBindAbilityDelegate == false)
+		return;
+	
 	if (UD1AbilitySystemComponent* D1ASC = Cast<UD1AbilitySystemComponent>(AbilitySystemComponent))
 	{
 		for (const FGameplayAbilitySpec& AbilitySpec : D1ASC->GetActivatableAbilities())
@@ -54,6 +58,9 @@ void UD1UserWidget::BindAbilityChangedDelegate()
 
 void UD1UserWidget::UnbindAbilityChangedDelegate()
 {
+	if (bShouldBindAbilityDelegate == false)
+		return;
+	
 	if (UD1AbilitySystemComponent* D1ASC = Cast<UD1AbilitySystemComponent>(AbilitySystemComponent))
 	{
 		D1ASC->AbilityChangedDelegate.Remove(AbilityDelegateHandle);
@@ -63,6 +70,9 @@ void UD1UserWidget::UnbindAbilityChangedDelegate()
 
 void UD1UserWidget::BindAttributeChangedDelegates()
 {
+	if (bShouldBindAttributeDelegate == false)
+		return;
+	
 	for (const auto& Pair : WatchingAttributes)
 	{
 		const FGameplayTag& AttributeTag = Pair.Key;
@@ -87,6 +97,9 @@ void UD1UserWidget::BindAttributeChangedDelegates()
 
 void UD1UserWidget::UnbindAttributeChangedDelegates()
 {
+	if (bShouldBindAttributeDelegate == false)
+		return;
+	
 	for (const auto& Tuple : AttributeDelegateHandles)
 	{
 		const FGameplayTag& AttributeTag = Tuple.Get<0>();
@@ -102,4 +115,14 @@ void UD1UserWidget::UnbindAttributeChangedDelegates()
 		}
 	}
 	AttributeDelegateHandles.Empty();
+}
+
+void UD1UserWidget::OnAbilityChanged_Implementation(bool bIsGiven, const FGameplayTag& AbilityTag)
+{
+	
+}
+
+void UD1UserWidget::OnAttributeChanged_Implementation(const FGameplayTag& AttributeTag, float NewValue)
+{
+	
 }

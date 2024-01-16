@@ -12,7 +12,7 @@
 
 FString FD1InventoryEntry::GetDebugString() const
 {
-	return FString::Printf(TEXT("[ID : %d] x %d"), Instance->GetItemID(), StackCount);
+	return FString::Printf(TEXT("[%s] [Pos : (%d,%d)]"), *Instance->GetDebugString(), Position.X, Position.Y);
 }
 
 bool FD1InventoryList::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
@@ -22,147 +22,280 @@ bool FD1InventoryList::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
 
 void FD1InventoryList::PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize)
 {
-	for (int32 Index : RemovedIndices)
+	if (OwnerComponent->OnInventoryEntryChanged.IsBound())
 	{
-		FD1InventoryEntry& Entry = Entries[Index];
-		// TODO: Broadcast(Entry.StackCount -> 0)
-		Entry.LastObservedCount = 0;
+		for (int32 Index : RemovedIndices)
+		{
+			const FD1InventoryEntry& Entry = Entries[Index];
+			OwnerComponent->OnInventoryEntryChanged.Broadcast(Entry.Position, Entry.Instance, 0);
+		}
 	}
 }
 
 void FD1InventoryList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize)
 {
-	for (int32 Index : AddedIndices)
+	if (OwnerComponent->OnInventoryEntryChanged.IsBound())
 	{
-		FD1InventoryEntry& Entry = Entries[Index];
-		// TODO: Broadcast(0 -> Entry.StackCount)
-		Entry.LastObservedCount = Entry.StackCount;
+		for (int32 Index : AddedIndices)
+		{
+			const FD1InventoryEntry& Entry = Entries[Index];
+			OwnerComponent->OnInventoryEntryChanged.Broadcast(Entry.Position, Entry.Instance, Entry.Count);
+		}
 	}
 }
 
 void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize)
 {
-	for (int32 Index : ChangedIndices)
+	if (OwnerComponent->OnInventoryEntryChanged.IsBound())
 	{
-		FD1InventoryEntry& Entry = Entries[Index];
-		check(Entry.LastObservedCount != INDEX_NONE);
-		// TODO: Broadcast(Entry.LastObservedCount -> Entry.StackCount)
-		Entry.LastObservedCount = Entry.StackCount;
+		for (int32 Index : ChangedIndices)
+		{
+			const FD1InventoryEntry& Entry = Entries[Index];
+			OwnerComponent->OnInventoryEntryChanged.Broadcast(Entry.Position, Entry.Instance, Entry.Count);
+		}
 	}
 }
 
-UD1ItemInstance* FD1InventoryList::TryAddItem(int32 ItemID, int32 StackCount)
+bool FD1InventoryList::TryAddItem(int32 ItemID, int32 Count)
 {
+	// @TODO: Check Max Stack Count
+	if (ItemID <= 0 || Count <= 0)
+		return false;
+	
 	check(OwnerComponent);
 	AActor* OwningActor = OwnerComponent->GetOwner();
 	check(OwningActor->HasAuthority());
 
-	const UD1ItemData* ItemData = UD1AssetManager::GetAssetByName<UD1ItemData>(UD1ItemData::ItemDataName);
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
 	check(ItemData);
 
 	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemID);
-	if (ItemDef.FindFragmentByClass(UD1ItemFragment_Stackable::StaticClass()))
+	if (ItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>())
 	{
 		for (FD1InventoryEntry& Entry : Entries)
 		{
 			if (Entry.Instance->GetItemID() == ItemID)
 			{
-				Entry.StackCount += StackCount;
+				Entry.Count += Count;
 				MarkItemDirty(Entry);
-				return Entry.Instance;
+				return true;
 			}
 		}
 	}
-
-	if (Entries.Num() >= InventorySize)
-	{
-		return nullptr;
-	}
 	
-	FD1InventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
-	NewEntry.Instance = NewObject<UD1ItemInstance>(OwnerComponent->GetOwner());
-	NewEntry.Instance->SetItemID(ItemID);
-
-	for (const UD1ItemFragment* Fragment : ItemDef.Fragments)
+	const FIntPoint& SlotSize = ItemDef.SlotSize;
+	TArray<TArray<bool>>& SlotChecks = OwnerComponent->GetSlotChecks();
+	for (int32 Y = 0; Y < SlotChecks.Num(); Y++)
 	{
-		if (Fragment)
+		for (int32 X = 0; X < SlotChecks[Y].Num(); X++)
 		{
-			Fragment->OnInstanceCreated(NewEntry.Instance);
+			if (SlotChecks[Y][X])
+				continue;
+
+			FIntPoint Position = FIntPoint(X, Y);
+			if (OwnerComponent->CanAddItemByPosition(Position, SlotSize))
+			{
+				OwnerComponent->MarkSlotChecks(true, Position, SlotSize);
+				
+				FD1InventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
+				NewEntry.Instance = NewObject<UD1ItemInstance>(OwnerComponent->GetOwner());
+				NewEntry.Instance->SetItemID(ItemID);
+				NewEntry.Count = Count;
+				NewEntry.Position = Position;
+
+				for (const UD1ItemFragment* Fragment : ItemDef.Fragments)
+				{
+					if (Fragment)
+					{
+						Fragment->OnInstanceCreated(NewEntry.Instance);
+					}
+				}
+				
+				MarkItemDirty(NewEntry);
+				OwnerComponent->AddReplicatedSubObject(NewEntry.Instance);
+				return true;
+			}
 		}
 	}
-	
-	NewEntry.StackCount = StackCount;
-	MarkItemDirty(NewEntry);
-	return NewEntry.Instance;
+	return false;
 }
 
-UD1ItemInstance* FD1InventoryList::TryAddItem(UD1ItemInstance* Instance, int32 StackCount)
+bool FD1InventoryList::TryAddItem(UD1ItemInstance* Instance, int32 Count)
 {
+	// @TODO: Check Max Stack Count
+	if (Instance == nullptr || Count <= 0)
+		return false;
+	
 	check(OwnerComponent);
 	AActor* OwningActor = OwnerComponent->GetOwner();
 	check(OwningActor->HasAuthority());
 
-	const UD1ItemData* ItemData = UD1AssetManager::GetAssetByName<UD1ItemData>(UD1ItemData::ItemDataName);
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
 	check(ItemData);
-	
+
 	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(Instance->GetItemID());
-	if (ItemDef.FindFragmentByClass(UD1ItemFragment_Stackable::StaticClass()))
+	if (ItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>())
 	{
 		for (FD1InventoryEntry& Entry : Entries)
 		{
 			if (Entry.Instance->GetItemID() == Instance->GetItemID())
 			{
-				Entry.StackCount += StackCount;
+				Entry.Count += Count;
 				MarkItemDirty(Entry);
-				return Entry.Instance;
+				return true;
 			}
 		}
 	}
-
-	if (Entries.Num() >= InventorySize)
+	
+	const FIntPoint& SlotSize = ItemDef.SlotSize;
+	TArray<TArray<bool>>& SlotChecks = OwnerComponent->GetSlotChecks();
+	for (int32 Y = 0; Y < SlotChecks.Num(); Y++)
 	{
-		return nullptr;
-	}
+		for (int32 X = 0; X < SlotChecks[Y].Num(); X++)
+		{
+			if (SlotChecks[Y][X])
+				continue;
 
-	FD1InventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
-	NewEntry.Instance = Instance;
-	NewEntry.StackCount = StackCount;
-	MarkItemDirty(NewEntry);
-	return NewEntry.Instance;
+			FIntPoint Position = FIntPoint(X, Y);
+			if (OwnerComponent->CanAddItemByPosition(Position, SlotSize))
+			{
+				OwnerComponent->MarkSlotChecks(true, Position, SlotSize);
+				
+				FD1InventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
+				NewEntry.Instance = Instance;
+				NewEntry.Count = Count;
+				NewEntry.Position = Position;
+				
+				MarkItemDirty(NewEntry);
+				OwnerComponent->AddReplicatedSubObject(NewEntry.Instance);
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool FD1InventoryList::TryRemoveItem(UD1ItemInstance* Instance, int32 StackCount)
+bool FD1InventoryList::TryRemoveItem(int32 ItemID, int32 Count)
 {
-	// for (auto It = Entries.CreateIterator(); It; ++It)
-	// {
-	// 	FD1InventoryEntry& Entry = *It;
-	// 	if (Entry.Instance == Instance)
-	// 	{
-	// 		if (Entry.StackCount > StackCount)
-	// 		{
-	// 			Entry.StackCount -= StackCount;
-	// 			MarkItemDirty(Entry);
-	// 		}
-	// 		else if (Entry.StackCount == StackCount)
-	// 		{
-	// 			It.RemoveCurrent();
-	// 			MarkArrayDirty();
-	// 		}
-	// 		else
-	// 		{
-	// 			UE_LOG(LogD1, Fatal, TEXT("Lack of StackCount : [%d] - [%d]"), Entry.StackCount, StackCount);
-	// 		}
-	// 		break;
-	// 	}
-	// }
+	// @TODO: Check Max Stack Count
+	if (ItemID <= 0 || Count <= 0)
+		return false;
 
+	check(OwnerComponent);
+	AActor* OwningActor = OwnerComponent->GetOwner();
+	check(OwningActor->HasAuthority());
+	
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	check(ItemData);
+
+	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemID);
+	if (ItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>() == nullptr)
+		return false;
+
+	if (Count > GetTotalCountByID(ItemID))
+		return false;
+	
+	for (auto It = Entries.CreateIterator(); It; ++It)
+	{
+		FD1InventoryEntry& Entry = *It;
+		if (Entry.Instance->GetItemID() == ItemID)
+		{
+			if (Entry.Count > Count)
+			{
+				Entry.Count -= Count;
+				MarkItemDirty(Entry);
+				break;
+			}
+			else
+			{
+				Count -= Entry.Count;
+				OwnerComponent->MarkSlotChecks(false, Entry.Position, ItemDef.SlotSize);
+				OwnerComponent->RemoveReplicatedSubObject(Entry.Instance);
+				It.RemoveCurrent();
+				MarkArrayDirty();
+				
+				if (Count <= 0)
+					break;
+			}
+		}
+	}
 	return true;
+}
+
+bool FD1InventoryList::TryRemoveItem(UD1ItemInstance* Instance, int32 Count)
+{
+	// @TODO: Check Max Stack Count
+	if (Instance == nullptr)
+		return false;
+	
+	check(OwnerComponent);
+	AActor* OwningActor = OwnerComponent->GetOwner();
+	check(OwningActor->HasAuthority());
+
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	check(ItemData);
+
+	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(Instance->GetItemID());
+	
+	if (Count > GetTotalCountByInstance(Instance))
+		return false;
+	
+	for (auto It = Entries.CreateIterator(); It; ++It)
+	{
+		FD1InventoryEntry& Entry = *It;
+		if (Entry.Instance == Instance)
+		{
+			if (Entry.Count > Count)
+			{
+				Entry.Count -= Count;
+				MarkItemDirty(Entry);
+				break;
+			}
+			else
+			{
+				Count -= Entry.Count;
+				OwnerComponent->MarkSlotChecks(false, Entry.Position, ItemDef.SlotSize);
+				OwnerComponent->RemoveReplicatedSubObject(Entry.Instance);
+				It.RemoveCurrent();
+				MarkArrayDirty();
+				
+				if (Count <= 0)
+					break;
+			}
+		}
+	}
+	return true;
+}
+
+int32 FD1InventoryList::GetTotalCountByID(int32 ItemID)
+{
+	int32 Result = 0;
+	for (FD1InventoryEntry& Entry : Entries)
+	{
+		if (Entry.Instance->GetItemID() == ItemID)
+		{
+			Result += Entry.Count;
+		}
+	}
+	return Result;
+}
+
+int32 FD1InventoryList::GetTotalCountByInstance(UD1ItemInstance* Instance)
+{
+	int32 Result = 0;
+	for (FD1InventoryEntry& Entry : Entries)
+	{
+		if (Entry.Instance == Instance)
+		{
+			Result += Entry.Count;
+		}
+	}
+	return Result;
 }
 
 UD1InventoryManagerComponent::UD1InventoryManagerComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
+	, InventoryList(this)
 {
     SetIsReplicatedByDefault(true);
 }
@@ -172,6 +305,7 @@ void UD1InventoryManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, InventoryList);
+	DOREPLIFETIME(ThisClass, InventorySize);
 }
 
 void UD1InventoryManagerComponent::ReadyForReplication()
@@ -205,21 +339,82 @@ bool UD1InventoryManagerComponent::ReplicateSubobjects(UActorChannel* Channel, F
 	return WroteSomething;
 }
 
-void UD1InventoryManagerComponent::SetInventorySize(int32 NewSize)
+bool UD1InventoryManagerComponent::TryExpandInventorySize(const FIntPoint& NewSize)
 {
+	if (InventorySize.X > NewSize.X || InventorySize.Y > NewSize.Y)
+		return false;
 	
+	InventorySize = NewSize;
+	
+	SlotChecks.SetNumZeroed(InventorySize.Y);
+	for (int32 Y = 0; Y < SlotChecks.Num(); Y++)
+	{
+		SlotChecks[Y].SetNumZeroed(InventorySize.X);
+	}
+	return true;
 }
 
-// void UD1InventoryManagerComponent::SetInventorySize(int32 NewSize)
-// {
-// 	if (NewSize <= InventoryList.GetInventorySize())
-// 		return;
-//
-// 	InventoryList.SetInventorySize(NewSize);
-// }
-//
-// bool UD1InventoryManagerComponent::CanAddItem(int32 ItemID, int32 StackCount)
-// {
-// 	
-// 	return false;
-// }
+bool UD1InventoryManagerComponent::TryAddItemByID(int32 ItemID, int32 Count)
+{
+	return InventoryList.TryAddItem(ItemID, Count);
+}
+
+bool UD1InventoryManagerComponent::TryAddItemByInstance(UD1ItemInstance* Instance, int32 Count)
+{
+	return InventoryList.TryAddItem(Instance, Count);
+}
+
+bool UD1InventoryManagerComponent::TryRemoveItemByID(int32 ItemID, int32 Count)
+{
+	return InventoryList.TryRemoveItem(ItemID, Count);
+}
+
+bool UD1InventoryManagerComponent::TryRemoveItemByInstance(UD1ItemInstance* Instance, int32 Count)
+{
+	return InventoryList.TryRemoveItem(Instance, Count);
+}
+
+const TArray<FD1InventoryEntry>& UD1InventoryManagerComponent::GetAllItems() const
+{
+	return InventoryList.GetAllItems();
+}
+
+bool UD1InventoryManagerComponent::CanAddItemByPosition(const FIntPoint& Position, const FIntPoint& SlotSize)
+{
+	for (int32 y = Position.Y; y < Position.Y + SlotSize.Y; y++)
+	{
+		for (int32 x = Position.X; x < Position.X + SlotSize.X; x++)
+		{
+			if (SlotChecks[y][x])
+				return false;
+		}
+	}
+	return true;
+}
+
+void UD1InventoryManagerComponent::MarkSlotChecks(bool bIsUsing, const FIntPoint& Position, const FIntPoint& SlotSize)
+{
+	for (int32 y = Position.Y; y < Position.Y + SlotSize.Y; y++)
+	{
+		for (int32 x = Position.X; x < Position.X + SlotSize.X; x++)
+		{
+			SlotChecks[y][x] = bIsUsing;
+		}
+	}
+}
+
+void UD1InventoryManagerComponent::AddReplicatedSubObject(UD1ItemInstance* Instance)
+{
+	if (Instance && IsUsingRegisteredSubObjectList() && IsReadyForReplication())
+	{
+		Super::AddReplicatedSubObject(Instance);
+	}
+}
+
+void UD1InventoryManagerComponent::RemoveReplicatedSubObject(UD1ItemInstance* Instance)
+{
+	if (Instance && IsUsingRegisteredSubObjectList())
+	{
+		Super::RemoveReplicatedSubObject(Instance);
+	}
+}

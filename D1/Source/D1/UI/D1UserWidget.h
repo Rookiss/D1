@@ -30,10 +30,10 @@ protected:
 	void BindAttributeChangedDelegate(const FGameplayTag& AttributeTag, TSubclassOf<UD1AttributeSet> AttributeSetClass, UserClass* Object, FuncType Func);
 	
 protected:
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintNativeEvent)
 	void OnAbilityChanged(bool bIsGiven, const FGameplayTag& AbilityTag);
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintNativeEvent)
 	void OnAttributeChanged(const FGameplayTag& AttributeTag, float NewValue);
 
 protected:
@@ -44,7 +44,13 @@ private:
 	TArray<TTuple<FGameplayTag, TSubclassOf<UD1AttributeSet>, FDelegateHandle>> AttributeDelegateHandles;
 	
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
+	bool bShouldBindAbilityDelegate = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bShouldBindAttributeDelegate = false;
+	
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 };
 

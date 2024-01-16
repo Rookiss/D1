@@ -5,7 +5,6 @@
 #include "GameFramework/Character.h"
 #include "D1Character.generated.h"
 
-class UD1PrimarySet;
 class UD1AbilitySystemComponent;
 
 UCLASS()
@@ -31,5 +30,5 @@ protected:
 	FName InitialAbilitySystemDataName;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UD1AbilitySystemComponent> D1ASC;
+	TObjectPtr<UD1AbilitySystemComponent> D1AbilitySystemComponent;
 };

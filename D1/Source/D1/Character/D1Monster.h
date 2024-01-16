@@ -3,7 +3,7 @@
 #include "D1Character.h"
 #include "D1Monster.generated.h"
 
-class UD1PrimarySet;
+class UD1MonsterSet;
 class UD1AbilitySystemComponent;
 
 UCLASS()
@@ -19,9 +19,9 @@ public:
 	virtual void InitAbilityActorInfo() override;
 	
 public:
-	const UD1PrimarySet* GetPrimarySet() const;
+	const UD1MonsterSet* GetPrimarySet() const;
 	
 protected:
 	UPROPERTY()
-	TObjectPtr<const UD1PrimarySet> PrimarySet;
+	TObjectPtr<const UD1MonsterSet> MonsterSet;
 };

@@ -1,11 +1,12 @@
-﻿#include "D1SecondarySet.h"
+﻿#include "D1PlayerSet.h"
 
 #include "D1GameplayTags.h"
 #include "Net/UnrealNetwork.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1SecondarySet)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1PlayerSet)
 
-UD1SecondarySet::UD1SecondarySet()
+UD1PlayerSet::UD1PlayerSet()
+	: Super()
 {
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Secondary_Strength, GetStrengthAttribute);
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Secondary_Vigor, GetVigorAttribute);
@@ -16,7 +17,7 @@ UD1SecondarySet::UD1SecondarySet()
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Secondary_Resourcefulness, GetResourcefulnessAttribute);
 }
 
-void UD1SecondarySet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UD1PlayerSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -29,37 +30,37 @@ void UD1SecondarySet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Resourcefulness, COND_None, REPNOTIFY_Always);
 }
 
-void UD1SecondarySet::OnRep_Strength(const FGameplayAttributeData& OldValue)
+void UD1PlayerSet::OnRep_Strength(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Strength, OldValue);
 }
 
-void UD1SecondarySet::OnRep_Vigor(const FGameplayAttributeData& OldValue)
+void UD1PlayerSet::OnRep_Vigor(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Vigor, OldValue);
 }
 
-void UD1SecondarySet::OnRep_Agility(const FGameplayAttributeData& OldValue)
+void UD1PlayerSet::OnRep_Agility(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Agility, OldValue);
 }
 
-void UD1SecondarySet::OnRep_Dexterity(const FGameplayAttributeData& OldValue)
+void UD1PlayerSet::OnRep_Dexterity(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Dexterity, OldValue);
 }
 
-void UD1SecondarySet::OnRep_Will(const FGameplayAttributeData& OldValue)
+void UD1PlayerSet::OnRep_Will(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Will, OldValue);
 }
 
-void UD1SecondarySet::OnRep_Knowledge(const FGameplayAttributeData& OldValue)
+void UD1PlayerSet::OnRep_Knowledge(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Knowledge, OldValue);
 }
 
-void UD1SecondarySet::OnRep_Resourcefulness(const FGameplayAttributeData& OldValue)
+void UD1PlayerSet::OnRep_Resourcefulness(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Resourcefulness, OldValue);
 }

@@ -8,6 +8,7 @@
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Data/D1InputData.h"
 #include "Input/D1InputComponent.h"
+#include "Inventory/D1InventoryManagerComponent.h"
 #include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1PlayerController)
@@ -16,13 +17,12 @@ AD1PlayerController::AD1PlayerController(const FObjectInitializer& ObjectInitial
 	: Super(ObjectInitializer)
 {
 	bReplicates = true;
+	InventoryManagerComponent = CreateDefaultSubobject<UD1InventoryManagerComponent>("InventoryManagerComponent");
 }
 
 void AD1PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ResetInput();
 	
 	if (const UD1InputData* InputData = UD1AssetManager::GetAssetByName<UD1InputData>("InputData_Default"))
 	{

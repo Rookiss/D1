@@ -5,6 +5,9 @@
 #include "Engine/AssetManager.h"
 #include "D1AssetManager.generated.h"
 
+class UD1GameData;
+class UD1ItemData;
+
 DECLARE_DELEGATE_OneParam(FAsyncLoadUpdateDelegate, float/*Progress*/);
 DECLARE_DELEGATE_OneParam(FAsyncLoadCompletedDelegate, const FName&/*AssetName or Label*/);
 
@@ -20,6 +23,9 @@ public:
 
 public:
 	static void Initialize();
+
+	static UD1GameData* GetGameData();
+	static UD1ItemData* GetItemData();
 	
 	template<typename AssetType>
 	static AssetType* GetAssetByName(const FName& AssetName);
@@ -38,7 +44,7 @@ public:
 	static void ReleaseAll();
 	
 private:
-	void LoadDataAssets();
+	void LoadPreloadAssets();
 	void AddLoadedAsset(const FName& AssetName, const UObject* Asset);
 	
 private:

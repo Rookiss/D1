@@ -41,11 +41,11 @@ void AD1Character::ApplyAbilitySystemData(const FName& DataName)
 {
 	if (const UD1AbilitySystemData* Data = UD1AssetManager::GetAssetByName<UD1AbilitySystemData>(DataName))
 	{
-		Data->GiveToAbilitySystem(D1ASC, &GrantedHandles);
+		Data->GiveToAbilitySystem(D1AbilitySystemComponent, &GrantedHandles);
 	}
 }
 
 UAbilitySystemComponent* AD1Character::GetAbilitySystemComponent() const
 {
-	return D1ASC;
+	return D1AbilitySystemComponent;
 }

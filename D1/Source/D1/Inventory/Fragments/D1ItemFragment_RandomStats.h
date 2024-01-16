@@ -11,10 +11,10 @@ struct FStatRange
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 MinValue;
+	int32 MinValue = 0;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 MaxValue;
+	int32 MaxValue = 0;
 };
 
 UCLASS(BlueprintType, CollapseCategories)

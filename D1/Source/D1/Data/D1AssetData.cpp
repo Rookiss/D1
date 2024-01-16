@@ -5,8 +5,6 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AssetData)
 
-const FName UD1AssetData::AssetDataName = FName("AssetData");
-
 void UD1AssetData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
 	Super::PreSave(ObjectSaveContext);
@@ -26,7 +24,7 @@ void UD1AssetData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 		{
 			FSoftObjectPath& AssetPath = AssetEntry.AssetPath;
 			const FString& AssetName = AssetPath.GetAssetName();
-			if (AssetName.StartsWith(TEXT("BP_")) || AssetName.StartsWith(TEXT("B_")))
+			if (AssetName.StartsWith(TEXT("BP_")) || AssetName.StartsWith(TEXT("B_")) || AssetName.StartsWith(TEXT("WBP_")))
 			{
 				FString AssetPathString = AssetPath.GetAssetPathString();
 				AssetPathString.Append(TEXT("_C"));

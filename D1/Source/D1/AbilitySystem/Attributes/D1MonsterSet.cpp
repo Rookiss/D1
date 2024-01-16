@@ -1,13 +1,14 @@
-﻿#include "D1PrimarySet.h"
+﻿#include "D1MonsterSet.h"
 
 #include "D1GameplayTags.h"
 #include "GameplayEffectExtension.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1PrimarySet)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1MonsterSet)
 
-UD1PrimarySet::UD1PrimarySet()
+UD1MonsterSet::UD1MonsterSet()
+	: Super()
 {
 	InitHealth(1.f);
 	InitMaxHealth(1.f);
@@ -18,7 +19,7 @@ UD1PrimarySet::UD1PrimarySet()
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MaxMana, GetMaxManaAttribute);
 }
 
-void UD1PrimarySet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UD1MonsterSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -31,7 +32,7 @@ void UD1PrimarySet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BaseHeal, COND_OwnerOnly, REPNOTIFY_Always);
 }
 
-bool UD1PrimarySet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data)
+bool UD1MonsterSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data)
 {
 	if (Super::PreGameplayEffectExecute(Data) == false)
 		return false;
@@ -50,7 +51,7 @@ bool UD1PrimarySet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Dat
 	return true;
 }
 
-void UD1PrimarySet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+void UD1MonsterSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
 	
@@ -88,21 +89,21 @@ void UD1PrimarySet::PostGameplayEffectExecute(const FGameplayEffectModCallbackDa
 	bOutOfHealth = (GetHealth() <= 0.f);
 }
 
-void UD1PrimarySet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
+void UD1MonsterSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
 {
 	Super::PreAttributeBaseChange(Attribute, NewValue);
 
 	ClampAttribute(Attribute, NewValue);
 }
 
-void UD1PrimarySet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+void UD1MonsterSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 	
 	ClampAttribute(Attribute, NewValue);
 }
 
-void UD1PrimarySet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+void UD1MonsterSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 
@@ -133,7 +134,7 @@ void UD1PrimarySet::PostAttributeChange(const FGameplayAttribute& Attribute, flo
 	}
 }
 
-void UD1PrimarySet::ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const
+void UD1MonsterSet::ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const
 {
 	if (Attribute == GetHealthAttribute())
 	{
@@ -153,7 +154,7 @@ void UD1PrimarySet::ClampAttribute(const FGameplayAttribute& Attribute, float& N
 	}
 }
 
-void UD1PrimarySet::OnRep_Health(const FGameplayAttributeData& OldValue)
+void UD1MonsterSet::OnRep_Health(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Health, OldValue);
 	
@@ -164,27 +165,27 @@ void UD1PrimarySet::OnRep_Health(const FGameplayAttributeData& OldValue)
 	bOutOfHealth = (GetHealth() <= 0.f);
 }
 
-void UD1PrimarySet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
+void UD1MonsterSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MaxHealth, OldValue);
 }
 
-void UD1PrimarySet::OnRep_Mana(const FGameplayAttributeData& OldValue)
+void UD1MonsterSet::OnRep_Mana(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Mana, OldValue);
 }
 
-void UD1PrimarySet::OnRep_MaxMana(const FGameplayAttributeData& OldValue)
+void UD1MonsterSet::OnRep_MaxMana(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MaxMana, OldValue);
 }
 
-void UD1PrimarySet::OnRep_BaseDamage(const FGameplayAttributeData& OldValue)
+void UD1MonsterSet::OnRep_BaseDamage(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseDamage, OldValue);
 }
 
-void UD1PrimarySet::OnRep_BaseHeal(const FGameplayAttributeData& OldValue)
+void UD1MonsterSet::OnRep_BaseHeal(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseHeal, OldValue);
 }

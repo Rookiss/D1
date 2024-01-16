@@ -34,9 +34,6 @@ class UD1AssetData : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-	static const FName AssetDataName;
-
-public:
 	virtual void PreSave(FObjectPreSaveContext ObjectSaveContext) override;
 	
 public:

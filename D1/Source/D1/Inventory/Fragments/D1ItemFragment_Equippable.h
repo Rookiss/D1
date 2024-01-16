@@ -7,11 +7,9 @@ UENUM(BlueprintType)
 enum class EEquipmentType : uint8
 {
 	None,
-	Head,
-	Chest,
-	Legs,
-	Hands,
-	Foot,
+	Weapon,
+	Armor,
+	Accessory,
 	
 	Count	UMETA(Hidden)
 };

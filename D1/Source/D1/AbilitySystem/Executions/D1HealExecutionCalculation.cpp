@@ -1,6 +1,6 @@
 ﻿#include "D1HealExecutionCalculation.h"
 
-#include "AbilitySystem/Attributes/D1PrimarySet.h"
+#include "AbilitySystem/Attributes/D1MonsterSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1HealExecutionCalculation)
 
@@ -9,7 +9,7 @@ struct FHealStatics
 public:
 	FHealStatics()
 	{
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UD1PrimarySet, BaseHeal, Source, true);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UD1MonsterSet, BaseHeal, Source, true);
 		// DEFINE_ATTRIBUTE_CAPTUREDEF(UD1PrimarySet, Strength, Source, false);
 		// DEFINE_ATTRIBUTE_CAPTUREDEF(UD1PrimarySet, Armor, Target, false);
 	}
@@ -54,7 +54,7 @@ void UD1HealExecutionCalculation::Execute_Implementation(const FGameplayEffectCu
 	const float HealDone = FMath::Max(0.f, BaseHeal * 999.f);
 	if (HealDone > 0.f)
 	{
-		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UD1PrimarySet::GetHealAttribute(), EGameplayModOp::Additive, HealDone));
+		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UD1MonsterSet::GetHealAttribute(), EGameplayModOp::Additive, HealDone));
 	}
 #endif // #if WITH_SERVER_CODE
 }

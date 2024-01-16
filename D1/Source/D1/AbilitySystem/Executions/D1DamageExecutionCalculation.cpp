@@ -1,6 +1,6 @@
 ﻿#include "D1DamageExecutionCalculation.h"
 
-#include "AbilitySystem/Attributes/D1PrimarySet.h"
+#include "AbilitySystem/Attributes/D1MonsterSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1DamageExecutionCalculation)
 
@@ -9,7 +9,7 @@ struct FDamageStatics
 public:
 	FDamageStatics()
 	{
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UD1PrimarySet, BaseDamage, Source, true);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UD1MonsterSet, BaseDamage, Source, true);
 		// DEFINE_ATTRIBUTE_CAPTUREDEF(UD1PrimarySet, Strength, Source, true);
 		// DEFINE_ATTRIBUTE_CAPTUREDEF(UD1PrimarySet, Armor, Target, true);
 	}
@@ -53,7 +53,7 @@ void UD1DamageExecutionCalculation::Execute_Implementation(const FGameplayEffect
 	const float DamageDone = FMath::Max(0.f, BaseDamage * 999.f);
 	if (DamageDone > 0.f)
 	{
-		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UD1PrimarySet::GetDamageAttribute(), EGameplayModOp::Additive, DamageDone));
+		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UD1MonsterSet::GetDamageAttribute(), EGameplayModOp::Additive, DamageDone));
 	}
 #endif // #if WITH_SERVER_CODE
 }
