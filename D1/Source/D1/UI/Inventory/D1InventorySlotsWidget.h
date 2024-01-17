@@ -15,16 +15,15 @@ public:
 	UD1InventorySlotsWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
 
 protected:
 	UFUNCTION(BlueprintNativeEvent)
-	void OnInventoryEntryChanged(const FIntPoint& Position, UD1ItemInstance* Instance, int32 ItemCount);
+	void OnInventoryEntryChanged(const FIntPoint& ItemPosition, UD1ItemInstance* ItemInstance, int32 ItemCount);
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FIntPoint SlotCount;
+	UPROPERTY(BlueprintReadOnly)
+	FIntPoint SlotCount = 0;
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UD1InventorySlotWidget> SlotWidgetClass;
@@ -33,6 +32,6 @@ protected:
 	TArray<TObjectPtr<UD1InventorySlotWidget>> SlotWidgets;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UUniformGridPanel> GridPanel_Slots;
 };

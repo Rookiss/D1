@@ -14,7 +14,7 @@ void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 
 	ItemNameToDef.ValueSort([](const FD1ItemDefinition& A, const FD1ItemDefinition& B)
 	{
-		return A.ID < B.ID;
+		return A.ItemID < B.ItemID;
 	});
 	
 	FString ErrorMsg;
@@ -22,7 +22,7 @@ void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 	{
 		const FString& Name = Pair.Key;
 		const FD1ItemDefinition& ItemDef = Pair.Value;
-		const int32 ID = ItemDef.ID;
+		const int32 ID = ItemDef.ItemID;
 		
 		if (ID <= 0 || ItemIDToDef.Contains(ID))
 		{
@@ -32,7 +32,7 @@ void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 
 		// TODO: Check Fragments
 		
-		ItemIDToDef.Emplace(ItemDef.ID, ItemDef);
+		ItemIDToDef.Emplace(ItemDef.ItemID, ItemDef);
 	}
 
 	if (ErrorMsg.IsEmpty() == false)

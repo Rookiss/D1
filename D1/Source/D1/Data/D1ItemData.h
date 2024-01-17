@@ -16,10 +16,10 @@ public:
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 ID = 0;
+	int32 ItemID = 0;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FIntPoint SlotSize = FIntPoint::ZeroValue;
+	FIntPoint ItemSlotCount = FIntPoint::ZeroValue;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText DisplayName;

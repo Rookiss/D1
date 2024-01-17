@@ -16,6 +16,10 @@ public:
 public:
 	void SetEntrySize(const FIntPoint& Size);
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SlotUnitPixelSize = 50;
+	
 protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<USizeBox> SizeBox_Entry;

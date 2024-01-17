@@ -14,57 +14,46 @@ UD1InventorySlotsWidget::UD1InventorySlotsWidget(const FObjectInitializer& Objec
     
 }
 
-void UD1InventorySlotsWidget::NativePreConstruct()
-{
-	Super::NativePreConstruct();
-
-	check(SlotWidgetClass);
-
-	SlotWidgets.Reserve(SlotCount.X * SlotCount.Y);
-	
-	for (int32 Y = 0; Y < SlotCount.Y; Y++)
-	{
-		for (int32 X = 0; X < SlotCount.X; X++)
-		{
-			UD1InventorySlotWidget* SlotWidget = CreateWidget<UD1InventorySlotWidget>(GetWorld(), SlotWidgetClass);
-			SlotWidgets.Add(SlotWidget);
-			GridPanel_Slots->AddChildToUniformGrid(SlotWidget, Y, X);
-		}
-	}
-}
-
 void UD1InventorySlotsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	check(SlotWidgetClass);
 
-	SlotWidgets.Reserve(SlotCount.X * SlotCount.Y);
-	
-	for (int32 Y = 0; Y < SlotCount.Y; Y++)
-	{
-		for (int32 X = 0; X < SlotCount.X; X++)
-		{
-			UD1InventorySlotWidget* SlotWidget = CreateWidget<UD1InventorySlotWidget>(GetOwningPlayer(), SlotWidgetClass);
-			SlotWidgets.Add(SlotWidget);
-			GridPanel_Slots->AddChildToUniformGrid(SlotWidget, Y, X);
-		}
-	}
-	
 	if (AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer()))
 	{
 		if (UD1InventoryManagerComponent* InventoryManager = PC->InventoryManagerComponent)
 		{
-			for (const FD1InventoryEntry& Entry : InventoryManager->GetAllItems())
+			SlotCount = InventoryManager->GetInventorySlotCount();
+			SlotWidgets.Reserve(SlotCount.X * SlotCount.Y);
+	
+			for (int32 Y = 0; Y < SlotCount.Y; Y++)
 			{
-				OnInventoryEntryChanged(Entry.GetPosition(), Entry.GetInstance(), Entry.GetCount());
+				for (int32 X = 0; X < SlotCount.X; X++)
+				{
+					UD1InventorySlotWidget* SlotWidget = CreateWidget<UD1InventorySlotWidget>(GetOwningPlayer(), SlotWidgetClass);
+					SlotWidgets.Add(SlotWidget);
+					GridPanel_Slots->AddChildToUniformGrid(SlotWidget, Y, X);
+				}
+			}
+
+			const TArray<FD1InventoryEntry>& Entries = InventoryManager->GetAllItems();
+			for (int32 i = 0; i < Entries.Num(); i++)
+			{
+				const FD1InventoryEntry& Entry = Entries[i];
+				if (Entry.GetItemInstance())
+				{
+					const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
+					FIntPoint ItemPosition = FIntPoint(i % InventorySlotCount.X, i / InventorySlotCount.X);
+					OnInventoryEntryChanged(ItemPosition, Entry.GetItemInstance(), Entry.GetItemCount());
+				}
 			}
 			InventoryManager->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
 		}
 	}
 }
 
-void UD1InventorySlotsWidget::OnInventoryEntryChanged_Implementation(const FIntPoint& Position, UD1ItemInstance* Instance, int32 ItemCount)
+void UD1InventorySlotsWidget::OnInventoryEntryChanged_Implementation(const FIntPoint& ItemPosition, UD1ItemInstance* ItemInstance, int32 ItemCount)
 {
 	
 }
