@@ -31,6 +31,17 @@ void AD1PlayerController::BeginPlay()
 			Subsystem->AddMappingContext(InputData->MappingContext, 0);
 		}
 	}
+
+	// @TODO: For Test
+	if (HasAuthority())
+	{
+		InventoryManagerComponent->TryAddItemByID(1003, 1);
+		InventoryManagerComponent->TryAddItemByID(1002, 1);
+		InventoryManagerComponent->TryAddItemByID(1001, 1);
+		InventoryManagerComponent->TryAddItemByID(1003, 1);
+		InventoryManagerComponent->TryAddItemByID(1001, 1);
+		InventoryManagerComponent->TryAddItemByID(1002, 1);
+	}
 }
 
 void AD1PlayerController::SetupInputComponent()

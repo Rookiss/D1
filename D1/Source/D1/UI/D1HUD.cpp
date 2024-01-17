@@ -19,6 +19,16 @@ void AD1HUD::ShowSceneWidget()
 	if (TSubclassOf<UD1UserWidget> SceneWidgetClass = UD1AssetManager::GetSubclassByName<UD1UserWidget>("SceneWidget"))
 	{
 		SceneWidget = CreateWidget<UD1UserWidget>(GetOwningPlayerController(), SceneWidgetClass);
-		SceneWidget->AddToViewport();	
+		SceneWidget->AddToViewport();
+	}
+
+	if (APlayerController* PC = GetOwningPlayerController())
+	{
+		FInputModeUIOnly InputMode;
+		InputMode.SetWidgetToFocus(SceneWidget->TakeWidget());
+		PC->SetInputMode(InputMode);
+		
+		PC->FlushPressedKeys();
+		PC->SetShowMouseCursor(true);
 	}
 }

@@ -68,20 +68,37 @@ bool FD1InventoryList::TryAddItem(const FIntPoint& ItemPosition, UD1ItemInstance
 
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
 	check(ItemData);
-
-	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
-	if (OwnerComponent->CanAddItemByPosition(ItemPosition, ItemDef.ItemSlotCount) == false)
+	
+	const FIntPoint& InventorySlotCount = OwnerComponent->GetInventorySlotCount();
+	int32 Index = ItemPosition.Y * InventorySlotCount.X + ItemPosition.X;
+	if (Entries.IsValidIndex(Index) == false)
 		return false;
 
-	OwnerComponent->MarkSlotChecks(true, ItemPosition, ItemDef.ItemSlotCount);
+	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
+	FD1InventoryEntry& InventoryEntry = Entries[Index];
+	if (InventoryEntry.ItemInstance)
+	{
+		if (InventoryEntry.ItemInstance->ItemID == ItemInstance->ItemID && ItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>())
+		{
+			InventoryEntry.ItemCount += ItemCount;
+			MarkItemDirty(InventoryEntry);
+			return true;
+		}
+		return false;
+	}
+	else
+	{
+		if (OwnerComponent->CanAddItemByPosition(ItemPosition, ItemDef.ItemSlotCount) == false)
+			return false;
 
-	const FIntPoint& InventorySlotCount = OwnerComponent->GetInventorySlotCount();
-	FD1InventoryEntry& InventoryEntry = Entries[ItemPosition.Y * InventorySlotCount.X + ItemPosition.X];
-	InventoryEntry.ItemInstance = ItemInstance;
-	InventoryEntry.ItemCount = ItemCount;
+		OwnerComponent->MarkSlotChecks(true, ItemPosition, ItemDef.ItemSlotCount);
+	
+		InventoryEntry.ItemInstance = ItemInstance;
+		InventoryEntry.ItemCount = ItemCount;
 				
-	MarkItemDirty(InventoryEntry);
-	return true;
+		MarkItemDirty(InventoryEntry);
+		return true;
+	}
 }
 
 bool FD1InventoryList::TryAddItem(int32 ItemID, int32 ItemCount)
@@ -102,6 +119,9 @@ bool FD1InventoryList::TryAddItem(int32 ItemID, int32 ItemCount)
 	{
 		for (FD1InventoryEntry& Entry : Entries)
 		{
+			if (Entry.ItemInstance == nullptr)
+				continue;
+			
 			if (Entry.ItemInstance->GetItemID() == ItemID)
 			{
 				Entry.ItemCount += ItemCount;
@@ -165,6 +185,9 @@ bool FD1InventoryList::TryAddItem(UD1ItemInstance* ItemInstance, int32 ItemCount
 	{
 		for (FD1InventoryEntry& Entry : Entries)
 		{
+			if (Entry.ItemInstance == nullptr)
+				continue;
+			
 			if (Entry.ItemInstance->GetItemID() == ItemInstance->GetItemID())
 			{
 				Entry.ItemCount += ItemCount;
@@ -260,6 +283,9 @@ bool FD1InventoryList::TryRemoveItem(int32 ItemID, int32 ItemCount)
 	for (int32 i = 0; i < Entries.Num(); i++)
 	{
 		FD1InventoryEntry& Entry = Entries[i];
+		if (Entry.ItemInstance == nullptr)
+			continue;
+		
 		if (Entry.ItemInstance->GetItemID() == ItemID)
 		{
 			if (Entry.ItemCount > ItemCount)
@@ -402,6 +428,25 @@ bool UD1InventoryManagerComponent::TryRemoveItemByID(int32 ItemID, int32 ItemCou
 	return InventoryList.TryRemoveItem(ItemID, ItemCount);
 }
 
+void UD1InventoryManagerComponent::RequestMoveItem_Implementation(const FIntPoint& FromPosition, const FIntPoint& ToPosition)
+{
+	const FD1InventoryEntry FromEntry = InventoryList.GetItemByPosition(FromPosition);
+	const FD1InventoryEntry ToEntry = InventoryList.GetItemByPosition(ToPosition);
+	
+	if (FromEntry.ItemInstance == nullptr || ToEntry.ItemInstance)
+		return;
+
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	check(ItemData);
+
+	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(FromEntry.ItemInstance->GetItemID());
+	if (CanAddItemByPosition(ToPosition, ItemDef.ItemSlotCount) == false)
+		return;
+
+	InventoryList.TryRemoveItem(FromPosition, FromEntry.ItemCount);
+	InventoryList.TryAddItem(ToPosition, FromEntry.ItemInstance, FromEntry.ItemCount);
+}
+
 const TArray<FD1InventoryEntry>& UD1InventoryManagerComponent::GetAllItems() const
 {
 	return InventoryList.GetAllItems();
@@ -412,7 +457,7 @@ FD1InventoryEntry UD1InventoryManagerComponent::GetItemByPosition(const FIntPoin
 	return InventoryList.GetItemByPosition(ItemPosition);
 }
 
-bool UD1InventoryManagerComponent::CanAddItemByPosition(const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount)
+bool UD1InventoryManagerComponent::CanAddItemByPosition(const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount) const
 {
 	if (ItemPosition.Y + ItemSlotCount.Y > InventorySlotCount.Y || ItemPosition.X + ItemSlotCount.X > InventorySlotCount.X)
 		return false;

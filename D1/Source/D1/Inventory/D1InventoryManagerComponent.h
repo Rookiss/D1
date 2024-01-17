@@ -49,7 +49,7 @@ public:
 
 private:
 	bool TryIncreaseSlotCount(int32 NewCount);
-
+	
 	bool TryAddItem(const FIntPoint& ItemPosition, UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
 	bool TryAddItem(int32 ItemID, int32 ItemCount = 1);
 	bool TryAddItem(UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
@@ -114,17 +114,26 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	bool TryRemoveItemByID(int32 ItemID, int32 ItemCount = 1);
 
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void RequestMoveItem(const FIntPoint& FromPosition, const FIntPoint& ToPosition);
+
+	UFUNCTION(BlueprintCallable)
+	void MarkSlotChecks(bool bIsUsing, const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount);
+	
 public:
 	UFUNCTION(BlueprintCallable)
-	FIntPoint GetInventorySlotCount() { return InventorySlotCount; }
+	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure="false")
 	const TArray<FD1InventoryEntry>& GetAllItems() const;
 
+	UFUNCTION(BlueprintCallable)
 	FD1InventoryEntry GetItemByPosition(const FIntPoint& ItemPosition);
+
+	UFUNCTION(BlueprintCallable)
+	bool CanAddItemByPosition(const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount) const;
+	
 	TArray<TArray<bool>>& GetSlotChecks() { return InventorySlotChecks; }
-	bool CanAddItemByPosition(const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount);
-	void MarkSlotChecks(bool bIsUsing, const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount);
 
 public:
 	FOnInventoryEntryChanged OnInventoryEntryChanged;
