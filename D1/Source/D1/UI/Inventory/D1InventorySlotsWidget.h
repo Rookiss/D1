@@ -26,11 +26,16 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnInventoryEntryChanged(const FIntPoint& ItemPosition, UD1ItemInstance* ItemInstance, int32 ItemCount);
 
+public:
+	const TArray<UD1InventorySlotWidget*> GetSlotWidgets() const { return SlotWidgets; }
+	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
+	FVector2D GetUnitSlotSize() const { return UnitSlotSize; }
+
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	TSubclassOf<UD1InventorySlotWidget> SlotWidgetClass;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	TSubclassOf<UD1InventoryEntryWidget> EntryWidgetClass;
 
 protected:
@@ -52,5 +57,5 @@ private:
 	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
 	
 	FIntPoint InventorySlotCount = 0;
-	FVector2D SlotSize = FVector2D::ZeroVector;
+	FVector2D UnitSlotSize = FVector2D::ZeroVector;
 };

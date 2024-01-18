@@ -1,9 +1,7 @@
 ﻿#include "D1InventorySlotsWidget.h"
 
-#include "D1InventoryDragDrop.h"
 #include "D1InventoryEntryWidget.h"
 #include "D1InventorySlotWidget.h"
-#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/UniformGridPanel.h"
@@ -25,7 +23,8 @@ void UD1InventorySlotsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	check(SlotWidgetClass);
+	SlotWidgetClass = UD1AssetManager::GetSubclassByName<UD1InventorySlotWidget>("SlotWidget");
+	EntryWidgetClass = UD1AssetManager::GetSubclassByName<UD1InventoryEntryWidget>("EntryWidget");
 	
 	if (AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer()))
 	{
@@ -49,7 +48,7 @@ void UD1InventorySlotsWidget::NativeConstruct()
 
 			if (UD1InventorySlotWidget* SlotWidget = Cast<UD1InventorySlotWidget>(GridPanel_Slots->GetChildAt(0)))
 			{
-				SlotSize = SlotWidget->SlotSize;
+				UnitSlotSize = SlotWidget->GetSlotSize();
 			}
 
 			const TArray<FD1InventoryEntry>& Entries = InventoryManagerComponent->GetAllItems();
@@ -98,7 +97,7 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged_Implementation(const FIntP
 					if (UD1InventorySlotWidget* SlotWidget = SlotWidgets[y * InventorySlotCount.X + x])
 					{
 						SlotWidget->SetEntryWidget(nullptr);
-						SlotWidget->ChangeSlotColor(ESlotColor::Normal);
+						SlotWidget->ChangeSlotState(ESlotState::Default);
 					}
 				}
 			}
@@ -113,13 +112,14 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged_Implementation(const FIntP
 		if (ItemCount > 0)
 		{
 			UD1InventoryEntryWidget* NewEntryWidget = CreateWidget<UD1InventoryEntryWidget>(GetOwningPlayer(), EntryWidgetClass);
-			NewEntryWidget->Init(this, FVector2D(ItemSlotCount.X * SlotSize.X, ItemSlotCount.Y * SlotSize.Y), ItemInstance);
-			NewEntryWidget->RefreshItemCount(ItemCount);
-			EntryWidgets[Index] = NewEntryWidget;
-
+			
 			UCanvasPanelSlot* EntrySlot = CanvasPanel_Entries->AddChildToCanvas(NewEntryWidget);
 			EntrySlot->SetAutoSize(true);
-			EntrySlot->SetPosition(FVector2D(ItemPosition.X * SlotSize.X, ItemPosition.Y * SlotSize.Y));
+			EntrySlot->SetPosition(FVector2D(ItemPosition.X * UnitSlotSize.X, ItemPosition.Y * UnitSlotSize.Y));
+
+			FVector2D WidgetSize = FVector2D(ItemSlotCount.X * UnitSlotSize.X, ItemSlotCount.Y * UnitSlotSize.Y);
+			NewEntryWidget->Init(this, WidgetSize, ItemInstance, ItemCount);
+			EntryWidgets[Index] = NewEntryWidget;
 
 			for (int y = ItemPosition.Y; y < ItemPosition.Y + ItemSlotCount.Y; y++)
 			{
@@ -128,7 +128,7 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged_Implementation(const FIntP
 					if (UD1InventorySlotWidget* SlotWidget = SlotWidgets[y * InventorySlotCount.X + x])
 					{
 						SlotWidget->SetEntryWidget(NewEntryWidget);
-						SlotWidget->ChangeSlotColor(ESlotColor::Blue);
+						SlotWidget->ChangeSlotState(ESlotState::Valid);
 					}
 				}
 			}

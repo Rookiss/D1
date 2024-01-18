@@ -8,12 +8,11 @@ class USizeBox;
 class UImage;
 
 UENUM(BlueprintType)
-enum class ESlotColor
+enum class ESlotState : uint8
 {
-	Normal,
-	Blue,
-	Green,
-	Red
+	Default,
+	InValid,
+	Valid
 };
 
 UCLASS()
@@ -28,15 +27,34 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
-	void SetEntryWidget(UD1InventoryEntryWidget* InEntryWidget) { EntryWidget = InEntryWidget; }
-	UD1InventoryEntryWidget* GetEntryWidget() const { return EntryWidget; }
-	
-	void ChangeSlotColor(ESlotColor SlotColor);
+	void ChangeSlotState(ESlotState InSlotState);
+	void ChangeHoverState(ESlotState InHoverState);
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	void SetEntryWidget(UD1InventoryEntryWidget* InEntryWidget) { EntryWidget = InEntryWidget; }
+	UD1InventoryEntryWidget* GetEntryWidget() const { return EntryWidget; }
+
+	FVector2D GetSlotSize() const { return SlotSize; }
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
 	FVector2D SlotSize = FVector2D(50, 50);
 
+	UPROPERTY(EditDefaultsOnly)
+	FLinearColor DefaultColor = FLinearColor(1.f, 1.f, 1.f, 0.f);
+	
+	UPROPERTY(EditDefaultsOnly)
+	FLinearColor RedColor = FLinearColor(0.28f, 0.02f, 0.f, 0.32f);
+	
+	UPROPERTY(EditDefaultsOnly)
+	FLinearColor GreenColor = FLinearColor(0.02f, 0.28f, 0.f, 0.32f);
+	
+	UPROPERTY(EditDefaultsOnly)
+	FLinearColor BlueColor = FLinearColor(0.f, 0.02f, 0.28f, 0.32f);
+
+	UPROPERTY(VisibleAnywhere)
+	ESlotState SlotState = ESlotState::Default;
+	
 protected:
 	UPROPERTY()
 	TObjectPtr<UD1InventoryEntryWidget> EntryWidget;
@@ -44,10 +62,7 @@ protected:
 protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<USizeBox> SizeBox_Root;
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Background;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Blue;
+	TObjectPtr<UImage> Image_Foreground;
 };

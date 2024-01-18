@@ -1,7 +1,10 @@
 ﻿#include "D1ItemData.h"
 
 #include "EditorDialogLibrary.h"
-#include "Inventory/Fragments/D1ItemFragment.h"
+#include "Inventory/Fragments/D1ItemFragment_Equippable.h"
+#include "Inventory/Fragments/D1ItemFragment_FixedStats.h"
+#include "Inventory/Fragments/D1ItemFragment_RandomStats.h"
+#include "Inventory/Fragments/D1ItemFragment_Stackable.h"
 #include "UObject/ObjectSaveContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemData)
@@ -26,11 +29,30 @@ void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 		
 		if (ID <= 0 || ItemIDToDef.Contains(ID))
 		{
-			ErrorMsg.Append(FString::Printf(TEXT("Invalid ID [Name : %s] [ID : %d]\n"), *Name, ID));
+			ErrorMsg.Append(FString::Printf(TEXT("Invalid or Duplicated ID : [Name : %s] - [ID : %d]\n"), *Name, ID));
 			continue;
 		}
+		
+		if (ItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>())
+		{
+			if (ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable>())
+			{
+				ErrorMsg.Append(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Stackable] <-> [Equippable]"), ID));
+				continue;
+			}
 
-		// TODO: Check Fragments
+			if (ItemDef.FindFragmentByClass<UD1ItemFragment_RandomStats>())
+			{
+				ErrorMsg.Append(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Stackable] <-> [RandomStats]"), ID));
+				continue;
+			}
+		}
+
+		if (ItemDef.FindFragmentByClass<UD1ItemFragment_FixedStats>() && ItemDef.FindFragmentByClass<UD1ItemFragment_RandomStats>())
+		{
+			ErrorMsg.Append(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [FixedStats] <-> [RandomStats]"), ID));
+			continue;
+		}
 		
 		ItemIDToDef.Emplace(ItemDef.ItemID, ItemDef);
 	}

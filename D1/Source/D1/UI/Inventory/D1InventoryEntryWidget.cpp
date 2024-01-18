@@ -1,13 +1,15 @@
 ﻿#include "D1InventoryEntryWidget.h"
 
 #include "D1InventoryDragDrop.h"
-#include "D1InventorySlotWidget.h"
+#include "D1InventoryDragWidget.h"
+#include "D1InventorySlotsWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Image.h"
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
 #include "Data/D1ItemData.h"
 #include "Inventory/D1ItemInstance.h"
+#include "Inventory/Fragments/D1ItemFragment_Stackable.h"
 #include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1InventoryEntryWidget)
@@ -22,6 +24,8 @@ void UD1InventoryEntryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	DragWidgetClass = UD1AssetManager::GetSubclassByName<UD1InventoryDragWidget>("DragWidget");
+	
 	Image_Hover->SetRenderOpacity(0.f);
 	Text_Count->SetText(FText::GetEmpty());
 }
@@ -42,58 +46,41 @@ void UD1InventoryEntryWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEve
 
 FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	// TODO
 	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 
-	// FVector2D MousePosition = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-	// FIntPoint SlotPosition = FIntPoint(MousePosition.X / SlotSize.X, MousePosition.Y / SlotSize.Y);
-	//
-	// int32 SlotIndex = SlotPosition.Y * InventorySlotCount.X + SlotPosition.X;
-	// if (SlotWidgets.IsValidIndex(SlotIndex))
-	// {
-	// 	if (UD1InventorySlotWidget* SlotWidget = SlotWidgets[SlotIndex])
-	// 	{
-	// 		if (UD1InventoryEntryWidget* EntryWidget = SlotWidget->GetEntryWidget())
-	// 		{
-	// 			DragCachedWidget = EntryWidget;
-	// 			FEventReply Reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
-	// 			return Reply.NativeReply;
-	// 		}
-	// 	}
-	// }
-	return FReply::Handled();
+	FEventReply Reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
+	return Reply.NativeReply;
 }
 
 void UD1InventoryEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-
-	// TODO
+	
 	if (ItemInstance == nullptr)
 		return;
 	
-	// const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	// check(ItemData);
-	// 	
-	// const UD1ItemInstance* ItemInstance = DragCachedWidget->ItemInstance;
-	// const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
-	//
-	// UD1InventoryEntryWidget* DragWidget = CreateWidget<UD1InventoryEntryWidget>(GetOwningPlayer(), EntryWidgetClass);
-	// DragWidget->Init(FVector2D(ItemDef.ItemSlotCount.X * SlotSize.X, ItemDef.ItemSlotCount.Y * SlotSize.Y));
-	// DragWidget->RefreshUI(DragCachedWidget->ItemInstance, DragCachedWidget->ItemCount);
-	//
-	// UD1InventoryDragDrop* DragDrop = NewObject<UD1InventoryDragDrop>();
-	// DragDrop->DefaultDragVisual = DragWidget;
-	// DragDrop->Pivot = EDragPivot::MouseDown;
-	// OutOperation = DragDrop;
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	check(ItemData);
+	
+	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
+	
+	UD1InventoryDragWidget* DragWidget = CreateWidget<UD1InventoryDragWidget>(GetOwningPlayer(), DragWidgetClass);
+	const FVector2D& UnitSlotSize = SlotsWidget->GetUnitSlotSize();
+	FVector2D WidgetSize = FVector2D(ItemDef.ItemSlotCount.X * UnitSlotSize.X, ItemDef.ItemSlotCount.Y * UnitSlotSize.Y);
+	DragWidget->Init(WidgetSize, ItemDef.IconTexture, ItemCount);
+	
+	UD1InventoryDragDrop* DragDrop = NewObject<UD1InventoryDragDrop>();
+	DragDrop->DefaultDragVisual = DragWidget;
+	DragDrop->Pivot = EDragPivot::MouseDown;
+	OutOperation = DragDrop;
 }
 
-void UD1InventoryEntryWidget::Init(UD1InventorySlotsWidget* InSlotsWidget, const FVector2D& NewSize, UD1ItemInstance* NewItemInstance)
+void UD1InventoryEntryWidget::Init(UD1InventorySlotsWidget* InSlotsWidget, const FVector2D& NewWidgetSize, UD1ItemInstance* NewItemInstance, int32 NewItemCount)
 {
 	SlotsWidget = InSlotsWidget;
 	
-	SizeBox_Root->SetWidthOverride(NewSize.X);
-	SizeBox_Root->SetHeightOverride(NewSize.Y);
+	SizeBox_Root->SetWidthOverride(NewWidgetSize.X);
+	SizeBox_Root->SetHeightOverride(NewWidgetSize.Y);
 	
 	ItemInstance = NewItemInstance;
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
@@ -101,11 +88,15 @@ void UD1InventoryEntryWidget::Init(UD1InventorySlotsWidget* InSlotsWidget, const
 
 	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
 	Image_Icon->SetBrushFromTexture(ItemDef.IconTexture);
+
+	if (ItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>())
+	{
+		RefreshItemCount(NewItemCount);
+	}
 }
 
 void UD1InventoryEntryWidget::RefreshItemCount(int32 NewItemCount)
 {
 	ItemCount = NewItemCount;
-	FText CountText = (ItemCount == 1) ? FText::GetEmpty() : FText::AsNumber(ItemCount);
-	Text_Count->SetText(CountText);
+	Text_Count->SetText((ItemCount >= 2) ? FText::AsNumber(ItemCount) : FText::GetEmpty());
 }

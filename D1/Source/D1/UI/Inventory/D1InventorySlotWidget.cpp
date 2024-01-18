@@ -19,20 +19,24 @@ void UD1InventorySlotWidget::NativeConstruct()
 	SizeBox_Root->SetHeightOverride(SlotSize.Y);
 }
 
-void UD1InventorySlotWidget::ChangeSlotColor(ESlotColor SlotColor)
+void UD1InventorySlotWidget::ChangeSlotState(ESlotState InSlotState)
 {
-	Image_Blue->SetRenderOpacity(0.f);
-	
-	switch (SlotColor)
+	SlotState = InSlotState;
+
+	switch (SlotState)
 	{
-	case ESlotColor::Normal:
-		break;
-	case ESlotColor::Blue:
-		Image_Blue->SetRenderOpacity(1.f);
-		break;
-	case ESlotColor::Green:
-		break;
-	case ESlotColor::Red:
-		break;
+	case ESlotState::Default: Image_Foreground->SetColorAndOpacity(DefaultColor);	break;
+	case ESlotState::InValid: Image_Foreground->SetColorAndOpacity(RedColor);		break;
+	case ESlotState::Valid:   Image_Foreground->SetColorAndOpacity(BlueColor);		break;
+	}
+}
+
+void UD1InventorySlotWidget::ChangeHoverState(ESlotState InHoverState)
+{
+	switch (InHoverState)
+	{
+	case ESlotState::Default: ChangeSlotState(SlotState);						break;
+	case ESlotState::InValid: Image_Foreground->SetColorAndOpacity(RedColor);	break;
+	case ESlotState::Valid:   Image_Foreground->SetColorAndOpacity(GreenColor);	break;
 	}
 }

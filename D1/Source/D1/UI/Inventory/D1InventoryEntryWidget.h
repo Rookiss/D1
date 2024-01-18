@@ -4,6 +4,7 @@
 #include "D1InventoryEntryWidget.generated.h"
 
 class UD1InventorySlotsWidget;
+class UD1InventoryDragWidget;
 class UTextBlock;
 class UImage;
 class UD1ItemInstance;
@@ -27,19 +28,22 @@ protected:
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 	
 public:
-	void Init(UD1InventorySlotsWidget* InSlotsWidget, const FVector2D& NewSize, UD1ItemInstance* NewItemInstance);
+	void Init(UD1InventorySlotsWidget* InSlotsWidget, const FVector2D& NewWidgetSize, UD1ItemInstance* NewItemInstance, int32 NewItemCount);
 	void RefreshItemCount(int32 NewItemCount);
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY()
 	TObjectPtr<UD1ItemInstance> ItemInstance;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY()
 	int32 ItemCount = 0;
 
-public:
+private:
 	UPROPERTY()
 	TObjectPtr<UD1InventorySlotsWidget> SlotsWidget;
+	
+	UPROPERTY()
+	TSubclassOf<UD1InventoryDragWidget> DragWidgetClass;
 	
 protected:
 	UPROPERTY(meta=(BindWidget))
@@ -49,8 +53,8 @@ protected:
 	TObjectPtr<UImage> Image_Icon;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Hover;
-
-	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_Count;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Hover;
 };
