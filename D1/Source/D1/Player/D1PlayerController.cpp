@@ -35,6 +35,7 @@ void AD1PlayerController::BeginPlay()
 	// @TODO: For Test
 	if (HasAuthority())
 	{
+		InventoryManagerComponent->Init();
 		InventoryManagerComponent->TryAddItemByID(1003, 1);
 		InventoryManagerComponent->TryAddItemByID(1002, 1);
 		InventoryManagerComponent->TryAddItemByID(1001, 1);

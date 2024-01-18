@@ -29,6 +29,9 @@ private:
 
 	UPROPERTY()
 	int32 ItemCount = 0;
+
+	UPROPERTY()
+	int32 CachedItemID = 0;
 };
 
 USTRUCT(BlueprintType)
@@ -42,11 +45,10 @@ public:
 
 public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
+	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
 
 private:
-	bool TryIncreaseSlotCount(int32 NewCount);
-	
 	bool TryAddItem(const FIntPoint& ItemPosition, UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
 	bool TryAddItem(int32 ItemID, int32 ItemCount = 1);
 	bool TryAddItem(UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
@@ -88,51 +90,30 @@ public:
 	UD1InventoryManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 	
 public:
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool TryIncreaseSlotCount(const FIntPoint& NewSlotCount);
+	void Init();
 
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	bool TryAddItemByPosition(const FIntPoint& ItemPosition, UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
-	
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	bool TryAddItemByID(int32 ItemID, int32 ItemCount = 1);
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	bool TryAddItemByInstance(UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool TryRemoveItemByPosition(const FIntPoint& ItemPosition, int32 ItemCount = 1);
 	
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	bool TryRemoveItemByPosition(const FIntPoint& ItemPosition, int32 ItemCount = 1);
 	bool TryRemoveItemByID(int32 ItemID, int32 ItemCount = 1);
 
-	UFUNCTION(Server, Reliable, BlueprintCallable)
+	UFUNCTION(Server, Reliable)
 	void RequestMoveItem(const FIntPoint& FromPosition, const FIntPoint& ToPosition);
-
-	UFUNCTION(BlueprintCallable)
+	
 	void MarkSlotChecks(bool bIsUsing, const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount);
 	
 public:
-	UFUNCTION(BlueprintCallable)
 	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure="false")
 	const TArray<FD1InventoryEntry>& GetAllItems() const;
-
-	UFUNCTION(BlueprintCallable)
 	FD1InventoryEntry GetItemByPosition(const FIntPoint& ItemPosition);
-
-	UFUNCTION(BlueprintCallable)
 	bool CanAddItemByPosition(const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount) const;
-
-	UFUNCTION(BlueprintCallable)
 	bool CanMoveItemByPosition(const FIntPoint& FromPosition, const FIntPoint& ToPosition, const FIntPoint& ItemSlotCount) const;
-	
 	TArray<TArray<bool>>& GetSlotChecks() { return InventorySlotChecks; }
 
 public:
@@ -142,7 +123,7 @@ private:
 	UPROPERTY(Replicated)
 	FD1InventoryList InventoryList;
 
-	UPROPERTY(EditDefaultsOnly, Replicated)
+	UPROPERTY(EditDefaultsOnly)
 	FIntPoint InventorySlotCount = FIntPoint(10, 5);
 	
 	TArray<TArray<bool>> InventorySlotChecks;

@@ -70,17 +70,65 @@ void UD1InventorySlotsWidget::NativeConstruct()
 bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragOver(InGeometry, InDragDropEvent, InOperation);
+	
+	UD1InventoryDragDrop* DragDrop = Cast<UD1InventoryDragDrop>(InOperation);
+	check(DragDrop);
 
-	// @TODO: Hover Slot Color
+	FVector2D MousePosition = InGeometry.AbsoluteToLocal(InDragDropEvent.GetScreenSpacePosition());
+	FIntPoint MouseSlotPosition = FIntPoint(MousePosition.X / UnitSlotSize.X, MousePosition.Y / UnitSlotSize.Y);
+	FIntPoint ToPosition = MouseSlotPosition - DragDrop->DeltaPosition;
+
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	check(ItemData);
+
+	UD1InventoryEntryWidget* EntryWidget = DragDrop->EntryWidget;
+	if (EntryWidget == nullptr)
+		return false;
 	
+	UD1ItemInstance* ItemInstance = EntryWidget->GetItemInstance();
+	if (ItemInstance == nullptr)
+		return false;
 	
+	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
+	const FIntPoint& ItemSlotCount = ItemDef.ItemSlotCount;
+	bool bCanMove = InventoryManagerComponent->CanMoveItemByPosition(DragDrop->FromPosition, ToPosition, ItemSlotCount);
+
+	UnHoverSlots();
+	
+	for (int32 y = ToPosition.Y; y < ToPosition.Y + ItemSlotCount.Y; y++)
+	{
+		for (int32 x = ToPosition.X; x < ToPosition.X + ItemSlotCount.X; x++)
+		{
+			if (x < 0 || y < 0 || x >= InventorySlotCount.X || y >= InventorySlotCount.Y)
+				continue;
+			
+			int32 Index = y * InventorySlotCount.X + x;
+			if (SlotWidgets.IsValidIndex(Index))
+			{
+				if (UD1InventorySlotWidget* SlotWidget = SlotWidgets[Index])
+				{
+					CachedSlotWidgets.Add(SlotWidget);
+					SlotWidget->ChangeHoverState(bCanMove ? ESlotState::Valid : ESlotState::InValid);
+				}
+			}
+		}
+	}
 	return true;
+}
+
+void UD1InventorySlotsWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	Super::NativeOnDragLeave(InDragDropEvent, InOperation);
+
+	UnHoverSlots();
 }
 
 bool UD1InventorySlotsWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
+	UnHoverSlots();
+	
 	UD1InventoryDragDrop* DragDrop = Cast<UD1InventoryDragDrop>(InOperation);
 	check(DragDrop);
 
@@ -93,6 +141,15 @@ bool UD1InventorySlotsWidget::NativeOnDrop(const FGeometry& InGeometry, const FD
 	FIntPoint ToPosition = FIntPoint(MousePosition.X / UnitSlotSize.X, MousePosition.Y / UnitSlotSize.Y) - DragDrop->DeltaPosition;
 	InventoryManagerComponent->RequestMoveItem(DragDrop->FromPosition, ToPosition);
 	return true;
+}
+
+void UD1InventorySlotsWidget::UnHoverSlots()
+{
+	for (UD1InventorySlotWidget* SlotWidget : CachedSlotWidgets)
+	{
+		SlotWidget->ChangeHoverState(ESlotState::Default);
+	}
+	CachedSlotWidgets.Reset();
 }
 
 void UD1InventorySlotsWidget::OnInventoryEntryChanged_Implementation(const FIntPoint& InItemPosition, UD1ItemInstance* InItemInstance, int32 InItemCount)

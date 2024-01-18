@@ -21,7 +21,11 @@ public:
 protected:
 	virtual void NativeConstruct() override;
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
+public:
+	void UnHoverSlots();
 	
 protected:
 	UFUNCTION(BlueprintNativeEvent)
@@ -53,10 +57,13 @@ private:
 	UPROPERTY()
 	TArray<TObjectPtr<UD1InventoryEntryWidget>> EntryWidgets;
 
+	UPROPERTY()
+	TArray<TObjectPtr<UD1InventorySlotWidget>> CachedSlotWidgets;
+	
 private:
 	UPROPERTY()
 	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
 	
-	FIntPoint InventorySlotCount = 0;
+	FIntPoint InventorySlotCount = FIntPoint::ZeroValue;
 	FVector2D UnitSlotSize = FVector2D::ZeroVector;
 };
