@@ -47,7 +47,15 @@ void UD1InventoryEntryWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEve
 FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-
+	
+	FVector2D MouseItemPosition = SlotsWidget->GetCachedGeometry().AbsoluteToLocal(InGeometry.LocalToAbsolute(FVector2D(5, 5)));
+	FVector2D MouseDragPosition = SlotsWidget->GetCachedGeometry().AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+	const FVector2D& UnitSlotSize = SlotsWidget->GetUnitSlotSize();
+	FIntPoint ItemPosition = FIntPoint(MouseItemPosition.X / UnitSlotSize.X, MouseItemPosition.Y / UnitSlotSize.Y);
+	FIntPoint DragPosition = FIntPoint(MouseDragPosition.X / UnitSlotSize.X, MouseDragPosition.Y / UnitSlotSize.Y);
+	CachedFromPosition = ItemPosition;
+	CachedDeltaPosition = DragPosition - ItemPosition;
+	
 	FEventReply Reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
 	return Reply.NativeReply;
 }
@@ -58,6 +66,8 @@ void UD1InventoryEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	
 	if (ItemInstance == nullptr)
 		return;
+
+	RefreshRenderOpacity(false);
 	
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
 	check(ItemData);
@@ -72,7 +82,23 @@ void UD1InventoryEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	UD1InventoryDragDrop* DragDrop = NewObject<UD1InventoryDragDrop>();
 	DragDrop->DefaultDragVisual = DragWidget;
 	DragDrop->Pivot = EDragPivot::MouseDown;
+	DragDrop->EntryWidget = this;
+	DragDrop->FromPosition = CachedFromPosition;
+	DragDrop->DeltaPosition = CachedDeltaPosition;
 	OutOperation = DragDrop;
+}
+
+void UD1InventoryEntryWidget::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
+	
+	UD1InventoryDragDrop* DragDrop = Cast<UD1InventoryDragDrop>(InOperation);
+	check(DragDrop);
+
+	if (UD1InventoryEntryWidget* EntryWidget = DragDrop->EntryWidget)
+	{
+		EntryWidget->RefreshRenderOpacity(true);
+	}
 }
 
 void UD1InventoryEntryWidget::Init(UD1InventorySlotsWidget* InSlotsWidget, const FVector2D& NewWidgetSize, UD1ItemInstance* NewItemInstance, int32 NewItemCount)
@@ -99,4 +125,9 @@ void UD1InventoryEntryWidget::RefreshItemCount(int32 NewItemCount)
 {
 	ItemCount = NewItemCount;
 	Text_Count->SetText((ItemCount >= 2) ? FText::AsNumber(ItemCount) : FText::GetEmpty());
+}
+
+void UD1InventoryEntryWidget::RefreshRenderOpacity(bool bIsVisible)
+{
+	SetRenderOpacity(bIsVisible ? 1.f : 0.5f);
 }

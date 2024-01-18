@@ -42,9 +42,6 @@ public:
 
 public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
-	
-	void PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize);
-	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
 
 private:
@@ -132,6 +129,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool CanAddItemByPosition(const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount) const;
+
+	UFUNCTION(BlueprintCallable)
+	bool CanMoveItemByPosition(const FIntPoint& FromPosition, const FIntPoint& ToPosition, const FIntPoint& ItemSlotCount) const;
 	
 	TArray<TArray<bool>>& GetSlotChecks() { return InventorySlotChecks; }
 

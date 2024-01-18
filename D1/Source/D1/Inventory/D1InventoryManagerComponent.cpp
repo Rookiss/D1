@@ -20,38 +20,33 @@ bool FD1InventoryList::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
 	return FFastArraySerializer::FastArrayDeltaSerialize<FD1InventoryEntry, FD1InventoryList>(Entries, DeltaParams, *this);
 }
 
-void FD1InventoryList::PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize)
-{
-	if (OwnerComponent->OnInventoryEntryChanged.IsBound())
-	{
-		for (int32 Index : RemovedIndices)
-		{
-			const FD1InventoryEntry& Entry = Entries[Index];
-			OwnerComponent->OnInventoryEntryChanged.Broadcast(Index, Entry.ItemInstance, 0);
-		}
-	}
-}
-
-void FD1InventoryList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize)
-{
-	if (OwnerComponent->OnInventoryEntryChanged.IsBound())
-	{
-		for (int32 Index : AddedIndices)
-		{
-			const FD1InventoryEntry& Entry = Entries[Index];
-			OwnerComponent->OnInventoryEntryChanged.Broadcast(Index, Entry.ItemInstance, Entry.ItemCount);
-		}
-	}
-}
-
 void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize)
 {
 	if (OwnerComponent->OnInventoryEntryChanged.IsBound())
 	{
+		TArray<int32> AliveIndices;
+		AliveIndices.Reserve(FinalSize);
+		
 		for (int32 Index : ChangedIndices)
 		{
 			const FD1InventoryEntry& Entry = Entries[Index];
-			OwnerComponent->OnInventoryEntryChanged.Broadcast(Index, Entry.ItemInstance, Entry.ItemCount);
+			if (Entry.ItemCount > 0)
+			{
+				AliveIndices.Add(Index);
+				continue;
+			}
+			
+			const FIntPoint& InventorySlotCount = OwnerComponent->GetInventorySlotCount();
+			const FIntPoint ItemPosition = FIntPoint(Index % InventorySlotCount.X, Index / InventorySlotCount.X);
+			OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemPosition, Entry.ItemInstance, Entry.ItemCount);
+		}
+
+		for (int32 Index : AliveIndices)
+		{
+			const FD1InventoryEntry& Entry = Entries[Index];
+			const FIntPoint& InventorySlotCount = OwnerComponent->GetInventorySlotCount();
+			const FIntPoint ItemPosition = FIntPoint(Index % InventorySlotCount.X, Index / InventorySlotCount.X);
+			OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemPosition, Entry.ItemInstance, Entry.ItemCount);
 		}
 	}
 }
@@ -430,6 +425,9 @@ bool UD1InventoryManagerComponent::TryRemoveItemByID(int32 ItemID, int32 ItemCou
 
 void UD1InventoryManagerComponent::RequestMoveItem_Implementation(const FIntPoint& FromPosition, const FIntPoint& ToPosition)
 {
+	if (FromPosition == ToPosition)
+		return;
+	
 	const FD1InventoryEntry FromEntry = InventoryList.GetItemByPosition(FromPosition);
 	const FD1InventoryEntry ToEntry = InventoryList.GetItemByPosition(ToPosition);
 	
@@ -440,7 +438,7 @@ void UD1InventoryManagerComponent::RequestMoveItem_Implementation(const FIntPoin
 	check(ItemData);
 
 	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(FromEntry.ItemInstance->GetItemID());
-	if (CanAddItemByPosition(ToPosition, ItemDef.ItemSlotCount) == false)
+	if (CanMoveItemByPosition(FromPosition, ToPosition, ItemDef.ItemSlotCount) == false)
 		return;
 
 	InventoryList.TryRemoveItem(FromPosition, FromEntry.ItemCount);
@@ -459,6 +457,9 @@ FD1InventoryEntry UD1InventoryManagerComponent::GetItemByPosition(const FIntPoin
 
 bool UD1InventoryManagerComponent::CanAddItemByPosition(const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount) const
 {
+	if (ItemPosition.Y < 0 || ItemPosition.X < 0)
+		return false;
+	
 	if (ItemPosition.Y + ItemSlotCount.Y > InventorySlotCount.Y || ItemPosition.X + ItemSlotCount.X > InventorySlotCount.X)
 		return false;
 	
@@ -467,6 +468,37 @@ bool UD1InventoryManagerComponent::CanAddItemByPosition(const FIntPoint& ItemPos
 		for (int32 x = ItemPosition.X; x < ItemPosition.X + ItemSlotCount.X; x++)
 		{
 			if (InventorySlotChecks[y][x])
+				return false;
+		}
+	}
+	return true;
+}
+
+bool UD1InventoryManagerComponent::CanMoveItemByPosition(const FIntPoint& FromPosition, const FIntPoint& ToPosition, const FIntPoint& ItemSlotCount) const
+{
+	if (FromPosition.Y < 0 || FromPosition.X < 0 || ToPosition.Y < 0 || ToPosition.X < 0)
+		return false;
+	
+	if (FromPosition.Y + ItemSlotCount.Y > InventorySlotCount.Y || FromPosition.X + ItemSlotCount.X > InventorySlotCount.X)
+		return false;
+
+	if (ToPosition.Y + ItemSlotCount.Y > InventorySlotCount.Y || ToPosition.X + ItemSlotCount.X > InventorySlotCount.X)
+		return false;
+	
+	TArray<TArray<bool>> TempSlotChecks = InventorySlotChecks;
+	for (int32 y = FromPosition.Y; y < FromPosition.Y + ItemSlotCount.Y; y++)
+	{
+		for (int32 x = FromPosition.X; x < FromPosition.X + ItemSlotCount.X; x++)
+		{
+			TempSlotChecks[y][x] = false;
+		}
+	}
+
+	for (int32 y = ToPosition.Y; y < ToPosition.Y + ItemSlotCount.Y; y++)
+	{
+		for (int32 x = ToPosition.X; x < ToPosition.X + ItemSlotCount.X; x++)
+		{
+			if (TempSlotChecks[y][x])
 				return false;
 		}
 	}
