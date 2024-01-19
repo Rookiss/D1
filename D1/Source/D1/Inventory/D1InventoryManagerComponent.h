@@ -47,13 +47,13 @@ public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
 	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
-	
-	bool TryAddItem(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
+
+private:
+	bool TryAddItem(const FIntPoint& ToItemSlotPos, UD1ItemInstance* FromItemInstance, int32 FromItemCount = 1);
 	bool TryAddItem(int32 ItemID, int32 ItemCount = 1);
 	bool TryAddItem(UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
 
 	bool TryRemoveItem(const FIntPoint& ItemSlotPos, int32 ItemCount = 1);
-	bool TryRemoveItem(int32 ItemID, int32 ItemCount = 1);
 
 public:
 	FD1InventoryEntry GetItemByPosition(const FIntPoint& ItemSlotPos);
@@ -108,10 +108,10 @@ public:
 	void MarkSlotChecks(bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);
 	
 public:
-	bool CanAddItem(const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
-	bool CanMoveItem(int32 FromItemID, const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos) const;
-	bool CanMergeItem(int32 FromItemID, const FIntPoint& FromSlotPos, int32 ToItemID, const FIntPoint& ToSlotPos) const;
-	
+	bool IsEmpty(const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
+	bool CanMoveItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos) const;
+	bool CanMergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos, int32& MergeCount) const;
+
 	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
 	const TArray<FD1InventoryEntry>& GetAllEntries() const;
 	FD1InventoryEntry GetItemByPosition(const FIntPoint& ItemSlotPos);

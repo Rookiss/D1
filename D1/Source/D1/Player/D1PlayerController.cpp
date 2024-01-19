@@ -57,7 +57,7 @@ void AD1PlayerController::BeginPlay()
 			}
 		}
 		
-		for (int32 i = 0; i < 10; i++)
+		for (int32 i = 0; i < 30; i++)
 		{
 			FIntPoint RandPos = FIntPoint(FMath::RandRange(0, 10), FMath::RandRange(0, 5));
 			InventoryManagerComponent->TryAddItemByPosition(RandPos, ItemInstance, 1);

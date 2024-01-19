@@ -64,7 +64,6 @@ void UD1InventorySlotsWidget::NativeConstruct()
 	}
 }
 
-// @TODO
 bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragOver(InGeometry, InDragDropEvent, InOperation);
@@ -91,7 +90,7 @@ bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, cons
 	const FIntPoint& FromSlotPos = DragDrop->FromSlotPos;
 	
 	int32 ToItemID = -1;
-	if (ToSlotPos.X >= 0 && ToSlotPos.Y >= 0)
+	if (ToSlotPos.X >= 0 && ToSlotPos.Y >= 0 && ToSlotPos.X < InventorySlotCount.X && ToSlotPos.Y < InventorySlotCount.Y)
 	{
 		int32 Index = ToSlotPos.Y * InventorySlotCount.X + ToSlotPos.X;
 		if (UD1InventoryEntryWidget* ToEntryWidget = EntryWidgets[Index])
