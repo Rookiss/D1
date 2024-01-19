@@ -17,7 +17,7 @@ public:
 	UD1InventoryDragWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void Init(const FVector2D& WidgetSize, UTexture2D* ItemIcon, int32 ItemCount);
+	void Init(const FVector2D& InWidgetSize, UTexture2D* InItemIcon, int32 InItemCount);
 
 protected:
 	UPROPERTY(meta=(BindWidget))

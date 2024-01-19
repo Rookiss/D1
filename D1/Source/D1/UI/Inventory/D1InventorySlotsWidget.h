@@ -3,12 +3,11 @@
 #include "UI/D1UserWidget.h"
 #include "D1InventorySlotsWidget.generated.h"
 
-class UD1InventoryManagerComponent;
 class UCanvasPanel;
-class UD1InventoryEntryWidget;
-class UD1InventorySlotWidget;
-class UD1InventoryDragWidget;
 class UUniformGridPanel;
+class UD1InventorySlotWidget;
+class UD1InventoryEntryWidget;
+class UD1InventoryManagerComponent;
 
 UCLASS()
 class UD1InventorySlotsWidget : public UD1UserWidget
@@ -26,29 +25,21 @@ protected:
 
 public:
 	void UnHoverSlots();
+	void FinishDrag();
 	
 protected:
 	UFUNCTION(BlueprintNativeEvent)
-	void OnInventoryEntryChanged(const FIntPoint& ItemPosition, UD1ItemInstance* ItemInstance, int32 ItemCount);
+	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount);
 
 public:
-	const TArray<UD1InventorySlotWidget*> GetSlotWidgets() const { return SlotWidgets; }
-	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
 	FVector2D GetUnitSlotSize() const { return UnitSlotSize; }
 
-protected:
+private:
 	UPROPERTY()
 	TSubclassOf<UD1InventorySlotWidget> SlotWidgetClass;
 
 	UPROPERTY()
 	TSubclassOf<UD1InventoryEntryWidget> EntryWidgetClass;
-
-protected:
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UUniformGridPanel> GridPanel_Slots;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UCanvasPanel> CanvasPanel_Entries;
 
 private:
 	UPROPERTY()
@@ -58,12 +49,20 @@ private:
 	TArray<TObjectPtr<UD1InventoryEntryWidget>> EntryWidgets;
 
 	UPROPERTY()
-	TArray<TObjectPtr<UD1InventorySlotWidget>> CachedSlotWidgets;
-	
-private:
+	TArray<TObjectPtr<UD1InventorySlotWidget>> HoveredSlotWidgets;
+
 	UPROPERTY()
 	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
 	
+private:
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UUniformGridPanel> GridPanel_Slots;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UCanvasPanel> CanvasPanel_Entries;
+	
+private:
 	FIntPoint InventorySlotCount = FIntPoint::ZeroValue;
 	FVector2D UnitSlotSize = FVector2D::ZeroVector;
+	FIntPoint PrevToSlotPos = FIntPoint::ZeroValue;
 };

@@ -5,7 +5,7 @@
 
 class UD1ItemInstance;
 
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnInventoryEntryChanged, const FIntPoint&/*ItemPosition*/, UD1ItemInstance*/*ItemInstance*/, int32/*ItemCount*/);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnInventoryEntryChanged, const FIntPoint&/*ItemSlotPos*/, UD1ItemInstance*/*ItemInstance*/, int32/*ItemCount*/);
 
 USTRUCT(BlueprintType)
 struct FD1InventoryEntry : public FFastArraySerializerItem
@@ -47,8 +47,7 @@ public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
 	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
-
-private:
+	
 	bool TryAddItem(const FIntPoint& ItemPosition, UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
 	bool TryAddItem(int32 ItemID, int32 ItemCount = 1);
 	bool TryAddItem(UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
@@ -92,10 +91,10 @@ public:
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
-	
-public:
-	void Init();
 
+public:
+	void Server_Init();
+	
 	bool TryAddItemByPosition(const FIntPoint& ItemPosition, UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
 	bool TryAddItemByID(int32 ItemID, int32 ItemCount = 1);
 	bool TryAddItemByInstance(UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
@@ -110,7 +109,7 @@ public:
 	
 public:
 	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
-	const TArray<FD1InventoryEntry>& GetAllItems() const;
+	const TArray<FD1InventoryEntry>& GetAllEntries() const;
 	FD1InventoryEntry GetItemByPosition(const FIntPoint& ItemPosition);
 	bool CanAddItemByPosition(const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount) const;
 	bool CanMoveItemByPosition(const FIntPoint& FromPosition, const FIntPoint& ToPosition, const FIntPoint& ItemSlotCount) const;

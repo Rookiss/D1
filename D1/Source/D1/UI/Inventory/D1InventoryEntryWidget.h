@@ -29,9 +29,9 @@ protected:
 	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	
 public:
-	void Init(UD1InventorySlotsWidget* InSlotsWidget, const FVector2D& NewWidgetSize, UD1ItemInstance* NewItemInstance, int32 NewItemCount);
+	void Init(UD1InventorySlotsWidget* InSlotsWidget, const FVector2D& InWidgetSize, UD1ItemInstance* InItemInstance, int32 InItemCount);
 	void RefreshItemCount(int32 NewItemCount);
-	void RefreshRenderOpacity(bool bIsVisible);
+	void RefreshWidgetOpacity(bool bClearlyVisible);
 
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
@@ -50,10 +50,10 @@ private:
 	UPROPERTY()
 	TSubclassOf<UD1InventoryDragWidget> DragWidgetClass;
 
-	FIntPoint CachedFromPosition = FIntPoint::ZeroValue;
-	FIntPoint CachedDeltaPosition = FIntPoint::ZeroValue;
+	FIntPoint CachedFromSlotPos = FIntPoint::ZeroValue;
+	FVector2D CachedDeltaWidgetPos = FVector2D::ZeroVector;
 	
-protected:
+private:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<USizeBox> SizeBox_Root;
 

@@ -31,9 +31,6 @@ public:
 	void ChangeHoverState(ESlotState InHoverState);
 
 public:
-	void SetEntryWidget(UD1InventoryEntryWidget* InEntryWidget) { EntryWidget = InEntryWidget; }
-	UD1InventoryEntryWidget* GetEntryWidget() const { return EntryWidget; }
-
 	FVector2D GetSlotSize() const { return SlotSize; }
 
 protected:
@@ -51,14 +48,10 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly)
 	FLinearColor BlueColor = FLinearColor(0.f, 0.02f, 0.28f, 0.32f);
-
-	UPROPERTY(VisibleAnywhere)
+	
+private:
 	ESlotState SlotState = ESlotState::Default;
-	
-protected:
-	UPROPERTY()
-	TObjectPtr<UD1InventoryEntryWidget> EntryWidget;
-	
+
 protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<USizeBox> SizeBox_Root;

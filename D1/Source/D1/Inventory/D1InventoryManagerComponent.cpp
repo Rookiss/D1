@@ -405,6 +405,7 @@ UD1InventoryManagerComponent::UD1InventoryManagerComponent(const FObjectInitiali
 	{
 		InventorySlotChecks[y].SetNumZeroed(InventorySlotCount.X);
 	}
+	InventoryList.Entries.Reserve(InventorySlotCount.X * InventorySlotCount.Y);
 }
 
 void UD1InventoryManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -428,7 +429,7 @@ bool UD1InventoryManagerComponent::ReplicateSubobjects(UActorChannel* Channel, F
 	return bWroteSomething;
 }
 
-void UD1InventoryManagerComponent::Init()
+void UD1InventoryManagerComponent::Server_Init()
 {
 	if (GetOwner()->HasAuthority() == false)
 		return;
@@ -508,7 +509,7 @@ void UD1InventoryManagerComponent::RequestMoveItem_Implementation(const FIntPoin
 	InventoryList.TryAddItem(ToPosition, FromEntry.ItemInstance, FromEntry.ItemCount);
 }
 
-const TArray<FD1InventoryEntry>& UD1InventoryManagerComponent::GetAllItems() const
+const TArray<FD1InventoryEntry>& UD1InventoryManagerComponent::GetAllEntries() const
 {
 	return InventoryList.GetAllItems();
 }

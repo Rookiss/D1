@@ -17,6 +17,6 @@ public:
 	UPROPERTY()
 	TObjectPtr<UD1InventoryEntryWidget> EntryWidget;
 	
-	FIntPoint FromPosition = FIntPoint::ZeroValue;
-	FIntPoint DeltaPosition = FIntPoint::ZeroValue;
+	FIntPoint FromSlotPos = FIntPoint::ZeroValue;
+	FVector2D DeltaWidgetPos = FVector2D::ZeroVector;
 };

@@ -13,11 +13,11 @@ UD1InventoryDragWidget::UD1InventoryDragWidget(const FObjectInitializer& ObjectI
     
 }
 
-void UD1InventoryDragWidget::Init(const FVector2D& WidgetSize, UTexture2D* ItemIcon, int32 ItemCount)
+void UD1InventoryDragWidget::Init(const FVector2D& InWidgetSize, UTexture2D* InItemIcon, int32 InItemCount)
 {
-	SizeBox_Root->SetWidthOverride(WidgetSize.X);
-	SizeBox_Root->SetHeightOverride(WidgetSize.Y);
+	SizeBox_Root->SetWidthOverride(InWidgetSize.X);
+	SizeBox_Root->SetHeightOverride(InWidgetSize.Y);
 	
-	Image_Icon->SetBrushFromTexture(ItemIcon);
-	Text_Count->SetText((ItemCount >= 2) ? FText::AsNumber(ItemCount) : FText::GetEmpty());
+	Image_Icon->SetBrushFromTexture(InItemIcon);
+	Text_Count->SetText((InItemCount >= 2) ? FText::AsNumber(InItemCount) : FText::GetEmpty());
 }
