@@ -9,6 +9,7 @@
 #include "Data/D1InputData.h"
 #include "Input/D1InputComponent.h"
 #include "Inventory/D1InventoryManagerComponent.h"
+#include "Inventory/D1ItemInstance.h"
 #include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1PlayerController)
@@ -42,6 +43,25 @@ void AD1PlayerController::BeginPlay()
 		InventoryManagerComponent->TryAddItemByID(1003, 1);
 		InventoryManagerComponent->TryAddItemByID(1001, 1);
 		InventoryManagerComponent->TryAddItemByID(1002, 1);
+
+		const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(1004);
+		
+		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+		ItemInstance->SetItemID(1004);
+		for (const UD1ItemFragment* Fragment : ItemDef.Fragments)
+		{
+			if (Fragment)
+			{
+				Fragment->OnInstanceCreated(ItemInstance);
+			}
+		}
+		
+		for (int32 i = 0; i < 10; i++)
+		{
+			FIntPoint RandPos = FIntPoint(FMath::RandRange(0, 10), FMath::RandRange(0, 5));
+			InventoryManagerComponent->TryAddItemByPosition(RandPos, ItemInstance, 1);
+		}
 	}
 }
 

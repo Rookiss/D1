@@ -48,18 +48,18 @@ public:
 	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
 	
-	bool TryAddItem(const FIntPoint& ItemPosition, UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
+	bool TryAddItem(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
 	bool TryAddItem(int32 ItemID, int32 ItemCount = 1);
 	bool TryAddItem(UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
 
-	bool TryRemoveItem(const FIntPoint& ItemPosition, int32 ItemCount = 1);
+	bool TryRemoveItem(const FIntPoint& ItemSlotPos, int32 ItemCount = 1);
 	bool TryRemoveItem(int32 ItemID, int32 ItemCount = 1);
 
 public:
-	FD1InventoryEntry GetItemByPosition(const FIntPoint& ItemPosition);
+	FD1InventoryEntry GetItemByPosition(const FIntPoint& ItemSlotPos);
 	int32 GetTotalCountByID(int32 ItemID);
 	
-	const TArray<FD1InventoryEntry>& GetAllItems() const { return Entries; }
+	const TArray<FD1InventoryEntry>& GetAllEntries() const { return Entries; }
 	
 private:
 	friend class UD1InventoryManagerComponent;
@@ -95,24 +95,26 @@ protected:
 public:
 	void Server_Init();
 	
-	bool TryAddItemByPosition(const FIntPoint& ItemPosition, UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
+	bool TryAddItemByPosition(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
 	bool TryAddItemByID(int32 ItemID, int32 ItemCount = 1);
 	bool TryAddItemByInstance(UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
 	
-	bool TryRemoveItemByPosition(const FIntPoint& ItemPosition, int32 ItemCount = 1);
+	bool TryRemoveItemByPosition(const FIntPoint& ItemSlotPos, int32 ItemCount = 1);
 	bool TryRemoveItemByID(int32 ItemID, int32 ItemCount = 1);
 
 	UFUNCTION(Server, Reliable)
-	void RequestMoveItem(const FIntPoint& FromPosition, const FIntPoint& ToPosition);
+	void RequestMoveOrMergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos);
 	
-	void MarkSlotChecks(bool bIsUsing, const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount);
+	void MarkSlotChecks(bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);
 	
 public:
+	bool CanAddItem(const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
+	bool CanMoveItem(int32 FromItemID, const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos) const;
+	bool CanMergeItem(int32 FromItemID, const FIntPoint& FromSlotPos, int32 ToItemID, const FIntPoint& ToSlotPos) const;
+	
 	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
 	const TArray<FD1InventoryEntry>& GetAllEntries() const;
-	FD1InventoryEntry GetItemByPosition(const FIntPoint& ItemPosition);
-	bool CanAddItemByPosition(const FIntPoint& ItemPosition, const FIntPoint& ItemSlotCount) const;
-	bool CanMoveItemByPosition(const FIntPoint& FromPosition, const FIntPoint& ToPosition, const FIntPoint& ItemSlotCount) const;
+	FD1InventoryEntry GetItemByPosition(const FIntPoint& ItemSlotPos);
 	TArray<TArray<bool>>& GetSlotChecks() { return InventorySlotChecks; }
 
 public:

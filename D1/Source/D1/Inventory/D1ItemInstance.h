@@ -49,10 +49,7 @@ private:
 template <typename FragmentClass>
 const FragmentClass* UD1ItemInstance::FindFragmentByClass() const
 {
-	if (const UD1ItemData* ItemData = UD1AssetManager::GetItemData())
-	{
-		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemID);
-		return ItemDef.FindFragmentByClass<FragmentClass>();
-	}
-	return nullptr;
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemID);
+	return ItemDef.FindFragmentByClass<FragmentClass>();
 }

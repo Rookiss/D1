@@ -21,6 +21,9 @@ void UD1ItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 void UD1ItemInstance::SetItemID(int32 InItemID)
 {
+	if (InItemID <= 0)
+		return;
+	
 	ItemID = InItemID;
 }
 
