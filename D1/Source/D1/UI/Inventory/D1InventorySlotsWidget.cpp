@@ -85,24 +85,12 @@ bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, cons
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
 	const FD1ItemDefinition& FromItemDef = ItemData->GetItemDefByID(FromItemInstance->GetItemID());
 	const FIntPoint& FromItemSlotCount = FromItemDef.ItemSlotCount;
-
-	const int32 FromItemID = FromItemInstance->GetItemID();
 	const FIntPoint& FromSlotPos = DragDrop->FromSlotPos;
 	
-	int32 ToItemID = -1;
-	if (ToSlotPos.X >= 0 && ToSlotPos.Y >= 0 && ToSlotPos.X < InventorySlotCount.X && ToSlotPos.Y < InventorySlotCount.Y)
-	{
-		int32 Index = ToSlotPos.Y * InventorySlotCount.X + ToSlotPos.X;
-		if (UD1InventoryEntryWidget* ToEntryWidget = EntryWidgets[Index])
-		{
-			UD1ItemInstance* ToItemInstance = ToEntryWidget->GetItemInstance();
-			ToItemID = ToItemInstance->GetItemID();
-		}
-	}
+	int32 CanMergeCount = 0;
+	EInventoryOpResult Result = InventoryManagerComponent->CanMoveOrMergeItem(FromSlotPos, ToSlotPos, CanMergeCount);
+	bool bIsValid = (Result != EInventoryOpResult::Fail);
 	
-	bool bIsValid = InventoryManagerComponent->CanMoveItem(FromItemID, FromSlotPos, ToSlotPos) ||
-					InventoryManagerComponent->CanMergeItem(FromItemID, FromSlotPos, ToItemID, ToSlotPos);
-
 	UnHoverSlots();
 	
 	const FIntPoint StartSlotPos = FIntPoint(FMath::Max(0, ToSlotPos.X), FMath::Max(0, ToSlotPos.Y));

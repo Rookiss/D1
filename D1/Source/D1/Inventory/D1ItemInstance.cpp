@@ -19,12 +19,23 @@ void UD1ItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(ThisClass, StatTags);
 }
 
-void UD1ItemInstance::SetItemID(int32 InItemID)
+void UD1ItemInstance::Init(int32 InItemID)
 {
 	if (InItemID <= 0)
 		return;
-	
+
 	ItemID = InItemID;
+
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemID);
+	
+	for (const UD1ItemFragment* Fragment : ItemDef.Fragments)
+	{
+		if (Fragment)
+		{
+			Fragment->OnInstanceCreated(this);
+		}
+	}
 }
 
 void UD1ItemInstance::AddStatTagStack(const FGameplayTag& StatTag, int32 StackCount)

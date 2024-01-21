@@ -20,7 +20,7 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
-	void SetItemID(int32 InItemID);
+	void Init(int32 InItemID);
 	
 	void AddStatTagStack(const FGameplayTag& StatTag, int32 StackCount);
 	void RemoveStatTagStack(const FGameplayTag& StatTag, int32 StackCount);
@@ -38,6 +38,7 @@ public:
 	
 private:
 	friend struct FD1InventoryList;
+	friend struct FD1InventoryEntry;
 	
 	UPROPERTY(Replicated)
 	int32 ItemID = 0;

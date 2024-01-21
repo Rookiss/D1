@@ -36,31 +36,10 @@ void AD1PlayerController::BeginPlay()
 	// @TODO: For Test
 	if (HasAuthority())
 	{
-		InventoryManagerComponent->Server_Init();
-		InventoryManagerComponent->TryAddItemByID(1003, 1);
-		InventoryManagerComponent->TryAddItemByID(1002, 1);
-		InventoryManagerComponent->TryAddItemByID(1001, 1);
-		InventoryManagerComponent->TryAddItemByID(1003, 1);
-		InventoryManagerComponent->TryAddItemByID(1001, 1);
-		InventoryManagerComponent->TryAddItemByID(1002, 1);
-
-		const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(1004);
-		
-		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-		ItemInstance->SetItemID(1004);
-		for (const UD1ItemFragment* Fragment : ItemDef.Fragments)
-		{
-			if (Fragment)
-			{
-				Fragment->OnInstanceCreated(ItemInstance);
-			}
-		}
-		
-		for (int32 i = 0; i < 30; i++)
+		for (int32 i = 0; i < 100; i++)
 		{
 			FIntPoint RandPos = FIntPoint(FMath::RandRange(0, 10), FMath::RandRange(0, 5));
-			InventoryManagerComponent->TryAddItemByPosition(RandPos, ItemInstance, 1);
+			InventoryManagerComponent->TryAddItem(RandPos, 1004, FMath::RandRange(1, 2));
 		}
 	}
 }

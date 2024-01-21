@@ -3,9 +3,18 @@
 #include "Net/Serialization/FastArraySerializer.h"
 #include "D1InventoryManagerComponent.generated.h"
 
+class UD1InventoryManagerComponent;
 class UD1ItemInstance;
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnInventoryEntryChanged, const FIntPoint&/*ItemSlotPos*/, UD1ItemInstance*/*ItemInstance*/, int32/*ItemCount*/);
+
+UENUM(BlueprintType)
+enum class EInventoryOpResult : uint8
+{
+	Fail,
+	Move,
+	Merge
+};
 
 USTRUCT(BlueprintType)
 struct FD1InventoryEntry : public FFastArraySerializerItem
@@ -15,6 +24,10 @@ struct FD1InventoryEntry : public FFastArraySerializerItem
 public:
 	FD1InventoryEntry() { }
 
+private:
+	void Init(int32 InItemID, int32 InItemCount);
+	void Init(UD1ItemInstance* InItemInstance, int32 InItemCount);
+	
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
 	int32 GetItemCount() const { return ItemCount; }
@@ -31,7 +44,7 @@ private:
 	int32 ItemCount = 0;
 
 	UPROPERTY()
-	int32 CachedItemID = 0;
+	int32 LatestValidItemID = 0;
 };
 
 USTRUCT(BlueprintType)
@@ -49,16 +62,19 @@ public:
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
 
 private:
-	bool TryAddItem(const FIntPoint& ToItemSlotPos, UD1ItemInstance* FromItemInstance, int32 FromItemCount = 1);
-	bool TryAddItem(int32 ItemID, int32 ItemCount = 1);
-	bool TryAddItem(UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
+	void ServerInit();
 
-	bool TryRemoveItem(const FIntPoint& ItemSlotPos, int32 ItemCount = 1);
-
-public:
-	FD1InventoryEntry GetItemByPosition(const FIntPoint& ItemSlotPos);
-	int32 GetTotalCountByID(int32 ItemID);
+	bool TryAddItem(const FIntPoint& ItemSlotPos, int32 ItemID, int32 ItemCount);
+	bool TryAddItem(int32 ItemID, int32 ItemCount);
+	bool TryRemoveItem(const FIntPoint& ItemSlotPos, int32 ItemCount);
+	bool TryRemoveItem(int32 ItemID, int32 ItemCount);
 	
+	void Unsafe_MoveItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos);
+	void Unsafe_MergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos, int32 MergeCount);
+	
+public:
+	FD1InventoryEntry GetEntryByPosition(const FIntPoint& ItemSlotPos);
+	int32 GetTotalCountByID(int32 ItemID);
 	const TArray<FD1InventoryEntry>& GetAllEntries() const { return Entries; }
 	
 private:
@@ -89,32 +105,30 @@ public:
 	UD1InventoryManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
 public:
-	void Server_Init();
-	
-	bool TryAddItemByPosition(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
-	bool TryAddItemByID(int32 ItemID, int32 ItemCount = 1);
-	bool TryAddItemByInstance(UD1ItemInstance* ItemInstance, int32 ItemCount = 1);
-	
-	bool TryRemoveItemByPosition(const FIntPoint& ItemSlotPos, int32 ItemCount = 1);
-	bool TryRemoveItemByID(int32 ItemID, int32 ItemCount = 1);
-
 	UFUNCTION(Server, Reliable)
 	void RequestMoveOrMergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos);
+
+	bool TryAddItem(const FIntPoint& ItemSlotPos, int32 ItemID, int32 ItemCount);
+	bool TryAddItem(int32 ItemID, int32 ItemCount);
+	bool TryRemoveItem(const FIntPoint& ItemSlotPos, int32 ItemCount);
+	bool TryRemoveItem(int32 ItemID, int32 ItemCount);
 	
+	void MarkSlotChecks(TArray<TArray<bool>>& SlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);
 	void MarkSlotChecks(bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);
 	
 public:
+	bool IsEmpty(const TArray<TArray<bool>>& SlotChecks, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
 	bool IsEmpty(const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
-	bool CanMoveItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos) const;
-	bool CanMergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos, int32& MergeCount) const;
+	EInventoryOpResult CanMoveOrMergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos, int32& OutMergeCount) const;
 
-	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
 	const TArray<FD1InventoryEntry>& GetAllEntries() const;
-	FD1InventoryEntry GetItemByPosition(const FIntPoint& ItemSlotPos);
+	FD1InventoryEntry GetEntryByPosition(const FIntPoint& ItemSlotPos);
+	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
 	TArray<TArray<bool>>& GetSlotChecks() { return InventorySlotChecks; }
 
 public:
