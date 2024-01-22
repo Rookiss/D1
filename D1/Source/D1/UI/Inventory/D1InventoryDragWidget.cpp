@@ -3,7 +3,6 @@
 #include "Components/Image.h"
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
-#include "Inventory/Fragments/D1ItemFragment_Stackable.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1InventoryDragWidget)
 

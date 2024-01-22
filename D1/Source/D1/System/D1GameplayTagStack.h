@@ -2,23 +2,23 @@
 
 #include "GameplayTagContainer.h"
 #include "Net/Serialization/FastArraySerializer.h"
-#include "GameplayTagStack.generated.h"
+#include "D1GameplayTagStack.generated.h"
 
 USTRUCT(BlueprintType)
-struct FGameplayTagStack : public FFastArraySerializerItem
+struct FD1GameplayTagStack : public FFastArraySerializerItem
 {
 	GENERATED_BODY()
 
 public:
-	FGameplayTagStack() { }
-	FGameplayTagStack(const FGameplayTag& InTag, int32 InStackCount)
+	FD1GameplayTagStack() { }
+	FD1GameplayTagStack(const FGameplayTag& InTag, int32 InStackCount)
 		: Tag(InTag), StackCount(InStackCount) { }
 
 public:
 	FString GetDebugString() const;
 	
 private:
-	friend struct FGameplayTagStackContainer;
+	friend struct FD1GameplayTagStackContainer;
 	
 	UPROPERTY()
 	FGameplayTag Tag;
@@ -28,12 +28,12 @@ private:
 };
 
 USTRUCT(BlueprintType)
-struct FGameplayTagStackContainer : public FFastArraySerializer
+struct FD1GameplayTagStackContainer : public FFastArraySerializer
 {
 	GENERATED_BODY()
 	
 public:
-	FGameplayTagStackContainer() { }
+	FD1GameplayTagStackContainer() { }
 
 public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
@@ -54,13 +54,13 @@ public:
 
 private:
 	UPROPERTY()
-	TArray<FGameplayTagStack> Stacks;
+	TArray<FD1GameplayTagStack> Stacks;
 
 	TMap<FGameplayTag, int32> TagToCount;
 };
 
 template<>
-struct TStructOpsTypeTraits<FGameplayTagStackContainer> : public TStructOpsTypeTraitsBase2<FGameplayTagStackContainer>
+struct TStructOpsTypeTraits<FD1GameplayTagStackContainer> : public TStructOpsTypeTraitsBase2<FD1GameplayTagStackContainer>
 {
 	enum
 	{

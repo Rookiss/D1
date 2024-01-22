@@ -7,8 +7,8 @@
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
 #include "Data/D1ItemData.h"
-#include "Inventory/D1ItemInstance.h"
-#include "Inventory/Fragments/D1ItemFragment_Stackable.h"
+#include "Item/D1ItemInstance.h"
+#include "Item/Fragments/D1ItemFragment_Stackable.h"
 #include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1InventoryEntryWidget)

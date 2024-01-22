@@ -2,6 +2,7 @@
 
 #include "D1PlayerController.generated.h"
 
+class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 struct FInputActionValue;
 struct FGameplayTag;
@@ -31,6 +32,9 @@ private:
 	void ResetInput();
 	
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
 

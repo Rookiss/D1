@@ -2,33 +2,33 @@
 
 #include "D1AssetData.generated.h"
 
-USTRUCT(BlueprintType)
+USTRUCT()
 struct FAssetEntry
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	FName AssetName;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	FSoftObjectPath AssetPath;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	TArray<FName> AssetLabels;
 };
 
-USTRUCT(BlueprintType)
+USTRUCT()
 struct FAssetSet
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	TArray<FAssetEntry> AssetEntries;
 };
 
-UCLASS(BlueprintType, Const, CollapseCategories)
+UCLASS(Const, CollapseCategories)
 class UD1AssetData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()

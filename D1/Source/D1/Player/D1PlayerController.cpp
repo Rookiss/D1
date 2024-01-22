@@ -8,8 +8,8 @@
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Data/D1InputData.h"
 #include "Input/D1InputComponent.h"
-#include "Inventory/D1InventoryManagerComponent.h"
-#include "Inventory/D1ItemInstance.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "Item/Managers/D1InventoryManagerComponent.h"
 #include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1PlayerController)
@@ -18,6 +18,8 @@ AD1PlayerController::AD1PlayerController(const FObjectInitializer& ObjectInitial
 	: Super(ObjectInitializer)
 {
 	bReplicates = true;
+	
+	EquipmentManagerComponent = CreateDefaultSubobject<UD1EquipmentManagerComponent>("EquipmentManagerComponent");
 	InventoryManagerComponent = CreateDefaultSubobject<UD1InventoryManagerComponent>("InventoryManagerComponent");
 }
 

@@ -21,9 +21,6 @@ struct FD1InventoryEntry : public FFastArraySerializerItem
 {
 	GENERATED_BODY()
 
-public:
-	FD1InventoryEntry() { }
-
 private:
 	void Init(int32 InItemID, int32 InItemCount);
 	void Init(UD1ItemInstance* InItemInstance, int32 InItemCount);

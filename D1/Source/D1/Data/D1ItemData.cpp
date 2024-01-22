@@ -1,26 +1,46 @@
 ﻿#include "D1ItemData.h"
 
 #include "EditorDialogLibrary.h"
-#include "Inventory/Fragments/D1ItemFragment_Equippable.h"
-#include "Inventory/Fragments/D1ItemFragment_FixedStats.h"
-#include "Inventory/Fragments/D1ItemFragment_RandomStats.h"
-#include "Inventory/Fragments/D1ItemFragment_Stackable.h"
+#include "Item/Fragments/D1ItemFragment_Consumable.h"
+#include "Item/Fragments/D1ItemFragment_Equippable.h"
+#include "Item/Fragments/D1ItemFragment_Stackable.h"
 #include "UObject/ObjectSaveContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemData)
 
+UD1ItemData::UD1ItemData()
+{
+	// 28, 22, 17, 12, 9, 6, 4, 2
+	ItemProbabilities.SetNum((int32)EItemRarity::Count);
+	for (int32 i = 0; i < ItemProbabilities.Num(); i++)
+	{
+		ItemProbabilities[i].Rarity = (EItemRarity)i;
+	}
+}
+
 void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);
+
+	FString ErrorMsg;
+	
+	int32 TotalProbability = 0;
+	for (const FD1ItemProbability& ItemProbability : ItemProbabilities)
+	{
+		TotalProbability += ItemProbability.Probability;
+	}
+
+	if (TotalProbability != 100)
+	{
+		ErrorMsg.Append(FString::Printf(TEXT("Total Probability is Low[%d%%] than 100%%"), TotalProbability));
+	}
 	
 	ItemIDToDef.Empty();
-
 	ItemNameToDef.ValueSort([](const FD1ItemDefinition& A, const FD1ItemDefinition& B)
 	{
 		return A.ItemID < B.ItemID;
 	});
 	
-	FString ErrorMsg;
 	for (const auto& Pair : ItemNameToDef)
 	{
 		const FString& Name = Pair.Key;
@@ -40,17 +60,11 @@ void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 				ErrorMsg.Append(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Stackable] <-> [Equippable]"), ID));
 				continue;
 			}
-
-			if (ItemDef.FindFragmentByClass<UD1ItemFragment_RandomStats>())
-			{
-				ErrorMsg.Append(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Stackable] <-> [RandomStats]"), ID));
-				continue;
-			}
 		}
 
-		if (ItemDef.FindFragmentByClass<UD1ItemFragment_FixedStats>() && ItemDef.FindFragmentByClass<UD1ItemFragment_RandomStats>())
+		if (ItemDef.FindFragmentByClass<UD1ItemFragment_Consumable>() && ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable>())
 		{
-			ErrorMsg.Append(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [FixedStats] <-> [RandomStats]"), ID));
+			ErrorMsg.Append(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Consumable] <-> [Equippable]"), ID));
 			continue;
 		}
 		

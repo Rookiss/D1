@@ -38,8 +38,8 @@ public:
 	void ProcessAbilityInput(float DeltaTime, bool bGamePaused);
 	void ClearAbilityInput();
 
-	void AddDynamicTagGameplayEffect(const FGameplayTag& Tag);
-	void RemoveDynamicTagGameplayEffect(const FGameplayTag& Tag);
+	void AddDynamicTagToSelf(const FGameplayTag& Tag);
+	void RemoveDynamicTagToSelf(const FGameplayTag& Tag);
 	
 public:
 	FAbilityChangedDelegate AbilityChangedDelegate;

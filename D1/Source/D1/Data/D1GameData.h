@@ -4,7 +4,7 @@
 
 class UGameplayEffect;
 
-UCLASS(BlueprintType, Const)
+UCLASS(Const)
 class UD1GameData : public UDataAsset
 {
 	GENERATED_BODY()

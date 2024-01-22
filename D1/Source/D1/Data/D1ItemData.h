@@ -1,11 +1,37 @@
 ﻿#pragma once
-#include "Inventory/Fragments/D1ItemFragment.h"
 
+#include "Item/Fragments/D1ItemFragment.h"
 #include "D1ItemData.generated.h"
 
-class UD1ItemFragment;
+UENUM()
+enum class EItemRarity : uint8
+{
+	Junk,
+	Poor,
+	Common,
+	Uncommon,
+	Rare,
+	Epic,
+	Legendary,
+	Unique,
 
-USTRUCT(BlueprintType)
+	Count	UMETA(Hidden)
+};
+
+USTRUCT()
+struct FD1ItemProbability
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleDefaultsOnly)
+	EItemRarity Rarity = EItemRarity::Junk;
+
+	UPROPERTY(EditDefaultsOnly)
+	int32 Probability = 0;
+};
+
+USTRUCT()
 struct FD1ItemDefinition
 {
 	GENERATED_BODY()
@@ -15,22 +41,22 @@ public:
 	const FragmentClass* FindFragmentByClass() const;
 	
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	int32 ItemID = 0;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	FIntPoint ItemSlotCount = FIntPoint::ZeroValue;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	FText DisplayName;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	FText Description;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UTexture2D> IconTexture;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
+	UPROPERTY(EditDefaultsOnly, Instanced)
 	TArray<TObjectPtr<UD1ItemFragment>> Fragments;
 };
 
@@ -47,18 +73,25 @@ const FragmentClass* FD1ItemDefinition::FindFragmentByClass() const
 	return nullptr;
 }
 
-UCLASS(BlueprintType, Const)
+UCLASS(Const)
 class UD1ItemData : public UDataAsset
 {
 	GENERATED_BODY()
+
+public:
+	UD1ItemData();
 	
 public:
 	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
 
 public:
+	const TArray<FD1ItemProbability>& GetItemProbabilities() const { return ItemProbabilities; }
 	const FD1ItemDefinition& GetItemDefByID(int32 ItemID) const;
 	
 private:
+	UPROPERTY(EditDefaultsOnly, EditFixedSize, meta=(ShowInnerProperties))
+	TArray<FD1ItemProbability> ItemProbabilities;
+	
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FString, FD1ItemDefinition> ItemNameToDef;
 

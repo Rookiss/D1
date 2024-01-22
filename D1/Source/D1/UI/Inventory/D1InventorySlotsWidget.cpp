@@ -7,8 +7,8 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Components/UniformGridPanel.h"
 #include "Data/D1ItemData.h"
-#include "Inventory/D1InventoryManagerComponent.h"
-#include "Inventory/D1ItemInstance.h"
+#include "Item/D1ItemInstance.h"
+#include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Player/D1PlayerController.h"
 #include "System/D1AssetManager.h"
 

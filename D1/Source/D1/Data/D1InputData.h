@@ -6,35 +6,34 @@
 class UInputMappingContext;
 class UInputAction;
 
-USTRUCT(BlueprintType)
+USTRUCT()
 struct FD1InputAction
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	FGameplayTag InputTag = FGameplayTag::EmptyTag;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> InputAction = nullptr;
 };
 
-UCLASS(BlueprintType, Const)
+UCLASS(Const)
 class UD1InputData : public UDataAsset
 {
 	GENERATED_BODY()
 	
 public:
-	UFUNCTION(BlueprintCallable)
 	const UInputAction* FindNativeInputActionForTag(const FGameplayTag& InputTag) const;
 	
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputMappingContext> MappingContext;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	TArray<FD1InputAction> NativeInputActions;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	TArray<FD1InputAction> AbilityInputActions;
 };

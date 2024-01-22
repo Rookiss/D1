@@ -25,6 +25,7 @@ void UD1ItemInstance::Init(int32 InItemID)
 		return;
 
 	ItemID = InItemID;
+	ItemRarity = DetermineItemRarity();
 
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
 	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemID);
@@ -61,4 +62,23 @@ bool UD1ItemInstance::HasStatTag(const FGameplayTag& StatTag) const
 FString UD1ItemInstance::GetDebugString() const
 {
 	return FString::Printf(TEXT("[ID : %d] : [%s]"), ItemID, *StatTags.GetDebugString());
+}
+
+EItemRarity UD1ItemInstance::DetermineItemRarity()
+{
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	const TArray<FD1ItemProbability>& ItemProbabilities = ItemData->GetItemProbabilities();
+	
+	int32 TotalPercent = 0.f;
+	int32 RandValue = FMath::RandRange(1, 100);
+
+	for (int32 i = 0; i < ItemProbabilities.Num(); i++)
+	{
+		TotalPercent += ItemProbabilities[i].Probability;
+		if (RandValue <= TotalPercent)
+		{
+			return ItemProbabilities[i].Rarity;
+		}
+	}
+	return EItemRarity::Junk;
 }

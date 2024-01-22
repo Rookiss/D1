@@ -1,15 +1,15 @@
 ﻿#pragma once
-#include "GameplayTagContainer.h"
 
+#include "GameplayAbilitySpecHandle.h"
+#include "ActiveGameplayEffectHandle.h"
+#include "GameplayTagContainer.h"
 #include "D1AbilitySystemData.generated.h"
 
 class UD1AbilitySystemComponent;
-struct FActiveGameplayEffectHandle;
-struct FGameplayAbilitySpecHandle;
 class UGameplayEffect;
 class UD1GameplayAbility;
 
-USTRUCT(BlueprintType)
+USTRUCT()
 struct FD1AbilitySystemData_Ability
 {
 	GENERATED_BODY()
@@ -28,7 +28,7 @@ public:
 	FGameplayTag InputTag = FGameplayTag::EmptyTag;
 };
 
-USTRUCT(BlueprintType)
+USTRUCT()
 struct FD1AbilitySystemData_Effect
 {
 	GENERATED_BODY()
@@ -41,7 +41,7 @@ public:
 	float EffectLevel = 1.f;
 };
 
-USTRUCT(BlueprintType)
+USTRUCT()
 struct FD1AbilitySystemData_GrantedHandles
 {
 	GENERATED_BODY()
@@ -60,7 +60,7 @@ protected:
 	TArray<FActiveGameplayEffectHandle> EffectHandles;
 };
 
-UCLASS(BlueprintType, Const)
+UCLASS(Const)
 class UD1AbilitySystemData : public UDataAsset
 {
 	GENERATED_BODY()

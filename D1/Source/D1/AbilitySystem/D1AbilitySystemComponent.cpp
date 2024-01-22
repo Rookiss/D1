@@ -273,7 +273,7 @@ void UD1AbilitySystemComponent::ClearAbilityInput()
 	InputReleasedSpecHandles.Reset();
 }
 
-void UD1AbilitySystemComponent::AddDynamicTagGameplayEffect(const FGameplayTag& Tag)
+void UD1AbilitySystemComponent::AddDynamicTagToSelf(const FGameplayTag& Tag)
 {
 	const TSubclassOf<UGameplayEffect> DynamicTagGE = UD1AssetManager::GetGameData()->DynamicTagGameplayEffect;
 	if (DynamicTagGE == nullptr)
@@ -294,7 +294,7 @@ void UD1AbilitySystemComponent::AddDynamicTagGameplayEffect(const FGameplayTag& 
 	ApplyGameplayEffectSpecToSelf(*Spec);
 }
 
-void UD1AbilitySystemComponent::RemoveDynamicTagGameplayEffect(const FGameplayTag& Tag)
+void UD1AbilitySystemComponent::RemoveDynamicTagToSelf(const FGameplayTag& Tag)
 {
 	const TSubclassOf<UGameplayEffect> DynamicTagGE = UD1AssetManager::GetGameData()->DynamicTagGameplayEffect;
 	if (DynamicTagGE == nullptr)

@@ -2,8 +2,7 @@
 
 #include "Data/D1ItemData.h"
 #include "System/D1AssetManager.h"
-#include "System/GameplayTagStack.h"
-
+#include "System/D1GameplayTagStack.h"
 #include "D1ItemInstance.generated.h"
 
 struct FGameplayTag;
@@ -35,6 +34,9 @@ public:
 
 	template <typename FragmentClass>
 	const FragmentClass* FindFragmentByClass() const;
+
+private:
+	EItemRarity DetermineItemRarity();
 	
 private:
 	friend struct FD1InventoryList;
@@ -42,9 +44,12 @@ private:
 	
 	UPROPERTY(Replicated)
 	int32 ItemID = 0;
+
+	UPROPERTY(Replicated)
+	EItemRarity ItemRarity = EItemRarity::Junk;
 	
 	UPROPERTY(Replicated)
-	FGameplayTagStackContainer StatTags;
+	FD1GameplayTagStackContainer StatTags;
 };
 
 template <typename FragmentClass>
