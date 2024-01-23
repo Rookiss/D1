@@ -23,8 +23,7 @@ public:
 
 public:
 	static void Initialize();
-
-	static UD1GameData* GetGameData();
+	
 	static UD1ItemData* GetItemData();
 	
 	template<typename AssetType>

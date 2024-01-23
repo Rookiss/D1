@@ -6,9 +6,10 @@
 
 FStatRangeSet::FStatRangeSet()
 {
-	for (int32 i = 0; i < (int32)EItemRarity::Count; i++)
+	StatRanges.SetNum(static_cast<int32>(EItemRarity::Count));
+	for (int32 i = 0; i < StatRanges.Num(); i++)
 	{
-		StatRanges.FindOrAdd((EItemRarity)i);
+		StatRanges[i].Rarity = static_cast<EItemRarity>(i);
 	}
 }
 
@@ -24,9 +25,10 @@ void UD1ItemFragment_Equippable::OnInstanceCreated(UD1ItemInstance* ItemInstance
 
 	for (const auto& Pair : Stats)
 	{
-		// const FGameplayTag& StatTag = Pair.Key;
-		// const FStatRange& StatRange = Pair.Value;
-		// const int32 StatCount = FMath::RandRange(StatRange.MinValue, StatRange.MaxValue);
-		// ItemInstance->AddStatTagStack(StatTag, StatCount);
+		const FGameplayTag& StatTag = Pair.Key;
+		const FStatRangeSet& StatRangeSet = Pair.Value;
+		const FStatRange& StatRange = StatRangeSet.StatRanges[static_cast<int32>(ItemInstance->GetItemRarity())];
+		const int32 StatCount = FMath::RandRange(StatRange.MinValue, StatRange.MaxValue);
+		ItemInstance->AddStatTagStack(StatTag, StatCount);
 	}
 }

@@ -135,7 +135,7 @@ bool UD1InventorySlotsWidget::NativeOnDrop(const FGeometry& InGeometry, const FD
 	FVector2D ToWidgetPos = MouseWidgetPos - DragDrop->DeltaWidgetPos;
 	FIntPoint ToSlotPos = FIntPoint(ToWidgetPos.X / UnitSlotSize.X, ToWidgetPos.Y / UnitSlotSize.Y);
 	
-	InventoryManagerComponent->RequestMoveOrMergeItem(DragDrop->FromSlotPos, ToSlotPos);
+	InventoryManagerComponent->Server_RequestMoveOrMergeItem(DragDrop->FromSlotPos, ToSlotPos);
 	return true;
 }
 

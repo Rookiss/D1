@@ -16,7 +16,7 @@ void UD1ItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, ItemID);
-	DOREPLIFETIME(ThisClass, StatTags);
+	DOREPLIFETIME(ThisClass, StatContainer);
 }
 
 void UD1ItemInstance::Init(int32 InItemID)
@@ -41,33 +41,38 @@ void UD1ItemInstance::Init(int32 InItemID)
 
 void UD1ItemInstance::AddStatTagStack(const FGameplayTag& StatTag, int32 StackCount)
 {
-	StatTags.AddStack(StatTag, StackCount);
+	StatContainer.AddStack(StatTag, StackCount);
 }
 
 void UD1ItemInstance::RemoveStatTagStack(const FGameplayTag& StatTag, int32 StackCount)
 {
-	StatTags.RemoveStack(StatTag, StackCount);
+	StatContainer.RemoveStack(StatTag, StackCount);
+}
+
+const TArray<FD1GameplayTagStack>& UD1ItemInstance::GetAllStatStacks() const
+{
+	return StatContainer.GetAllStatStacks();
 }
 
 int32 UD1ItemInstance::GetStackCountByTag(const FGameplayTag& StatTag) const
 {
-	return StatTags.GetStackCountByTag(StatTag);
+	return StatContainer.GetStackCountByTag(StatTag);
 }
 
 bool UD1ItemInstance::HasStatTag(const FGameplayTag& StatTag) const
 {
-	return StatTags.ContainsTag(StatTag);
+	return StatContainer.ContainsTag(StatTag);
 }
 
 FString UD1ItemInstance::GetDebugString() const
 {
-	return FString::Printf(TEXT("[ID : %d] : [%s]"), ItemID, *StatTags.GetDebugString());
+	return FString::Printf(TEXT("[ID : %d] : [%s]"), ItemID, *StatContainer.GetDebugString());
 }
 
 EItemRarity UD1ItemInstance::DetermineItemRarity()
 {
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const TArray<FD1ItemProbability>& ItemProbabilities = ItemData->GetItemProbabilities();
+	const TArray<FD1ItemRarityProbability>& ItemProbabilities = ItemData->GetItemRarityProbabilities();
 	
 	int32 TotalPercent = 0.f;
 	int32 RandValue = FMath::RandRange(1, 100);

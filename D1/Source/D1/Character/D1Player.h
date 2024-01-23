@@ -5,6 +5,7 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class UD1EquipmentManagerComponent;
 
 UCLASS()
 class AD1Player : public AD1Character
@@ -26,4 +27,7 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> FirstPersonMeshComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
 };

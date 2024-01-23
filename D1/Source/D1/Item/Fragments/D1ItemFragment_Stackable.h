@@ -3,7 +3,7 @@
 #include "D1ItemFragment.h"
 #include "D1ItemFragment_Stackable.generated.h"
 
-UCLASS(CollapseCategories)
+UCLASS(Const)
 class UD1ItemFragment_Stackable : public UD1ItemFragment
 {
 	GENERATED_BODY()

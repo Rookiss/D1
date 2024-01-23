@@ -24,6 +24,7 @@ struct FD1InventoryEntry : public FFastArraySerializerItem
 private:
 	void Init(int32 InItemID, int32 InItemCount);
 	void Init(UD1ItemInstance* InItemInstance, int32 InItemCount);
+	void Reset();
 	
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
@@ -59,7 +60,7 @@ public:
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
 
 private:
-	void ServerInit();
+	void InitOnServer();
 
 	bool TryAddItem(const FIntPoint& ItemSlotPos, int32 ItemID, int32 ItemCount);
 	bool TryAddItem(int32 ItemID, int32 ItemCount);
@@ -70,8 +71,8 @@ private:
 	void Unsafe_MergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos, int32 MergeCount);
 	
 public:
-	FD1InventoryEntry GetEntryByPosition(const FIntPoint& ItemSlotPos);
-	int32 GetTotalCountByID(int32 ItemID);
+	FD1InventoryEntry GetEntryByPosition(const FIntPoint& ItemSlotPos) const;
+	int32 GetTotalCountByID(int32 ItemID) const;
 	const TArray<FD1InventoryEntry>& GetAllEntries() const { return Entries; }
 	
 private:
@@ -108,7 +109,7 @@ protected:
 
 public:
 	UFUNCTION(Server, Reliable)
-	void RequestMoveOrMergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos);
+	void Server_RequestMoveOrMergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos);
 
 	bool TryAddItem(const FIntPoint& ItemSlotPos, int32 ItemID, int32 ItemCount);
 	bool TryAddItem(int32 ItemID, int32 ItemCount);

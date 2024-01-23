@@ -23,18 +23,18 @@ void FD1AbilitySystemData_GrantedHandles::AddEffectHandle(const FActiveGameplayE
 	}
 }
 
-void FD1AbilitySystemData_GrantedHandles::TakeFromAbilitySystem(UD1AbilitySystemComponent* D1ASC)
+void FD1AbilitySystemData_GrantedHandles::TakeFromAbilitySystem(UD1AbilitySystemComponent* ASC)
 {
-	check(D1ASC);
+	check(ASC);
 
-	if (D1ASC->IsOwnerActorAuthoritative() == false)
+	if (ASC->IsOwnerActorAuthoritative() == false)
 		return;
 
 	for (const FGameplayAbilitySpecHandle& Handle : AbilitySpecHandles)
 	{
 		if (Handle.IsValid())
 		{
-			D1ASC->ClearAbility(Handle);
+			ASC->ClearAbility(Handle);
 		}
 	}
 
@@ -42,7 +42,7 @@ void FD1AbilitySystemData_GrantedHandles::TakeFromAbilitySystem(UD1AbilitySystem
 	{
 		if (Handle.IsValid())
 		{
-			D1ASC->RemoveActiveGameplayEffect(Handle);
+			ASC->RemoveActiveGameplayEffect(Handle);
 		}
 	}
 
@@ -56,11 +56,11 @@ UD1AbilitySystemData::UD1AbilitySystemData(const FObjectInitializer& ObjectIniti
     
 }
 
-void UD1AbilitySystemData::GiveToAbilitySystem(UD1AbilitySystemComponent* D1ASC, FD1AbilitySystemData_GrantedHandles* OutGrantedHandles, UObject* SourceObject) const
+void UD1AbilitySystemData::GiveToAbilitySystem(UD1AbilitySystemComponent* ASC, FD1AbilitySystemData_GrantedHandles* OutGrantedHandles, UObject* SourceObject) const
 {
-	check(D1ASC);
+	check(ASC);
 
-	if (D1ASC->IsOwnerActorAuthoritative() == false)
+	if (ASC->IsOwnerActorAuthoritative() == false)
 		return;
 
 	for (int32 AbilityIndex = 0; AbilityIndex < Abilities.Num(); AbilityIndex++)
@@ -78,7 +78,7 @@ void UD1AbilitySystemData::GiveToAbilitySystem(UD1AbilitySystemComponent* D1ASC,
 		AbilitySpec.SourceObject = SourceObject;
 		AbilitySpec.DynamicAbilityTags.AddTag(AbilityToGrant.InputTag);
 
-		const FGameplayAbilitySpecHandle AbilitySpecHandle = D1ASC->GiveAbility(AbilitySpec);
+		const FGameplayAbilitySpecHandle AbilitySpecHandle = ASC->GiveAbility(AbilitySpec);
 		if (OutGrantedHandles)
 		{
 			OutGrantedHandles->AddAbilitySpecHandle(AbilitySpecHandle);
@@ -95,7 +95,7 @@ void UD1AbilitySystemData::GiveToAbilitySystem(UD1AbilitySystemComponent* D1ASC,
 		}
 
 		const UGameplayEffect* Effect = EffectToGrant.Effect->GetDefaultObject<UGameplayEffect>();
-		const FActiveGameplayEffectHandle EffectHandle = D1ASC->ApplyGameplayEffectToSelf(Effect, EffectToGrant.EffectLevel, D1ASC->MakeEffectContext());
+		const FActiveGameplayEffectHandle EffectHandle = ASC->ApplyGameplayEffectToSelf(Effect, EffectToGrant.EffectLevel, ASC->MakeEffectContext());
 		if (OutGrantedHandles)
 		{
 			OutGrantedHandles->AddEffectHandle(EffectHandle);

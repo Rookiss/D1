@@ -6,7 +6,6 @@
 #include "Abilities/D1GameplayAbility.h"
 #include "Animation/D1AnimInstance.h"
 #include "Data/D1AbilitySystemData.h"
-#include "Data/D1GameData.h"
 #include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AbilitySystemComponent)
@@ -275,7 +274,7 @@ void UD1AbilitySystemComponent::ClearAbilityInput()
 
 void UD1AbilitySystemComponent::AddDynamicTagToSelf(const FGameplayTag& Tag)
 {
-	const TSubclassOf<UGameplayEffect> DynamicTagGE = UD1AssetManager::GetGameData()->DynamicTagGameplayEffect;
+	const TSubclassOf<UGameplayEffect> DynamicTagGE = UD1AssetManager::GetSubclassByName<UGameplayEffect>("DynamicTagEffect");
 	if (DynamicTagGE == nullptr)
 	{
 		UE_LOG(LogD1AbilitySystem, Warning, TEXT("AddDynamicTagGameplayEffect : Unable to find DynamicTagGameplayEffect."));
@@ -296,7 +295,7 @@ void UD1AbilitySystemComponent::AddDynamicTagToSelf(const FGameplayTag& Tag)
 
 void UD1AbilitySystemComponent::RemoveDynamicTagToSelf(const FGameplayTag& Tag)
 {
-	const TSubclassOf<UGameplayEffect> DynamicTagGE = UD1AssetManager::GetGameData()->DynamicTagGameplayEffect;
+	const TSubclassOf<UGameplayEffect> DynamicTagGE = UD1AssetManager::GetSubclassByName<UGameplayEffect>("DynamicTagEffect");
 	if (DynamicTagGE == nullptr)
 	{
 		UE_LOG(LogD1AbilitySystem, Warning, TEXT("AddDynamicTagGameplayEffect : Unable to find DynamicTagGameplayEffect."));

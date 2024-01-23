@@ -19,7 +19,7 @@ enum class EItemRarity : uint8
 };
 
 USTRUCT()
-struct FD1ItemProbability
+struct FD1ItemRarityProbability
 {
 	GENERATED_BODY()
 
@@ -84,13 +84,17 @@ public:
 public:
 	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
 
+#if WITH_EDITOR
+	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
+#endif
+	
 public:
-	const TArray<FD1ItemProbability>& GetItemProbabilities() const { return ItemProbabilities; }
+	const TArray<FD1ItemRarityProbability>& GetItemRarityProbabilities() const { return ItemRarityProbabilities; }
 	const FD1ItemDefinition& GetItemDefByID(int32 ItemID) const;
 	
 private:
-	UPROPERTY(EditDefaultsOnly, EditFixedSize, meta=(ShowInnerProperties))
-	TArray<FD1ItemProbability> ItemProbabilities;
+	UPROPERTY(EditDefaultsOnly, EditFixedSize)
+	TArray<FD1ItemRarityProbability> ItemRarityProbabilities;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FString, FD1ItemDefinition> ItemNameToDef;

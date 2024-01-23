@@ -35,6 +35,10 @@ class UD1AssetData : public UPrimaryDataAsset
 
 public:
 	virtual void PreSave(FObjectPreSaveContext ObjectSaveContext) override;
+
+#if WITH_EDITOR
+	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
+#endif
 	
 public:
 	FSoftObjectPath GetAssetPathByName(const FName& AssetName);

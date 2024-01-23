@@ -8,7 +8,6 @@
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Data/D1InputData.h"
 #include "Input/D1InputComponent.h"
-#include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "System/D1AssetManager.h"
 
@@ -19,7 +18,6 @@ AD1PlayerController::AD1PlayerController(const FObjectInitializer& ObjectInitial
 {
 	bReplicates = true;
 	
-	EquipmentManagerComponent = CreateDefaultSubobject<UD1EquipmentManagerComponent>("EquipmentManagerComponent");
 	InventoryManagerComponent = CreateDefaultSubobject<UD1InventoryManagerComponent>("InventoryManagerComponent");
 }
 
@@ -141,4 +139,13 @@ void AD1PlayerController::ResetInput()
 	{
 		D1InputComponent->RemoveBinds(InputBindHandles);
 	}
+}
+
+UAbilitySystemComponent* AD1PlayerController::GetAbilitySystemComponent() const
+{
+	if (AD1PlayerState* PS = GetPlayerState<AD1PlayerState>())
+	{
+		return PS->GetAbilitySystemComponent();
+	}
+	return nullptr;
 }

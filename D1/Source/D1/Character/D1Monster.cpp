@@ -10,9 +10,9 @@ AD1Monster::AD1Monster(const FObjectInitializer& ObjectInitializer)
 {
 	NetUpdateFrequency = 100.f;
 
-	D1AbilitySystemComponent = CreateDefaultSubobject<UD1AbilitySystemComponent>("D1AbilitySystemComponent");
-	D1AbilitySystemComponent->SetIsReplicated(true);
-	D1AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+	AbilitySystemComponent = CreateDefaultSubobject<UD1AbilitySystemComponent>("D1AbilitySystemComponent");
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	
 	MonsterSet = CreateDefaultSubobject<UD1MonsterSet>("D1MonsterSet");
 }
@@ -33,7 +33,7 @@ void AD1Monster::InitAbilityActorInfo()
 {
 	Super::InitAbilityActorInfo();
 
-	D1AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
 const UD1MonsterSet* AD1Monster::GetPrimarySet() const

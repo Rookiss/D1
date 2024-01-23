@@ -49,8 +49,8 @@ struct FD1AbilitySystemData_GrantedHandles
 public:
 	void AddAbilitySpecHandle(const FGameplayAbilitySpecHandle& Handle);
 	void AddEffectHandle(const FActiveGameplayEffectHandle& Handle);
-
-	void TakeFromAbilitySystem(UD1AbilitySystemComponent* D1ASC);
+	
+	void TakeFromAbilitySystem(UD1AbilitySystemComponent* ASC);
 
 protected:
 	UPROPERTY()
@@ -69,7 +69,7 @@ public:
 	UD1AbilitySystemData(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void GiveToAbilitySystem(UD1AbilitySystemComponent* D1ASC, FD1AbilitySystemData_GrantedHandles* OutGrantedHandles, UObject* SourceObject = nullptr) const;
+	void GiveToAbilitySystem(UD1AbilitySystemComponent* ASC, FD1AbilitySystemData_GrantedHandles* OutGrantedHandles, UObject* SourceObject = nullptr) const;
 	
 public:
 	UPROPERTY(EditDefaultsOnly)

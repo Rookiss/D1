@@ -5,7 +5,7 @@
 
 class UGameplayEffect;
 
-UCLASS(CollapseCategories)
+UCLASS(Const)
 class UD1ItemFragment_Consumable : public UD1ItemFragment
 {
 	GENERATED_BODY()

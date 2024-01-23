@@ -2,6 +2,7 @@
 
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Player/D1PlayerController.h"
 #include "Player/D1PlayerState.h"
 #include "System/D1AssetManager.h"
@@ -23,11 +24,13 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	FirstPersonMeshComponent->SetOnlyOwnerSee(true);
 	FirstPersonMeshComponent->SetRelativeLocation(FVector(-16.6f, -7.1f, -141.4f));
 	FirstPersonMeshComponent->SetCastShadow(false);
-
+	
 	GetMesh()->SetOwnerNoSee(true);
 	GetMesh()->SetOnlyOwnerSee(false);
 
 	InitialAbilitySystemDataName = "AbilitySystemData_Player";
+
+	EquipmentManagerComponent = CreateDefaultSubobject<UD1EquipmentManagerComponent>("EquipmentManagerComponent");
 }
 
 void AD1Player::PostInitializeComponents()
@@ -57,11 +60,11 @@ void AD1Player::OnRep_PlayerState()
 
 	InitAbilityActorInfo();
 	
-	if (AD1PlayerController* D1PC = Cast<AD1PlayerController>(GetController()))
+	if (AD1PlayerController* PC = Cast<AD1PlayerController>(GetController()))
 	{
-		if (AD1HUD* D1HUD = Cast<AD1HUD>(D1PC->GetHUD()))
+		if (AD1HUD* HUD = Cast<AD1HUD>(PC->GetHUD()))
 		{
-			D1HUD->ShowSceneWidget();
+			HUD->ShowSceneWidget();
 		}
 	}
 }
@@ -70,10 +73,10 @@ void AD1Player::InitAbilityActorInfo()
 {
 	Super::InitAbilityActorInfo();
 
-	if (AD1PlayerState* D1PS = GetPlayerState<AD1PlayerState>())
+	if (AD1PlayerState* PS = GetPlayerState<AD1PlayerState>())
 	{
-		D1AbilitySystemComponent = Cast<UD1AbilitySystemComponent>(D1PS->GetAbilitySystemComponent());
-		check(D1AbilitySystemComponent);
-		D1AbilitySystemComponent->InitAbilityActorInfo(D1PS, this);
+		AbilitySystemComponent = Cast<UD1AbilitySystemComponent>(PS->GetAbilitySystemComponent());
+		check(AbilitySystemComponent);
+		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
 	}
 }

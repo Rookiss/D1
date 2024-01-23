@@ -30,5 +30,5 @@ protected:
 	FName InitialAbilitySystemDataName;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UD1AbilitySystemComponent> D1AbilitySystemComponent;
+	TObjectPtr<UD1AbilitySystemComponent> AbilitySystemComponent;
 };

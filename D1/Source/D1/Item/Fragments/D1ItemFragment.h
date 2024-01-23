@@ -4,7 +4,7 @@
 
 class UD1ItemInstance;
 
-UCLASS(Abstract, DefaultToInstanced, EditInlineNew, CollapseCategories)
+UCLASS(Abstract, Const, DefaultToInstanced, EditInlineNew, CollapseCategories)
 class UD1ItemFragment : public UObject
 {
 	GENERATED_BODY()

@@ -27,7 +27,7 @@ struct FD1EquipmentAttachInfo
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AActor> AttachActorClass;
+	TSubclassOf<AActor> SpawnActorClass;
 
 	UPROPERTY(EditDefaultsOnly)
 	FName AttachSocket;
@@ -42,6 +42,9 @@ struct FStatRange
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(VisibleDefaultsOnly)
+	EItemRarity Rarity = EItemRarity::Junk;
+	
 	UPROPERTY(EditDefaultsOnly)
 	int32 MinValue = 0;
 
@@ -58,11 +61,11 @@ public:
 	FStatRangeSet();
 	
 public:
-	UPROPERTY(EditDefaultsOnly, EditFixedSize, meta=(ForceInlineRow))
-	TMap<EItemRarity, FStatRange> StatRanges;
+	UPROPERTY(EditDefaultsOnly, EditFixedSize)
+	TArray<FStatRange> StatRanges;
 };
 
-UCLASS(CollapseCategories)
+UCLASS(Const)
 class UD1ItemFragment_Equippable : public UD1ItemFragment
 {
 	GENERATED_BODY()
@@ -78,11 +81,11 @@ public:
 	EEquipmentType EquipmentType = EEquipmentType::Weapon;
 
 	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<const UD1AbilitySystemData> AbilitySystemToGrant;
+	
+	UPROPERTY(EditDefaultsOnly)
 	FD1EquipmentAttachInfo AttachInfo;
 	
 	UPROPERTY(EditDefaultsOnly, meta=(ForceInlineRow))
 	TMap<FGameplayTag, FStatRangeSet> Stats;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<const UD1AbilitySystemData> AbilitySystemToGrant;
 };

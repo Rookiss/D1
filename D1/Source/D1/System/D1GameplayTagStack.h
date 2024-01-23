@@ -12,16 +12,19 @@ struct FD1GameplayTagStack : public FFastArraySerializerItem
 public:
 	FD1GameplayTagStack() { }
 	FD1GameplayTagStack(const FGameplayTag& InTag, int32 InStackCount)
-		: Tag(InTag), StackCount(InStackCount) { }
+		: StatTag(InTag), StackCount(InStackCount) { }
 
 public:
+	const FGameplayTag& GetStatTag() const { return StatTag; }
+	int32 GetStatCount() const { return StackCount; }
+	
 	FString GetDebugString() const;
 	
 private:
 	friend struct FD1GameplayTagStackContainer;
 	
 	UPROPERTY()
-	FGameplayTag Tag;
+	FGameplayTag StatTag;
 
 	UPROPERTY()
 	int32 StackCount = 0;
@@ -47,6 +50,7 @@ public:
 	void RemoveStack(const FGameplayTag& Tag, int32 StackCount);
 	
 public:
+	const TArray<FD1GameplayTagStack>& GetAllStatStacks() const { return Stacks; }
 	int32 GetStackCountByTag(const FGameplayTag& Tag) const { return TagToCount.FindRef(Tag); }
 	bool ContainsTag(const FGameplayTag& Tag) const { return TagToCount.Contains(Tag); }
 

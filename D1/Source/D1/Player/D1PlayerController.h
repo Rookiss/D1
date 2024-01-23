@@ -1,16 +1,15 @@
 ﻿#pragma once
 
+#include "AbilitySystemInterface.h"
 #include "D1PlayerController.generated.h"
 
-class UD1EquipmentManagerComponent;
-class UD1InventoryManagerComponent;
 struct FInputActionValue;
 struct FGameplayTag;
-class AD1PlayerState;
 class UD1AbilitySystemComponent;
+class UD1InventoryManagerComponent;
 
 UCLASS()
-class AD1PlayerController : public APlayerController
+class AD1PlayerController : public APlayerController, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 	
@@ -30,11 +29,11 @@ private:
 	void Input_AbilityInputTagReleased(FGameplayTag InputTag);
 	
 	void ResetInput();
+
+public:
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
 

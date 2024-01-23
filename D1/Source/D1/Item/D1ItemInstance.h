@@ -28,8 +28,12 @@ public:
 	virtual bool IsSupportedForNetworking() const override { return true; }
 
 	int32 GetItemID() const { return ItemID; }
+	EItemRarity GetItemRarity() const { return ItemRarity; }
+
+	const TArray<FD1GameplayTagStack>& GetAllStatStacks() const;
 	int32 GetStackCountByTag(const FGameplayTag& StatTag) const;
 	bool HasStatTag(const FGameplayTag& StatTag) const;
+
 	FString GetDebugString() const;
 
 	template <typename FragmentClass>
@@ -39,6 +43,9 @@ private:
 	EItemRarity DetermineItemRarity();
 	
 private:
+	friend struct FD1EquipmentList;
+	friend struct FD1EquipmentEntry;
+	
 	friend struct FD1InventoryList;
 	friend struct FD1InventoryEntry;
 	
@@ -49,7 +56,7 @@ private:
 	EItemRarity ItemRarity = EItemRarity::Junk;
 	
 	UPROPERTY(Replicated)
-	FD1GameplayTagStackContainer StatTags;
+	FD1GameplayTagStackContainer StatContainer;
 };
 
 template <typename FragmentClass>

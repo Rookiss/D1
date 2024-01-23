@@ -2,7 +2,6 @@
 
 #include "D1LogChannels.h"
 #include "Data/D1AssetData.h"
-#include "Data/D1GameData.h"
 #include "Data/D1ItemData.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AssetManager)
@@ -30,11 +29,6 @@ UD1AssetManager& UD1AssetManager::Get()
 void UD1AssetManager::Initialize()
 {
 	Get().LoadPreloadAssets();
-}
-
-UD1GameData* UD1AssetManager::GetGameData()
-{
-	return GetAssetByName<UD1GameData>("GameData");
 }
 
 UD1ItemData* UD1AssetManager::GetItemData()

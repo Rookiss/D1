@@ -6,7 +6,7 @@
 
 FString FD1GameplayTagStack::GetDebugString() const
 {
-	return FString::Printf(TEXT("[%s x %d]"), *Tag.ToString(), StackCount);
+	return FString::Printf(TEXT("[%s x %d]"), *StatTag.ToString(), StackCount);
 }
 
 bool FD1GameplayTagStackContainer::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
@@ -18,7 +18,7 @@ void FD1GameplayTagStackContainer::PreReplicatedRemove(const TArrayView<int32> R
 {
 	for (int32 Index : RemovedIndices)
 	{
-		const FGameplayTag& Tag = Stacks[Index].Tag;
+		const FGameplayTag& Tag = Stacks[Index].StatTag;
 		TagToCount.Remove(Tag);
 	}
 }
@@ -28,7 +28,7 @@ void FD1GameplayTagStackContainer::PostReplicatedAdd(const TArrayView<int32> Add
 	for (int32 Index : AddedIndices)
 	{
 		const FD1GameplayTagStack& Stack = Stacks[Index];
-		TagToCount.Add(Stack.Tag, Stack.StackCount);
+		TagToCount.Add(Stack.StatTag, Stack.StackCount);
 	}
 }
 
@@ -37,7 +37,7 @@ void FD1GameplayTagStackContainer::PostReplicatedChange(const TArrayView<int32> 
 	for (int32 Index : ChangedIndices)
 	{
 		const FD1GameplayTagStack& Stack = Stacks[Index];
-		TagToCount[Stack.Tag] = Stack.StackCount;
+		TagToCount[Stack.StatTag] = Stack.StackCount;
 	}
 }
 
@@ -53,7 +53,7 @@ void FD1GameplayTagStackContainer::AddStack(const FGameplayTag& Tag, int32 Stack
 	{
 		for (FD1GameplayTagStack& Stack : Stacks)
 		{
-			if (Stack.Tag == Tag)
+			if (Stack.StatTag == Tag)
 			{
 				const int32 NewCount = Stack.StackCount + StackCount;
 				Stack.StackCount = NewCount;
@@ -81,7 +81,7 @@ void FD1GameplayTagStackContainer::RemoveStack(const FGameplayTag& Tag, int32 St
 		for (auto It = Stacks.CreateIterator(); It; ++It)
 		{
 			FD1GameplayTagStack& Stack = *It;
-			if (Stack.Tag == Tag)
+			if (Stack.StatTag == Tag)
 			{
 				if (Stack.StackCount > StackCount)
 				{
