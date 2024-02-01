@@ -15,5 +15,8 @@ public:
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UGameplayEffect> EffectToApply;
+	FText Description;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> Effect;
 };

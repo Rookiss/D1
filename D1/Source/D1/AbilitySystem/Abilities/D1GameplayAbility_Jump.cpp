@@ -49,7 +49,6 @@ void UD1GameplayAbility_Jump::StartJump()
 	{
 		if (D1Character->IsLocallyControlled())
 		{
-			D1Character->UnCrouch();
 			D1Character->Jump();
 		}
 	}

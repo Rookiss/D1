@@ -3,7 +3,7 @@
 #include "GameFramework/HUD.h"
 #include "D1HUD.generated.h"
 
-class UD1UserWidget;
+class UD1SceneWidget;
 
 UCLASS()
 class AD1HUD : public AHUD
@@ -18,5 +18,5 @@ public:
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UD1UserWidget> SceneWidget;
+	TObjectPtr<UD1SceneWidget> SceneWidget;
 };

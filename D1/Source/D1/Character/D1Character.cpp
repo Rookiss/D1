@@ -13,7 +13,7 @@ AD1Character::AD1Character(const FObjectInitializer& ObjectInitializer)
 {
 	NetCullDistanceSquared = 900000000.0f;
 	
-	GetCapsuleComponent()->InitCapsuleSize(34.0f, 88.0f);
+	GetCapsuleComponent()->InitCapsuleSize(50.0f, 88.0f);
 	
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -88.f), FRotator(0.f, -90.f, 0.f));
 	
@@ -23,7 +23,9 @@ AD1Character::AD1Character(const FObjectInitializer& ObjectInitializer)
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	GetCharacterMovement()->bCanWalkOffLedgesWhenCrouching = true;
 	GetCharacterMovement()->SetCrouchedHalfHeight(65.0f);
-
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = 150.f;
+	
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
@@ -32,13 +34,16 @@ AD1Character::AD1Character(const FObjectInitializer& ObjectInitializer)
 	CrouchedEyeHeight = 50.0f;
 }
 
-void AD1Character::InitAbilityActorInfo()
+void AD1Character::InitAbilitySystem()
 {
 	
 }
 
 void AD1Character::ApplyAbilitySystemData(const FName& DataName)
 {
+	if (HasAuthority() == false)
+		return;
+	
 	if (const UD1AbilitySystemData* Data = UD1AssetManager::GetAssetByName<UD1AbilitySystemData>(DataName))
 	{
 		Data->GiveToAbilitySystem(AbilitySystemComponent, &GrantedHandles);

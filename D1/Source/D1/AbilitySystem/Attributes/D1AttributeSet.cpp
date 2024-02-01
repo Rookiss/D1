@@ -21,6 +21,11 @@ TFunction<FGameplayAttribute()> UD1AttributeSet::GetAttributeFuncByTag(const FGa
 	return nullptr;
 }
 
+void UD1AttributeSet::GetAllAttributeTags(TArray<FGameplayTag>& OutAttributeTags) const
+{
+	TagToAttributeFunc.GetKeys(OutAttributeTags);
+}
+
 UD1AbilitySystemComponent* UD1AttributeSet::GetD1AbilitySystemComponent() const
 {
 	return Cast<UD1AbilitySystemComponent>(GetOwningAbilitySystemComponent());

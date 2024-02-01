@@ -5,7 +5,6 @@
 #include "D1PlayerState.generated.h"
 
 class UD1PlayerSet;
-class UD1MonsterSet;
 class UD1AbilitySystemComponent;
 
 UCLASS()
@@ -23,8 +22,8 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UD1AbilitySystemComponent> D1AbilitySystemComponent;
+	TObjectPtr<UD1AbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()
-	TObjectPtr<const UD1PlayerSet> D1PlayerSet;
+	TObjectPtr<const UD1PlayerSet> PlayerSet;
 };

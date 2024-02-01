@@ -30,7 +30,7 @@ public:
 	int32 GetItemID() const { return ItemID; }
 	EItemRarity GetItemRarity() const { return ItemRarity; }
 
-	const TArray<FD1GameplayTagStack>& GetAllStatStacks() const;
+	const FD1GameplayTagStackContainer& GetStatContainer() const { return StatContainer; }
 	int32 GetStackCountByTag(const FGameplayTag& StatTag) const;
 	bool HasStatTag(const FGameplayTag& StatTag) const;
 

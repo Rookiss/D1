@@ -24,6 +24,7 @@ public:
 	
 public:
 	TFunction<FGameplayAttribute()> GetAttributeFuncByTag(const FGameplayTag& AttributeTag) const;
+	void GetAllAttributeTags(TArray<FGameplayTag>& OutAttributeTags) const;
 	UD1AbilitySystemComponent* GetD1AbilitySystemComponent() const;
 
 protected:

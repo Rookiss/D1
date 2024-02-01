@@ -1,20 +1,14 @@
 ﻿#pragma once
 
+#include "D1EquipmentManagerComponent.h"
 #include "Net/Serialization/FastArraySerializer.h"
 #include "D1InventoryManagerComponent.generated.h"
 
+class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 class UD1ItemInstance;
 
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnInventoryEntryChanged, const FIntPoint&/*ItemSlotPos*/, UD1ItemInstance*/*ItemInstance*/, int32/*ItemCount*/);
-
-UENUM(BlueprintType)
-enum class EInventoryOpResult : uint8
-{
-	Fail,
-	Move,
-	Merge
-};
+DECLARE_MULTICAST_DELEGATE_FiveParams(FOnInventoryEntryChanged, const FIntPoint&/*ItemSlotPos*/, UD1ItemInstance*/*ItemInstance*/, int32/*ItemID*/, int32/*OldItemCount*/, int32/*NewItemCount*/);
 
 USTRUCT(BlueprintType)
 struct FD1InventoryEntry : public FFastArraySerializerItem
@@ -29,6 +23,7 @@ private:
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
 	int32 GetItemCount() const { return ItemCount; }
+	int32 GetLastObservedCount() const { return LastObservedCount; }
 	FString GetDebugString() const;
 
 private:
@@ -36,13 +31,16 @@ private:
 	friend class UD1InventoryManagerComponent;
 	
 	UPROPERTY()
-	TObjectPtr<UD1ItemInstance> ItemInstance = nullptr;
+	TObjectPtr<UD1ItemInstance> ItemInstance;
 
 	UPROPERTY()
 	int32 ItemCount = 0;
 
 	UPROPERTY()
 	int32 LatestValidItemID = 0;
+
+	UPROPERTY(NotReplicated)
+	int32 LastObservedCount = INDEX_NONE;
 };
 
 USTRUCT(BlueprintType)
@@ -61,22 +59,21 @@ public:
 
 private:
 	void InitOnServer();
-
-	bool TryAddItem(const FIntPoint& ItemSlotPos, int32 ItemID, int32 ItemCount);
+	
+	void AddItem_Unsafe(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount);
+	UD1ItemInstance* RemoveItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemCount); /* Return Removed ItemInstance */
+	
 	bool TryAddItem(int32 ItemID, int32 ItemCount);
-	bool TryRemoveItem(const FIntPoint& ItemSlotPos, int32 ItemCount);
 	bool TryRemoveItem(int32 ItemID, int32 ItemCount);
-	
-	void Unsafe_MoveItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos);
-	void Unsafe_MergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos, int32 MergeCount);
-	
+
 public:
+	const TArray<FD1InventoryEntry>& GetAllEntries() const { return Entries; }
 	FD1InventoryEntry GetEntryByPosition(const FIntPoint& ItemSlotPos) const;
 	int32 GetTotalCountByID(int32 ItemID) const;
-	const TArray<FD1InventoryEntry>& GetAllEntries() const { return Entries; }
 	
 private:
 	friend class UD1InventoryManagerComponent;
+	friend class UD1EquipmentManagerComponent;
 	
 	UPROPERTY()
 	TArray<FD1InventoryEntry> Entries;
@@ -108,36 +105,49 @@ protected:
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
 public:
-	UFUNCTION(Server, Reliable)
-	void Server_RequestMoveOrMergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos);
-
-	bool TryAddItem(const FIntPoint& ItemSlotPos, int32 ItemID, int32 ItemCount);
-	bool TryAddItem(int32 ItemID, int32 ItemCount);
-	bool TryRemoveItem(const FIntPoint& ItemSlotPos, int32 ItemCount);
-	bool TryRemoveItem(int32 ItemID, int32 ItemCount);
+	void Init(FIntPoint InInventorySlotCount);
 	
-	void MarkSlotChecks(TArray<TArray<bool>>& SlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);
+public:
+	// TODO: Auth Check
+	UFUNCTION(Server, Reliable)
+	void Server_RequestMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos);
+	int32 CanMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const; /* Return Movable Item Count */
+
+	UFUNCTION(Server, Reliable)
+	void Server_RequestMoveOrMergeItem_FromExternalInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos);
+	int32 CanMoveOrMergeItem_FromExternalInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const; /* Return Movable Item Count */
+
+	UFUNCTION(Server, Reliable)
+	void Server_RequestMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos);
+	bool CanMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const;
+
+public:
+	bool TryAddItem(int32 ItemID, int32 ItemCount);
+	bool TryRemoveItem(int32 ItemID, int32 ItemCount);
+
+public:
+	void MarkSlotChecks(TArray<TArray<bool>>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);
 	void MarkSlotChecks(bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);
 	
 public:
-	bool IsEmpty(const TArray<TArray<bool>>& SlotChecks, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
+	bool IsEmpty(const TArray<TArray<bool>>& InSlotChecks, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
 	bool IsEmpty(const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
-	EInventoryOpResult CanMoveOrMergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos, int32& OutMergeCount) const;
 
+public:
 	const TArray<FD1InventoryEntry>& GetAllEntries() const;
-	FD1InventoryEntry GetEntryByPosition(const FIntPoint& ItemSlotPos);
 	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
-	TArray<TArray<bool>>& GetSlotChecks() { return InventorySlotChecks; }
+	TArray<TArray<bool>>& GetSlotChecks() { return SlotChecks; }
+	int32 GetTotalCountByID(int32 ItemID) const;
 
 public:
 	FOnInventoryEntryChanged OnInventoryEntryChanged;
 	
 private:
+	friend class UD1EquipmentManagerComponent;
+	
 	UPROPERTY(Replicated)
 	FD1InventoryList InventoryList;
-
-	UPROPERTY(EditDefaultsOnly)
-	FIntPoint InventorySlotCount = FIntPoint(10, 5);
 	
-	TArray<TArray<bool>> InventorySlotChecks;
+	FIntPoint InventorySlotCount;
+	TArray<TArray<bool>> SlotChecks;
 };

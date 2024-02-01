@@ -1,15 +1,13 @@
 ﻿#pragma once
 
-#include "AbilitySystemInterface.h"
 #include "D1PlayerController.generated.h"
 
+class UD1UserWidget;
 struct FInputActionValue;
 struct FGameplayTag;
-class UD1AbilitySystemComponent;
-class UD1InventoryManagerComponent;
 
 UCLASS()
-class AD1PlayerController : public APlayerController, public IAbilitySystemInterface
+class AD1PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
@@ -20,22 +18,21 @@ public:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused) override;
+
+public:
+	void SetInputModeGameOnly();
+	void SetInputModeUIOnly(UD1UserWidget* FocusWidget);
 	
 private:
 	void Input_Move(const FInputActionValue& InputValue);
 	void Input_Look(const FInputActionValue& InputValue);
+	void Input_Crouch();
+	void Input_Inventory();
 	
 	void Input_AbilityInputTagPressed(FGameplayTag InputTag);
 	void Input_AbilityInputTagReleased(FGameplayTag InputTag);
 	
 	void ResetInput();
-
-public:
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
 
 private:
 	TArray<uint32> InputBindHandles;

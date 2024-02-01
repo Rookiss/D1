@@ -6,10 +6,14 @@
 #include "D1GameplayTags.h"
 #include "D1PlayerState.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
+#include "Camera/D1PlayerCameraManager.h"
 #include "Data/D1InputData.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Input/D1InputComponent.h"
-#include "Item/Managers/D1InventoryManagerComponent.h"
 #include "System/D1AssetManager.h"
+#include "UI/D1HUD.h"
+#include "UI/D1SceneWidget.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1PlayerController)
 
@@ -17,8 +21,7 @@ AD1PlayerController::AD1PlayerController(const FObjectInitializer& ObjectInitial
 	: Super(ObjectInitializer)
 {
 	bReplicates = true;
-	
-	InventoryManagerComponent = CreateDefaultSubobject<UD1InventoryManagerComponent>("InventoryManagerComponent");
+	PlayerCameraManagerClass = AD1PlayerCameraManager::StaticClass();
 }
 
 void AD1PlayerController::BeginPlay()
@@ -29,17 +32,7 @@ void AD1PlayerController::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(InputData->MappingContext, 0);
-		}
-	}
-
-	// @TODO: For Test
-	if (HasAuthority())
-	{
-		for (int32 i = 0; i < 100; i++)
-		{
-			FIntPoint RandPos = FIntPoint(FMath::RandRange(0, 10), FMath::RandRange(0, 5));
-			InventoryManagerComponent->TryAddItem(RandPos, FMath::RandRange(1001, 1004), FMath::RandRange(1, 2));
+			Subsystem->AddMappingContext(InputData->InputMappingContext, 0);
 		}
 	}
 }
@@ -51,20 +44,43 @@ void AD1PlayerController::SetupInputComponent()
 	if (const UD1InputData* InputData = UD1AssetManager::GetAssetByName<UD1InputData>("InputData_Default"))
 	{
 		UD1InputComponent* D1InputComponent = CastChecked<UD1InputComponent>(InputComponent);
+
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look, InputBindHandles);
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Crouch, ETriggerEvent::Triggered, this, &ThisClass::Input_Crouch, InputBindHandles);
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Inventory, ETriggerEvent::Triggered, this, &ThisClass::Input_Inventory, InputBindHandles);
+
 		D1InputComponent->BindAbilityActions(InputData, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, InputBindHandles);
 	}
 }
 
 void AD1PlayerController::PostProcessInput(const float DeltaTime, const bool bGamePaused)
 {
-	if (UD1AbilitySystemComponent* D1ASC = Cast<UD1AbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(PlayerState)))
+	if (UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(PlayerState)))
 	{
-		D1ASC->ProcessAbilityInput(DeltaTime, bGamePaused);
+		ASC->ProcessAbilityInput(DeltaTime, bGamePaused);
 	}
 	
 	Super::PostProcessInput(DeltaTime, bGamePaused);
+}
+
+void AD1PlayerController::SetInputModeGameOnly()
+{
+	FInputModeGameOnly InputMode;
+	SetInputMode(InputMode);
+
+	FlushPressedKeys();
+	SetShowMouseCursor(false);
+}
+
+void AD1PlayerController::SetInputModeUIOnly(UD1UserWidget* FocusWidget)
+{
+	FInputModeUIOnly InputMode;
+	InputMode.SetWidgetToFocus(FocusWidget->TakeWidget());
+	SetInputMode(InputMode);
+		
+	FlushPressedKeys();
+	SetShowMouseCursor(true);
 }
 
 void AD1PlayerController::Input_Move(const FInputActionValue& InputValue)
@@ -106,14 +122,36 @@ void AD1PlayerController::Input_Look(const FInputActionValue& InputValue)
 	}
 }
 
+void AD1PlayerController::Input_Crouch()
+{
+	if (ACharacter* ControlledCharacter = GetCharacter())
+	{
+		if (ControlledCharacter->GetCharacterMovement()->IsFalling() == false)
+		{
+			(ControlledCharacter->bIsCrouched) ? ControlledCharacter->UnCrouch() : ControlledCharacter->Crouch();
+		}
+	}
+}
+
+void AD1PlayerController::Input_Inventory()
+{
+	if (AD1HUD* HUD = Cast<AD1HUD>(GetHUD()))
+	{
+		if (UD1SceneWidget* SceneWidget = HUD->SceneWidget)
+		{
+			SceneWidget->ShowControlledPlayerInventoryWidget();
+		}
+	}
+}
+
 void AD1PlayerController::Input_AbilityInputTagPressed(FGameplayTag InputTag)
 {
 	if (GetPawn() == nullptr)
 		return;
 	
-	if (UD1AbilitySystemComponent* D1ASC = Cast<UD1AbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(PlayerState)))
+	if (UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(PlayerState)))
 	{
-		D1ASC->AbilityInputTagPressed(InputTag);
+		ASC->AbilityInputTagPressed(InputTag);
 	}
 }
 
@@ -122,9 +160,9 @@ void AD1PlayerController::Input_AbilityInputTagReleased(FGameplayTag InputTag)
 	if (GetPawn() == nullptr)
 		return;
 	
-	if (UD1AbilitySystemComponent* D1ASC = Cast<UD1AbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(PlayerState)))
+	if (UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(PlayerState)))
 	{
-   		D1ASC->AbilityInputTagReleased(InputTag);
+   		ASC->AbilityInputTagReleased(InputTag);
 	}
 }
 
@@ -139,13 +177,4 @@ void AD1PlayerController::ResetInput()
 	{
 		D1InputComponent->RemoveBinds(InputBindHandles);
 	}
-}
-
-UAbilitySystemComponent* AD1PlayerController::GetAbilitySystemComponent() const
-{
-	if (AD1PlayerState* PS = GetPlayerState<AD1PlayerState>())
-	{
-		return PS->GetAbilitySystemComponent();
-	}
-	return nullptr;
 }

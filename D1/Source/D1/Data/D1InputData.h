@@ -29,7 +29,7 @@ public:
 	
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputMappingContext> MappingContext;
+	TObjectPtr<UInputMappingContext> InputMappingContext;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FD1InputAction> NativeInputActions;

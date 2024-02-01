@@ -9,13 +9,11 @@ struct FHealStatics
 public:
 	FHealStatics()
 	{
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UD1MonsterSet, BaseHeal, Source, true);
 		// DEFINE_ATTRIBUTE_CAPTUREDEF(UD1PrimarySet, Strength, Source, false);
 		// DEFINE_ATTRIBUTE_CAPTUREDEF(UD1PrimarySet, Armor, Target, false);
 	}
 
 public:
-	DECLARE_ATTRIBUTE_CAPTUREDEF(BaseHeal);
 	// DECLARE_ATTRIBUTE_CAPTUREDEF(Strength);
 	// DECLARE_ATTRIBUTE_CAPTUREDEF(Armor);
 };
@@ -30,7 +28,6 @@ static const FHealStatics& HealStatics()
 UD1HealExecutionCalculation::UD1HealExecutionCalculation(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	RelevantAttributesToCapture.Add(HealStatics().BaseHealDef);
 	// RelevantAttributesToCapture.Add(DamageStatics().StrengthDef);
 	// RelevantAttributesToCapture.Add(DamageStatics().ArmorDef);
 }
@@ -47,14 +44,14 @@ void UD1HealExecutionCalculation::Execute_Implementation(const FGameplayEffectCu
 	EvaluateParameters.SourceTags = SourceTags;
 	EvaluateParameters.TargetTags = TargetTags;
 	
-	float BaseHeal = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(HealStatics().BaseHealDef, EvaluateParameters, BaseHeal);
+	float Strength = 0.f;
+	// ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(HealStatics().StrengthDef, EvaluateParameters, Strength);
 
 	// TODO: Calculate Final Heal (Based on Attributes)
-	const float HealDone = FMath::Max(0.f, BaseHeal * 999.f);
-	if (HealDone > 0.f)
+	const float FinalHeal = FMath::Max(0.f, Strength * 999.f);
+	if (FinalHeal > 0.f)
 	{
-		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UD1MonsterSet::GetHealAttribute(), EGameplayModOp::Additive, HealDone));
+		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UD1MonsterSet::GetHealAttribute(), EGameplayModOp::Additive, FinalHeal));
 	}
 #endif // #if WITH_SERVER_CODE
 }

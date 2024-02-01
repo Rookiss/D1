@@ -28,7 +28,8 @@ void UD1AssetData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 		{
 			FSoftObjectPath& AssetPath = AssetEntry.AssetPath;
 			const FString& AssetName = AssetPath.GetAssetName();
-			if (AssetName.StartsWith(TEXT("BP_")) || AssetName.StartsWith(TEXT("B_")) || AssetName.StartsWith(TEXT("WBP_")))
+			if (AssetName.StartsWith(TEXT("BP_")) || AssetName.StartsWith(TEXT("B_")) || AssetName.StartsWith(TEXT("WBP_")) ||
+				AssetName.StartsWith(TEXT("GE_")) || AssetName.StartsWith(TEXT("GA_")) ||  AssetName.StartsWith(TEXT("ABP_")))
 			{
 				FString AssetPathString = AssetPath.GetAssetPathString();
 				AssetPathString.Append(TEXT("_C"));

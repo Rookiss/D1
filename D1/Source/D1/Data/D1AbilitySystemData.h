@@ -5,6 +5,7 @@
 #include "GameplayTagContainer.h"
 #include "D1AbilitySystemData.generated.h"
 
+class UAttributeSet;
 class UD1AbilitySystemComponent;
 class UGameplayEffect;
 class UD1GameplayAbility;
@@ -16,7 +17,7 @@ struct FD1AbilitySystemData_Ability
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UD1GameplayAbility> Ability = nullptr;
+	TSubclassOf<UD1GameplayAbility> AbilityClass = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 AbilityLevel = 1;
@@ -35,10 +36,20 @@ struct FD1AbilitySystemData_Effect
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UGameplayEffect> Effect = nullptr;
+	TSubclassOf<UGameplayEffect> EffectClass = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
 	float EffectLevel = 1.f;
+};
+
+USTRUCT()
+struct FD1AbilitySystemData_AttributeSet
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UAttributeSet> AttributeSetClass;
 };
 
 USTRUCT()
@@ -49,15 +60,19 @@ struct FD1AbilitySystemData_GrantedHandles
 public:
 	void AddAbilitySpecHandle(const FGameplayAbilitySpecHandle& Handle);
 	void AddEffectHandle(const FActiveGameplayEffectHandle& Handle);
+	void AddAttributeSet(UAttributeSet* AttributeSet);
 	
 	void TakeFromAbilitySystem(UD1AbilitySystemComponent* ASC);
 
 protected:
 	UPROPERTY()
-	TArray<FGameplayAbilitySpecHandle> AbilitySpecHandles;
+	TArray<FGameplayAbilitySpecHandle> GrantedAbilitySpecHandles;
 
 	UPROPERTY()
-	TArray<FActiveGameplayEffectHandle> EffectHandles;
+	TArray<FActiveGameplayEffectHandle> GrantedEffectHandles;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UAttributeSet>> GrantedAttributeSets;
 };
 
 UCLASS(Const)
@@ -73,8 +88,11 @@ public:
 	
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FD1AbilitySystemData_Ability> Abilities;
+	TArray<FD1AbilitySystemData_Ability> AbilitiesToGrant;
 
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FD1AbilitySystemData_Effect> Effects;
+	TArray<FD1AbilitySystemData_Effect> EffectsToGrant;
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FD1AbilitySystemData_AttributeSet> AttributeSetsToGrant;
 };

@@ -1,10 +1,15 @@
 ﻿#include "D1EquipmentManagerComponent.h"
 
 #include "AbilitySystemGlobals.h"
+#include "D1InventoryManagerComponent.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/D1PlayerSet.h"
 #include "Engine/ActorChannel.h"
 #include "GameFramework/Character.h"
+#include "Item/Fragments/D1ItemFragment_Consumable.h"
+#include "Item/Fragments/D1ItemFragment_Equippable.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Net/UnrealNetwork.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentManagerComponent)
@@ -13,58 +18,64 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* InItemInstance)
 {
 	if (InItemInstance == nullptr)
 		return;
-
+	
 	const UD1ItemFragment_Equippable* Equippable = InItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
 	check(Equippable);
 
 	UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(OwnerComponent->GetAbilitySystemComponent());
-	check(ASC);
 	
 	ItemInstance = InItemInstance;
 	LatestValidItemID = ItemInstance->ItemID;
 	GrantedHandles.TakeFromAbilitySystem(ASC);
 	
-	const UD1AbilitySystemData* AbilitySystemData = Equippable->AbilitySystemToGrant;
-	AbilitySystemData->GiveToAbilitySystem(ASC, &GrantedHandles, ItemInstance);
-	
-	APawn* OwningPawn = Cast<APawn>(OwnerComponent->GetOwner());
-	check(OwningPawn);
-	
-	USceneComponent* AttachTarget = OwningPawn->GetRootComponent();
-	if (ACharacter* OwningCharacter = Cast<ACharacter>(OwningPawn))
+	if (const UD1AbilitySystemData* AbilitySystemData = Equippable->AbilitySystemDataToGrant)
 	{
-		AttachTarget = OwningCharacter->GetMesh();
+		AbilitySystemData->GiveToAbilitySystem(ASC, &GrantedHandles, ItemInstance);
 	}
 
-	UWorld* World = OwnerComponent->GetWorld();
 	const FD1EquipmentAttachInfo& AttachInfo = Equippable->AttachInfo;
-	AActor* NewActor = World->SpawnActorDeferred<AActor>(AttachInfo.SpawnActorClass, FTransform::Identity, OwningPawn);
-	NewActor->FinishSpawning(FTransform::Identity, true);
-	NewActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
-	NewActor->AttachToComponent(AttachTarget, FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
-
-	SpawnedActor.Add(NewActor);
-
-	// TODO: Apply Stats
-	const FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
-	const FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(UGameplayEffect::StaticClass(), 1.f, ContextHandle);
-	
-	const TArray<FD1GameplayTagStack>& Stacks = ItemInstance->GetAllStatStacks();
-	for (const FD1GameplayTagStack& Stack : Stacks)
+	if (AttachInfo.SpawnActorClass)
 	{
-		const FGameplayTag& StatTag = Stack.GetStatTag();
-		const int32 StatCount = Stack.GetStatCount();
-		SpecHandle.Data->SetSetByCallerMagnitude(StatTag, StatCount);
+		APawn* OwningPawn = Cast<APawn>(OwnerComponent->GetOwner());
+		check(OwningPawn);
+	
+		USceneComponent* AttachTarget = OwningPawn->GetRootComponent();
+		if (ACharacter* OwningCharacter = Cast<ACharacter>(OwningPawn))
+		{
+			AttachTarget = OwningCharacter->GetMesh();
+		}
+
+		UWorld* World = OwnerComponent->GetWorld();
+		AActor* NewActor = World->SpawnActorDeferred<AActor>(AttachInfo.SpawnActorClass, FTransform::Identity, OwningPawn);
+		NewActor->FinishSpawning(FTransform::Identity, true);
+		NewActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
+		NewActor->AttachToComponent(AttachTarget, FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
+		
+		SpawnedActor.Add(NewActor);
 	}
+
+	TArray<FGameplayTag> AttributeTags;
+	const UD1PlayerSet* PlayerSet = Cast<UD1PlayerSet>(ASC->GetAttributeSet(UD1PlayerSet::StaticClass()));
+	PlayerSet->GetAllAttributeTags(AttributeTags);
+	
+	const FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
+	const FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(UD1AssetManager::GetSubclassByName<UGameplayEffect>("AttributeModifier"), 1.f, ContextHandle);
+
+	for (const FGameplayTag& AttributeTag : AttributeTags)
+	{
+		int32 Count = ItemInstance->GetStackCountByTag(AttributeTag);
+		SpecHandle.Data->SetSetByCallerMagnitude(AttributeTag, Count);
+	}
+	
 	FActiveGameplayEffectHandle Handle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
-	SpecHandle.Data->
+	StatHandles.Add(Handle);
 }
 
 void FD1EquipmentEntry::Reset()
 {
 	ItemInstance = nullptr;
 	GrantedHandles.TakeFromAbilitySystem(OwnerComponent->GetAbilitySystemComponent());
-
+	
 	for (AActor* Actor : SpawnedActor)
 	{
 		if (IsValid(Actor))
@@ -73,10 +84,13 @@ void FD1EquipmentEntry::Reset()
 		}
 	}
 	SpawnedActor.Reset();
-	
-	// TODO: Revoke Stats
-	// ASC->RemoveActiveGameplayEffect();
-	
+
+	UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(OwnerComponent->GetAbilitySystemComponent());
+	for (const FActiveGameplayEffectHandle& Handle : StatHandles)
+	{
+		ASC->RemoveActiveGameplayEffect(Handle);
+	}
+	StatHandles.Reset();
 }
 
 FString FD1EquipmentEntry::GetDebugString() const
@@ -99,14 +113,10 @@ void FD1EquipmentList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, i
 		UD1ItemInstance* ItemInstance = Entry.GetItemInstance();
 		if (ItemInstance == nullptr)
 			continue;
-
-		const UD1ItemFragment_Equippable* Equippable = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
-		if (Equippable == nullptr)
-			continue;
 		
 		if (OwnerComponent->OnEquipmentEntryChanged.IsBound())
 		{
-			OwnerComponent->OnEquipmentEntryChanged.Broadcast(Equippable->EquipmentType, ItemInstance);
+			OwnerComponent->OnEquipmentEntryChanged.Broadcast(static_cast<EEquipmentSlotType>(Index), ItemInstance);
 		}
 	}
 }
@@ -116,17 +126,10 @@ void FD1EquipmentList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 	for (int32 Index : ChangedIndices)
 	{
 		const FD1EquipmentEntry& Entry = Entries[Index];
-
-		const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(Entry.LatestValidItemID);
-		
-		const UD1ItemFragment_Equippable* Equippable = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable>();
-		if (Equippable == nullptr)
-			continue;
 		
 		if (OwnerComponent->OnEquipmentEntryChanged.IsBound())
 		{
-			OwnerComponent->OnEquipmentEntryChanged.Broadcast(Equippable->EquipmentType, Entry.ItemInstance);
+			OwnerComponent->OnEquipmentEntryChanged.Broadcast(static_cast<EEquipmentSlotType>(Index), Entry.ItemInstance);
 		}
 	}
 }
@@ -142,46 +145,25 @@ void FD1EquipmentList::InitOnServer()
 	}
 }
 
-void FD1EquipmentList::Unsafe_EquipItem(UD1ItemInstance* ItemInstance)
+void FD1EquipmentList::EquipItem_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
 {
-	const UD1ItemFragment_Equippable* Equippable = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
-	FD1EquipmentEntry& Entry = Entries[static_cast<int32>(Equippable->EquipmentType)];
+	FD1EquipmentEntry& Entry = Entries[EquipmentSlotType];
 	Entry.Init(ItemInstance);
 	MarkItemDirty(Entry);
 }
 
-void FD1EquipmentList::Unsafe_UnEquipItem(EEquipmentType EquipmentType)
+UD1ItemInstance* FD1EquipmentList::UnEquipItem_Unsafe(EEquipmentSlotType EquipmentSlotType)
 {
-	FD1EquipmentEntry& Entry = Entries[static_cast<int32>(EquipmentType)];
+	FD1EquipmentEntry& Entry = Entries[EquipmentSlotType];
+	UD1ItemInstance* ItemInstance = Entry.ItemInstance;
 	Entry.Reset();
 	MarkItemDirty(Entry);
+	return ItemInstance;
 }
 
-bool FD1EquipmentList::CanEquipItem(UD1ItemInstance* ItemInstance) const
+FD1EquipmentEntry FD1EquipmentList::GetEntryBySlotType(EEquipmentSlotType EquipmentSlotType) const
 {
-	if (ItemInstance == nullptr)
-		return false;
-
-	const UD1ItemFragment_Equippable* Equippable = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
-	if (Equippable == nullptr)
-		return false;
-	
-	const FD1EquipmentEntry& Entry = Entries[static_cast<int32>(Equippable->EquipmentType)];
-	if (Entry.ItemInstance)
-		return false;
-	
-	return true;
-}
-
-bool FD1EquipmentList::CanUnEquipItem(EEquipmentType EquipmentType) const
-{
-	const FD1EquipmentEntry& Entry = Entries[static_cast<int32>(EquipmentType)];
-	return (Entry.ItemInstance != nullptr);
-}
-
-FD1EquipmentEntry FD1EquipmentList::GetEntryByType(EEquipmentType EquipmentType) const
-{
-	return Entries[static_cast<int32>(EquipmentType)];
+	return Entries[EquipmentSlotType];
 }
 
 UD1EquipmentManagerComponent::UD1EquipmentManagerComponent(const FObjectInitializer& ObjectInitializer)
@@ -190,8 +172,6 @@ UD1EquipmentManagerComponent::UD1EquipmentManagerComponent(const FObjectInitiali
 {
     SetIsReplicatedByDefault(true);
 	bWantsInitializeComponent = true;
-
-	EquipmentList.Entries.Reserve(EquipmentSlotCount);
 }
 
 void UD1EquipmentManagerComponent::BeginPlay()
@@ -235,44 +215,152 @@ bool UD1EquipmentManagerComponent::ReplicateSubobjects(UActorChannel* Channel, F
 	return bWroteSomething;
 }
 
-void UD1EquipmentManagerComponent::Server_RequestEquipItem_Implementation(UD1ItemInstance* ItemInstance)
+void UD1EquipmentManagerComponent::Server_RequestEquipItem_FromInventory_Implementation(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType)
 {
 	check(GetOwner()->HasAuthority());
 
-	if (CanEquipItem(ItemInstance))
-	{
-		EquipmentList.Unsafe_EquipItem(ItemInstance);
-	}
+	if (CanEquipItem_FromInventory(OtherComponent, FromItemSlotPos, ToEquipmentSlotType) == false)
+		return;
+	
+	UD1ItemInstance* RemovedItemInstance = OtherComponent->InventoryList.RemoveItem_Unsafe(FromItemSlotPos, 1);
+	EquipmentList.EquipItem_Unsafe(ToEquipmentSlotType, RemovedItemInstance);
 }
 
-void UD1EquipmentManagerComponent::Server_RequestUnEquipItem_Implementation(EEquipmentType EquipmentType)
+bool UD1EquipmentManagerComponent::CanEquipItem_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const
+{
+	if (OtherComponent == nullptr)
+		return false;
+
+	const FIntPoint& FromTotalItemSlotCount = OtherComponent->GetInventorySlotCount();
+	if (FromItemSlotPos.X < 0 || FromItemSlotPos.Y < 0 || FromItemSlotPos.X >= FromTotalItemSlotCount.X || FromItemSlotPos.Y >= FromTotalItemSlotCount.Y)
+		return false;
+	
+	const TArray<FD1InventoryEntry>& FromEntries = OtherComponent->GetAllEntries();
+	const int32 FromIndex = FromItemSlotPos.Y * FromTotalItemSlotCount.X + FromItemSlotPos.X;
+	const FD1InventoryEntry& FromEntry = FromEntries[FromIndex];
+	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
+
+	return CanEquipItem(FromItemInstance, ToEquipmentSlotType);
+}
+
+void UD1EquipmentManagerComponent::Server_RequestEquipItem_FromEquipment_Implementation(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType)
 {
 	check(GetOwner()->HasAuthority());
 
-	if (CanUnEquipItem(EquipmentType))
+	if (CanEquipItem_FromEquipment(OtherComponent, FromEquipmentSlotType, ToEquipmentSlotType) == false)
+		return;
+
+	UD1ItemInstance* RemovedItemInstance = OtherComponent->EquipmentList.UnEquipItem_Unsafe(FromEquipmentSlotType);
+	EquipmentList.EquipItem_Unsafe(ToEquipmentSlotType, RemovedItemInstance);
+}
+
+bool UD1EquipmentManagerComponent::CanEquipItem_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const
+{
+	if (OtherComponent == nullptr)
+		return false;
+
+	if (FromEquipmentSlotType != ToEquipmentSlotType)
+		return false;
+	
+	if (FromEquipmentSlotType == EEquipmentSlotType::EquipmentSlotCount || ToEquipmentSlotType == EEquipmentSlotType::EquipmentSlotCount)
+		return false;
+	
+	const TArray<FD1EquipmentEntry>& FromEntries = OtherComponent->GetAllEntries();
+	const FD1EquipmentEntry& FromEntry = FromEntries[FromEquipmentSlotType];
+	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
+
+	return CanEquipItem(FromItemInstance, ToEquipmentSlotType);
+}
+
+bool UD1EquipmentManagerComponent::CanEquipItem(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const
+{
+	if (ToEquipmentSlotType == EEquipmentSlotType::EquipmentSlotCount || FromItemInstance == nullptr)
+		return false;
+
+	const TArray<FD1EquipmentEntry>& Entries = GetAllEntries();
+	const FD1EquipmentEntry& Entry = Entries[ToEquipmentSlotType];
+	if (FromItemInstance == Entry.ItemInstance)
+		return true;
+
+	if (Entry.ItemInstance)
+		return false;
+	
+	const UD1ItemFragment_Equippable* Equippable = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
+	if (Equippable == nullptr)
+		return false;
+	
+	if (Equippable->EquipmentType == EEquipmentType::Weapon)
 	{
-		EquipmentList.Unsafe_UnEquipItem(EquipmentType);
+		const UD1ItemFragment_Equippable_Weapon* EquippableWeapon = Cast<UD1ItemFragment_Equippable_Weapon>(Equippable);
+		EWeaponHandType WeaponHandType = EquippableWeapon->WeaponHandType;
+
+		if (IsSameWeaponHandType(ToEquipmentSlotType, WeaponHandType) == false)
+			return false;
+		
+		if (IsPrimaryWeaponSlot(ToEquipmentSlotType))
+		{
+			if (WeaponHandType == EWeaponHandType::LeftHand || WeaponHandType == EWeaponHandType::RightHand)
+			{
+				const FD1EquipmentEntry& TwoHandEntry = Entries[Weapon_Primary_TwoHand];
+				return (TwoHandEntry.ItemInstance == nullptr);
+			}
+			else if (WeaponHandType == EWeaponHandType::TwoHand)
+			{
+				const FD1EquipmentEntry& LeftHandEntry = Entries[Weapon_Primary_LeftHand];
+				const FD1EquipmentEntry& RightHandEntry = Entries[Weapon_Primary_RightHand];
+				return (LeftHandEntry.ItemInstance == nullptr && RightHandEntry.ItemInstance == nullptr);
+			}
+		}
+		else if (IsSecondaryWeaponSlot(ToEquipmentSlotType))
+		{
+			if (WeaponHandType == EWeaponHandType::LeftHand || WeaponHandType == EWeaponHandType::RightHand)
+			{
+				const FD1EquipmentEntry& TwoHandEntry = Entries[Weapon_Secondary_TwoHand];
+				return (TwoHandEntry.ItemInstance == nullptr);
+			}
+			else if (WeaponHandType == EWeaponHandType::TwoHand)
+			{
+				const FD1EquipmentEntry& LeftHandEntry = Entries[Weapon_Secondary_LeftHand];
+				const FD1EquipmentEntry& RightHandEntry = Entries[Weapon_Secondary_RightHand];
+				return (LeftHandEntry.ItemInstance == nullptr && RightHandEntry.ItemInstance == nullptr);
+			}
+		}
 	}
+	else if (Equippable->EquipmentType == EEquipmentType::Armor)
+	{
+		const UD1ItemFragment_Equippable_Armor* EquippableArmor = Cast<UD1ItemFragment_Equippable_Armor>(Equippable);
+		return IsSameArmorType(ToEquipmentSlotType, EquippableArmor->ArmorType);
+	}
+	return false;
 }
 
-bool UD1EquipmentManagerComponent::CanEquipItem(UD1ItemInstance* ItemInstance) const
+bool UD1EquipmentManagerComponent::IsSameWeaponHandType(EEquipmentSlotType EquipmentSlotType, EWeaponHandType WeaponHandType) const
 {
-	return EquipmentList.CanEquipItem(ItemInstance);
+	return ((EquipmentSlotType == EEquipmentSlotType::Weapon_Primary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Weapon_Secondary_LeftHand)  && WeaponHandType == EWeaponHandType::LeftHand  ||
+			(EquipmentSlotType == EEquipmentSlotType::Weapon_Primary_RightHand || EquipmentSlotType == EEquipmentSlotType::Weapon_Secondary_RightHand) && WeaponHandType == EWeaponHandType::RightHand ||
+			(EquipmentSlotType == EEquipmentSlotType::Weapon_Primary_TwoHand   || EquipmentSlotType == EEquipmentSlotType::Weapon_Secondary_TwoHand)   && WeaponHandType == EWeaponHandType::TwoHand);
 }
 
-bool UD1EquipmentManagerComponent::CanUnEquipItem(EEquipmentType EquipmentType) const
+bool UD1EquipmentManagerComponent::IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType) const
 {
-	return EquipmentList.CanUnEquipItem(EquipmentType);
+	return (EquipmentSlotType == EEquipmentSlotType::Helmet && ArmorType == EArmorType::Head || EquipmentSlotType == EEquipmentSlotType::Chest && ArmorType == EArmorType::Chest ||
+			EquipmentSlotType == EEquipmentSlotType::Legs && ArmorType == EArmorType::Legs || EquipmentSlotType == EEquipmentSlotType::Hands && ArmorType == EArmorType::Hand ||
+			EquipmentSlotType == EEquipmentSlotType::Foot && ArmorType == EArmorType::Foot);
+}
+
+bool UD1EquipmentManagerComponent::IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const
+{
+	return (EquipmentSlotType == EEquipmentSlotType::Weapon_Primary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Weapon_Primary_RightHand || EquipmentSlotType == EEquipmentSlotType::Weapon_Primary_TwoHand);
+}
+
+bool UD1EquipmentManagerComponent::IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const
+{
+	return (EquipmentSlotType == EEquipmentSlotType::Weapon_Secondary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Weapon_Secondary_RightHand || EquipmentSlotType == EEquipmentSlotType::Weapon_Secondary_TwoHand);
 }
 
 const TArray<FD1EquipmentEntry>& UD1EquipmentManagerComponent::GetAllEntries() const
 {
 	return EquipmentList.GetAllEntries();
-}
-
-FD1EquipmentEntry UD1EquipmentManagerComponent::GetEntryByType(EEquipmentType EquipmentType)
-{
-	return EquipmentList.GetEntryByType(EquipmentType);
 }
 
 UD1AbilitySystemComponent* UD1EquipmentManagerComponent::GetAbilitySystemComponent() const

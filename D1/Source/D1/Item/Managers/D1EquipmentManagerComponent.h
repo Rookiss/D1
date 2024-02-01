@@ -1,7 +1,8 @@
 ﻿#pragma once
 
 #include "Data/D1AbilitySystemData.h"
-#include "Item/Fragments/D1ItemFragment_Equippable.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Net/Serialization/FastArraySerializer.h"
 #include "D1EquipmentManagerComponent.generated.h"
 
@@ -9,7 +10,27 @@ class UD1ItemInstance;
 class UD1AbilitySystemComponent;
 class UD1EquipmentManagerComponent;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEquipmentEntryChanged, EEquipmentType, UD1ItemInstance*)
+UENUM()
+enum EEquipmentSlotType
+{
+	Weapon_Primary_LeftHand,
+	Weapon_Primary_RightHand,
+	Weapon_Primary_TwoHand,
+	
+	Weapon_Secondary_LeftHand,
+	Weapon_Secondary_RightHand,
+	Weapon_Secondary_TwoHand,
+	
+	Helmet,
+	Chest,
+	Legs,
+	Hands,
+	Foot,
+	
+	EquipmentSlotCount	UMETA(Hidden)
+};
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEquipmentEntryChanged, EEquipmentSlotType, UD1ItemInstance*)
 
 USTRUCT(BlueprintType)
 struct FD1EquipmentEntry : public FFastArraySerializerItem
@@ -29,17 +50,22 @@ private:
 	friend class UD1EquipmentManagerComponent;
 
 	UPROPERTY()
-	TObjectPtr<UD1ItemInstance> ItemInstance = nullptr;
+	TObjectPtr<UD1ItemInstance> ItemInstance;
 
 	UPROPERTY()
 	int32 LatestValidItemID = 0;
 
-	UPROPERTY()
+private:
+	UPROPERTY(NotReplicated)
 	TArray<TObjectPtr<AActor>> SpawnedActor;
 	
 	UPROPERTY(NotReplicated)
 	FD1AbilitySystemData_GrantedHandles GrantedHandles;
-	
+
+	UPROPERTY(NotReplicated)
+	TArray<FActiveGameplayEffectHandle> StatHandles;
+
+private:
 	UPROPERTY(NotReplicated)
 	TObjectPtr<UD1EquipmentManagerComponent> OwnerComponent;
 };
@@ -61,19 +87,16 @@ public:
 private:
 	void InitOnServer();
 	
-	void Unsafe_EquipItem(UD1ItemInstance* ItemInstance);
-	void Unsafe_UnEquipItem(EEquipmentType EquipmentType);
-
-private:
-	bool CanEquipItem(UD1ItemInstance* ItemInstance) const;
-	bool CanUnEquipItem(EEquipmentType EquipmentType) const;
+	void EquipItem_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+	UD1ItemInstance* UnEquipItem_Unsafe(EEquipmentSlotType EquipmentSlotType); /* Return UnEquipped ItemInstance */
 
 public:
-	FD1EquipmentEntry GetEntryByType(EEquipmentType EquipmentType) const;
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const { return Entries; }
+	FD1EquipmentEntry GetEntryBySlotType(EEquipmentSlotType EquipmentSlotType) const;
 	
 private:
 	friend class UD1EquipmentManagerComponent;
+	friend class UD1InventoryManagerComponent;
 
 	UPROPERTY()
 	TArray<FD1EquipmentEntry> Entries;
@@ -106,28 +129,34 @@ protected:
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
 public:
+	// TODO: Auth Check
 	UFUNCTION(Server, Reliable)
-	void Server_RequestEquipItem(UD1ItemInstance* ItemInstance);
+	void Server_RequestEquipItem_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType);
+	bool CanEquipItem_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const;
 
 	UFUNCTION(Server, Reliable)
-	void Server_RequestUnEquipItem(EEquipmentType EquipmentType);
+	void Server_RequestEquipItem_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType);
+	bool CanEquipItem_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
+	
+	bool CanEquipItem(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
 
 public:
-	bool CanEquipItem(UD1ItemInstance* ItemInstance) const;
-	bool CanUnEquipItem(EEquipmentType EquipmentType) const;
+	bool IsSameWeaponHandType(EEquipmentSlotType EquipmentSlotType, EWeaponHandType WeaponHandType) const;
+	bool IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType) const;
+
+	bool IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
+	bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
 	
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const;
-	FD1EquipmentEntry GetEntryByType(EEquipmentType EquipmentType);
 	int32 GetEquipmentSlotCount() const { return EquipmentSlotCount; }
 	UD1AbilitySystemComponent* GetAbilitySystemComponent() const;
-	
+
 public:
 	FOnEquipmentEntryChanged OnEquipmentEntryChanged;
 	
 private:
+	friend class UD1InventoryManagerComponent;
+	
 	UPROPERTY(Replicated)
 	FD1EquipmentList EquipmentList;
-
-	UPROPERTY()
-	int32 EquipmentSlotCount = static_cast<int32>(EEquipmentType::Count);
 };

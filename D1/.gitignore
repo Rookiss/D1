@@ -3,7 +3,10 @@
 .idea/
 
 # Blueprint-Assist Cache files
-Plugins/BlueprintAssist/NodeSizeCache/*
+Plugins/**/BlueprintAssist/NodeSizeCache/*
+
+# Debug files
+*.pdb
 
 # Compiled Object files
 *.slo
@@ -72,7 +75,7 @@ Saved/*
 
 # Compiled source files for the engine to use
 Intermediate/*
-Plugins/*/Intermediate/*
+Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*

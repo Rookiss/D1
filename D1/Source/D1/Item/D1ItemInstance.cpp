@@ -16,6 +16,7 @@ void UD1ItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, ItemID);
+	DOREPLIFETIME(ThisClass, ItemRarity);
 	DOREPLIFETIME(ThisClass, StatContainer);
 }
 
@@ -47,11 +48,6 @@ void UD1ItemInstance::AddStatTagStack(const FGameplayTag& StatTag, int32 StackCo
 void UD1ItemInstance::RemoveStatTagStack(const FGameplayTag& StatTag, int32 StackCount)
 {
 	StatContainer.RemoveStack(StatTag, StackCount);
-}
-
-const TArray<FD1GameplayTagStack>& UD1ItemInstance::GetAllStatStacks() const
-{
-	return StatContainer.GetAllStatStacks();
 }
 
 int32 UD1ItemInstance::GetStackCountByTag(const FGameplayTag& StatTag) const

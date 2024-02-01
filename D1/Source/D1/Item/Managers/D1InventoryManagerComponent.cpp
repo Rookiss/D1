@@ -61,7 +61,7 @@ void FD1InventoryList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, i
 
 	for (int32 Index : AddedIndices)
 	{
-		const FD1InventoryEntry& Entry = Entries[Index];
+		FD1InventoryEntry& Entry = Entries[Index];
 		if (Entry.ItemInstance == nullptr)
 			continue;
 
@@ -71,10 +71,8 @@ void FD1InventoryList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, i
 
 		OwnerComponent->MarkSlotChecks(true, ItemSlotPos, ItemSlotCount);
 
-		if (OwnerComponent->OnInventoryEntryChanged.IsBound())
-		{
-			OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemSlotPos, Entry.ItemInstance, Entry.ItemCount);
-		}
+		OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemSlotPos, Entry.ItemInstance, Entry.LatestValidItemID, 0, Entry.ItemCount);
+		Entry.LastObservedCount = Entry.ItemCount;
 	}
 }
 
@@ -88,7 +86,7 @@ void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 
 	for (int32 Index : ChangedIndices)
 	{
-		const FD1InventoryEntry& Entry = Entries[Index];
+		FD1InventoryEntry& Entry = Entries[Index];
 		if (Entry.ItemCount > 0)
 		{
 			AliveIndices.Add(Index);
@@ -101,26 +99,22 @@ void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 
 		OwnerComponent->MarkSlotChecks(false, ItemSlotPos, ItemSlotCount);
 
-		if (OwnerComponent->OnInventoryEntryChanged.IsBound())
-		{
-			OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemSlotPos, Entry.ItemInstance, Entry.ItemCount);
-		}
+		OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemSlotPos, Entry.ItemInstance, Entry.LatestValidItemID, Entry.LastObservedCount, Entry.ItemCount);
+		Entry.LastObservedCount = Entry.ItemCount;
 	}
 
 	for (int32 Index : AliveIndices)
 	{
-		const FD1InventoryEntry& Entry = Entries[Index];
+		FD1InventoryEntry& Entry = Entries[Index];
 
 		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID((Entry.GetItemInstance()->GetItemID()));
 		const FIntPoint ItemSlotPos = FIntPoint(Index % InventorySlotCount.X, Index / InventorySlotCount.X);
 		const FIntPoint& ItemSlotCount = ItemDef.ItemSlotCount;
 
 		OwnerComponent->MarkSlotChecks(true, ItemSlotPos, ItemSlotCount);
-
-		if (OwnerComponent->OnInventoryEntryChanged.IsBound())
-		{
-			OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemSlotPos, Entry.ItemInstance, Entry.ItemCount);
-		}
+		
+		OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemSlotPos, Entry.ItemInstance, Entry.LatestValidItemID, Entry.LastObservedCount, Entry.ItemCount);
+		Entry.LastObservedCount = Entry.ItemCount;
 	}
 }
 
@@ -135,50 +129,52 @@ void FD1InventoryList::InitOnServer()
 	}
 }
 
-bool FD1InventoryList::TryAddItem(const FIntPoint& ItemSlotPos, int32 ItemID, int32 ItemCount)
+void FD1InventoryList::AddItem_Unsafe(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount)
 {
 	AActor* OwningActor = OwnerComponent->GetOwner();
 	check(OwningActor->HasAuthority());
 
-	if (ItemID <= 0 || ItemCount <= 0)
-		return false;
-
-	const FIntPoint& InventorySlotCount = OwnerComponent->GetInventorySlotCount();
-	if (ItemSlotPos.X < 0 || ItemSlotPos.Y < 0 || ItemSlotPos.X >= InventorySlotCount.X || ItemSlotPos.Y >= InventorySlotCount.Y)
-		return false;
-
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemID);
-
+	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->ItemID);
+	
+	const FIntPoint& InventorySlotCount = OwnerComponent->GetInventorySlotCount();
 	int32 Index = ItemSlotPos.Y * InventorySlotCount.X + ItemSlotPos.X;
 	FD1InventoryEntry& Entry = Entries[Index];
-	
+
 	if (Entry.ItemInstance)
 	{
-		if (Entry.ItemInstance->ItemID == ItemID)
-		{
-			if (const UD1ItemFragment_Stackable* Stackable = ItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>())
-			{
-				if (Entry.ItemCount + ItemCount <= Stackable->MaxStackCount)
-				{
-					Entry.ItemCount += ItemCount;
-					MarkItemDirty(Entry);
-					return true;
-				}
-			}
-		}
+		Entry.ItemCount += ItemCount;
+		MarkItemDirty(Entry);
 	}
 	else
 	{
-		if (OwnerComponent->IsEmpty(ItemSlotPos, ItemDef.ItemSlotCount))
-		{
-			OwnerComponent->MarkSlotChecks(true, ItemSlotPos, ItemDef.ItemSlotCount);
-			Entry.Init(ItemID, ItemCount);
-			MarkItemDirty(Entry);
-			return true;
-		}
+		OwnerComponent->MarkSlotChecks(true, ItemSlotPos, ItemDef.ItemSlotCount);
+		Entry.Init(ItemInstance, ItemCount);
+		MarkItemDirty(Entry);
 	}
-	return false;
+}
+
+UD1ItemInstance* FD1InventoryList::RemoveItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemCount)
+{
+	AActor* OwningActor = OwnerComponent->GetOwner();
+	check(OwningActor->HasAuthority());
+
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+
+	const FIntPoint& InventorySlotCount = OwnerComponent->GetInventorySlotCount();
+	const int32 Index = ItemSlotPos.Y * InventorySlotCount.X + ItemSlotPos.X;
+	FD1InventoryEntry& Entry = Entries[Index];
+	UD1ItemInstance* ItemInstance = Entry.ItemInstance;
+	
+	Entry.ItemCount -= ItemCount;
+	if (Entry.ItemCount <= 0)
+	{
+		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->ItemID);
+		OwnerComponent->MarkSlotChecks(false, ItemSlotPos, ItemDef.ItemSlotCount);
+		Entry.Reset();
+	}
+	MarkItemDirty(Entry);
+	return ItemInstance;
 }
 
 bool FD1InventoryList::TryAddItem(int32 ItemID, int32 ItemCount)
@@ -269,39 +265,6 @@ bool FD1InventoryList::TryAddItem(int32 ItemID, int32 ItemCount)
 	return false;
 }
 
-bool FD1InventoryList::TryRemoveItem(const FIntPoint& ItemSlotPos, int32 ItemCount)
-{
-	AActor* OwningActor = OwnerComponent->GetOwner();
-	check(OwningActor->HasAuthority());
-	
-	if (ItemCount <= 0)
-		return false;
-	
-	const FIntPoint& InventorySlotCount = OwnerComponent->GetInventorySlotCount();
-	if (ItemSlotPos.X < 0 || ItemSlotPos.Y < 0 || ItemSlotPos.X >= InventorySlotCount.X || ItemSlotPos.Y >= InventorySlotCount.Y)
-		return false;
-
-	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-
-	int32 Index = ItemSlotPos.Y * InventorySlotCount.X + ItemSlotPos.X;
-	FD1InventoryEntry& Entry = Entries[Index];
-	if (Entry.ItemInstance == nullptr)
-		return false;
-
-	if (Entry.ItemCount < ItemCount)
-		return false;
-
-	Entry.ItemCount -= ItemCount;
-	if (Entry.ItemCount == 0)
-	{
-		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(Entry.ItemInstance->GetItemID());
-		OwnerComponent->MarkSlotChecks(false, ItemSlotPos, ItemDef.ItemSlotCount);
-		Entry.Reset();
-	}
-	MarkItemDirty(Entry);
-	return true;
-}
-
 bool FD1InventoryList::TryRemoveItem(int32 ItemID, int32 ItemCount)
 {
 	AActor* OwningActor = OwnerComponent->GetOwner();
@@ -356,64 +319,6 @@ bool FD1InventoryList::TryRemoveItem(int32 ItemID, int32 ItemCount)
 	return false;
 }
 
-void FD1InventoryList::Unsafe_MoveItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos)
-{
-	if (FromSlotPos == ToSlotPos)
-		return;
-
-	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FIntPoint& InventorySlotCount = OwnerComponent->GetInventorySlotCount();
-
-	int32 FromIndex = FromSlotPos.Y * InventorySlotCount.X + FromSlotPos.X;
-	FD1InventoryEntry& FromEntry = Entries[FromIndex];
-	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
-	const int32 FromItemID = FromItemInstance->GetItemID();
-	const FD1ItemDefinition& FromItemDef = ItemData->GetItemDefByID(FromItemID);
-
-	int32 ToIndex = ToSlotPos.Y * InventorySlotCount.X + ToSlotPos.X;
-	FD1InventoryEntry& ToEntry = Entries[ToIndex];
-
-	ToEntry.ItemInstance = FromItemInstance;
-	ToEntry.ItemCount = FromEntry.ItemCount;
-	ToEntry.LatestValidItemID = FromItemInstance->ItemID;
-	MarkItemDirty(ToEntry);
-
-	FromEntry.Reset();
-	MarkItemDirty(FromEntry);
-
-	OwnerComponent->MarkSlotChecks(false, FromSlotPos, FromItemDef.ItemSlotCount);
-	OwnerComponent->MarkSlotChecks(true, ToSlotPos, FromItemDef.ItemSlotCount);
-}
-
-void FD1InventoryList::Unsafe_MergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos, int32 MergeCount)
-{
-	if (FromSlotPos == ToSlotPos || MergeCount == 0)
-		return;
-
-	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FIntPoint& InventorySlotCount = OwnerComponent->GetInventorySlotCount();
-
-	int32 FromIndex = FromSlotPos.Y * InventorySlotCount.X + FromSlotPos.X;
-	FD1InventoryEntry& FromEntry = Entries[FromIndex];
-	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
-	const int32 FromItemID = FromItemInstance->GetItemID();
-	const FD1ItemDefinition& FromItemDef = ItemData->GetItemDefByID(FromItemID);
-
-	int32 ToIndex = ToSlotPos.Y * InventorySlotCount.X + ToSlotPos.X;
-	FD1InventoryEntry& ToEntry = Entries[ToIndex];
-
-	ToEntry.ItemCount += MergeCount;
-	MarkItemDirty(ToEntry);
-
-	FromEntry.ItemCount -= MergeCount;
-	if (FromEntry.ItemCount <= 0)
-	{
-		FromEntry.Reset();
-		OwnerComponent->MarkSlotChecks(false, FromSlotPos, FromItemDef.ItemSlotCount);
-	}
-	MarkItemDirty(FromEntry);
-}
-
 FD1InventoryEntry FD1InventoryList::GetEntryByPosition(const FIntPoint& ItemSlotPos) const
 {
 	if (ItemSlotPos.X < 0 || ItemSlotPos.Y < 0)
@@ -444,14 +349,6 @@ UD1InventoryManagerComponent::UD1InventoryManagerComponent(const FObjectInitiali
 	, InventoryList(this)
 {
 	SetIsReplicatedByDefault(true);
-
-	InventorySlotChecks.SetNumZeroed(InventorySlotCount.Y);
-	for (int32 y = 0; y < InventorySlotChecks.Num(); y++)
-	{
-		InventorySlotChecks[y].SetNumZeroed(InventorySlotCount.X);
-	}
-
-	InventoryList.Entries.Reserve(InventorySlotCount.X * InventorySlotCount.Y);
 }
 
 void UD1InventoryManagerComponent::BeginPlay()
@@ -485,35 +382,220 @@ bool UD1InventoryManagerComponent::ReplicateSubobjects(UActorChannel* Channel, F
 	return bWroteSomething;
 }
 
-void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_Implementation(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos)
+void UD1InventoryManagerComponent::Init(FIntPoint InInventorySlotCount)
+{
+	InventorySlotCount = InInventorySlotCount;
+	
+	SlotChecks.SetNumZeroed(InventorySlotCount.Y);
+	for (int32 y = 0; y < SlotChecks.Num(); y++)
+	{
+		SlotChecks[y].SetNumZeroed(InventorySlotCount.X);
+	}
+
+	InventoryList.Entries.Reserve(InventorySlotCount.X * InventorySlotCount.Y);
+}
+
+void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromInternalInventory_Implementation(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos)
 {
 	check(GetOwner()->HasAuthority());
-
-	int32 MergeCount = 0;
-	EInventoryOpResult Result = CanMoveOrMergeItem(FromSlotPos, ToSlotPos, MergeCount);
-	if (Result == EInventoryOpResult::Fail)
+	
+	int32 MovableItemCount = CanMoveOrMergeItem_FromInternalInventory(FromItemSlotPos, ToItemSlotPos);
+	if (MovableItemCount == 0)
 		return;
 
-	switch (Result)
+	UD1ItemInstance* RemovedItemInstance = InventoryList.RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
+	InventoryList.AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, MovableItemCount);
+}
+
+int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const
+{
+	if (FromItemSlotPos.X < 0 || FromItemSlotPos.Y < 0 || FromItemSlotPos.X >= InventorySlotCount.X || FromItemSlotPos.Y >= InventorySlotCount.Y)
+		return 0;
+
+	if (ToItemSlotPos.X < 0 || ToItemSlotPos.Y < 0 || ToItemSlotPos.X >= InventorySlotCount.X || ToItemSlotPos.Y >= InventorySlotCount.Y)
+		return 0;
+
+	const TArray<FD1InventoryEntry>& Entries = GetAllEntries();
+
+	int32 FromIndex = FromItemSlotPos.Y * InventorySlotCount.X + FromItemSlotPos.X;
+	const FD1InventoryEntry& FromEntry = Entries[FromIndex];
+	const int32 FromItemCount = FromEntry.ItemCount;
+
+	int32 ToIndex = ToItemSlotPos.Y * InventorySlotCount.X + ToItemSlotPos.X;
+	const FD1InventoryEntry& ToEntry = Entries[ToIndex];
+	const int32 ToItemCount = ToEntry.ItemCount;
+	
+	const UD1ItemInstance* FromItemInstance = FromEntry.ItemInstance;
+	if (FromItemInstance == nullptr)
+		return 0;
+	
+	if (FromItemSlotPos == ToItemSlotPos)
+		return FromItemCount;
+
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	const int32 FromItemID = FromItemInstance->GetItemID();
+	const FD1ItemDefinition& FromItemDef = ItemData->GetItemDefByID(FromItemID);
+	const FIntPoint& FromItemSlotCount = FromItemDef.ItemSlotCount;
+
+	if (const UD1ItemInstance* ToItemInstance = ToEntry.ItemInstance)
 	{
-	case EInventoryOpResult::Move:  InventoryList.Unsafe_MoveItem(FromSlotPos, ToSlotPos);				break;
-	case EInventoryOpResult::Merge: InventoryList.Unsafe_MergeItem(FromSlotPos, ToSlotPos, MergeCount); break;
+		const int32 ToItemID = ToItemInstance->GetItemID();
+		if (FromItemID != ToItemID)
+			return 0;
+
+		const UD1ItemFragment_Stackable* Stackable = FromItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>();
+		if (Stackable == nullptr)
+			return 0;
+
+		return FMath::Min(FromItemCount + ToItemCount, Stackable->MaxStackCount) - ToItemCount;
+	}
+	else
+	{
+		if (ToItemSlotPos.X + FromItemSlotCount.X > InventorySlotCount.X || ToItemSlotPos.Y + FromItemSlotCount.Y > InventorySlotCount.Y)
+			return 0;
+
+		TArray<TArray<bool>> TempSlotChecks = SlotChecks;
+
+		FIntPoint StartSlotPos = FromItemSlotPos;
+		FIntPoint EndSlotPos = FromItemSlotPos + FromItemSlotCount;
+
+		for (int32 y = StartSlotPos.Y; y < EndSlotPos.Y; y++)
+		{
+			for (int32 x = StartSlotPos.X; x < EndSlotPos.X; x++)
+			{
+				TempSlotChecks[y][x] = false;
+			}
+		}
+
+		StartSlotPos = ToItemSlotPos;
+		EndSlotPos = ToItemSlotPos + FromItemSlotCount;
+
+		for (int32 y = StartSlotPos.Y; y < EndSlotPos.Y; y++)
+		{
+			for (int32 x = StartSlotPos.X; x < EndSlotPos.X; x++)
+			{
+				if (TempSlotChecks[y][x])
+					return 0;
+			}
+		}
+		return FromItemCount;
 	}
 }
 
-bool UD1InventoryManagerComponent::TryAddItem(const FIntPoint& ItemSlotPos, int32 ItemID, int32 ItemCount)
+void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromExternalInventory_Implementation(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos)
 {
-	return InventoryList.TryAddItem(ItemSlotPos, ItemID, ItemCount);
+	check(GetOwner()->HasAuthority());
+	
+	int32 MovableItemCount = CanMoveOrMergeItem_FromExternalInventory(OtherComponent, FromItemSlotPos, ToItemSlotPos);
+	if (MovableItemCount == 0)
+		return;
+
+	UD1ItemInstance* RemovedItemInstance = OtherComponent->InventoryList.RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
+	InventoryList.AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, MovableItemCount);
+}
+
+int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const
+{
+	if (OtherComponent == nullptr)
+		return 0;
+
+	const FIntPoint& FromInventorySlotCount = OtherComponent->GetInventorySlotCount();
+	const FIntPoint& ToInventorySlotCount = InventorySlotCount;
+	
+	if (FromItemSlotPos.X < 0 || FromItemSlotPos.Y < 0 || FromItemSlotPos.X >= FromInventorySlotCount.X || FromItemSlotPos.Y >= FromInventorySlotCount.Y)
+		return 0;
+	
+	if (ToItemSlotPos.X < 0 || ToItemSlotPos.Y < 0 || ToItemSlotPos.X >= ToInventorySlotCount.X || ToItemSlotPos.Y >= ToInventorySlotCount.Y)
+		return 0;
+
+	const TArray<FD1InventoryEntry>& FromEntries = OtherComponent->GetAllEntries();
+	const TArray<FD1InventoryEntry>& ToEntries = GetAllEntries();
+
+	const int32 FromIndex = FromItemSlotPos.Y * FromInventorySlotCount.X + FromItemSlotPos.X;
+	const FD1InventoryEntry& FromEntry = FromEntries[FromIndex];
+	const UD1ItemInstance* FromItemInstance = FromEntry.ItemInstance;
+	const int32 FromItemCount = FromEntry.ItemCount;
+
+	if (FromItemInstance == nullptr)
+		return 0;
+	
+	const int32 ToIndex = ToItemSlotPos.Y * ToInventorySlotCount.X + ToItemSlotPos.X;
+	const FD1InventoryEntry& ToEntry = ToEntries[ToIndex];
+	const UD1ItemInstance* ToItemInstance = ToEntry.ItemInstance;
+
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	const int32 FromItemID = FromItemInstance->GetItemID();
+	
+	const FD1ItemDefinition& FromItemDef = ItemData->GetItemDefByID(FromItemID);
+	
+	if (ToItemInstance)
+	{
+		const int32 ToItemID = ToItemInstance->GetItemID();
+		if (FromItemID != ToItemID)
+			return 0;
+
+		const UD1ItemFragment_Stackable* Stackable = FromItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>();
+		if (Stackable == nullptr)
+			return 0;
+
+		return FMath::Min(FromItemCount + ToEntry.ItemCount, Stackable->MaxStackCount) - ToEntry.ItemCount;
+	}
+	else
+	{
+		const FIntPoint& FromItemSlotCount = FromItemDef.ItemSlotCount;
+		return IsEmpty(ToItemSlotPos, FromItemSlotCount) ? FromItemCount : 0;
+	}
+}
+
+void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromExternalEquipment_Implementation(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos)
+{
+	check(GetOwner()->HasAuthority());
+	
+	if (CanMoveOrMergeItem_FromExternalEquipment(OtherComponent, FromEquipmentSlotType, ToItemSlotPos) == false)
+		return;
+
+	UD1ItemInstance* UnEquippedItemInstance = OtherComponent->EquipmentList.UnEquipItem_Unsafe(FromEquipmentSlotType);
+	InventoryList.AddItem_Unsafe(ToItemSlotPos, UnEquippedItemInstance, 1);
+}
+
+bool UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const
+{
+	if (OtherComponent == nullptr)
+		return false;
+
+	if (FromEquipmentSlotType == EEquipmentSlotType::EquipmentSlotCount)
+		return false;
+	
+	if (ToItemSlotPos.X < 0 || ToItemSlotPos.Y < 0 || ToItemSlotPos.X >= InventorySlotCount.X || ToItemSlotPos.Y >= InventorySlotCount.Y)
+		return false;
+
+	const TArray<FD1EquipmentEntry>& FromEntries = OtherComponent->GetAllEntries();
+	const TArray<FD1InventoryEntry>& ToEntries = GetAllEntries();
+	
+	const FD1EquipmentEntry& FromEntry = FromEntries[FromEquipmentSlotType];
+	const UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
+
+	if (FromItemInstance == nullptr)
+		return false;
+	
+	int32 ToIndex = ToItemSlotPos.Y * InventorySlotCount.X + ToItemSlotPos.X;
+	const FD1InventoryEntry& ToEntry = ToEntries[ToIndex];
+	const UD1ItemInstance* ToItemInstance = ToEntry.ItemInstance;
+
+	if (ToItemInstance)
+		return false;
+
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	const int32 FromItemID = FromItemInstance->GetItemID();
+	const FD1ItemDefinition& FromItemDef = ItemData->GetItemDefByID(FromItemID);
+
+	const FIntPoint& FromItemSlotCount = FromItemDef.ItemSlotCount;
+	return IsEmpty(ToItemSlotPos, FromItemSlotCount);
 }
 
 bool UD1InventoryManagerComponent::TryAddItem(int32 ItemID, int32 ItemCount)
 {
 	return InventoryList.TryAddItem(ItemID, ItemCount);
-}
-
-bool UD1InventoryManagerComponent::TryRemoveItem(const FIntPoint& ItemSlotPos, int32 ItemCount)
-{
-	return InventoryList.TryRemoveItem(ItemSlotPos, ItemCount);
 }
 
 bool UD1InventoryManagerComponent::TryRemoveItem(int32 ItemID, int32 ItemCount)
@@ -526,12 +608,12 @@ const TArray<FD1InventoryEntry>& UD1InventoryManagerComponent::GetAllEntries() c
 	return InventoryList.GetAllEntries();
 }
 
-FD1InventoryEntry UD1InventoryManagerComponent::GetEntryByPosition(const FIntPoint& ItemSlotPos)
+int32 UD1InventoryManagerComponent::GetTotalCountByID(int32 ItemID) const
 {
-	return InventoryList.GetEntryByPosition(ItemSlotPos);
+	return InventoryList.GetTotalCountByID(ItemID);
 }
 
-bool UD1InventoryManagerComponent::IsEmpty(const TArray<TArray<bool>>& SlotChecks, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const
+bool UD1InventoryManagerComponent::IsEmpty(const TArray<TArray<bool>>& InSlotChecks, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const
 {
 	if (ItemSlotPos.X < 0 || ItemSlotPos.Y < 0)
 		return false;
@@ -546,7 +628,7 @@ bool UD1InventoryManagerComponent::IsEmpty(const TArray<TArray<bool>>& SlotCheck
 	{
 		for (int32 x = StartSlotPos.X; x < EndSlotPos.X; x++)
 		{
-			if (SlotChecks[y][x])
+			if (InSlotChecks[y][x])
 				return false;
 		}
 	}
@@ -555,86 +637,10 @@ bool UD1InventoryManagerComponent::IsEmpty(const TArray<TArray<bool>>& SlotCheck
 
 bool UD1InventoryManagerComponent::IsEmpty(const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const
 {
-	return IsEmpty(InventorySlotChecks, ItemSlotPos, ItemSlotCount);
+	return IsEmpty(SlotChecks, ItemSlotPos, ItemSlotCount);
 }
 
-EInventoryOpResult UD1InventoryManagerComponent::CanMoveOrMergeItem(const FIntPoint& FromSlotPos, const FIntPoint& ToSlotPos, int32& OutMergeCount) const
-{
-	OutMergeCount = 0;
-
-	if (FromSlotPos.X < 0 || FromSlotPos.Y < 0 || FromSlotPos.X >= InventorySlotCount.X || FromSlotPos.Y >= InventorySlotCount.Y)
-		return EInventoryOpResult::Fail;
-
-	if (ToSlotPos.X < 0 || ToSlotPos.Y < 0 || ToSlotPos.X >= InventorySlotCount.X || ToSlotPos.Y >= InventorySlotCount.Y)
-		return EInventoryOpResult::Fail;
-
-	const TArray<FD1InventoryEntry>& Entries = GetAllEntries();
-
-	int32 FromIndex = FromSlotPos.Y * InventorySlotCount.X + FromSlotPos.X;
-	const FD1InventoryEntry& FromEntry = Entries[FromIndex];
-
-	int32 ToIndex = ToSlotPos.Y * InventorySlotCount.X + ToSlotPos.X;
-	const FD1InventoryEntry& ToEntry = Entries[ToIndex];
-
-	if (const UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance())
-	{
-		if (FromSlotPos == ToSlotPos)
-			return EInventoryOpResult::Move;
-
-		const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-		const int32 FromItemID = FromItemInstance->GetItemID();
-		const FD1ItemDefinition& FromItemDef = ItemData->GetItemDefByID(FromItemID);
-		const FIntPoint& FromItemSlotCount = FromItemDef.ItemSlotCount;
-
-		if (const UD1ItemInstance* ToItemInstance = ToEntry.GetItemInstance())
-		{
-			const int32 ToItemID = ToItemInstance->GetItemID();
-			if (FromItemID != ToItemID)
-				return EInventoryOpResult::Fail;
-
-			const UD1ItemFragment_Stackable* Stackable = FromItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>();
-			if (Stackable == nullptr)
-				return EInventoryOpResult::Fail;
-
-			OutMergeCount = FMath::Min(FromEntry.GetItemCount() + ToEntry.GetItemCount(), Stackable->MaxStackCount) - ToEntry.GetItemCount();
-			return OutMergeCount ? EInventoryOpResult::Merge : EInventoryOpResult::Fail;
-		}
-		else
-		{
-			if (ToSlotPos.X + FromItemSlotCount.X > InventorySlotCount.X || ToSlotPos.Y + FromItemSlotCount.Y > InventorySlotCount.Y)
-				return EInventoryOpResult::Fail;
-
-			TArray<TArray<bool>> TempSlotChecks = InventorySlotChecks;
-
-			FIntPoint StartSlotPos = FromSlotPos;
-			FIntPoint EndSlotPos = FromSlotPos + FromItemSlotCount;
-
-			for (int32 y = StartSlotPos.Y; y < EndSlotPos.Y; y++)
-			{
-				for (int32 x = StartSlotPos.X; x < EndSlotPos.X; x++)
-				{
-					TempSlotChecks[y][x] = false;
-				}
-			}
-
-			StartSlotPos = ToSlotPos;
-			EndSlotPos = ToSlotPos + FromItemSlotCount;
-
-			for (int32 y = StartSlotPos.Y; y < EndSlotPos.Y; y++)
-			{
-				for (int32 x = StartSlotPos.X; x < EndSlotPos.X; x++)
-				{
-					if (TempSlotChecks[y][x])
-						return EInventoryOpResult::Fail;
-				}
-			}
-			return EInventoryOpResult::Move;
-		}
-	}
-	return EInventoryOpResult::Fail;
-}
-
-void UD1InventoryManagerComponent::MarkSlotChecks(TArray<TArray<bool>>& SlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount)
+void UD1InventoryManagerComponent::MarkSlotChecks(TArray<TArray<bool>>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount)
 {
 	if (ItemSlotPos.X < 0 || ItemSlotPos.Y < 0)
 		return;
@@ -649,12 +655,12 @@ void UD1InventoryManagerComponent::MarkSlotChecks(TArray<TArray<bool>>& SlotChec
 	{
 		for (int32 x = StartSlotPos.X; x < EndSlotPos.X; x++)
 		{
-			SlotChecks[y][x] = bIsUsing;
+			InSlotChecks[y][x] = bIsUsing;
 		}
 	}
 }
 
 void UD1InventoryManagerComponent::MarkSlotChecks(bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount)
 {
-	MarkSlotChecks(InventorySlotChecks, bIsUsing, ItemSlotPos, ItemSlotCount);
+	MarkSlotChecks(SlotChecks, bIsUsing, ItemSlotPos, ItemSlotCount);
 }

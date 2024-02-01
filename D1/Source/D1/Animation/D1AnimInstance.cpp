@@ -2,6 +2,11 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
+#include "KismetAnimationLibrary.h"
+#include "Character/D1Player.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AnimInstance)
 
@@ -24,21 +29,31 @@ void UD1AnimInstance::NativeInitializeAnimation()
 	}
 }
 
-void UD1AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
-{
-	Super::NativeUpdateAnimation(DeltaSeconds);
-
-	// TODO: Pitch 동기화 구현 필요함
-	if (APawn* Pawn = TryGetPawnOwner())
-	{
-		if (AController* Controller = Pawn->GetController())
-		{
-			Pitch = (Controller->GetControlRotation() - Pawn->GetActorRotation()).GetNormalized().Pitch;
-		}
-	}
-}
-
 void UD1AnimInstance::InitializedWithAbilitySystem(UAbilitySystemComponent* ASC)
 {
 	GameplayTagPropertyMap.Initialize(this, ASC);
+}
+
+void UD1AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+{
+	Super::NativeUpdateAnimation(DeltaSeconds);
+	
+	if (APawn* Pawn = TryGetPawnOwner())
+	{
+		if (AD1Player* Character = Cast<AD1Player>(Pawn))
+		{
+			AimPitch = Character->CalculateAimPitch();
+			
+			if (UCharacterMovementComponent* MovementComponent = Character->GetCharacterMovement())
+			{
+				Velocity = MovementComponent->Velocity;
+				GroundSpeed = Velocity.Size2D();
+				Direction = UKismetAnimationLibrary::CalculateDirection(Velocity, Character->GetActorRotation());
+				
+				bShouldMove = (GroundSpeed > 3.f && MovementComponent->GetCurrentAcceleration() != FVector::ZeroVector);
+				bIsCrouching = MovementComponent->IsCrouching();
+				bIsFalling = MovementComponent->IsFalling();
+			}
+		}
+	}
 }

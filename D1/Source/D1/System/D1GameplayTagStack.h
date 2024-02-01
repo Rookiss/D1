@@ -50,7 +50,7 @@ public:
 	void RemoveStack(const FGameplayTag& Tag, int32 StackCount);
 	
 public:
-	const TArray<FD1GameplayTagStack>& GetAllStatStacks() const { return Stacks; }
+	const TArray<FD1GameplayTagStack>& GetStacks() const { return Stacks; } 
 	int32 GetStackCountByTag(const FGameplayTag& Tag) const { return TagToCount.FindRef(Tag); }
 	bool ContainsTag(const FGameplayTag& Tag) const { return TagToCount.Contains(Tag); }
 

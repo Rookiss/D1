@@ -8,17 +8,14 @@ class UD1AbilitySystemData;
 class UD1EquipmentInstance;
 
 UENUM()
-enum class EEquipmentType : uint8
+enum class EEquipmentType
 {
 	Weapon,
-	Head,
-	Chest,
-	Legs,
-	Hand,
-	Foot,
+	Armor,
 	
 	Count	UMETA(Hidden)
 };
+
 
 USTRUCT()
 struct FD1EquipmentAttachInfo
@@ -65,7 +62,7 @@ public:
 	TArray<FStatRange> StatRanges;
 };
 
-UCLASS(Const)
+UCLASS(Abstract, Const)
 class UD1ItemFragment_Equippable : public UD1ItemFragment
 {
 	GENERATED_BODY()
@@ -77,11 +74,10 @@ public:
 	virtual void OnInstanceCreated(UD1ItemInstance* ItemInstance) const override;
 
 public:
-	UPROPERTY(EditDefaultsOnly)
-	EEquipmentType EquipmentType = EEquipmentType::Weapon;
+	EEquipmentType EquipmentType = EEquipmentType::Count;
 
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<const UD1AbilitySystemData> AbilitySystemToGrant;
+	TObjectPtr<const UD1AbilitySystemData> AbilitySystemDataToGrant;
 	
 	UPROPERTY(EditDefaultsOnly)
 	FD1EquipmentAttachInfo AttachInfo;

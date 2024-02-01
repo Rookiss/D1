@@ -9,6 +9,9 @@
 #include "Misc/DataValidation.h"
 #endif
 
+#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
+
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemData)
 
 UD1ItemData::UD1ItemData()
@@ -61,6 +64,12 @@ EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) 
 		const FString& Name = Pair.Key;
 		const FD1ItemDefinition& ItemDef = Pair.Value;
 		const int32 ItemID = ItemDef.ItemID;
+
+		const UD1ItemFragment_Consumable* Consumable = ItemDef.FindFragmentByClass<UD1ItemFragment_Consumable>();
+		const UD1ItemFragment_Equippable* Equippable = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable>();
+		const UD1ItemFragment_Equippable_Armor* Armor = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
+		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+		const UD1ItemFragment_Stackable* Stackable = ItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>();
 		
 		if (ItemID <= 0)
 		{
@@ -74,20 +83,47 @@ EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) 
 			Result = EDataValidationResult::Invalid;
 		}
 		ItemIDSet.Add(ItemID);
-		
-		if (ItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>())
+
+		if (Equippable)
 		{
-			if (ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable>())
+			if (Armor && Weapon)
+			{
+				Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Armor] <-> [Weapon]"), ItemID)));
+				Result = EDataValidationResult::Invalid;
+			}
+			
+			if (Stackable)
 			{
 				Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Stackable] <-> [Equippable]"), ItemID)));
 				Result = EDataValidationResult::Invalid;
 			}
-		}
 
-		if (ItemDef.FindFragmentByClass<UD1ItemFragment_Consumable>() && ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable>())
-		{
-			Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Consumable] <-> [Equippable]"), ItemID)));
-			Result = EDataValidationResult::Invalid;
+			if (Consumable)
+			{
+				Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Consumable] <-> [Equippable]"), ItemID)));
+				Result = EDataValidationResult::Invalid;
+			}
+
+			if (Armor && Armor->ArmorType == EArmorType::Count)
+			{
+				Context.AddError(FText::FromString(FString::Printf(TEXT("Armor Type is Invalid : [ID : %d] : [EArmorType::Count]"), ItemID)));
+				Result = EDataValidationResult::Invalid;
+			}
+
+			if (Weapon)
+			{
+				if (Weapon->WeaponType == EWeaponType::Count)
+				{
+					Context.AddError(FText::FromString(FString::Printf(TEXT("Weapon Type is Invalid : [ID : %d] : [EWeaponType::Count]"), ItemID)));
+					Result = EDataValidationResult::Invalid;
+				}
+				
+				if (Weapon->WeaponHandType == EWeaponHandType::Count)
+				{
+					Context.AddError(FText::FromString(FString::Printf(TEXT("Weapon Hand Type is Invalid : [ID : %d] : [EWeaponHandType::Count]"), ItemID)));
+					Result = EDataValidationResult::Invalid;
+				}
+			}
 		}
 	}
 	return Result;

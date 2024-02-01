@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "GameplayEffectTypes.h"
-#include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "D1AnimInstance.generated.h"
 
 class UAbilitySystemComponent;
@@ -16,15 +15,33 @@ public:
 
 public:
 	virtual void NativeInitializeAnimation() override;
-	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-
 	virtual void InitializedWithAbilitySystem(UAbilitySystemComponent* ASC);
+	
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayTagBlueprintPropertyMap GameplayTagPropertyMap;
 
-	// TODO: For Test
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	float Pitch = 0.f;
+	FVector Velocity = FVector::ZeroVector;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float GroundSpeed = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float Direction = 0.f;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float AimPitch = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bShouldMove = false;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bIsCrouching = false;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bIsFalling = false;
 };

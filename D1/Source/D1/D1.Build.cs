@@ -26,7 +26,7 @@ public class D1 : ModuleRules
 			"GameplayTasks",
 			"GameplayAbilities",
 			"AIModule",
-			"EditorScriptingUtilities",
+			"AnimGraphRuntime",
 		});
 
 		PublicDefinitions.Add("SHIPPING_DRAW_DEBUG_ERROR=1");

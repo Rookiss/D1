@@ -6,7 +6,6 @@
 #include "D1InputComponent.generated.h"
 
 struct FGameplayTag;
-class UEnhancedInputLocalPlayerSubsystem;
 
 UCLASS()
 class UD1InputComponent : public UEnhancedInputComponent

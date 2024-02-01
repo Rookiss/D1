@@ -51,9 +51,6 @@ public:
 	FText DisplayName;
 
 	UPROPERTY(EditDefaultsOnly)
-	FText Description;
-
-	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UTexture2D> IconTexture;
 	
 	UPROPERTY(EditDefaultsOnly, Instanced)

@@ -1,6 +1,6 @@
 ﻿#include "D1HUD.h"
 
-#include "D1UserWidget.h"
+#include "D1SceneWidget.h"
 #include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1HUD)
@@ -16,19 +16,9 @@ void AD1HUD::ShowSceneWidget()
 	if (SceneWidget)
 		return;
 
-	if (TSubclassOf<UD1UserWidget> SceneWidgetClass = UD1AssetManager::GetSubclassByName<UD1UserWidget>("SceneWidget"))
+	if (TSubclassOf<UD1SceneWidget> SceneWidgetClass = UD1AssetManager::GetSubclassByName<UD1SceneWidget>("SceneWidget"))
 	{
-		SceneWidget = CreateWidget<UD1UserWidget>(GetOwningPlayerController(), SceneWidgetClass);
+		SceneWidget = CreateWidget<UD1SceneWidget>(GetOwningPlayerController(), SceneWidgetClass);
 		SceneWidget->AddToViewport();
-	}
-
-	if (APlayerController* PC = GetOwningPlayerController())
-	{
-		FInputModeUIOnly InputMode;
-		InputMode.SetWidgetToFocus(SceneWidget->TakeWidget());
-		PC->SetInputMode(InputMode);
-		
-		PC->FlushPressedKeys();
-		PC->SetShowMouseCursor(true);
 	}
 }
