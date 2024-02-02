@@ -4,6 +4,7 @@
 #include "D1InventoryManagerComponent.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/D1PlayerSet.h"
+#include "Character/D1Player.h"
 #include "Engine/ActorChannel.h"
 #include "GameFramework/Character.h"
 #include "Item/Fragments/D1ItemFragment_Consumable.h"
@@ -16,8 +17,7 @@
 
 void FD1EquipmentEntry::Init(UD1ItemInstance* InItemInstance)
 {
-	if (InItemInstance == nullptr)
-		return;
+	check(InItemInstance);
 	
 	const UD1ItemFragment_Equippable* Equippable = InItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
 	check(Equippable);
@@ -32,58 +32,76 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* InItemInstance)
 	{
 		AbilitySystemData->GiveToAbilitySystem(ASC, &GrantedHandles, ItemInstance);
 	}
-
-	const FD1EquipmentAttachInfo& AttachInfo = Equippable->AttachInfo;
-	if (AttachInfo.SpawnActorClass)
-	{
-		APawn* OwningPawn = Cast<APawn>(OwnerComponent->GetOwner());
-		check(OwningPawn);
-	
-		USceneComponent* AttachTarget = OwningPawn->GetRootComponent();
-		if (ACharacter* OwningCharacter = Cast<ACharacter>(OwningPawn))
-		{
-			AttachTarget = OwningCharacter->GetMesh();
-		}
-
-		UWorld* World = OwnerComponent->GetWorld();
-		AActor* NewActor = World->SpawnActorDeferred<AActor>(AttachInfo.SpawnActorClass, FTransform::Identity, OwningPawn);
-		NewActor->FinishSpawning(FTransform::Identity, true);
-		NewActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
-		NewActor->AttachToComponent(AttachTarget, FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
-		
-		SpawnedActor.Add(NewActor);
-	}
-
-	TArray<FGameplayTag> AttributeTags;
-	const UD1PlayerSet* PlayerSet = Cast<UD1PlayerSet>(ASC->GetAttributeSet(UD1PlayerSet::StaticClass()));
-	PlayerSet->GetAllAttributeTags(AttributeTags);
 	
 	const FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
 	const FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(UD1AssetManager::GetSubclassByName<UGameplayEffect>("AttributeModifier"), 1.f, ContextHandle);
-
-	for (const FGameplayTag& AttributeTag : AttributeTags)
+	
+	if (const UD1MonsterSet* MonsterSet = Cast<UD1MonsterSet>(ASC->GetAttributeSet(UD1MonsterSet::StaticClass())))
 	{
-		int32 Count = ItemInstance->GetStackCountByTag(AttributeTag);
-		SpecHandle.Data->SetSetByCallerMagnitude(AttributeTag, Count);
+		TArray<FGameplayTag> AttributeTags;
+		MonsterSet->GetAllAttributeTags(AttributeTags);
+		for (const FGameplayTag& Tag : AttributeTags)
+		{
+			SpecHandle.Data->SetSetByCallerMagnitude(Tag, 0);
+		}
+	}
+	
+	if (const UD1PlayerSet* PlayerSet = Cast<UD1PlayerSet>(ASC->GetAttributeSet(UD1PlayerSet::StaticClass())))
+	{
+		TArray<FGameplayTag> AttributeTags;
+		PlayerSet->GetAllAttributeTags(AttributeTags);
+		for (const FGameplayTag& Tag : AttributeTags)
+		{
+			SpecHandle.Data->SetSetByCallerMagnitude(Tag, 0);
+		}
+	}
+
+	for (const FD1GameplayTagStack& Stack : ItemInstance->GetStatContainer().GetStacks())
+	{
+		SpecHandle.Data->SetSetByCallerMagnitude(Stack.GetStatTag(), Stack.GetStatCount());
 	}
 	
 	FActiveGameplayEffectHandle Handle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 	StatHandles.Add(Handle);
+
+	if (Equippable->EquipmentType == EEquipmentType::Weapon)
+	{
+		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+		const FD1WeaponAttachInfo& AttachInfo = Weapon->WeaponAttachInfo;
+		if (AttachInfo.SpawnActorClass)
+		{
+			APawn* OwningPawn = Cast<APawn>(OwnerComponent->GetOwner());
+			check(OwningPawn);
+	
+			USceneComponent* AttachTarget = OwningPawn->GetRootComponent();
+			if (ACharacter* OwningCharacter = Cast<ACharacter>(OwningPawn))
+			{
+				AttachTarget = OwningCharacter->GetMesh();
+			}
+
+			UWorld* World = OwnerComponent->GetWorld();
+			AActor* NewActor = World->SpawnActorDeferred<AActor>(AttachInfo.SpawnActorClass, FTransform::Identity, OwningPawn);
+			NewActor->FinishSpawning(FTransform::Identity, true);
+			NewActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
+			NewActor->AttachToComponent(AttachTarget, FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
+		
+			SpawnedActor.Add(NewActor);
+		}
+	}
+	else if (Equippable->EquipmentType == EEquipmentType::Armor)
+	{
+		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
+		AD1Player* Player = Cast<AD1Player>(OwnerComponent->GetOwner());
+		Player->Multicast_SetArmorMesh(Armor->ArmorType, Armor->ArmorMesh.ToSoftObjectPath());
+	}
 }
 
 void FD1EquipmentEntry::Reset()
 {
-	ItemInstance = nullptr;
-	GrantedHandles.TakeFromAbilitySystem(OwnerComponent->GetAbilitySystemComponent());
+	if (ItemInstance == nullptr)
+		return;
 	
-	for (AActor* Actor : SpawnedActor)
-	{
-		if (IsValid(Actor))
-		{
-			Actor->Destroy();
-		}
-	}
-	SpawnedActor.Reset();
+	GrantedHandles.TakeFromAbilitySystem(OwnerComponent->GetAbilitySystemComponent());
 
 	UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(OwnerComponent->GetAbilitySystemComponent());
 	for (const FActiveGameplayEffectHandle& Handle : StatHandles)
@@ -91,6 +109,27 @@ void FD1EquipmentEntry::Reset()
 		ASC->RemoveActiveGameplayEffect(Handle);
 	}
 	StatHandles.Reset();
+
+	const UD1ItemFragment_Equippable* Equippable = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
+	if (Equippable->EquipmentType == EEquipmentType::Weapon)
+	{
+		for (AActor* Actor : SpawnedActor)
+		{
+			if (IsValid(Actor))
+			{
+				Actor->Destroy();
+			}
+		}
+		SpawnedActor.Reset();
+	}
+	else if (Equippable->EquipmentType == EEquipmentType::Armor)
+	{
+		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
+		AD1Player* Player = Cast<AD1Player>(OwnerComponent->GetOwner());
+		Player->Multicast_SetArmorMesh(Armor->ArmorType, FSoftObjectPath());
+	}
+	
+	ItemInstance = nullptr;
 }
 
 FString FD1EquipmentEntry::GetDebugString() const
@@ -152,7 +191,7 @@ void FD1EquipmentList::EquipItem_Unsafe(EEquipmentSlotType EquipmentSlotType, UD
 	MarkItemDirty(Entry);
 }
 
-UD1ItemInstance* FD1EquipmentList::UnEquipItem_Unsafe(EEquipmentSlotType EquipmentSlotType)
+UD1ItemInstance* FD1EquipmentList::UnequipItem_Unsafe(EEquipmentSlotType EquipmentSlotType)
 {
 	FD1EquipmentEntry& Entry = Entries[EquipmentSlotType];
 	UD1ItemInstance* ItemInstance = Entry.ItemInstance;
@@ -250,7 +289,7 @@ void UD1EquipmentManagerComponent::Server_RequestEquipItem_FromEquipment_Impleme
 	if (CanEquipItem_FromEquipment(OtherComponent, FromEquipmentSlotType, ToEquipmentSlotType) == false)
 		return;
 
-	UD1ItemInstance* RemovedItemInstance = OtherComponent->EquipmentList.UnEquipItem_Unsafe(FromEquipmentSlotType);
+	UD1ItemInstance* RemovedItemInstance = OtherComponent->EquipmentList.UnequipItem_Unsafe(FromEquipmentSlotType);
 	EquipmentList.EquipItem_Unsafe(ToEquipmentSlotType, RemovedItemInstance);
 }
 
@@ -343,7 +382,7 @@ bool UD1EquipmentManagerComponent::IsSameWeaponHandType(EEquipmentSlotType Equip
 
 bool UD1EquipmentManagerComponent::IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType) const
 {
-	return (EquipmentSlotType == EEquipmentSlotType::Helmet && ArmorType == EArmorType::Head || EquipmentSlotType == EEquipmentSlotType::Chest && ArmorType == EArmorType::Chest ||
+	return (EquipmentSlotType == EEquipmentSlotType::Helmet && ArmorType == EArmorType::Helmet || EquipmentSlotType == EEquipmentSlotType::Chest && ArmorType == EArmorType::Chest ||
 			EquipmentSlotType == EEquipmentSlotType::Legs && ArmorType == EArmorType::Legs || EquipmentSlotType == EEquipmentSlotType::Hands && ArmorType == EArmorType::Hand ||
 			EquipmentSlotType == EEquipmentSlotType::Foot && ArmorType == EArmorType::Foot);
 }

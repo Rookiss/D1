@@ -27,6 +27,7 @@ void UD1ItemFragment_Equippable::OnInstanceCreated(UD1ItemInstance* ItemInstance
 	{
 		const FGameplayTag& StatTag = Pair.Key;
 		const FStatRangeSet& StatRangeSet = Pair.Value;
+		
 		const FStatRange& StatRange = StatRangeSet.StatRanges[static_cast<int32>(ItemInstance->GetItemRarity())];
 		const int32 StatCount = FMath::RandRange(StatRange.MinValue, StatRange.MaxValue);
 		ItemInstance->AddStatTagStack(StatTag, StatCount);

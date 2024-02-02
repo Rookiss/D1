@@ -3,8 +3,8 @@
 #include "D1Character.h"
 #include "D1Player.generated.h"
 
+enum class EArmorType;
 class UCameraComponent;
-class USpringArmComponent;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
@@ -25,34 +25,27 @@ public:
 
 public:
 	float CalculateAimPitch();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetArmorMesh(EArmorType ArmorType, FSoftObjectPath ArmorMeshPath);
+
+private:
+	UPROPERTY()
+	TObjectPtr<USkeletalMeshComponent> WeaponLeftMeshComponent;
+
+	UPROPERTY()
+	TObjectPtr<USkeletalMeshComponent> WeaponRightMeshComponent;
 	
+	UPROPERTY()
+	TArray<TObjectPtr<USkeletalMeshComponent>> ArmorMeshComponents;
+
+	UPROPERTY()
+	TArray<TObjectPtr<USkeletalMesh>> DefaultArmorMeshes;
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UCameraComponent> CameraComponent;
-
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USkeletalMeshComponent> WeaponLeftMeshComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USkeletalMeshComponent> WeaponRightMeshComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USkeletalMeshComponent> HelmetMeshComponent;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USkeletalMeshComponent> ChestMeshComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USkeletalMeshComponent> LegsMeshComponent;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USkeletalMeshComponent> HandsMeshComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USkeletalMeshComponent> FootMeshComponent;
-
-public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
 	

@@ -554,7 +554,7 @@ void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromExternalEqu
 	if (CanMoveOrMergeItem_FromExternalEquipment(OtherComponent, FromEquipmentSlotType, ToItemSlotPos) == false)
 		return;
 
-	UD1ItemInstance* UnEquippedItemInstance = OtherComponent->EquipmentList.UnEquipItem_Unsafe(FromEquipmentSlotType);
+	UD1ItemInstance* UnEquippedItemInstance = OtherComponent->EquipmentList.UnequipItem_Unsafe(FromEquipmentSlotType);
 	InventoryList.AddItem_Unsafe(ToItemSlotPos, UnEquippedItemInstance, 1);
 }
 

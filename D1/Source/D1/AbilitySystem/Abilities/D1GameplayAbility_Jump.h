@@ -3,7 +3,7 @@
 #include "D1GameplayAbility.h"
 #include "D1GameplayAbility_Jump.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class UD1GameplayAbility_Jump : public UD1GameplayAbility
 {
 	GENERATED_BODY()

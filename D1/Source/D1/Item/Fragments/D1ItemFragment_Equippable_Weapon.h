@@ -24,6 +24,22 @@ enum class EWeaponHandType
 	Count	UMETA(Hidden)
 };
 
+USTRUCT()
+struct FD1WeaponAttachInfo
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AActor> SpawnActorClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	FName AttachSocket;
+
+	UPROPERTY(EditDefaultsOnly)
+	FTransform AttachTransform;
+};
+
 UCLASS()
 class UD1ItemFragment_Equippable_Weapon : public UD1ItemFragment_Equippable
 {
@@ -38,4 +54,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	EWeaponHandType WeaponHandType = EWeaponHandType::LeftHand;
+
+	UPROPERTY(EditDefaultsOnly)
+	FD1WeaponAttachInfo WeaponAttachInfo;
 };

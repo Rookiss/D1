@@ -97,6 +97,7 @@ void UD1GlobalAbilitySystem::RegisterASC(UD1AbilitySystemComponent* ASC)
 void UD1GlobalAbilitySystem::UnregisterASC(UD1AbilitySystemComponent* ASC)
 {
 	check(ASC);
+	
 	for (auto& AppliedAbility : AppliedAbilities)
 	{
 		AppliedAbility.Value.RemoveFromASC(ASC);

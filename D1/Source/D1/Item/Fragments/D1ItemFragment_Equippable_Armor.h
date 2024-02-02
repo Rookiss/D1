@@ -6,7 +6,7 @@
 UENUM()
 enum class EArmorType
 {
-	Head,
+	Helmet,
 	Chest,
 	Legs,
 	Hand,
@@ -26,4 +26,7 @@ public:
 public:
 	UPROPERTY(EditDefaultsOnly)
 	EArmorType ArmorType = EArmorType::Count;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<USkeletalMesh> ArmorMesh;
 };

@@ -88,6 +88,7 @@ public:
 public:
 	const TArray<FD1ItemRarityProbability>& GetItemRarityProbabilities() const { return ItemRarityProbabilities; }
 	const FD1ItemDefinition& GetItemDefByID(int32 ItemID) const;
+	const TMap<int32, FD1ItemDefinition>& GetAllItemDefs() const { return ItemIDToDef; }
 	
 private:
 	UPROPERTY(EditDefaultsOnly, EditFixedSize)

@@ -9,7 +9,7 @@ class UD1GameData;
 class UD1ItemData;
 
 DECLARE_DELEGATE_OneParam(FAsyncLoadUpdateDelegate, float/*Progress*/);
-DECLARE_DELEGATE_OneParam(FAsyncLoadCompletedDelegate, const FName&/*AssetName or Label*/);
+DECLARE_DELEGATE_TwoParams(FAsyncLoadCompletedDelegate, const FName&/*AssetName or Label*/, UObject*/*LoadedAsset*/);
 
 UCLASS()
 class UD1AssetManager : public UAssetManager
@@ -26,18 +26,23 @@ public:
 	
 	static UD1ItemData* GetItemData();
 	
+	static void GetAssetByPath(const FSoftObjectPath& AssetPath, FAsyncLoadCompletedDelegate CompletedDelegate = FAsyncLoadCompletedDelegate());
+	
 	template<typename AssetType>
 	static AssetType* GetAssetByName(const FName& AssetName);
 
 	template<typename AssetType>
 	static TSubclassOf<AssetType> GetSubclassByName(const FName& AssetName);
 
+	static void LoadSyncByPath(const FSoftObjectPath& AssetPath);
 	static void LoadSyncByName(const FName& AssetName);
 	static void LoadSyncByLabel(const FName& Label);
-	
+
+	static void LoadAsyncByPath(const FSoftObjectPath& AssetPath, FAsyncLoadCompletedDelegate CompletedDelegate = FAsyncLoadCompletedDelegate());
 	static void LoadAsyncByName(const FName& AssetName, FAsyncLoadCompletedDelegate CompletedDelegate = FAsyncLoadCompletedDelegate());
 	static void LoadAsyncByLabel(const FName& Label, FAsyncLoadCompletedDelegate CompletedDelegate = FAsyncLoadCompletedDelegate(), FAsyncLoadUpdateDelegate UpdateDelegate = FAsyncLoadUpdateDelegate());
-	
+
+	static void ReleaseByPath(const FSoftObjectPath& AssetPath);
 	static void ReleaseByName(const FName& AssetName);
 	static void ReleaseByLabel(const FName& Label);
 	static void ReleaseAll();

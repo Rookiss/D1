@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "AbilitySystemGlobals.h"
-
 #include "D1AbilitySystemGlobals.generated.h"
 
 UCLASS()

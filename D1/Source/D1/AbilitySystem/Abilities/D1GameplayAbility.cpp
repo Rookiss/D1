@@ -20,13 +20,13 @@ void UD1GameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInf
 {
 	Super::OnGiveAbility(ActorInfo, Spec);
 
-	TryActivateAbilityOnSpawn(ActorInfo, Spec);
+	TryActivateAbilityOnGiveOrSpawn(ActorInfo, Spec);
 }
 
-void UD1GameplayAbility::TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const
+void UD1GameplayAbility::TryActivateAbilityOnGiveOrSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const
 {
 	const bool bIsPredicting = (Spec.ActivationInfo.ActivationMode == EGameplayAbilityActivationMode::Predicting);
-	if (ActorInfo && Spec.IsActive() == false && bIsPredicting == false && ActivationPolicy == ED1AbilityActivationPolicy::OnSpawn)
+	if (ActorInfo && Spec.IsActive() == false && bIsPredicting == false && ActivationPolicy == ED1AbilityActivationPolicy::OnGiveOrSpawn)
 	{
 		UAbilitySystemComponent* ASC = ActorInfo->AbilitySystemComponent.Get();
 		const AActor* AvatarActor = ActorInfo->AvatarActor.Get();
@@ -45,12 +45,12 @@ void UD1GameplayAbility::TryActivateAbilityOnSpawn(const FGameplayAbilityActorIn
 	}
 }
 
-UD1AbilitySystemComponent* UD1GameplayAbility::GetD1AbilitySystemComponent() const
+UD1AbilitySystemComponent* UD1GameplayAbility::GetAbilitySystemComponent() const
 {
 	return (CurrentActorInfo ? Cast<UD1AbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent.Get()) : nullptr);
 }
 
-AD1Character* UD1GameplayAbility::GetD1Character() const
+AD1Character* UD1GameplayAbility::GetCharacter() const
 {
 	return (CurrentActorInfo ? Cast<AD1Character>(CurrentActorInfo->AvatarActor.Get()) : nullptr);
 }

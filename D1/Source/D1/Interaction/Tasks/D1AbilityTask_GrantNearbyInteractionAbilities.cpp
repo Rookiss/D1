@@ -1,42 +1,40 @@
-﻿#include "D1AbilityTask_GrantNearbyInteraction.h"
+﻿#include "D1AbilityTask_GrantNearbyInteractionAbilities.h"
 
 #include "AbilitySystemComponent.h"
 #include "Interaction/D1Interactable.h"
 #include "Interaction/D1InteractionInfo.h"
 #include "Physics/D1CollisionChannels.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1AbilityTask_GrantNearbyInteraction)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1AbilityTask_GrantNearbyInteractionAbilities)
 
-UD1AbilityTask_GrantNearbyInteraction::UD1AbilityTask_GrantNearbyInteraction(const FObjectInitializer& ObjectInitializer)
+UD1AbilityTask_GrantNearbyInteractionAbilities::UD1AbilityTask_GrantNearbyInteractionAbilities(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1AbilityTask_GrantNearbyInteraction::Activate()
+UD1AbilityTask_GrantNearbyInteractionAbilities* UD1AbilityTask_GrantNearbyInteractionAbilities::GrantNearbyInteractionAbilities(UGameplayAbility* OwningAbility, float InteractionScanRange, float InteractionScanRate)
 {
-	Super::Activate();
+	UD1AbilityTask_GrantNearbyInteractionAbilities* TaskObject = NewAbilityTask<UD1AbilityTask_GrantNearbyInteractionAbilities>(OwningAbility);
+	TaskObject->InteractionScanRange = InteractionScanRange;
+	TaskObject->InteractionScanRate = InteractionScanRate;
+	return TaskObject;
+}
 
+void UD1AbilityTask_GrantNearbyInteractionAbilities::Activate()
+{
 	SetWaitingOnAvatar();
 	GetWorld()->GetTimerManager().SetTimer(QueryTimerHandle, this, &ThisClass::QueryInteractables, InteractionScanRate, true);
 }
 
-void UD1AbilityTask_GrantNearbyInteraction::OnDestroy(bool bInOwnerFinished)
+void UD1AbilityTask_GrantNearbyInteractionAbilities::OnDestroy(bool bInOwnerFinished)
 {
 	GetWorld()->GetTimerManager().ClearTimer(QueryTimerHandle);
 
 	Super::OnDestroy(bInOwnerFinished);
 }
 
-UD1AbilityTask_GrantNearbyInteraction* UD1AbilityTask_GrantNearbyInteraction::GrantNearbyInteraction(UGameplayAbility* OwningAbility, float InteractionScanRange, float InteractionScanRate)
-{
-	UD1AbilityTask_GrantNearbyInteraction* TaskObject = NewAbilityTask<UD1AbilityTask_GrantNearbyInteraction>(OwningAbility);
-	TaskObject->InteractionScanRange = InteractionScanRange;
-	TaskObject->InteractionScanRate = InteractionScanRate;
-	return TaskObject;
-}
-
-void UD1AbilityTask_GrantNearbyInteraction::QueryInteractables()
+void UD1AbilityTask_GrantNearbyInteractionAbilities::QueryInteractables()
 {
 	UWorld* World = GetWorld();
 	AActor* AvatarActor = GetAvatarActor();
@@ -66,31 +64,37 @@ void UD1AbilityTask_GrantNearbyInteraction::QueryInteractables()
 				}
 			}
 			
-			// TODO
-			TArray<FD1InteractionInfo> Infos;
-			// for (TScriptInterface<ID1Interactable>& Interactable : Interactables)
-			// {
-			// 	// Interactable->Gather
-			// 	
-			// }
+			TArray<FD1InteractionInfo> InteractableInfos;
+			for (TScriptInterface<ID1Interactable>& Interactable : Interactables)
+			{
+				Interactable->AddInteractionInfo(InteractableInfos);
+			}
 
 			TSet<FObjectKey> RemoveKeys;
 			AppliedInteractionAbilities.GetKeys(RemoveKeys);
 			
-			for (FD1InteractionInfo& Info : Infos)
+			for (FD1InteractionInfo& Info : InteractableInfos)
 			{
 				if (Info.InteractionAbilityToGrant)
 				{
 					FObjectKey ObjectKey(Info.InteractionAbilityToGrant);
-					RemoveKeys.Remove(ObjectKey);
 					
-					if (AppliedInteractionAbilities.Find(ObjectKey) == false)
+					if (AppliedInteractionAbilities.Find(ObjectKey))
+					{
+						RemoveKeys.Remove(ObjectKey);
+					}
+					else
 					{
 						FGameplayAbilitySpec Spec(Info.InteractionAbilityToGrant, 1, INDEX_NONE, this);
 						FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
 						AppliedInteractionAbilities.Add(ObjectKey, Handle);
 					}
 				}
+			}
+
+			for (const FObjectKey& RemoveKey : RemoveKeys)
+			{
+				AbilitySystemComponent->ClearAbility(AppliedInteractionAbilities[RemoveKey]);
 			}
 		}
 	}

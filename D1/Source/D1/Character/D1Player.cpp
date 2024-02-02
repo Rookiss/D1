@@ -33,29 +33,19 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	WeaponRightMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponRightMeshComponent");
 	WeaponRightMeshComponent->SetupAttachment(GetMesh());
 
-	HelmetMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("HelmetMeshComponent");
-	HelmetMeshComponent->SetupAttachment(GetMesh());
-
-	ChestMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("ChestMeshComponent");
-	ChestMeshComponent->SetupAttachment(GetMesh());
-
-	LegsMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("LegsMeshComponent");
-	LegsMeshComponent->SetupAttachment(GetMesh());
-
-	HandsMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("HandsMeshComponent");
-	HandsMeshComponent->SetupAttachment(GetMesh());
-
-	FootMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("FootMeshComponent");
-	FootMeshComponent->SetupAttachment(GetMesh());
-
+	int32 ArmorTypeCount = static_cast<int32>(EArmorType::Count);
+	ArmorMeshComponents.SetNum(ArmorTypeCount);
+	
+	for (int32 i = 0; i < ArmorTypeCount; i++)
+	{
+		USkeletalMeshComponent* ArmorMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(FName(FString::Printf(TEXT("ArmorMeshComponent_%d"), i)));
+		ArmorMeshComponent->SetupAttachment(GetMesh());
+		ArmorMeshComponent->SetLeaderPoseComponent(GetMesh());
+		ArmorMeshComponents[i] = ArmorMeshComponent;
+	}
+	
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
-
-	HelmetMeshComponent->SetLeaderPoseComponent(GetMesh());
-	ChestMeshComponent->SetLeaderPoseComponent(GetMesh());
-	LegsMeshComponent->SetLeaderPoseComponent(GetMesh());
-	HandsMeshComponent->SetLeaderPoseComponent(GetMesh());
-	FootMeshComponent->SetLeaderPoseComponent(GetMesh());
 }
 
 void AD1Player::PostInitializeComponents()
@@ -64,15 +54,22 @@ void AD1Player::PostInitializeComponents()
 
 	InventoryManagerComponent->Init(FIntPoint(10, 5));
 	
+	GetMesh()->SetSkeletalMesh(UD1AssetManager::GetAssetByName<USkeletalMesh>("Head_Default"));
 	GetMesh()->SetAnimClass(UD1AssetManager::GetSubclassByName<UAnimInstance>("ABP_Player"));
 	
 	CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("CameraSocket"));
+
+	TArray<FName> DefaultArmorMeshNames = { "None", "Chest_Default", "Legs_Default", "Hands_Default", "Foot_Default" };
+	DefaultArmorMeshes.SetNum(DefaultArmorMeshNames.Num());
 	
-	GetMesh()->SetSkeletalMesh(UD1AssetManager::GetAssetByName<USkeletalMesh>("Head_Default"));
-	ChestMeshComponent->SetSkeletalMesh(UD1AssetManager::GetAssetByName<USkeletalMesh>("Chest_Default"));
-	LegsMeshComponent->SetSkeletalMesh(UD1AssetManager::GetAssetByName<USkeletalMesh>("Legs_Default"));
-	HandsMeshComponent->SetSkeletalMesh(UD1AssetManager::GetAssetByName<USkeletalMesh>("Hands_Default"));
-	FootMeshComponent->SetSkeletalMesh(UD1AssetManager::GetAssetByName<USkeletalMesh>("Foot_Default"));
+	for (int i = 0; i < DefaultArmorMeshNames.Num(); i++)
+	{
+		if (DefaultArmorMeshNames[i] == "None")
+			continue;
+		
+		DefaultArmorMeshes[i] = UD1AssetManager::GetAssetByName<USkeletalMesh>(DefaultArmorMeshNames[i]);
+		ArmorMeshComponents[i]->SetSkeletalMesh(DefaultArmorMeshes[i]);
+	}
 }
 
 void AD1Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -90,12 +87,14 @@ void AD1Player::PossessedBy(AController* NewController)
 
 	// @TODO: For Test
 	int32 IterateCount = 2;
-	TArray<int32> IDs = { 1001, 2001, 3001, 9999 };
+	UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	const TMap<int32, FD1ItemDefinition>& AllItemDefs = ItemData->GetAllItemDefs();
+	
 	for (int i = 0; i < IterateCount; i++)
 	{
-		for (int32 j = 0; j < IDs.Num(); j++)
+		for (const auto& Pair : AllItemDefs)
 		{
-			InventoryManagerComponent->TryAddItem(IDs[j], FMath::RandRange(1, 2));
+			InventoryManagerComponent->TryAddItem(Pair.Key, FMath::RandRange(1, 2));
 		}
 	}
 }
@@ -140,5 +139,30 @@ float AD1Player::CalculateAimPitch()
 	{
 		CurrentAimPitch = FMath::FInterpTo(CurrentAimPitch, TargetAimPitch, GetWorld()->DeltaTimeSeconds, 12.f);
 		return CurrentAimPitch;
+	}
+}
+
+void AD1Player::Multicast_SetArmorMesh_Implementation(EArmorType ArmorType, FSoftObjectPath ArmorMeshPath)
+{
+	if (ArmorType == EArmorType::Count)
+		return;
+
+	if (ArmorMeshPath.IsValid())
+	{
+		UD1AssetManager::GetAssetByPath(ArmorMeshPath, FAsyncLoadCompletedDelegate::CreateLambda(
+		[this, ArmorType](const FName& AssetName, UObject* LoadedAsset)
+		{
+			if (USkeletalMeshComponent* ArmorMeshComponent = ArmorMeshComponents[static_cast<int32>(ArmorType)])
+			{
+				ArmorMeshComponent->SetSkeletalMesh(Cast<USkeletalMesh>(LoadedAsset));
+			}
+		}));
+	}
+	else
+	{
+		if (USkeletalMeshComponent* ArmorMeshComponent = ArmorMeshComponents[static_cast<int32>(ArmorType)])
+		{
+			ArmorMeshComponent->SetSkeletalMesh(DefaultArmorMeshes[static_cast<int32>(ArmorType)]);
+		}
 	}
 }

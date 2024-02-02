@@ -17,6 +17,8 @@ UD1MonsterSet::UD1MonsterSet()
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MaxHealth, GetMaxHealthAttribute);
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_Mana, GetManaAttribute);
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MaxMana, GetMaxManaAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_AttackSpeed, GetAttackSpeedAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MoveSpeed, GetMoveSpeedAttribute);
 }
 
 void UD1MonsterSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -27,6 +29,8 @@ void UD1MonsterSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxMana, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, AttackSpeed, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeed, COND_None, REPNOTIFY_Always);
 }
 
 bool UD1MonsterSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data)
@@ -34,7 +38,7 @@ bool UD1MonsterSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Dat
 	if (Super::PreGameplayEffectExecute(Data) == false)
 		return false;
 
-	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
 		if (Data.EvaluatedData.Magnitude > 0.f)
 		{
@@ -52,15 +56,15 @@ void UD1MonsterSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackDa
 {
 	Super::PostGameplayEffectExecute(Data);
 	
-	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
-		SetHealth(FMath::Clamp(GetHealth() - GetDamage(), 0.f, GetMaxHealth()));
-		SetDamage(0.f);
+		SetHealth(FMath::Clamp(GetHealth() - GetIncomingDamage(), 0.f, GetMaxHealth()));
+		SetIncomingDamage(0.f);
 	}
-	else if (Data.EvaluatedData.Attribute == GetHealAttribute())
+	else if (Data.EvaluatedData.Attribute == GetIncomingHealAttribute())
 	{
-		SetHealth(FMath::Clamp(GetHealth() + GetHeal(), 0.f, GetMaxHealth()));
-		SetHeal(0.f);
+		SetHealth(FMath::Clamp(GetHealth() + GetIncomingHeal(), 0.f, GetMaxHealth()));
+		SetIncomingHeal(0.f);
 	}
 	else if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
@@ -108,7 +112,7 @@ void UD1MonsterSet::PostAttributeChange(const FGameplayAttribute& Attribute, flo
 	{
 		if (GetHealth() > NewValue)
 		{
-			UD1AbilitySystemComponent* D1ASC = GetD1AbilitySystemComponent();
+			UD1AbilitySystemComponent* D1ASC = GetAbilitySystemComponent();
 			check(D1ASC);
 
 			D1ASC->ApplyModToAttribute(GetHealthAttribute(), EGameplayModOp::Override, NewValue);
@@ -118,7 +122,7 @@ void UD1MonsterSet::PostAttributeChange(const FGameplayAttribute& Attribute, flo
 	{
 		if (GetMana() > NewValue)
 		{
-			UD1AbilitySystemComponent* D1ASC = GetD1AbilitySystemComponent();
+			UD1AbilitySystemComponent* D1ASC = GetAbilitySystemComponent();
 			check(D1ASC);
 
 			D1ASC->ApplyModToAttribute(GetManaAttribute(), EGameplayModOp::Override, NewValue);
@@ -175,4 +179,14 @@ void UD1MonsterSet::OnRep_Mana(const FGameplayAttributeData& OldValue)
 void UD1MonsterSet::OnRep_MaxMana(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MaxMana, OldValue);
+}
+
+void UD1MonsterSet::OnRep_AttackSpeed(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, AttackSpeed, OldValue);
+}
+
+void UD1MonsterSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MoveSpeed, OldValue);
 }

@@ -98,7 +98,7 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 			FString ArmorType;
 			switch (Armor->ArmorType)
 			{
-			case EArmorType::Head:	ArmorType = TEXT("Head");	break;
+			case EArmorType::Helmet:	ArmorType = TEXT("Head");	break;
 			case EArmorType::Chest: ArmorType = TEXT("Chest");	break;
 			case EArmorType::Legs:	ArmorType = TEXT("Legs");	break;
 			case EArmorType::Hand:	ArmorType = TEXT("Hand");	break;

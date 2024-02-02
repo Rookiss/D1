@@ -88,7 +88,7 @@ private:
 	void InitOnServer();
 	
 	void EquipItem_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
-	UD1ItemInstance* UnEquipItem_Unsafe(EEquipmentSlotType EquipmentSlotType); /* Return UnEquipped ItemInstance */
+	UD1ItemInstance* UnequipItem_Unsafe(EEquipmentSlotType EquipmentSlotType); /* Return Unequipped ItemInstance */
 
 public:
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const { return Entries; }

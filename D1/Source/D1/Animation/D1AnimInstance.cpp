@@ -38,22 +38,19 @@ void UD1AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	
-	if (APawn* Pawn = TryGetPawnOwner())
+	if (AD1Player* Character = Cast<AD1Player>(TryGetPawnOwner()))
 	{
-		if (AD1Player* Character = Cast<AD1Player>(Pawn))
-		{
-			AimPitch = Character->CalculateAimPitch();
+		AimPitch = Character->CalculateAimPitch();
 			
-			if (UCharacterMovementComponent* MovementComponent = Character->GetCharacterMovement())
-			{
-				Velocity = MovementComponent->Velocity;
-				GroundSpeed = Velocity.Size2D();
-				Direction = UKismetAnimationLibrary::CalculateDirection(Velocity, Character->GetActorRotation());
+		if (UCharacterMovementComponent* MovementComponent = Character->GetCharacterMovement())
+		{
+			Velocity = MovementComponent->Velocity;
+			GroundSpeed = Velocity.Size2D();
+			Direction = UKismetAnimationLibrary::CalculateDirection(Velocity, Character->GetActorRotation());
 				
-				bShouldMove = (GroundSpeed > 3.f && MovementComponent->GetCurrentAcceleration() != FVector::ZeroVector);
-				bIsCrouching = MovementComponent->IsCrouching();
-				bIsFalling = MovementComponent->IsFalling();
-			}
+			bShouldMove = (GroundSpeed > 3.f && MovementComponent->GetCurrentAcceleration() != FVector::ZeroVector);
+			bIsCrouching = MovementComponent->IsCrouching();
+			bIsFalling = MovementComponent->IsFalling();
 		}
 	}
 }

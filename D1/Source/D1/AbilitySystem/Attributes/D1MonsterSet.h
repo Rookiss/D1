@@ -37,6 +37,13 @@ protected:
 	
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldValue);
+
+protected:
+	UFUNCTION()
+	void OnRep_AttackSpeed(const FGameplayAttributeData& OldValue);
+	
+	UFUNCTION()
+	void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
 	
 public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Health, meta=(AllowPrivateAccess="true"))
@@ -54,15 +61,33 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxMana, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(ThisClass, MaxMana);
+
+public:
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_AttackSpeed, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData AttackSpeed;
+	ATTRIBUTE_ACCESSORS(ThisClass, AttackSpeed);
 	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MoveSpeed, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData MoveSpeed;
+	ATTRIBUTE_ACCESSORS(ThisClass, MoveSpeed);
+
 public:
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
-	FGameplayAttributeData Damage;
-	ATTRIBUTE_ACCESSORS(ThisClass, Damage);
+	FGameplayAttributeData BaseDamage;
+	ATTRIBUTE_ACCESSORS(ThisClass, BaseDamage);
+	
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData BaseDefense;
+	ATTRIBUTE_ACCESSORS(ThisClass, BaseDefense);
+
+public:
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS(ThisClass, IncomingDamage);
 
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
-	FGameplayAttributeData Heal;
-	ATTRIBUTE_ACCESSORS(ThisClass, Heal);
+	FGameplayAttributeData IncomingHeal;
+	ATTRIBUTE_ACCESSORS(ThisClass, IncomingHeal);
 
 public:
 	FOutOfHealthDelegate OutOfHealthDelegate;

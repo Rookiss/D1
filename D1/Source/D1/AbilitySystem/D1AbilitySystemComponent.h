@@ -24,7 +24,7 @@ public:
 	
 	void TryActivateAbilitiesOnSpawn();
 
-	typedef TFunctionRef<bool(const UD1GameplayAbility* D1Ability, FGameplayAbilitySpecHandle Handle)> TShouldCancelAbilityFunc;
+	typedef TFunctionRef<bool(const UD1GameplayAbility* Ability, FGameplayAbilitySpecHandle Handle)> TShouldCancelAbilityFunc;
 	void CancelAbilitiesByFunc(TShouldCancelAbilityFunc ShouldCancelFunc, bool bReplicateCancelAbility);
 
 	void CancelInputActivatedAbilities(bool bReplicateCancelAbility);

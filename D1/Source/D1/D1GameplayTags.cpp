@@ -21,25 +21,18 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Mana,					"Attribute.Primary.Mana");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MaxMana,				"Attribute.Primary.MaxMana");
 	
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_AttackSpeed,			"Attribute.Primary.AttackSpeed");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MoveSpeed,				"Attribute.Primary.MoveSpeed");
+	
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_BaseDamage,			"Attribute.Primary.BaseDamage");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_BaseDefense,			"Attribute.Primary.BaseDefense");
+	
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Secondary_Strength,			"Attribute.Secondary.Strength");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Secondary_Will,				"Attribute.Secondary.Will");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Secondary_Vigor,				"Attribute.Secondary.Vigor");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Secondary_Agility,				"Attribute.Secondary.Agility");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Secondary_Dexterity,			"Attribute.Secondary.Dexterity");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Secondary_Will,				"Attribute.Secondary.Will");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Secondary_Knowledge,			"Attribute.Secondary.Knowledge");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Secondary_Resourcefulness, 	"Attribute.Secondary.Resourcefulness");
 	
-	// UE_DEFINE_GAMEPLAY_TAG(Equipment_Weapon_Primary_LeftHand,	"Equipment.Weapon.Primary.LeftHand");
-	// UE_DEFINE_GAMEPLAY_TAG(Equipment_Weapon_Primary_RightHand,	"Equipment.Weapon.Primary.RightHand");
-	// UE_DEFINE_GAMEPLAY_TAG(Equipment_Weapon_Primary_TwoHand,		"Equipment.Weapon.Primary.TwoHand");
-	//
-	// UE_DEFINE_GAMEPLAY_TAG(Equipment_Weapon_Secondary_LeftHand,  "Equipment.Weapon.Secondary.LeftHand");
-	// UE_DEFINE_GAMEPLAY_TAG(Equipment_Weapon_Secondary_RightHand, "Equipment.Weapon.Secondary.RightHand");
-	// UE_DEFINE_GAMEPLAY_TAG(Equipment_Weapon_Secondary_TwoHand,   "Equipment.Weapon.Secondary.TwoHand");
-	//
-	// UE_DEFINE_GAMEPLAY_TAG(Equipment_Armor_Head,					"Equipment.Armor.Head");
-	// UE_DEFINE_GAMEPLAY_TAG(Equipment_Armor_Chest,				"Equipment.Armor.Chest");
-	// UE_DEFINE_GAMEPLAY_TAG(Equipment_Armor_Legs,					"Equipment.Armor.Legs");
-	// UE_DEFINE_GAMEPLAY_TAG(Equipment_Armor_Hand,					"Equipment.Armor.Hand");
-	// UE_DEFINE_GAMEPLAY_TAG(Equipment_Armor_Foot,					"Equipment.Armor.Foot");
+	UE_DEFINE_GAMEPLAY_TAG(Attack_Physical,							"Attack.Physical");
+	UE_DEFINE_GAMEPLAY_TAG(Attack_Magical,							"Attack.Magical");
 }

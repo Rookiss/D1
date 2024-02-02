@@ -19,8 +19,8 @@ bool UD1GameplayAbility_Jump::CanActivateAbility(const FGameplayAbilitySpecHandl
 	if (ActorInfo == nullptr || ActorInfo->AvatarActor.IsValid() == false)
 		return false;
 
-	const AD1Character* D1Character = Cast<AD1Character>(ActorInfo->AvatarActor.Get());
-	if (D1Character == nullptr || D1Character->CanJump() == false)
+	const AD1Character* Character = Cast<AD1Character>(ActorInfo->AvatarActor.Get());
+	if (Character == nullptr || Character->CanJump() == false)
 		return false;
 
 	if (Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags) == false)
@@ -45,22 +45,22 @@ void UD1GameplayAbility_Jump::EndAbility(const FGameplayAbilitySpecHandle Handle
 
 void UD1GameplayAbility_Jump::StartJump()
 {
-	if (AD1Character* D1Character = GetD1Character())
+	if (AD1Character* Character = GetCharacter())
 	{
-		if (D1Character->IsLocallyControlled())
+		if (Character->IsLocallyControlled())
 		{
-			D1Character->Jump();
+			Character->Jump();
 		}
 	}
 }
 
 void UD1GameplayAbility_Jump::StopJump()
 {
-	if (AD1Character* D1Character = GetD1Character())
+	if (AD1Character* Character = GetCharacter())
 	{
-		if (D1Character->IsLocallyControlled())
+		if (Character->IsLocallyControlled())
 		{
-			D1Character->StopJumping();
+			Character->StopJumping();
 		}
 	}
 }

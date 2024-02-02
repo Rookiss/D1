@@ -21,25 +21,18 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_Mana);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MaxMana);
 	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_AttackSpeed);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MoveSpeed);
+	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_BaseDamage);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_BaseDefense);
+	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Secondary_Strength);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Secondary_Will);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Secondary_Vigor);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Secondary_Agility);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Secondary_Dexterity);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Secondary_Will);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Secondary_Knowledge);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Secondary_Resourcefulness);
-
-	// UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipment_Weapon_Primary_LeftHand);
-	// UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipment_Weapon_Primary_RightHand);
-	// UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipment_Weapon_Primary_TwoHand);
-	//
-	// UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipment_Weapon_Secondary_LeftHand);
-	// UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipment_Weapon_Secondary_RightHand);
-	// UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipment_Weapon_Secondary_TwoHand);
-	//
-	// UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipment_Armor_Head);
-	// UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipment_Armor_Chest);
-	// UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipment_Armor_Legs);
-	// UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipment_Armor_Hand);
-	// UE_DECLARE_GAMEPLAY_TAG_EXTERN(Equipment_Armor_Foot);
+	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack_Physical);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack_Magical);
 }

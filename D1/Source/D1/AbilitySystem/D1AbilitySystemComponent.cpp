@@ -43,9 +43,9 @@ void UD1AbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AActo
 			GlobalAbilitySystem->RegisterASC(this);
 		}
 
-		if (UD1AnimInstance* D1AnimInst = Cast<UD1AnimInstance>(ActorInfo->GetAnimInstance()))
+		if (UD1AnimInstance* AnimInstance = Cast<UD1AnimInstance>(ActorInfo->GetAnimInstance()))
 		{
-			D1AnimInst->InitializedWithAbilitySystem(this);
+			AnimInstance->InitializedWithAbilitySystem(this);
 		}
 
 		TryActivateAbilitiesOnSpawn();
@@ -85,8 +85,8 @@ void UD1AbilitySystemComponent::TryActivateAbilitiesOnSpawn()
 	ABILITYLIST_SCOPE_LOCK();
 	for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 	{
-		const UD1GameplayAbility* D1AbilityCDO = CastChecked<UD1GameplayAbility>(AbilitySpec.Ability);
-		D1AbilityCDO->TryActivateAbilityOnSpawn(AbilityActorInfo.Get(), AbilitySpec);
+		const UD1GameplayAbility* AbilityCDO = CastChecked<UD1GameplayAbility>(AbilitySpec.Ability);
+		AbilityCDO->TryActivateAbilityOnGiveOrSpawn(AbilityActorInfo.Get(), AbilitySpec);
 	}
 }
 
@@ -98,8 +98,8 @@ void UD1AbilitySystemComponent::CancelAbilitiesByFunc(TShouldCancelAbilityFunc S
 		if (AbilitySpec.IsActive() == false)
 			continue;
 
-		UD1GameplayAbility* D1AbilityCDO = CastChecked<UD1GameplayAbility>(AbilitySpec.Ability);
-		if (D1AbilityCDO->GetInstancingPolicy() != EGameplayAbilityInstancingPolicy::NonInstanced)
+		UD1GameplayAbility* AbilityCDO = CastChecked<UD1GameplayAbility>(AbilitySpec.Ability);
+		if (AbilityCDO->GetInstancingPolicy() != EGameplayAbilityInstancingPolicy::NonInstanced)
 		{
 			TArray<UGameplayAbility*> Instances = AbilitySpec.GetAbilityInstances();
 			for (UGameplayAbility* AbilityInstance : Instances)
@@ -120,10 +120,10 @@ void UD1AbilitySystemComponent::CancelAbilitiesByFunc(TShouldCancelAbilityFunc S
 		}
 		else
 		{
-			if (ShouldCancelFunc(D1AbilityCDO, AbilitySpec.Handle))
+			if (ShouldCancelFunc(AbilityCDO, AbilitySpec.Handle))
 			{
-				check(D1AbilityCDO->CanBeCanceled());
-				D1AbilityCDO->CancelAbility(AbilitySpec.Handle, AbilityActorInfo.Get(), FGameplayAbilityActivationInfo(), bReplicateCancelAbility);
+				check(AbilityCDO->CanBeCanceled());
+				AbilityCDO->CancelAbility(AbilitySpec.Handle, AbilityActorInfo.Get(), FGameplayAbilityActivationInfo(), bReplicateCancelAbility);
 			}
 		}
 	}
@@ -131,9 +131,9 @@ void UD1AbilitySystemComponent::CancelAbilitiesByFunc(TShouldCancelAbilityFunc S
 
 void UD1AbilitySystemComponent::CancelInputActivatedAbilities(bool bReplicateCancelAbility)
 {
-	auto ShouldCancelFunc = [this](const UD1GameplayAbility* D1Ability, FGameplayAbilitySpecHandle Handle)
+	auto ShouldCancelFunc = [this](const UD1GameplayAbility* Ability, FGameplayAbilitySpecHandle Handle)
 	{
-		const ED1AbilityActivationPolicy ActivationPolicy = D1Ability->GetActivationPolicy();
+		const ED1AbilityActivationPolicy ActivationPolicy = Ability->GetActivationPolicy();
 		return ((ActivationPolicy == ED1AbilityActivationPolicy::InputPressed) || (ActivationPolicy == ED1AbilityActivationPolicy::InputHeld));
 	};
 
@@ -207,8 +207,8 @@ void UD1AbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGameP
 		{
 			if (AbilitySpec->Ability && AbilitySpec->IsActive() == false)
 			{
-				const UD1GameplayAbility* D1AbilityCDO = CastChecked<UD1GameplayAbility>(AbilitySpec->Ability);
-				if (D1AbilityCDO->GetActivationPolicy() == ED1AbilityActivationPolicy::InputHeld)
+				const UD1GameplayAbility* AbilityCDO = CastChecked<UD1GameplayAbility>(AbilitySpec->Ability);
+				if (AbilityCDO->GetActivationPolicy() == ED1AbilityActivationPolicy::InputHeld)
 				{
 					AbilitiesToActivate.AddUnique(AbilitySpec->Handle);
 				}
@@ -274,18 +274,18 @@ void UD1AbilitySystemComponent::ClearAbilityInput()
 
 void UD1AbilitySystemComponent::AddDynamicTagToSelf(const FGameplayTag& Tag)
 {
-	const TSubclassOf<UGameplayEffect> DynamicTagGE = UD1AssetManager::GetSubclassByName<UGameplayEffect>("DynamicTagEffect");
-	if (DynamicTagGE == nullptr)
+	const TSubclassOf<UGameplayEffect> DynamicTagEffectClass = UD1AssetManager::GetSubclassByName<UGameplayEffect>("DynamicTagEffect");
+	if (DynamicTagEffectClass == nullptr)
 	{
 		UE_LOG(LogD1AbilitySystem, Warning, TEXT("AddDynamicTagGameplayEffect : Unable to find DynamicTagGameplayEffect."));
 		return;
 	}
 
-	const FGameplayEffectSpecHandle SpecHandle = MakeOutgoingSpec(DynamicTagGE, 1.f, MakeEffectContext());
+	const FGameplayEffectSpecHandle SpecHandle = MakeOutgoingSpec(DynamicTagEffectClass, 1.f, MakeEffectContext());
 	FGameplayEffectSpec* Spec = SpecHandle.Data.Get();
 	if (Spec == nullptr)
 	{
-		UE_LOG(LogD1AbilitySystem, Warning, TEXT("AddDynamicTagGameplayEffect : Unable to make outgoing spec for [%s]."), *GetNameSafe(DynamicTagGE));
+		UE_LOG(LogD1AbilitySystem, Warning, TEXT("AddDynamicTagGameplayEffect : Unable to make outgoing spec for [%s]."), *GetNameSafe(DynamicTagEffectClass));
 		return;
 	}
 
@@ -295,14 +295,14 @@ void UD1AbilitySystemComponent::AddDynamicTagToSelf(const FGameplayTag& Tag)
 
 void UD1AbilitySystemComponent::RemoveDynamicTagToSelf(const FGameplayTag& Tag)
 {
-	const TSubclassOf<UGameplayEffect> DynamicTagGE = UD1AssetManager::GetSubclassByName<UGameplayEffect>("DynamicTagEffect");
-	if (DynamicTagGE == nullptr)
+	const TSubclassOf<UGameplayEffect> DynamicTagEffectClass = UD1AssetManager::GetSubclassByName<UGameplayEffect>("DynamicTagEffect");
+	if (DynamicTagEffectClass == nullptr)
 	{
 		UE_LOG(LogD1AbilitySystem, Warning, TEXT("AddDynamicTagGameplayEffect : Unable to find DynamicTagGameplayEffect."));
 		return;
 	}
 
 	FGameplayEffectQuery Query = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(FGameplayTagContainer(Tag));
-	Query.EffectDefinition = DynamicTagGE;
+	Query.EffectDefinition = DynamicTagEffectClass;
 	RemoveActiveEffects(Query);
 }

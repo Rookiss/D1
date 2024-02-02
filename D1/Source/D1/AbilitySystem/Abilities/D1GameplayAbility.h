@@ -10,7 +10,7 @@ UENUM(BlueprintType)
 enum class ED1AbilityActivationPolicy : uint8
 {
 	Manual,
-	OnSpawn,
+	OnGiveOrSpawn,
 	InputPressed,
 	InputHeld
 };
@@ -23,17 +23,18 @@ class UD1GameplayAbility : public UGameplayAbility
 public:
 	UD1GameplayAbility(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-public:
+protected:
 	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 
-	void TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
+public:
+	void TryActivateAbilityOnGiveOrSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
 	
 public:
 	UFUNCTION(BlueprintCallable)
-	UD1AbilitySystemComponent* GetD1AbilitySystemComponent() const;
+	UD1AbilitySystemComponent* GetAbilitySystemComponent() const;
 	
 	UFUNCTION(BlueprintCallable)
-	AD1Character* GetD1Character() const;
+	AD1Character* GetCharacter() const;
 
 	ED1AbilityActivationPolicy GetActivationPolicy() const { return ActivationPolicy; }
 	

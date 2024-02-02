@@ -16,23 +16,6 @@ enum class EEquipmentType
 	Count	UMETA(Hidden)
 };
 
-
-USTRUCT()
-struct FD1EquipmentAttachInfo
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AActor> SpawnActorClass;
-
-	UPROPERTY(EditDefaultsOnly)
-	FName AttachSocket;
-
-	UPROPERTY(EditDefaultsOnly)
-	FTransform AttachTransform;
-};
-
 USTRUCT()
 struct FStatRange
 {
@@ -78,9 +61,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<const UD1AbilitySystemData> AbilitySystemDataToGrant;
-	
-	UPROPERTY(EditDefaultsOnly)
-	FD1EquipmentAttachInfo AttachInfo;
 	
 	UPROPERTY(EditDefaultsOnly, meta=(ForceInlineRow))
 	TMap<FGameplayTag, FStatRangeSet> Stats;
