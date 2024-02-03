@@ -72,7 +72,7 @@ EDataValidationResult UD1AssetData::IsDataValid(FDataValidationContext& Context)
 
 	return Result;
 }
-#endif
+#endif // #if WITH_EDITOR
 
 FSoftObjectPath UD1AssetData::GetAssetPathByName(const FName& AssetName)
 {

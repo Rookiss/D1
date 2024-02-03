@@ -12,19 +12,17 @@ struct FDamageStatics
 public:
 	FDamageStatics()
 	{
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UD1MonsterSet, BaseDamage, Source, true);
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UD1MonsterSet, BaseDefense, Target, true);
-		
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UD1PlayerSet, Strength, Source, true);
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UD1PlayerSet, Will, Source, true);
+		BaseDamageDef = FGameplayEffectAttributeCaptureDefinition(UD1MonsterSet::GetBaseDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		BaseDefenseDef = FGameplayEffectAttributeCaptureDefinition(UD1MonsterSet::GetBaseDefenseAttribute(), EGameplayEffectAttributeCaptureSource::Target, true);
+		StrengthDef = FGameplayEffectAttributeCaptureDefinition(UD1PlayerSet::GetStrengthAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		WillDef = FGameplayEffectAttributeCaptureDefinition(UD1PlayerSet::GetWillAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 	}
 
 public:
-	DECLARE_ATTRIBUTE_CAPTUREDEF(BaseDamage);
-	DECLARE_ATTRIBUTE_CAPTUREDEF(BaseDefense);
-	
-	DECLARE_ATTRIBUTE_CAPTUREDEF(Strength);
-	DECLARE_ATTRIBUTE_CAPTUREDEF(Will);
+	FGameplayEffectAttributeCaptureDefinition BaseDamageDef;
+	FGameplayEffectAttributeCaptureDefinition BaseDefenseDef;
+	FGameplayEffectAttributeCaptureDefinition StrengthDef;
+	FGameplayEffectAttributeCaptureDefinition WillDef;
 };
 
 static const FDamageStatics& DamageStatics()
@@ -38,7 +36,6 @@ UD1DamageExecutionCalculation::UD1DamageExecutionCalculation(const FObjectInitia
 {
 	RelevantAttributesToCapture.Add(DamageStatics().BaseDamageDef);
 	RelevantAttributesToCapture.Add(DamageStatics().BaseDefenseDef);
-	
 	RelevantAttributesToCapture.Add(DamageStatics().StrengthDef);
 	RelevantAttributesToCapture.Add(DamageStatics().WillDef);
 }

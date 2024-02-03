@@ -51,7 +51,7 @@ protected:
 	FVector2D CachedDeltaWidgetPos = FVector2D::ZeroVector;
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::EquipmentSlotCount;
 
-private:
+protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<USizeBox> SizeBox_Root;
 

@@ -45,48 +45,56 @@ protected:
 	UFUNCTION()
 	void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
 	
-public:
+private:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Health, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Health;
-	ATTRIBUTE_ACCESSORS(ThisClass, Health);
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxHealth, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MaxHealth;
-	ATTRIBUTE_ACCESSORS(ThisClass, MaxHealth);
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Mana, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Mana;
-	ATTRIBUTE_ACCESSORS(ThisClass, Mana);
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxMana, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MaxMana;
-	ATTRIBUTE_ACCESSORS(ThisClass, MaxMana);
 
 public:
+	ATTRIBUTE_ACCESSORS(ThisClass, Health);
+	ATTRIBUTE_ACCESSORS(ThisClass, MaxHealth);
+	ATTRIBUTE_ACCESSORS(ThisClass, Mana);
+	ATTRIBUTE_ACCESSORS(ThisClass, MaxMana);
+
+private:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_AttackSpeed, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData AttackSpeed;
-	ATTRIBUTE_ACCESSORS(ThisClass, AttackSpeed);
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MoveSpeed, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MoveSpeed;
+	
+public:
+	ATTRIBUTE_ACCESSORS(ThisClass, AttackSpeed);
 	ATTRIBUTE_ACCESSORS(ThisClass, MoveSpeed);
 
-public:
+private:
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData BaseDamage;
-	ATTRIBUTE_ACCESSORS(ThisClass, BaseDamage);
 	
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData BaseDefense;
-	ATTRIBUTE_ACCESSORS(ThisClass, BaseDefense);
 
 public:
+	ATTRIBUTE_ACCESSORS(ThisClass, BaseDamage);
+	ATTRIBUTE_ACCESSORS(ThisClass, BaseDefense);
+
+private:
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData IncomingDamage;
-	ATTRIBUTE_ACCESSORS(ThisClass, IncomingDamage);
 
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData IncomingHeal;
+
+public:
+	ATTRIBUTE_ACCESSORS(ThisClass, IncomingDamage);
 	ATTRIBUTE_ACCESSORS(ThisClass, IncomingHeal);
 
 public:

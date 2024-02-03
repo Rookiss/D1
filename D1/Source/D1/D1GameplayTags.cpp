@@ -1,7 +1,5 @@
 ﻿#include "D1GameplayTags.h"
 
-#include "GameplayTagsManager.h"
-
 namespace D1GameplayTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(ASC_DamageImmunity,						"ASC.DamageImmunity");

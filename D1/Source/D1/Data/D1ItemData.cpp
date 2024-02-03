@@ -128,7 +128,7 @@ EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) 
 	}
 	return Result;
 }
-#endif
+#endif // #if WITH_EDITOR
 
 const FD1ItemDefinition& UD1ItemData::GetItemDefByID(int32 ItemID) const
 {
