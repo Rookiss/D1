@@ -1,5 +1,6 @@
 #pragma once
 
+#include "D1InteractionInfo.h"
 #include "UObject/Interface.h"
 #include "D1Interactable.generated.h"
 
@@ -16,5 +17,5 @@ class ID1Interactable
 	GENERATED_BODY()
 
 public:
-	virtual void AddInteractionInfo(TArray<FD1InteractionInfo>& OutInteractionInfos) abstract;
+	virtual const FD1InteractionInfo& GetInteractionInfo() const abstract;
 };

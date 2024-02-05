@@ -53,4 +53,7 @@ class UD1Pickupable : public UInterface
 class ID1Pickupable
 {
 	GENERATED_BODY()
+
+public:
+	virtual const FPickupInfo& GetPickupInfo() const abstract;
 };

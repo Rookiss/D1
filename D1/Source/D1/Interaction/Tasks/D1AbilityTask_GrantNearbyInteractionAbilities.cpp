@@ -56,18 +56,12 @@ void UD1AbilityTask_GrantNearbyInteractionAbilities::QueryInteractables()
 				{
 					Interactables.AddUnique(InteractableActor);
 				}
-
-				TScriptInterface<ID1Interactable> InteractableComponent(OverlapResult.GetComponent());
-				if (InteractableComponent)
-				{
-					Interactables.AddUnique(InteractableComponent);
-				}
 			}
 			
 			TArray<FD1InteractionInfo> InteractableInfos;
 			for (TScriptInterface<ID1Interactable>& Interactable : Interactables)
 			{
-				Interactable->AddInteractionInfo(InteractableInfos);
+				InteractableInfos.Add(Interactable->GetInteractionInfo());
 			}
 
 			TSet<FObjectKey> RemoveKeys;

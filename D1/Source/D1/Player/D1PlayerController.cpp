@@ -137,10 +137,7 @@ void AD1PlayerController::Input_Inventory()
 {
 	if (AD1HUD* HUD = Cast<AD1HUD>(GetHUD()))
 	{
-		if (UD1SceneWidget* SceneWidget = HUD->SceneWidget)
-		{
-			SceneWidget->ShowControlledPlayerInventoryWidget();
-		}
+		HUD->ShowControlledPlayerInventoryWidget();
 	}
 }
 

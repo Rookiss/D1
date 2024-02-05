@@ -3,6 +3,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "D1GameplayAbility.generated.h"
 
+class AD1PlayerController;
 class AD1Character;
 class UD1AbilitySystemComponent;
 
@@ -35,6 +36,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	AD1Character* GetCharacter() const;
+
+	UFUNCTION(BlueprintCallable)
+	AD1PlayerController* GetPlayerController() const;
 
 	ED1AbilityActivationPolicy GetActivationPolicy() const { return ActivationPolicy; }
 	

@@ -6,7 +6,7 @@
 class ID1Interactable;
 class UD1GameplayAbility;
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FD1InteractionInfo
 {
 	GENERATED_BODY()
@@ -21,12 +21,15 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UD1GameplayAbility> InteractionAbilityToGrant;
 
+	UPROPERTY()
+	FGameplayAbilitySpecHandle InteractionAbilityHandle;
+
 public:
 	FORCEINLINE bool operator==(const FD1InteractionInfo& Other) const
 	{
 		return Interactable == Other.Interactable &&
-			   InteractionAbilityToGrant == Other.InteractionAbilityToGrant &&
-			   InteractionText.IdenticalTo(Other.InteractionText);
+			   InteractionText.IdenticalTo(Other.InteractionText) &&
+			   InteractionAbilityToGrant == Other.InteractionAbilityToGrant;
 	}
 
 	FORCEINLINE bool operator!=(const FD1InteractionInfo& Other) const

@@ -54,3 +54,8 @@ AD1Character* UD1GameplayAbility::GetCharacter() const
 {
 	return (CurrentActorInfo ? Cast<AD1Character>(CurrentActorInfo->AvatarActor.Get()) : nullptr);
 }
+
+AD1PlayerController* UD1GameplayAbility::GetPlayerController() const
+{
+	return (CurrentActorInfo ? Cast<AD1PlayerController>(CurrentActorInfo->PlayerController.Get()) : nullptr);
+}

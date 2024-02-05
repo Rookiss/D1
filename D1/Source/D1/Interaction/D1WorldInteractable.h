@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "D1Interactable.h"
-#include "D1InteractionInfo.h"
 #include "D1WorldInteractable.generated.h"
 
 UCLASS(Abstract, Blueprintable)
@@ -13,9 +12,9 @@ public:
 	AD1WorldInteractable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	virtual void AddInteractionInfo(TArray<FD1InteractionInfo>& OutInteractionInfos);
-	
+	virtual const FD1InteractionInfo& GetInteractionInfo() const { return InteractionInfo; }
+
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	FD1InteractionInfo InteractionInfo;
 };

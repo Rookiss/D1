@@ -22,3 +22,45 @@ void AD1HUD::ShowSceneWidget()
 		SceneWidget->AddToViewport();
 	}
 }
+
+void AD1HUD::ShowInteractionWidget(const FText& InteractionText)
+{
+	// TODO
+}
+
+void AD1HUD::HideInteractionWidget()
+{
+	// TODO
+}
+
+void AD1HUD::ShowControlledPlayerInventoryWidget()
+{
+	if (SceneWidget)
+	{
+		SceneWidget->ShowControlledPlayerInventoryWidget();
+	}
+}
+
+void AD1HUD::HideControlledPlayerInventoryWidget()
+{
+	if (SceneWidget)
+	{
+		SceneWidget->HideControlledPlayerInventoryWidget();
+	}
+}
+
+void AD1HUD::ShowItemHoverWidget(UD1ItemInstance* ItemInstance)
+{
+	if (SceneWidget)
+	{
+		SceneWidget->ShowItemHoverWidget(ItemInstance);
+	}
+}
+
+void AD1HUD::HideItemHoverWidget()
+{
+	if (SceneWidget)
+	{
+		SceneWidget->HideItemHoverWidget();
+	}
+}

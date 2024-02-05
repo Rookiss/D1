@@ -55,10 +55,7 @@ void UD1EquipmentEntryWidget::NativeOnMouseEnter(const FGeometry& InGeometry, co
 	
 	if (AD1HUD* HUD = Cast<AD1HUD>(GetOwningPlayer()->GetHUD()))
 	{
-		if (UD1SceneWidget* SceneWidget = HUD->SceneWidget)
-		{
-			SceneWidget->ShowItemHoverWidget(ItemInstance);
-		}
+		HUD->ShowItemHoverWidget(ItemInstance);
 	}
 }
 
@@ -70,10 +67,7 @@ void UD1EquipmentEntryWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEve
 
 	if (AD1HUD* HUD = Cast<AD1HUD>(GetOwningPlayer()->GetHUD()))
 	{
-		if (UD1SceneWidget* SceneWidget = HUD->SceneWidget)
-		{
-			SceneWidget->HideItemHoverWidget();
-		}
+		HUD->HideItemHoverWidget();
 	}
 }
 

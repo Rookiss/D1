@@ -12,6 +12,9 @@ class AD1WorldPickupable : public AD1WorldInteractable, public ID1Pickupable
 public:
 	AD1WorldPickupable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+public:
+	virtual const FPickupInfo& GetPickupInfo() const override { return PickupInfo; }
+	
 protected:
 	UPROPERTY(EditAnywhere)
 	FPickupInfo PickupInfo;
