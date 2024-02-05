@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "GameplayTags.h"
 #include "AttributeSet.h"
 #include "D1AttributeSet.generated.h"
 

@@ -53,6 +53,11 @@ void AD1Player::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	InventoryManagerComponent->Init(FIntPoint(10, 5));
+}
+
+void AD1Player::BeginPlay()
+{
+	Super::BeginPlay();
 	
 	GetMesh()->SetSkeletalMesh(UD1AssetManager::GetAssetByName<USkeletalMesh>("Head_Default"));
 	GetMesh()->SetAnimClass(UD1AssetManager::GetSubclassByName<UAnimInstance>("ABP_Player"));
@@ -70,6 +75,22 @@ void AD1Player::PostInitializeComponents()
 		DefaultArmorMeshes[i] = UD1AssetManager::GetAssetByName<USkeletalMesh>(DefaultArmorMeshNames[i]);
 		ArmorMeshComponents[i]->SetSkeletalMesh(DefaultArmorMeshes[i]);
 	}
+
+	if (HasAuthority())
+	{
+		// @TODO: For Test
+		int32 IterateCount = 2;
+		UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+		const TMap<int32, FD1ItemDefinition>& AllItemDefs = ItemData->GetAllItemDefs();
+	
+		for (int i = 0; i < IterateCount; i++)
+		{
+			for (const auto& Pair : AllItemDefs)
+			{
+				InventoryManagerComponent->TryAddItem(Pair.Key, FMath::RandRange(1, 2));
+			}
+		}
+	}
 }
 
 void AD1Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -84,19 +105,6 @@ void AD1Player::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	InitAbilitySystem();
-
-	// @TODO: For Test
-	int32 IterateCount = 2;
-	UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const TMap<int32, FD1ItemDefinition>& AllItemDefs = ItemData->GetAllItemDefs();
-	
-	for (int i = 0; i < IterateCount; i++)
-	{
-		for (const auto& Pair : AllItemDefs)
-		{
-			InventoryManagerComponent->TryAddItem(Pair.Key, FMath::RandRange(1, 2));
-		}
-	}
 }
 
 void AD1Player::OnRep_PlayerState()
