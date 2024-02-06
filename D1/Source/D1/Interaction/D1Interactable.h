@@ -6,7 +6,7 @@
 
 struct FD1InteractionInfo;
 
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, BlueprintType)
 class UD1Interactable : public UInterface
 {
 	GENERATED_BODY()

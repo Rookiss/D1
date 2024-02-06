@@ -12,7 +12,7 @@ struct FD1InteractionInfo
 	GENERATED_BODY()
 
 public:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TScriptInterface<ID1Interactable> Interactable;
 	
 	UPROPERTY(EditAnywhere)
@@ -23,7 +23,7 @@ public:
 
 	UPROPERTY()
 	FGameplayAbilitySpecHandle InteractionAbilityHandle;
-
+	
 public:
 	FORCEINLINE bool operator==(const FD1InteractionInfo& Other) const
 	{

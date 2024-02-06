@@ -15,6 +15,13 @@ public:
 	virtual const FD1InteractionInfo& GetInteractionInfo() const { return InteractionInfo; }
 
 protected:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category="Info")
 	FD1InteractionInfo InteractionInfo;
+
+protected:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> SceneComponent;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 };

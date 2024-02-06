@@ -60,19 +60,10 @@ void UD1GameplayAbility_Interact::TriggerInteraction()
 		AActor* InteractableActor = Cast<AActor>(LatestInfo.Interactable.GetObject());
 		
 		FGameplayEventData Payload;
-		Payload.EventTag = D1GameplayTags::Ability_Interaction_Activate;
+		Payload.EventTag = D1GameplayTags::Ability_Interaction;
 		Payload.Instigator = Instigator;
 		Payload.Target = InteractableActor;
-	
-		FGameplayAbilityActorInfo ActorInfo;
-		ActorInfo.InitFromActor(InteractableActor, InteractableActor, ASC);
 
-		ASC->TriggerAbilityFromGameplayEvent(
-			LatestInfo.InteractionAbilityHandle,
-			&ActorInfo,
-			D1GameplayTags::Ability_Interaction_Activate,
-			&Payload,
-			*ASC
-		);
+		ASC->TriggerAbilityFromGameplayEvent(LatestInfo.InteractionAbilityHandle, nullptr, D1GameplayTags::Ability_Interaction, &Payload, *ASC);
 	}
 }

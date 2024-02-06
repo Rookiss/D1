@@ -10,10 +10,11 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Crouch,						"Input.Action.Crouch");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Jump,						"Input.Action.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Inventory,					"Input.Action.Inventory");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Interaction,				"Input.Action.Interaction");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Death,							"Ability.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,							"Ability.Jump");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_Interaction_Activate,			"Ability.Interaction.Activate");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Interaction,						"Ability.Interaction");
 
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				"Attribute.Primary.Health");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MaxHealth, 			"Attribute.Primary.MaxHealth");

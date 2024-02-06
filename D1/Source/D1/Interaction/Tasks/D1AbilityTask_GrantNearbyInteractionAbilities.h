@@ -26,5 +26,5 @@ private:
 	FTimerHandle QueryTimerHandle;
 	float InteractionScanRange = 100.f;
 	float InteractionScanRate = 0.1f;
-	TMap<FObjectKey, FGameplayAbilitySpecHandle> AppliedInteractionAbilities;
+	TMap<FObjectKey, FGameplayAbilitySpecHandle> GrantedInteractionAbilities;
 };

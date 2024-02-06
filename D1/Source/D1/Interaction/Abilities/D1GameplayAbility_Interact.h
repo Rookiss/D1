@@ -23,14 +23,18 @@ protected:
 	
 	UFUNCTION(BlueprintCallable)
 	void TriggerInteraction();
+
+public:
+	UFUNCTION(BlueprintCallable)
+	bool IsInfoValid() const { return LatestInfo.Interactable != nullptr; }
 	
 protected:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FD1InteractionInfo LatestInfo;
 	
 	UPROPERTY(EditDefaultsOnly)
-	float InteractionScanRate = 0.1;
+	float InteractionScanRate = 0.1f;
 
 	UPROPERTY(EditDefaultsOnly)
-	float InteractionScanRange = 500;
+	float InteractionScanRange = 500.f;
 };

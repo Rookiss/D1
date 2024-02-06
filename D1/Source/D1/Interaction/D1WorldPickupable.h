@@ -16,6 +16,6 @@ public:
 	virtual const FPickupInfo& GetPickupInfo() const override { return PickupInfo; }
 	
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Info")
 	FPickupInfo PickupInfo;
 };

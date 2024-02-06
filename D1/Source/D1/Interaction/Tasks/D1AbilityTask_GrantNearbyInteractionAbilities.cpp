@@ -46,26 +46,19 @@ void UD1AbilityTask_GrantNearbyInteractionAbilities::QueryInteractables()
 		TArray<FOverlapResult> OverlapResults;
 		World->OverlapMultiByChannel(OverlapResults, AvatarActor->GetActorLocation(), FQuat::Identity, D1_TraceChannel_Interaction, FCollisionShape::MakeSphere(InteractionScanRange), Params);
 
+		TSet<FObjectKey> RemoveKeys;
+		GrantedInteractionAbilities.GetKeys(RemoveKeys);
+		
 		if (OverlapResults.Num() > 0)
 		{
-			TArray<TScriptInterface<ID1Interactable>> Interactables;
+			TArray<FD1InteractionInfo> InteractableInfos;
 			for (const FOverlapResult& OverlapResult : OverlapResults)
 			{
-				TScriptInterface<ID1Interactable> InteractableActor(OverlapResult.GetActor());
-				if (InteractableActor)
+				if (ID1Interactable* Interactable = Cast<ID1Interactable>(OverlapResult.GetActor()))
 				{
-					Interactables.AddUnique(InteractableActor);
+					InteractableInfos.Add(Interactable->GetInteractionInfo());
 				}
 			}
-			
-			TArray<FD1InteractionInfo> InteractableInfos;
-			for (TScriptInterface<ID1Interactable>& Interactable : Interactables)
-			{
-				InteractableInfos.Add(Interactable->GetInteractionInfo());
-			}
-
-			TSet<FObjectKey> RemoveKeys;
-			AppliedInteractionAbilities.GetKeys(RemoveKeys);
 			
 			for (FD1InteractionInfo& Info : InteractableInfos)
 			{
@@ -73,7 +66,7 @@ void UD1AbilityTask_GrantNearbyInteractionAbilities::QueryInteractables()
 				{
 					FObjectKey ObjectKey(Info.InteractionAbilityToGrant);
 					
-					if (AppliedInteractionAbilities.Find(ObjectKey))
+					if (GrantedInteractionAbilities.Find(ObjectKey))
 					{
 						RemoveKeys.Remove(ObjectKey);
 					}
@@ -81,15 +74,16 @@ void UD1AbilityTask_GrantNearbyInteractionAbilities::QueryInteractables()
 					{
 						FGameplayAbilitySpec Spec(Info.InteractionAbilityToGrant, 1, INDEX_NONE, this);
 						FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
-						AppliedInteractionAbilities.Add(ObjectKey, Handle);
+						GrantedInteractionAbilities.Add(ObjectKey, Handle);
 					}
 				}
 			}
+		}
 
-			for (const FObjectKey& RemoveKey : RemoveKeys)
-			{
-				AbilitySystemComponent->ClearAbility(AppliedInteractionAbilities[RemoveKey]);
-			}
+		for (const FObjectKey& RemoveKey : RemoveKeys)
+		{
+			AbilitySystemComponent->ClearAbility(GrantedInteractionAbilities[RemoveKey]);
+			GrantedInteractionAbilities.Remove(RemoveKey);
 		}
 	}
 }
