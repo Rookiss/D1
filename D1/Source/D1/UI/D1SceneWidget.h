@@ -6,6 +6,7 @@
 class UD1ItemInstance;
 class UD1PlayerInventoryWidget;
 class UD1ItemHoverWidget;
+class UD1InteractionWidget;
 
 UCLASS()
 class UD1SceneWidget : public UD1UserWidget
@@ -27,8 +28,12 @@ public:
 	void ShowItemHoverWidget(UD1ItemInstance* ItemInstance);
 	void HideItemHoverWidget();
 
+	void ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent);
+	void ShowInteractionProgress(float HoldTime);
+	void HideInteractionWidget();
+
 public:
-	bool IsAllHidden() const;
+	bool IsAllMouseInteractionWidgetHidden() const;
 	
 protected:
 	UPROPERTY(meta=(BindWidget))
@@ -36,4 +41,7 @@ protected:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UD1ItemHoverWidget> ItemHoverWidget;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UD1InteractionWidget> InteractionWidget;
 };

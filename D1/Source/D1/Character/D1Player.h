@@ -26,7 +26,9 @@ public:
 
 public:
 	float CalculateAimPitch();
-
+	
+	void DisableInputAndCollision();
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_SetArmorMesh(EArmorType ArmorType, FSoftObjectPath ArmorMeshPath);
 

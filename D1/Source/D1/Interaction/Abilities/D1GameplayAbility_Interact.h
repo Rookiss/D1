@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "AbilitySystem/Abilities/D1GameplayAbility.h"
-#include "Interaction/D1InteractionInfo.h"
+#include "Interaction/D1Interactable.h"
 #include "D1GameplayAbility_Interact.generated.h"
 
 struct FD1InteractionInfo;
@@ -19,18 +19,26 @@ protected:
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	void RefreshInteractionWidget(const FD1InteractionInfo& InteractionInfo);
+	void HandleInteractionInfo(const FD1InteractionInfo& NewInteractionInfo);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void WaitInteractionPress();
 	
 	UFUNCTION(BlueprintCallable)
+	void OnInteractionPressDetected();
+	
 	void TriggerInteraction();
 
-public:
-	UFUNCTION(BlueprintCallable)
-	bool IsInfoValid() const { return LatestInfo.Interactable != nullptr; }
+private:
+	void ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent);
+	void ShowInteractionProgress(float HoldTime);
+	void HideInteractionWidget();
 	
 protected:
-	UPROPERTY(BlueprintReadOnly)
-	FD1InteractionInfo LatestInfo;
+	UPROPERTY()
+	FD1InteractionInfo TraceHitInfo;
+
+	FTimerHandle HoldTimerHandle;
 	
 	UPROPERTY(EditDefaultsOnly)
 	float InteractionScanRate = 0.1f;

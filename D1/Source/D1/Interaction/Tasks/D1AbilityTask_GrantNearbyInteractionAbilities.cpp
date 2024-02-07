@@ -2,7 +2,6 @@
 
 #include "AbilitySystemComponent.h"
 #include "Interaction/D1Interactable.h"
-#include "Interaction/D1InteractionInfo.h"
 #include "Physics/D1CollisionChannels.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AbilityTask_GrantNearbyInteractionAbilities)

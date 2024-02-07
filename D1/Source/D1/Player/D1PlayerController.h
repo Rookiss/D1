@@ -21,7 +21,7 @@ public:
 
 public:
 	void SetInputModeGameOnly();
-	void SetInputModeUIOnly(UD1UserWidget* FocusWidget);
+	void SetInputModeUIOnly(bool bShowCursor = true);
 	
 private:
 	void Input_Move(const FInputActionValue& InputValue);

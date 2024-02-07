@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "Interaction/D1InteractionInfo.h"
 #include "Abilities/Tasks/AbilityTask.h"
+#include "Interaction/D1Interactable.h"
 #include "D1AbilityTask_WaitForLineTraceHitInteractable.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractableChanged, const FD1InteractionInfo&, InteractionInfo);

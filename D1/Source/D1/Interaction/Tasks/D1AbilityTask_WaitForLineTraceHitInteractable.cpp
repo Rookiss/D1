@@ -82,7 +82,7 @@ void UD1AbilityTask_WaitForLineTraceHitInteractable::HandleInteractableInfo(cons
 
 	if (Interactable)
 	{
-		FD1InteractionInfo PendingInfo = Interactable->GetInteractionInfo();
+		const FD1InteractionInfo& PendingInfo = Interactable->GetInteractionInfo();
 
 		if (PendingInfo.InteractionAbilityToGrant)
 		{

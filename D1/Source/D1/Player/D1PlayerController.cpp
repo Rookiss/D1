@@ -73,14 +73,20 @@ void AD1PlayerController::SetInputModeGameOnly()
 	SetShowMouseCursor(false);
 }
 
-void AD1PlayerController::SetInputModeUIOnly(UD1UserWidget* FocusWidget)
+void AD1PlayerController::SetInputModeUIOnly(bool bShowCursor)
 {
-	FInputModeUIOnly InputMode;
-	InputMode.SetWidgetToFocus(FocusWidget->TakeWidget());
-	SetInputMode(InputMode);
-		
-	FlushPressedKeys();
-	SetShowMouseCursor(true);
+	if (AD1HUD* D1HUD = Cast<AD1HUD>(GetHUD()))
+	{
+		if (UD1SceneWidget* SceneWidget = D1HUD->SceneWidget)
+		{
+			FInputModeUIOnly InputMode;
+			InputMode.SetWidgetToFocus(SceneWidget->TakeWidget());
+			SetInputMode(InputMode);
+	
+			FlushPressedKeys();
+			SetShowMouseCursor(bShowCursor);
+		}
+	}
 }
 
 void AD1PlayerController::Input_Move(const FInputActionValue& InputValue)

@@ -23,16 +23,6 @@ void AD1HUD::ShowSceneWidget()
 	}
 }
 
-void AD1HUD::ShowInteractionWidget(const FText& InteractionText)
-{
-	// TODO
-}
-
-void AD1HUD::HideInteractionWidget()
-{
-	// TODO
-}
-
 void AD1HUD::ShowControlledPlayerInventoryWidget()
 {
 	if (SceneWidget)
@@ -62,5 +52,29 @@ void AD1HUD::HideItemHoverWidget()
 	if (SceneWidget)
 	{
 		SceneWidget->HideItemHoverWidget();
+	}
+}
+
+void AD1HUD::ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent)
+{
+	if (SceneWidget)
+	{
+		SceneWidget->ShowInteractionPress(InteractionTitle, InteractionContent);
+	}
+}
+
+void AD1HUD::ShowInteractionProgress(float HoldTime)
+{
+	if (SceneWidget)
+	{
+		SceneWidget->ShowInteractionProgress(HoldTime);
+	}
+}
+
+void AD1HUD::HideInteractionWidget()
+{
+	if (SceneWidget)
+	{
+		SceneWidget->HideInteractionWidget();
 	}
 }

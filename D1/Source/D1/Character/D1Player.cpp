@@ -2,6 +2,8 @@
 
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -148,6 +150,24 @@ float AD1Player::CalculateAimPitch()
 		CurrentAimPitch = FMath::FInterpTo(CurrentAimPitch, TargetAimPitch, GetWorld()->DeltaTimeSeconds, 12.f);
 		return CurrentAimPitch;
 	}
+}
+
+void AD1Player::DisableInputAndCollision()
+{
+	if (Controller)
+	{
+		Controller->SetIgnoreMoveInput(true);
+	}
+
+	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+	check(MovementComponent);
+	MovementComponent->StopMovementImmediately();
+	MovementComponent->DisableMovement();
+	
+	UCapsuleComponent* CollisionComponent = GetCapsuleComponent();
+	check(CollisionComponent);
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 void AD1Player::Multicast_SetArmorMesh_Implementation(EArmorType ArmorType, FSoftObjectPath ArmorMeshPath)

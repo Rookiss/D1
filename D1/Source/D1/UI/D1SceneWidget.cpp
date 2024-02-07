@@ -2,6 +2,7 @@
 
 #include "Character/D1Player.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Interaction/D1InteractionWidget.h"
 #include "Item/D1ItemHoverWidget.h"
 #include "Item/D1PlayerInventoryWidget.h"
 #include "Player/D1PlayerController.h"
@@ -43,7 +44,7 @@ FReply UD1SceneWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 FReply UD1SceneWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	FReply Reply = Super::NativeOnMouseMove(InGeometry, InMouseEvent);
-	if (IsAllHidden())
+	if (IsAllMouseInteractionWidgetHidden())
 		return Reply;
 	
 	FVector2D MouseWidgetPos = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
@@ -79,7 +80,7 @@ void UD1SceneWidget::ShowControlledPlayerInventoryWidget()
 	
 	if (AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer()))
 	{
-		PlayerController->SetInputModeUIOnly(this);
+		PlayerController->SetInputModeUIOnly();
 	}
 }
 
@@ -90,7 +91,8 @@ void UD1SceneWidget::HideControlledPlayerInventoryWidget()
 	
 	ControlledPlayerInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 
-	if (AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer()))
+	AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer());
+	if (PlayerController && IsAllMouseInteractionWidgetHidden())
 	{
 		PlayerController->SetInputModeGameOnly();
 	}
@@ -107,7 +109,22 @@ void UD1SceneWidget::HideItemHoverWidget()
 	ItemHoverWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-bool UD1SceneWidget::IsAllHidden() const
+void UD1SceneWidget::ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent)
+{
+	InteractionWidget->ShowInteractionPress(InteractionTitle, InteractionContent);
+}
+
+void UD1SceneWidget::ShowInteractionProgress(float HoldTime)
+{
+	InteractionWidget->ShowInteractionProgress(HoldTime);
+}
+
+void UD1SceneWidget::HideInteractionWidget()
+{
+	InteractionWidget->HideInteractionWidget();
+}
+
+bool UD1SceneWidget::IsAllMouseInteractionWidgetHidden() const
 {
 	bool bAllHidden = true;
 	if (ControlledPlayerInventoryWidget->GetVisibility() == ESlateVisibility::Visible)

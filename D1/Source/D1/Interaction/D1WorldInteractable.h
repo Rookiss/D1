@@ -10,18 +10,11 @@ class AD1WorldInteractable : public AActor, public ID1Interactable
 	
 public:
 	AD1WorldInteractable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
+	
 public:
 	virtual const FD1InteractionInfo& GetInteractionInfo() const { return InteractionInfo; }
 
 protected:
 	UPROPERTY(EditAnywhere, Category="Info")
 	FD1InteractionInfo InteractionInfo;
-
-protected:
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USceneComponent> SceneComponent;
-	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 };

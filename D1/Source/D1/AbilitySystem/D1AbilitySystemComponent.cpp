@@ -31,7 +31,7 @@ void UD1AbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AActo
 	FGameplayAbilityActorInfo* ActorInfo = AbilityActorInfo.Get();
 	check(ActorInfo);
 	check(InOwnerActor);
-
+	
 	const bool bHasNewPawnAvatar = Cast<APawn>(InAvatarActor) && (InAvatarActor != ActorInfo->AvatarActor);
 	
 	Super::InitAbilityActorInfo(InOwnerActor, InAvatarActor);
@@ -274,7 +274,7 @@ void UD1AbilitySystemComponent::ClearAbilityInput()
 
 void UD1AbilitySystemComponent::AddDynamicTagToSelf(const FGameplayTag& Tag)
 {
-	const TSubclassOf<UGameplayEffect> DynamicTagEffectClass = UD1AssetManager::GetSubclassByName<UGameplayEffect>("DynamicTagEffect");
+	const TSubclassOf<UGameplayEffect> DynamicTagEffectClass = UD1AssetManager::GetSubclassByName<UGameplayEffect>("DynamicTag");
 	if (DynamicTagEffectClass == nullptr)
 	{
 		UE_LOG(LogD1AbilitySystem, Warning, TEXT("AddDynamicTagGameplayEffect : Unable to find DynamicTagGameplayEffect."));
@@ -295,7 +295,7 @@ void UD1AbilitySystemComponent::AddDynamicTagToSelf(const FGameplayTag& Tag)
 
 void UD1AbilitySystemComponent::RemoveDynamicTagToSelf(const FGameplayTag& Tag)
 {
-	const TSubclassOf<UGameplayEffect> DynamicTagEffectClass = UD1AssetManager::GetSubclassByName<UGameplayEffect>("DynamicTagEffect");
+	const TSubclassOf<UGameplayEffect> DynamicTagEffectClass = UD1AssetManager::GetSubclassByName<UGameplayEffect>("DynamicTag");
 	if (DynamicTagEffectClass == nullptr)
 	{
 		UE_LOG(LogD1AbilitySystem, Warning, TEXT("AddDynamicTagGameplayEffect : Unable to find DynamicTagGameplayEffect."));

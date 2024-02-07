@@ -16,15 +16,16 @@ public:
 
 public:
 	void ShowSceneWidget();
-	
-	void ShowInteractionWidget(const FText& InteractionText);
-	void HideInteractionWidget();
 
 	void ShowControlledPlayerInventoryWidget();
 	void HideControlledPlayerInventoryWidget();
 
 	void ShowItemHoverWidget(UD1ItemInstance* ItemInstance);
 	void HideItemHoverWidget();
+
+	void ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent);
+	void ShowInteractionProgress(float HoldTime);
+	void HideInteractionWidget();
 	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
