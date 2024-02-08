@@ -89,11 +89,11 @@ void UD1GameplayAbility_Interact::TriggerInteraction()
 		AActor* InteractableActor = Cast<AActor>(TraceHitInfo.Interactable.GetObject());
 		
 		FGameplayEventData Payload;
-		Payload.EventTag = D1GameplayTags::Ability_Interaction;
+		Payload.EventTag = D1GameplayTags::Ability_Interaction_Activate;
 		Payload.Instigator = Instigator;
 		Payload.Target = InteractableActor;
 
-		ASC->TriggerAbilityFromGameplayEvent(TraceHitInfo.InteractionAbilityHandle, nullptr, D1GameplayTags::Ability_Interaction, &Payload, *ASC);
+		ASC->TriggerAbilityFromGameplayEvent(TraceHitInfo.InteractionAbilityHandle, nullptr, D1GameplayTags::Ability_Interaction_Activate, &Payload, *ASC);
 	}
 }
 
@@ -128,4 +128,10 @@ void UD1GameplayAbility_Interact::HideInteractionWidget()
 			HUD->HideInteractionWidget();
 		}
 	}
+}
+
+bool UD1GameplayAbility_Interact::IsEqualTargetDataHandle(const FGameplayAbilityTargetDataHandle& A, const FGameplayAbilityTargetDataHandle& B)
+{
+	return (A.Num() == 1 && A.Get(0)->HasHitResult()) && (B.Num() == 1 && B.Get(0)->HasHitResult())
+			&& (A.Get(0)->GetHitResult()->GetComponent() == B.Get(0)->GetHitResult()->GetComponent());
 }

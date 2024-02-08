@@ -14,7 +14,8 @@ namespace D1GameplayTags
 	
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Death,							"Ability.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,							"Ability.Jump");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_Interaction,						"Ability.Interaction");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Interaction_Activate,			"Ability.Interaction.Activate");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Interaction_End,					"Ability.Interaction.End");
 
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				"Attribute.Primary.Health");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MaxHealth, 			"Attribute.Primary.MaxHealth");

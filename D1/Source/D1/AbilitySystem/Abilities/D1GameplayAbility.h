@@ -40,6 +40,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AD1PlayerController* GetPlayerController() const;
 
+	UFUNCTION(BlueprintCallable)
+	bool IsInputPressed() const;
+	
 	ED1AbilityActivationPolicy GetActivationPolicy() const { return ActivationPolicy; }
 	
 protected:

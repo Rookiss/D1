@@ -22,6 +22,8 @@ UD1AbilityTask_WaitForLineTraceHitInteractable* UD1AbilityTask_WaitForLineTraceH
 
 void UD1AbilityTask_WaitForLineTraceHitInteractable::Activate()
 {
+	Super::Activate();
+	
 	SetWaitingOnAvatar();
 
 	GetWorld()->GetTimerManager().SetTimer(TraceTimerHandle, this, &ThisClass::PerformTrace, InteractionScanRate, true);
@@ -36,8 +38,11 @@ void UD1AbilityTask_WaitForLineTraceHitInteractable::OnDestroy(bool bInOwnerFini
 
 void UD1AbilityTask_WaitForLineTraceHitInteractable::PerformTrace()
 {
+	if (Ability == nullptr)
+		return;
+	
 	AActor* AvatarActor = Ability->GetCurrentActorInfo()->AvatarActor.Get();
-	if (AvatarActor == nullptr || Ability == nullptr)
+	if (AvatarActor == nullptr)
 		return;
 
 	TArray<AActor*> ActorsToIgnore;
@@ -45,23 +50,62 @@ void UD1AbilityTask_WaitForLineTraceHitInteractable::PerformTrace()
 
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(UD1AbilityTask_WaitForInteractable)/*Used for Profiling*/, false);
 	Params.AddIgnoredActors(ActorsToIgnore);
+
+	FVector TraceStart;
+	FVector TraceEnd;
 	
-	APlayerController* PC = Ability->GetCurrentActorInfo()->PlayerController.Get();
-	check(PC);
-
-	FVector CameraStart;
-	FRotator CameraRotation;
-	PC->GetPlayerViewPoint(CameraStart, CameraRotation);
-
-	const FVector CameraDirection = CameraRotation.Vector();
-
-	FVector TraceStart = CameraStart;
-	FVector TraceEnd = CameraStart + (CameraDirection * InteractionScanRange);
+	if (APlayerController* PC = Ability->GetCurrentActorInfo()->PlayerController.Get())
+	{
+		FVector CameraStart;
+		FRotator CameraRotation;
+		PC->GetPlayerViewPoint(CameraStart, CameraRotation);
 		
-	FHitResult HitResult;
-	GetWorld()->LineTraceSingleByProfile(HitResult, TraceStart, TraceEnd, TraceProfile.Name, Params);
+		TraceStart = CameraStart;
+		TraceEnd = CameraStart + (CameraRotation.Vector() * InteractionScanRange);
+	}
+	else
+	{
+		TraceStart = AvatarActor->GetActorLocation();
+		TraceEnd = TraceStart + (AvatarActor->GetActorForwardVector() * InteractionScanRange);
+	}
 	
-	HandleInteractableInfo(HitResult.GetActor());
+	FHitResult HitResult;
+	LineTrace(HitResult, TraceStart, TraceEnd, TraceProfile.Name, Params);
+
+	if (HitResult.bBlockingHit == false)
+	{
+		if (TargetDataHandle.Num() > 0 && TargetDataHandle.Get(0)->GetHitResult()->GetActor())
+		{
+			LostInteractable.Broadcast(TargetDataHandle);
+
+			FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(HitResult);
+			TargetDataHandle = FGameplayAbilityTargetDataHandle(TargetData);
+		}
+	}
+	else
+	{
+		bool bFoundNewTarget = true;
+		
+		if (TargetDataHandle.Num() > 0)
+		{
+			const AActor* OldTarget = TargetDataHandle.Get(0)->GetHitResult()->GetActor();
+			if (OldTarget == HitResult.GetActor())
+			{
+				bFoundNewTarget = false;
+			}
+			else if (OldTarget)
+			{
+				LostInteractable.Broadcast(TargetDataHandle);
+			}
+		}
+
+		if (bFoundNewTarget)
+		{
+			FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(HitResult);
+			TargetDataHandle = FGameplayAbilityTargetDataHandle(TargetData);
+			FoundNewInteractable.Broadcast(TargetDataHandle);
+		}
+	}
 
 #if ENABLE_DRAW_DEBUG
 	if (HitResult.bBlockingHit && HitResult.GetActor()->Implements<UD1Interactable>())
@@ -76,30 +120,15 @@ void UD1AbilityTask_WaitForLineTraceHitInteractable::PerformTrace()
 #endif // ENABLE_DRAW_DEBUG
 }
 
-void UD1AbilityTask_WaitForLineTraceHitInteractable::HandleInteractableInfo(const TScriptInterface<ID1Interactable>& Interactable)
+void UD1AbilityTask_WaitForLineTraceHitInteractable::LineTrace(FHitResult& OutHitResult, const FVector& Start, const FVector& End, FName ProfileName, const FCollisionQueryParams Params)
 {
-	FD1InteractionInfo NewInfo;
-
-	if (Interactable)
+	OutHitResult = FHitResult();
+	
+	TArray<FHitResult> HitResults;
+	GetWorld()->LineTraceMultiByProfile(HitResults, Start, End, ProfileName, Params);
+	
+	if (HitResults.Num() > 0)
 	{
-		const FD1InteractionInfo& PendingInfo = Interactable->GetInteractionInfo();
-
-		if (PendingInfo.InteractionAbilityToGrant)
-		{
-			if (FGameplayAbilitySpec* InteractionAbilitySpec = AbilitySystemComponent->FindAbilitySpecFromClass(PendingInfo.InteractionAbilityToGrant))
-			{
-				if (InteractionAbilitySpec->Ability->CanActivateAbility(InteractionAbilitySpec->Handle, AbilitySystemComponent->AbilityActorInfo.Get()))
-				{
-					NewInfo = PendingInfo;
-					NewInfo.InteractionAbilityHandle = InteractionAbilitySpec->Handle;
-				}
-			}
-		}
-	}
-
-	if (NewInfo != LatestInfo)
-	{
-		LatestInfo = NewInfo;
-		OnInteractableChanged.Broadcast(LatestInfo);
+		OutHitResult = HitResults[0];
 	}
 }

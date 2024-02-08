@@ -22,6 +22,8 @@ UD1AbilityTask_GrantNearbyInteractionAbilities* UD1AbilityTask_GrantNearbyIntera
 
 void UD1AbilityTask_GrantNearbyInteractionAbilities::Activate()
 {
+	Super::Activate();
+	
 	SetWaitingOnAvatar();
 	GetWorld()->GetTimerManager().SetTimer(QueryTimerHandle, this, &ThisClass::QueryInteractables, InteractionScanRate, true);
 }

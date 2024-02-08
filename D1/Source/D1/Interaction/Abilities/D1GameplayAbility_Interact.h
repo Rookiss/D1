@@ -33,6 +33,10 @@ private:
 	void ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent);
 	void ShowInteractionProgress(float HoldTime);
 	void HideInteractionWidget();
+
+public:
+	UFUNCTION(BlueprintPure)
+	static bool IsEqualTargetDataHandle(const FGameplayAbilityTargetDataHandle& A, const FGameplayAbilityTargetDataHandle& B);
 	
 protected:
 	UPROPERTY()

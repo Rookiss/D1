@@ -59,3 +59,9 @@ AD1PlayerController* UD1GameplayAbility::GetPlayerController() const
 {
 	return (CurrentActorInfo ? Cast<AD1PlayerController>(CurrentActorInfo->PlayerController.Get()) : nullptr);
 }
+
+bool UD1GameplayAbility::IsInputPressed() const
+{
+	FGameplayAbilitySpec* AbilitySpec = GetCurrentAbilitySpec();
+	return (AbilitySpec && AbilitySpec->InputPressed);
+}

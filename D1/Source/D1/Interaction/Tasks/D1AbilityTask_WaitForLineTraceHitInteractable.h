@@ -4,7 +4,7 @@
 #include "Interaction/D1Interactable.h"
 #include "D1AbilityTask_WaitForLineTraceHitInteractable.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractableChanged, const FD1InteractionInfo&, InteractionInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractableChanged, const FGameplayAbilityTargetDataHandle&, TargetDataHandle);
 
 UCLASS()
 class UD1AbilityTask_WaitForLineTraceHitInteractable : public UAbilityTask
@@ -24,11 +24,14 @@ protected:
 
 private:
 	void PerformTrace();
-	void HandleInteractableInfo(const TScriptInterface<ID1Interactable>& Interactable);
+	void LineTrace(FHitResult& OutHitResult, const FVector& Start, const FVector& End, FName ProfileName, const FCollisionQueryParams Params);
 	
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnInteractableChanged OnInteractableChanged;
+	FOnInteractableChanged FoundNewInteractable;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnInteractableChanged LostInteractable;
 
 private:
 	FCollisionProfileName TraceProfile;
@@ -36,5 +39,6 @@ private:
 	float InteractionScanRate = 0.1f;
 	
 	FTimerHandle TraceTimerHandle;
+	FGameplayAbilityTargetDataHandle TargetDataHandle;
 	FD1InteractionInfo LatestInfo;
 };
