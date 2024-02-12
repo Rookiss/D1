@@ -12,7 +12,7 @@ public:
 	AD1WorldInteractable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 public:
-	virtual const FD1InteractionInfo& GetInteractionInfo() const { return InteractionInfo; }
+	virtual const FD1InteractionInfo& GetInteractionInfo() const override { return InteractionInfo; }
 
 protected:
 	UPROPERTY(EditAnywhere, Category="Info")

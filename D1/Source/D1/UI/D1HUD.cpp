@@ -55,19 +55,19 @@ void AD1HUD::HideItemHoverWidget()
 	}
 }
 
-void AD1HUD::ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent)
+void AD1HUD::ShowInteractionPressWidget(const FText& InteractionTitle, const FText& InteractionContent)
 {
 	if (SceneWidget)
 	{
-		SceneWidget->ShowInteractionPress(InteractionTitle, InteractionContent);
+		SceneWidget->ShowInteractionPressWidget(InteractionTitle, InteractionContent);
 	}
 }
 
-void AD1HUD::ShowInteractionProgress(float HoldTime)
+void AD1HUD::ShowInteractionHasDurationWidget(float HoldTime)
 {
 	if (SceneWidget)
 	{
-		SceneWidget->ShowInteractionProgress(HoldTime);
+		SceneWidget->ShowInteractionHasDurationWidget(HoldTime);
 	}
 }
 

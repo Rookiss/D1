@@ -16,8 +16,10 @@ namespace D1GameplayTags
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Death);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Jump);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Interaction_Activate);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Interaction);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Interaction_Active);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Interaction_End);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Interaction_Block);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_Health);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MaxHealth);

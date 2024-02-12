@@ -2,6 +2,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "Interaction/D1Interactable.h"
+#include "Physics/D1CollisionChannels.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AbilityTask_WaitForLineTraceHitInteractable)
 
@@ -11,12 +12,13 @@ UD1AbilityTask_WaitForLineTraceHitInteractable::UD1AbilityTask_WaitForLineTraceH
     
 }
 
-UD1AbilityTask_WaitForLineTraceHitInteractable* UD1AbilityTask_WaitForLineTraceHitInteractable::WaitForLineTraceHitInteractable(UGameplayAbility* OwningAbility, FCollisionProfileName TraceProfile, float InteractionScanRange, float InteractionScanRate)
+UD1AbilityTask_WaitForLineTraceHitInteractable* UD1AbilityTask_WaitForLineTraceHitInteractable::WaitForLineTraceHitInteractable(UGameplayAbility* OwningAbility, FCollisionProfileName TraceProfile, float InteractionScanRange, float InteractionScanRate, bool bShowDebug)
 {
 	UD1AbilityTask_WaitForLineTraceHitInteractable* Task = NewAbilityTask<UD1AbilityTask_WaitForLineTraceHitInteractable>(OwningAbility);
 	Task->TraceProfile = TraceProfile;
 	Task->InteractionScanRange = InteractionScanRange;
 	Task->InteractionScanRate = InteractionScanRate;
+	Task->bShowDebug = bShowDebug;
 	return Task;
 }
 
@@ -25,7 +27,6 @@ void UD1AbilityTask_WaitForLineTraceHitInteractable::Activate()
 	Super::Activate();
 	
 	SetWaitingOnAvatar();
-
 	GetWorld()->GetTimerManager().SetTimer(TraceTimerHandle, this, &ThisClass::PerformTrace, InteractionScanRate, true);
 }
 
@@ -54,81 +55,62 @@ void UD1AbilityTask_WaitForLineTraceHitInteractable::PerformTrace()
 	FVector TraceStart;
 	FVector TraceEnd;
 	
-	if (APlayerController* PC = Ability->GetCurrentActorInfo()->PlayerController.Get())
-	{
-		FVector CameraStart;
-		FRotator CameraRotation;
-		PC->GetPlayerViewPoint(CameraStart, CameraRotation);
+	APlayerController* PC = Ability->GetCurrentActorInfo()->PlayerController.Get();
+	if (PC == nullptr)
+		return;
+	
+	FVector CameraStart;
+	FRotator CameraRotation;
+	PC->GetPlayerViewPoint(CameraStart, CameraRotation);
 		
-		TraceStart = CameraStart;
-		TraceEnd = CameraStart + (CameraRotation.Vector() * InteractionScanRange);
-	}
-	else
-	{
-		TraceStart = AvatarActor->GetActorLocation();
-		TraceEnd = TraceStart + (AvatarActor->GetActorForwardVector() * InteractionScanRange);
-	}
+	TraceStart = CameraStart;
+	TraceEnd = CameraStart + (CameraRotation.Vector() * InteractionScanRange);
 	
 	FHitResult HitResult;
-	LineTrace(HitResult, TraceStart, TraceEnd, TraceProfile.Name, Params);
+	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, D1_TraceChannel_Interaction, Params);
 
-	if (HitResult.bBlockingHit == false)
+	bool bShouldBroadcast = true;
+	
+	if (HitResult.bBlockingHit)
 	{
-		if (TargetDataHandle.Num() > 0 && TargetDataHandle.Get(0)->GetHitResult()->GetActor())
+		if (CurrentTargetDataHandle.Num() > 0)
 		{
-			LostInteractable.Broadcast(TargetDataHandle);
-
-			FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(HitResult);
-			TargetDataHandle = FGameplayAbilityTargetDataHandle(TargetData);
-		}
-	}
-	else
-	{
-		bool bFoundNewTarget = true;
-		
-		if (TargetDataHandle.Num() > 0)
-		{
-			const AActor* OldTarget = TargetDataHandle.Get(0)->GetHitResult()->GetActor();
+			const AActor* OldTarget = CurrentTargetDataHandle.Get(0)->GetHitResult()->GetActor();
 			if (OldTarget == HitResult.GetActor())
 			{
-				bFoundNewTarget = false;
-			}
-			else if (OldTarget)
-			{
-				LostInteractable.Broadcast(TargetDataHandle);
+				bShouldBroadcast = false;
 			}
 		}
+	}
+	else if (CurrentTargetDataHandle.Num() == 0)
+	{
+		bShouldBroadcast = false;
+	}
 
-		if (bFoundNewTarget)
-		{
-			FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(HitResult);
-			TargetDataHandle = FGameplayAbilityTargetDataHandle(TargetData);
-			FoundNewInteractable.Broadcast(TargetDataHandle);
-		}
+	if (bShouldBroadcast)
+	{
+		FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(HitResult);
+		
+		FGameplayAbilityTargetDataHandle TargetDataHandle;
+		TargetDataHandle.Add(TargetData);
+		
+		CurrentTargetDataHandle = TargetDataHandle;
+		InteractableFocusChanged.Broadcast(CurrentTargetDataHandle);
 	}
 
 #if ENABLE_DRAW_DEBUG
-	if (HitResult.bBlockingHit && HitResult.GetActor()->Implements<UD1Interactable>())
+	if (bShowDebug)
 	{
-		DrawDebugLine(GetWorld(), TraceStart, HitResult.Location, FColor::Red, false, InteractionScanRate);
-		DrawDebugSphere(GetWorld(), HitResult.Location, 5, 16, FColor::Red, false, InteractionScanRate);
-	}
-	else
-	{
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Green, false, InteractionScanRate);
+		FColor DebugColor = HitResult.bBlockingHit ? FColor::Red : FColor::Green;
+		if (HitResult.bBlockingHit)
+		{
+			DrawDebugLine(GetWorld(), TraceStart, HitResult.Location, DebugColor, false, InteractionScanRate);
+			DrawDebugSphere(GetWorld(), HitResult.Location, 5, 16, DebugColor, false, InteractionScanRate);
+		}
+		else
+		{
+			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, DebugColor, false, InteractionScanRate);
+		}
 	}
 #endif // ENABLE_DRAW_DEBUG
-}
-
-void UD1AbilityTask_WaitForLineTraceHitInteractable::LineTrace(FHitResult& OutHitResult, const FVector& Start, const FVector& End, FName ProfileName, const FCollisionQueryParams Params)
-{
-	OutHitResult = FHitResult();
-	
-	TArray<FHitResult> HitResults;
-	GetWorld()->LineTraceMultiByProfile(HitResults, Start, End, ProfileName, Params);
-	
-	if (HitResults.Num() > 0)
-	{
-		OutHitResult = HitResults[0];
-	}
 }

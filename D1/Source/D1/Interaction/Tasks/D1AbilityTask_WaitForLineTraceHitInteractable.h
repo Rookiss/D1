@@ -1,10 +1,11 @@
 ﻿#pragma once
 
 #include "Abilities/Tasks/AbilityTask.h"
-#include "Interaction/D1Interactable.h"
 #include "D1AbilityTask_WaitForLineTraceHitInteractable.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractableChanged, const FGameplayAbilityTargetDataHandle&, TargetDataHandle);
+class ID1Interactable;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractableFocusChanged, const FGameplayAbilityTargetDataHandle&, TargetDataHandle);
 
 UCLASS()
 class UD1AbilityTask_WaitForLineTraceHitInteractable : public UAbilityTask
@@ -16,7 +17,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, meta=(HidePin="OwningAbility", DefaultToSelf="OwningAbility", BlueprintInternalUseOnly="true"))
-	static UD1AbilityTask_WaitForLineTraceHitInteractable* WaitForLineTraceHitInteractable(UGameplayAbility* OwningAbility, FCollisionProfileName TraceProfile, float InteractionScanRange = 100, float InteractionScanRate = 0.1f);
+	static UD1AbilityTask_WaitForLineTraceHitInteractable* WaitForLineTraceHitInteractable(UGameplayAbility* OwningAbility, FCollisionProfileName TraceProfile, float InteractionScanRange = 100, float InteractionScanRate = 0.1f, bool bShowDebug = false);
 
 protected:
 	virtual void Activate() override;
@@ -24,21 +25,18 @@ protected:
 
 private:
 	void PerformTrace();
-	void LineTrace(FHitResult& OutHitResult, const FVector& Start, const FVector& End, FName ProfileName, const FCollisionQueryParams Params);
 	
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnInteractableChanged FoundNewInteractable;
-	
-	UPROPERTY(BlueprintAssignable)
-	FOnInteractableChanged LostInteractable;
+	FOnInteractableFocusChanged InteractableFocusChanged;
 
 private:
 	FCollisionProfileName TraceProfile;
 	float InteractionScanRange = 100.f;
 	float InteractionScanRate = 0.1f;
-	
+	bool bShowDebug = false;
+
+private:
 	FTimerHandle TraceTimerHandle;
-	FGameplayAbilityTargetDataHandle TargetDataHandle;
-	FD1InteractionInfo LatestInfo;
+	FGameplayAbilityTargetDataHandle CurrentTargetDataHandle;
 };

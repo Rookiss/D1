@@ -93,6 +93,9 @@ void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 			continue;
 		}
 
+		if (Entry.LatestValidItemID <= 0)
+			continue;
+
 		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(Entry.LatestValidItemID);
 		const FIntPoint ItemSlotPos = FIntPoint(Index % InventorySlotCount.X, Index / InventorySlotCount.X);
 		const FIntPoint& ItemSlotCount = ItemDef.ItemSlotCount;

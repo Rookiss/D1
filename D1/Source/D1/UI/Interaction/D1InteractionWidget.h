@@ -4,8 +4,8 @@
 #include "D1InteractionWidget.generated.h"
 
 class UImage;
-class UWidgetSwitcher;
 class UTextBlock;
+class UWidgetSwitcher;
 
 UCLASS()
 class UD1InteractionWidget : public UD1UserWidget
@@ -17,11 +17,10 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 public:
-	void ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent);
-	void ShowInteractionProgress(float HoldTime);
+	void ShowInteractionPressWidget(const FText& InteractionTitle, const FText& InteractionContent);
+	void ShowInteractionHasDurationWidget(float HoldTime);
 	void HideInteractionWidget();
 	
 protected:
@@ -43,8 +42,10 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> CircularMaterialInstance;
-
-	FNumberFormattingOptions NumberFormattingOptions;
+	
 	float LeftHoldTime = 0.f;
 	float TotalHoldTime = 0.f;
+	FTimerHandle ProgressTimerHandle;
+	float ProgressTickTime = 0.05f;
+	FNumberFormattingOptions NumberFormattingOptions;
 };

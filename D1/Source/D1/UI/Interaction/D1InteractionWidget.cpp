@@ -3,6 +3,7 @@
 #include "Components/Image.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/TextBlock.h"
+#include "Interaction/D1Interactable.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1InteractionWidget)
 
@@ -17,40 +18,43 @@ void UD1InteractionWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	SetVisibility(ESlateVisibility::Collapsed);
+	
 	CircularMaterialInstance = Image_Circular_Fill->GetDynamicMaterial();
+	CircularMaterialInstance->SetScalarParameterValue("Percent", 1.f);
 	
 	NumberFormattingOptions.MinimumFractionalDigits = 1;
 	NumberFormattingOptions.MaximumFractionalDigits = 1;
 }
 
-void UD1InteractionWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
-
-	if (LeftHoldTime >= 0.f)
-	{
-		LeftHoldTime -= InDeltaTime;
-		Text_HoldTime->SetText(FText::AsNumber(LeftHoldTime, &NumberFormattingOptions));
-		CircularMaterialInstance->SetScalarParameterValue("Percent", LeftHoldTime / TotalHoldTime);
-	}
-}
-
-void UD1InteractionWidget::ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent)
+void UD1InteractionWidget::ShowInteractionPressWidget(const FText& InteractionTitle, const FText& InteractionContent)
 {
 	SetVisibility(ESlateVisibility::HitTestInvisible);
 	WidgetSwitcher->SetActiveWidgetIndex(0);
-
+	
 	Text_InteractionTitle->SetText(InteractionTitle);
 	Text_InteractionContent->SetText(InteractionContent);
 }
 
-void UD1InteractionWidget::ShowInteractionProgress(float HoldTime)
+void UD1InteractionWidget::ShowInteractionHasDurationWidget(float HoldTime)
 {
 	SetVisibility(ESlateVisibility::HitTestInvisible);
 	WidgetSwitcher->SetActiveWidgetIndex(1);
-
-	TotalHoldTime = HoldTime;
+	
 	LeftHoldTime = HoldTime;
+	TotalHoldTime = HoldTime;
+
+	CircularMaterialInstance->SetScalarParameterValue("Percent", 1.f);
+	GetWorld()->GetTimerManager().SetTimer(ProgressTimerHandle, [this]()
+	{
+		LeftHoldTime = FMath::Max(LeftHoldTime - ProgressTickTime, 0.f);
+		Text_HoldTime->SetText(FText::AsNumber(LeftHoldTime, &NumberFormattingOptions));
+		CircularMaterialInstance->SetScalarParameterValue("Percent", LeftHoldTime / TotalHoldTime);
+
+		if (LeftHoldTime <= 0.f)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(ProgressTimerHandle);
+		}
+	}, ProgressTickTime, true);
 }
 
 void UD1InteractionWidget::HideInteractionWidget()

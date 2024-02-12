@@ -109,14 +109,14 @@ void UD1SceneWidget::HideItemHoverWidget()
 	ItemHoverWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void UD1SceneWidget::ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent)
+void UD1SceneWidget::ShowInteractionPressWidget(const FText& InteractionTitle, const FText& InteractionContent)
 {
-	InteractionWidget->ShowInteractionPress(InteractionTitle, InteractionContent);
+	InteractionWidget->ShowInteractionPressWidget(InteractionTitle, InteractionContent);
 }
 
-void UD1SceneWidget::ShowInteractionProgress(float HoldTime)
+void UD1SceneWidget::ShowInteractionHasDurationWidget(float HoldTime)
 {
-	InteractionWidget->ShowInteractionProgress(HoldTime);
+	InteractionWidget->ShowInteractionHasDurationWidget(HoldTime);
 }
 
 void UD1SceneWidget::HideInteractionWidget()

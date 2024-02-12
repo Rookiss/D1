@@ -5,5 +5,5 @@
 AD1WorldInteractable::AD1WorldInteractable(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	InteractionInfo.Interactable = this;
+	
 }

@@ -2,12 +2,10 @@
 
 #include "AbilitySystemComponent.h"
 #include "D1GameplayTags.h"
-#include "AbilitySystem/D1AbilitySystemComponent.h"
-#include "Character/D1Character.h"
 #include "Interaction/D1Interactable.h"
-#include "Interaction/Tasks/D1AbilityTask_GrantNearbyInteractionAbilities.h"
 #include "Player/D1PlayerController.h"
 #include "UI/D1HUD.h"
+#include "UI/Interaction/D1InteractionWidget.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Interact)
 
@@ -23,98 +21,58 @@ void UD1GameplayAbility_Interact::ActivateAbility(const FGameplayAbilitySpecHand
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
-	if (ASC && ASC->GetOwnerRole() == ROLE_Authority)
-	{
-		UD1AbilityTask_GrantNearbyInteractionAbilities* Task = UD1AbilityTask_GrantNearbyInteractionAbilities::GrantNearbyInteractionAbilities(this, InteractionScanRange, InteractionScanRate);
-		Task->ReadyForActivation();
-	}
+	GetWorld()->GetTimerManager().SetTimer(UpdateWidgetTimerHandle, this, &ThisClass::UpdateWidget, 0.1f, true);
 }
 
-void UD1GameplayAbility_Interact::HandleInteractionInfo(const FD1InteractionInfo& NewInteractionInfo)
+void UD1GameplayAbility_Interact::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	if (TraceHitInfo != NewInteractionInfo)
-	{
-		TraceHitInfo = NewInteractionInfo;
-		
-		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-		UD1AbilitySystemComponent* ASC = CastChecked<UD1AbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
-		
-		if (TimerManager.TimerExists(HoldTimerHandle))
-		{
-			ASC->RemoveDynamicTagToSelf(D1GameplayTags::ASC_InputBlocked);
-			TimerManager.ClearTimer(HoldTimerHandle);
-		}
-
-		if (GetAvatarActorFromActorInfo()->HasAuthority() == false && TraceHitInfo.Interactable.IsValid())
-		{
-			ShowInteractionPress(TraceHitInfo.InteractionTitle, TraceHitInfo.InteractionContent);
-		}
-		else
-		{
-			HideInteractionWidget();
-		}
-	}
-}
-
-void UD1GameplayAbility_Interact::OnInteractionPressDetected()
-{
-	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-	UD1AbilitySystemComponent* ASC = CastChecked<UD1AbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
+	GetWorld()->GetTimerManager().ClearTimer(UpdateWidgetTimerHandle);
 	
-	if (TimerManager.TimerExists(HoldTimerHandle))
-	{
-		ASC->RemoveDynamicTagToSelf(D1GameplayTags::ASC_InputBlocked);
-		ShowInteractionPress(TraceHitInfo.InteractionTitle, TraceHitInfo.InteractionContent);
-		TimerManager.ClearTimer(HoldTimerHandle);
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+void UD1GameplayAbility_Interact::UpdateLineTracedInfo(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
+{
+	CurrentTargetDataHandle = TargetDataHandle;
+}
+
+void UD1GameplayAbility_Interact::UpdateWidget()
+{
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
+	if (ASC && ASC->HasMatchingGameplayTag(D1GameplayTags::Ability_Interaction_Active))
 		return;
-	}
-
-	if (TraceHitInfo.Interactable.IsValid())
-	{
-		ASC->AddDynamicTagToSelf(D1GameplayTags::ASC_InputBlocked);
-		ShowInteractionProgress(TraceHitInfo.HoldTime);
-		TimerManager.SetTimer(HoldTimerHandle, this, &ThisClass::TriggerInteraction, TraceHitInfo.HoldTime, false);
-	}
-}
-
-void UD1GameplayAbility_Interact::TriggerInteraction()
-{
-	if (UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo()))
-	{
-		ASC->RemoveDynamicTagToSelf(D1GameplayTags::ASC_InputBlocked);
-		ShowInteractionPress(TraceHitInfo.InteractionTitle, TraceHitInfo.InteractionContent);
 		
-		AActor* Instigator = GetAvatarActorFromActorInfo();
-		AActor* InteractableActor = Cast<AActor>(TraceHitInfo.Interactable.GetObject());
-		
-		FGameplayEventData Payload;
-		Payload.EventTag = D1GameplayTags::Ability_Interaction_Activate;
-		Payload.Instigator = Instigator;
-		Payload.Target = InteractableActor;
-
-		ASC->TriggerAbilityFromGameplayEvent(TraceHitInfo.InteractionAbilityHandle, nullptr, D1GameplayTags::Ability_Interaction_Activate, &Payload, *ASC);
-	}
-}
-
-void UD1GameplayAbility_Interact::ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent)
-{
-	if (AD1PlayerController* PC = GetPlayerController())
+	if (CurrentTargetDataHandle.Num() > 0)
 	{
-		if (AD1HUD* HUD = Cast<AD1HUD>(PC->GetHUD()))
+		if (ID1Interactable* TargetInteractable = Cast<ID1Interactable>(CurrentTargetDataHandle.Get(0)->GetHitResult()->GetActor()))
 		{
-			HUD->ShowInteractionPress(InteractionTitle, InteractionContent);
+			ShowInteractionPressWidget(TargetInteractable->GetInteractionInfo());
+			return;
 		}
 	}
+		
+	HideInteractionWidget();
 }
 
-void UD1GameplayAbility_Interact::ShowInteractionProgress(float HoldTime)
+void UD1GameplayAbility_Interact::HandleInputPress()
+{
+	if (CurrentTargetDataHandle.Num() == 0 || CurrentTargetDataHandle.Get(0)->GetHitResult()->GetActor() == nullptr)
+		return;
+	
+	FGameplayEventData Payload;
+	Payload.Instigator = GetAvatarActorFromActorInfo();
+	Payload.TargetData = CurrentTargetDataHandle;
+	
+	SendGameplayEvent(D1GameplayTags::Ability_Interaction_Active, Payload);
+}
+
+void UD1GameplayAbility_Interact::ShowInteractionPressWidget(const FD1InteractionInfo& InteractionInfo)
 {
 	if (AD1PlayerController* PC = GetPlayerController())
 	{
 		if (AD1HUD* HUD = Cast<AD1HUD>(PC->GetHUD()))
 		{
-			HUD->ShowInteractionProgress(HoldTime);
+			HUD->ShowInteractionPressWidget(InteractionInfo.InteractionTitle, InteractionInfo.InteractionContent);
 		}
 	}
 }
@@ -128,10 +86,4 @@ void UD1GameplayAbility_Interact::HideInteractionWidget()
 			HUD->HideInteractionWidget();
 		}
 	}
-}
-
-bool UD1GameplayAbility_Interact::IsEqualTargetDataHandle(const FGameplayAbilityTargetDataHandle& A, const FGameplayAbilityTargetDataHandle& B)
-{
-	return (A.Num() == 1 && A.Get(0)->HasHitResult()) && (B.Num() == 1 && B.Get(0)->HasHitResult())
-			&& (A.Get(0)->GetHitResult()->GetComponent() == B.Get(0)->GetHitResult()->GetComponent());
 }

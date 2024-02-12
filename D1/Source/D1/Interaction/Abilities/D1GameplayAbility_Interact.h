@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include "AbilitySystem/Abilities/D1GameplayAbility.h"
-#include "Interaction/D1Interactable.h"
 #include "D1GameplayAbility_Interact.generated.h"
 
+class ID1Interactable;
 struct FD1InteractionInfo;
 
 UCLASS()
@@ -14,39 +14,28 @@ class UD1GameplayAbility_Interact : public UD1GameplayAbility
 public:
 	UD1GameplayAbility_Interact(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+	
 protected:
 	UFUNCTION(BlueprintCallable)
-	void HandleInteractionInfo(const FD1InteractionInfo& NewInteractionInfo);
+	void UpdateLineTracedInfo(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void WaitInteractionPress();
-	
 	UFUNCTION(BlueprintCallable)
-	void OnInteractionPressDetected();
+	void HandleInputPress();
 	
-	void TriggerInteraction();
-
-private:
-	void ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent);
-	void ShowInteractionProgress(float HoldTime);
+protected:
+	void UpdateWidget();
+	void ShowInteractionPressWidget(const FD1InteractionInfo& InteractionInfo);
 	void HideInteractionWidget();
 
-public:
-	UFUNCTION(BlueprintPure)
-	static bool IsEqualTargetDataHandle(const FGameplayAbilityTargetDataHandle& A, const FGameplayAbilityTargetDataHandle& B);
-	
 protected:
-	UPROPERTY()
-	FD1InteractionInfo TraceHitInfo;
-
-	FTimerHandle HoldTimerHandle;
-	
 	UPROPERTY(EditDefaultsOnly)
 	float InteractionScanRate = 0.1f;
 
 	UPROPERTY(EditDefaultsOnly)
 	float InteractionScanRange = 500.f;
+
+	FTimerHandle UpdateWidgetTimerHandle;
+	FGameplayAbilityTargetDataHandle CurrentTargetDataHandle;
 };

@@ -23,8 +23,8 @@ public:
 	void ShowItemHoverWidget(UD1ItemInstance* ItemInstance);
 	void HideItemHoverWidget();
 
-	void ShowInteractionPress(const FText& InteractionTitle, const FText& InteractionContent);
-	void ShowInteractionProgress(float HoldTime);
+	void ShowInteractionPressWidget(const FText& InteractionTitle, const FText& InteractionContent);
+	void ShowInteractionHasDurationWidget(float HoldTime);
 	void HideInteractionWidget();
 	
 public:
