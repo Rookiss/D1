@@ -1,9 +1,10 @@
 ﻿#pragma once
 
+#include "D1SceneWidget.h"
 #include "GameFramework/HUD.h"
 #include "D1HUD.generated.h"
 
-class UD1ItemInstance;
+class UD1InteractionWidget;
 class UD1SceneWidget;
 
 UCLASS()
@@ -19,15 +20,15 @@ public:
 
 	void ShowControlledPlayerInventoryWidget();
 	void HideControlledPlayerInventoryWidget();
-
+	
 	void ShowItemHoverWidget(UD1ItemInstance* ItemInstance);
 	void HideItemHoverWidget();
-
-	void ShowInteractionPressWidget(const FText& InteractionTitle, const FText& InteractionContent);
-	void ShowInteractionHasDurationWidget(float HoldTime);
-	void HideInteractionWidget();
 	
 public:
+	UD1SceneWidget* GetSceneWidget() const { return SceneWidget; }
+	UD1InteractionWidget* GetInteractionWidget() const { return SceneWidget ? SceneWidget->GetInteractionWidget() : nullptr; }
+	
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UD1SceneWidget> SceneWidget;
 };

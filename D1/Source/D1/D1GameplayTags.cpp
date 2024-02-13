@@ -2,22 +2,23 @@
 
 namespace D1GameplayTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(ASC_DamageImmunity,					"ASC.DamageImmunity");
-	UE_DEFINE_GAMEPLAY_TAG(ASC_InputBlocked,					"ASC.InputBlocked");
+	UE_DEFINE_GAMEPLAY_TAG(State_Dead,							"State.Dead");
+	UE_DEFINE_GAMEPLAY_TAG(State_DamageImmunity,				"State.DamageImmunity");
+	UE_DEFINE_GAMEPLAY_TAG(State_InputBlocked,					"State.InputBlocked");
+
+	UE_DEFINE_GAMEPLAY_TAG(Event_Interact_Active,				"Event.Interact.Active");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Move,					"Input.Action.Move");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Look,					"Input.Action.Look");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Crouch,					"Input.Action.Crouch");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Jump,					"Input.Action.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Inventory,				"Input.Action.Inventory");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Interaction,			"Input.Action.Interaction");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Interact,				"Input.Action.Interact");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Death,						"Ability.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,						"Ability.Jump");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_Interaction,					"Ability.Interaction");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_Interaction_Active,			"Ability.Interaction.Active");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_Interaction_End,				"Ability.Interaction.End");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_Interaction_Block,			"Ability.Interaction.Block");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact,					"Ability.Interact");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack,						"Ability.Attack");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,			"Attribute.Primary.Health");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MaxHealth, 		"Attribute.Primary.MaxHealth");
@@ -39,4 +40,3 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Attack_Physical,						"Attack.Physical");
 	UE_DEFINE_GAMEPLAY_TAG(Attack_Magical,						"Attack.Magical");
 }	
-	

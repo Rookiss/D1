@@ -37,15 +37,16 @@ void UD1EquipmentSlotWidget::NativeConstruct()
 bool UD1EquipmentSlotWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragOver(InGeometry, InDragDropEvent, InOperation);
-
+	
 	if (bAlreadyHovered)
 		return true;
 
 	bAlreadyHovered = true;
 	
 	UD1ItemDragDrop* DragDrop = Cast<UD1ItemDragDrop>(InOperation);
-
+	
 	bool bIsValid = false;
+	
 	if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
 	{
 		bIsValid = EquipmentManagerComponent->CanEquipItem_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, EquipmentSlotType);

@@ -114,6 +114,7 @@ void UD1InventoryEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	DragDrop->FromInventoryManager = SlotsWidget->GetInventoryManagerComponent();
 	DragDrop->FromItemSlotPos = CachedFromSlotPos;
 	DragDrop->DeltaWidgetPos = CachedDeltaWidgetPos;
+	DragDrop->ItemID = ItemInstance->GetItemID();
 	OutOperation = DragDrop;
 }
 

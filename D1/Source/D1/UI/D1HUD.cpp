@@ -54,27 +54,3 @@ void AD1HUD::HideItemHoverWidget()
 		SceneWidget->HideItemHoverWidget();
 	}
 }
-
-void AD1HUD::ShowInteractionPressWidget(const FText& InteractionTitle, const FText& InteractionContent)
-{
-	if (SceneWidget)
-	{
-		SceneWidget->ShowInteractionPressWidget(InteractionTitle, InteractionContent);
-	}
-}
-
-void AD1HUD::ShowInteractionHasDurationWidget(float HoldTime)
-{
-	if (SceneWidget)
-	{
-		SceneWidget->ShowInteractionHasDurationWidget(HoldTime);
-	}
-}
-
-void AD1HUD::HideInteractionWidget()
-{
-	if (SceneWidget)
-	{
-		SceneWidget->HideInteractionWidget();
-	}
-}

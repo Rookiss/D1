@@ -3,6 +3,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "D1GameplayAbility.generated.h"
 
+class AD1HUD;
 class AD1PlayerController;
 class AD1Character;
 class UD1AbilitySystemComponent;
@@ -39,6 +40,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AD1PlayerController* GetPlayerController() const;
+
+	UFUNCTION(BlueprintCallable)
+	AD1HUD* GetHUD() const;
 
 	UFUNCTION(BlueprintCallable)
 	bool IsInputPressed() const;

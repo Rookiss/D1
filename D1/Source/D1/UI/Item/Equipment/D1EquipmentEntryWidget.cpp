@@ -103,6 +103,7 @@ void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	DragDrop->FromEquipmentManager = EquipmentManagerComponent;
 	DragDrop->FromEquipmentSlotType = EquipmentSlotType;
 	DragDrop->DeltaWidgetPos = (EntityWidgetSize / 2.f) - (UD1InventorySlotWidget::UnitSlotSize / 2.f);
+	DragDrop->ItemID = ItemInstance->GetItemID();
 	OutOperation = DragDrop;
 }
 

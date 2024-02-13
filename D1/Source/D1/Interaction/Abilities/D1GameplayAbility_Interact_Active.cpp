@@ -2,8 +2,8 @@
 
 #include "AbilitySystemComponent.h"
 #include "Interaction/D1Interactable.h"
-#include "Player/D1PlayerController.h"
 #include "UI/D1HUD.h"
+#include "UI/Interaction/D1InteractionWidget.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Interact_Active)
 
@@ -17,45 +17,50 @@ UD1GameplayAbility_Interact_Active::UD1GameplayAbility_Interact_Active(const FOb
 
 void UD1GameplayAbility_Interact_Active::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	HideInteractionWidget();
+	HideInteractionDurationWidget();
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UD1GameplayAbility_Interact_Active::Initialize(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
-	CurrentTargetDataHandle = TargetDataHandle;
-	TargetActor = TargetDataHandle.Get(0)->GetHitResult()->GetActor();
+	AActor* TargetActor = TargetDataHandle.Get(0)->GetHitResult()->GetActor();
 	
 	if (ID1Interactable* Interactable = Cast<ID1Interactable>(TargetActor))
 	{
-		HoldTime = Interactable->GetInteractionInfo().HoldTime;
+		CurrentTargetDataHandle = TargetDataHandle;
+		CachedTargetActor = TargetActor;
+		CachedHoldTime = Interactable->GetInteractionInfo().HoldTime;
+	}
+	else
+	{
+		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
 	}
 }
 
 void UD1GameplayAbility_Interact_Active::Interact()
 {
-	ID1Interactable::Execute_Interact(TargetActor.Get(), GetAvatarActorFromActorInfo());
+	ID1Interactable::Execute_Interact(CachedTargetActor.Get(), GetAvatarActorFromActorInfo());
 }
 
-void UD1GameplayAbility_Interact_Active::ShowInteractionProgressWidget()
+void UD1GameplayAbility_Interact_Active::ShowInteractionDurationWidget()
 {
-	if (AD1PlayerController* PC = GetPlayerController())
+	if (AD1HUD* HUD = GetHUD())
 	{
-		if (AD1HUD* HUD = Cast<AD1HUD>(PC->GetHUD()))
+		if (UD1InteractionWidget* InteractionWidget = HUD->GetInteractionWidget())
 		{
-			HUD->ShowInteractionHasDurationWidget(HoldTime);
+			InteractionWidget->ShowInteractionDurationWidget(CachedHoldTime);
 		}
 	}
 }
 
-void UD1GameplayAbility_Interact_Active::HideInteractionWidget()
+void UD1GameplayAbility_Interact_Active::HideInteractionDurationWidget()
 {
-	if (AD1PlayerController* PC = GetPlayerController())
+	if (AD1HUD* HUD = GetHUD())
 	{
-		if (AD1HUD* HUD = Cast<AD1HUD>(PC->GetHUD()))
+		if (UD1InteractionWidget* InteractionWidget = HUD->GetInteractionWidget())
 		{
-			HUD->HideInteractionWidget();
+			InteractionWidget->HideInteractionWidget();
 		}
 	}
 }

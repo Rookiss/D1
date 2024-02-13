@@ -42,7 +42,7 @@ bool UD1MonsterSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Dat
 	{
 		if (Data.EvaluatedData.Magnitude > 0.f)
 		{
-			if (Data.Target.HasMatchingGameplayTag(D1GameplayTags::ASC_DamageImmunity))
+			if (Data.Target.HasMatchingGameplayTag(D1GameplayTags::State_DamageImmunity))
 			{
 				Data.EvaluatedData.Magnitude = 0.f;
 				return false;

@@ -192,7 +192,7 @@ void UD1AbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inpu
 
 void UD1AbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGamePaused)
 {
-	if (HasMatchingGameplayTag(D1GameplayTags::ASC_InputBlocked))
+	if (HasMatchingGameplayTag(D1GameplayTags::State_InputBlocked))
 	{
 		ClearAbilityInput();
 		return;

@@ -77,7 +77,7 @@ void AD1PlayerController::SetInputModeUIOnly(bool bShowCursor)
 {
 	if (AD1HUD* D1HUD = Cast<AD1HUD>(GetHUD()))
 	{
-		if (UD1SceneWidget* SceneWidget = D1HUD->SceneWidget)
+		if (UD1SceneWidget* SceneWidget = D1HUD->GetSceneWidget())
 		{
 			FInputModeUIOnly InputMode;
 			InputMode.SetWidgetToFocus(SceneWidget->TakeWidget());

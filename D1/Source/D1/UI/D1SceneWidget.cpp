@@ -109,21 +109,6 @@ void UD1SceneWidget::HideItemHoverWidget()
 	ItemHoverWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void UD1SceneWidget::ShowInteractionPressWidget(const FText& InteractionTitle, const FText& InteractionContent)
-{
-	InteractionWidget->ShowInteractionPressWidget(InteractionTitle, InteractionContent);
-}
-
-void UD1SceneWidget::ShowInteractionHasDurationWidget(float HoldTime)
-{
-	InteractionWidget->ShowInteractionHasDurationWidget(HoldTime);
-}
-
-void UD1SceneWidget::HideInteractionWidget()
-{
-	InteractionWidget->HideInteractionWidget();
-}
-
 bool UD1SceneWidget::IsAllMouseInteractionWidgetHidden() const
 {
 	bool bAllHidden = true;

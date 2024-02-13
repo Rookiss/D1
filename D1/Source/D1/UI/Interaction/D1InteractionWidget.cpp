@@ -17,7 +17,7 @@ void UD1InteractionWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	SetVisibility(ESlateVisibility::Collapsed);
+	HideInteractionWidget();
 	
 	CircularMaterialInstance = Image_Circular_Fill->GetDynamicMaterial();
 	CircularMaterialInstance->SetScalarParameterValue("Percent", 1.f);
@@ -28,18 +28,18 @@ void UD1InteractionWidget::NativeConstruct()
 
 void UD1InteractionWidget::ShowInteractionPressWidget(const FText& InteractionTitle, const FText& InteractionContent)
 {
-	SetVisibility(ESlateVisibility::HitTestInvisible);
+	WidgetSwitcher->SetVisibility(ESlateVisibility::Visible);
 	WidgetSwitcher->SetActiveWidgetIndex(0);
-	
+
 	Text_InteractionTitle->SetText(InteractionTitle);
 	Text_InteractionContent->SetText(InteractionContent);
 }
 
-void UD1InteractionWidget::ShowInteractionHasDurationWidget(float HoldTime)
+void UD1InteractionWidget::ShowInteractionDurationWidget(float HoldTime)
 {
-	SetVisibility(ESlateVisibility::HitTestInvisible);
+	WidgetSwitcher->SetVisibility(ESlateVisibility::Visible);
 	WidgetSwitcher->SetActiveWidgetIndex(1);
-	
+
 	LeftHoldTime = HoldTime;
 	TotalHoldTime = HoldTime;
 
@@ -59,5 +59,10 @@ void UD1InteractionWidget::ShowInteractionHasDurationWidget(float HoldTime)
 
 void UD1InteractionWidget::HideInteractionWidget()
 {
-	SetVisibility(ESlateVisibility::Collapsed);
+	WidgetSwitcher->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+bool UD1InteractionWidget::IsShowingDurationWidget() const
+{
+	return (WidgetSwitcher->GetVisibility() == ESlateVisibility::Visible && WidgetSwitcher->GetActiveWidgetIndex() == 1);
 }

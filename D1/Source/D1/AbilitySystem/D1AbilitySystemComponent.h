@@ -37,7 +37,7 @@ public:
 	
 	void ProcessAbilityInput(float DeltaTime, bool bGamePaused);
 	void ClearAbilityInput();
-
+	
 	void AddDynamicTagToSelf(const FGameplayTag& Tag);
 	void RemoveDynamicTagToSelf(const FGameplayTag& Tag);
 	

@@ -27,12 +27,9 @@ public:
 	
 	void ShowItemHoverWidget(UD1ItemInstance* ItemInstance);
 	void HideItemHoverWidget();
-	
-	void ShowInteractionPressWidget(const FText& InteractionTitle, const FText& InteractionContent);
-	void ShowInteractionHasDurationWidget(float HoldTime);
-	void HideInteractionWidget();
 
 public:
+	UD1InteractionWidget* GetInteractionWidget() const { return InteractionWidget; }
 	bool IsAllMouseInteractionWidgetHidden() const;
 	
 protected:

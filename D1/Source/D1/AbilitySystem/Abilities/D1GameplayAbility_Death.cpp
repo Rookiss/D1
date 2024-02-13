@@ -18,7 +18,6 @@ void UD1GameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle 
 {
 	UD1AbilitySystemComponent* D1ASC = CastChecked<UD1AbilitySystemComponent>(ActorInfo->AbilitySystemComponent.Get());
 	D1ASC->CancelAllAbilities();
-	D1ASC->AddDynamicTagToSelf(D1GameplayTags::ASC_InputBlocked);
 	
 	SetCanBeCanceled(false);
 	StartDeath();

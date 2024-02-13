@@ -37,4 +37,5 @@ public:
 
 public:
 	FVector2D DeltaWidgetPos = FVector2D::ZeroVector;
+	int32 ItemID = 0;
 };

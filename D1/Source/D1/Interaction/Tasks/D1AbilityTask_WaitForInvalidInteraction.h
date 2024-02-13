@@ -29,7 +29,7 @@ public:
 	FOnInvalidInteraction InvalidInteraction;
 
 private:
-	FHitResult HitResult;
+	FHitResult CachedHitResult;
 	float AcceptanceAngle = 80.f;
 	float AcceptanceDistance = 300.f;
 	

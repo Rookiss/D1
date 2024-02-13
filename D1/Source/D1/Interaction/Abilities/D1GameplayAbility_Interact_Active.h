@@ -23,18 +23,18 @@ protected:
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	void ShowInteractionProgressWidget();
+	void ShowInteractionDurationWidget();
 
 	UFUNCTION(BlueprintCallable)
-	void HideInteractionWidget();
-
+	void HideInteractionDurationWidget();
+	
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayAbilityTargetDataHandle CurrentTargetDataHandle;
 	
 	UPROPERTY(BlueprintReadOnly)
-	TWeakObjectPtr<AActor> TargetActor;
+	TWeakObjectPtr<AActor> CachedTargetActor;
 
 	UPROPERTY(BlueprintReadOnly)
-	float HoldTime = 0.f;
+	float CachedHoldTime = 0.f;
 };

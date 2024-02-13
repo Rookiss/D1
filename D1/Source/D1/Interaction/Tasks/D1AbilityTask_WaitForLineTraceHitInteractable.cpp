@@ -46,25 +46,22 @@ void UD1AbilityTask_WaitForLineTraceHitInteractable::PerformTrace()
 	if (AvatarActor == nullptr)
 		return;
 
+	APlayerController* AvatarController = Ability->GetCurrentActorInfo()->PlayerController.Get();
+	if (AvatarController == nullptr)
+		return;
+
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(AvatarActor);
 
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(UD1AbilityTask_WaitForInteractable)/*Used for Profiling*/, false);
 	Params.AddIgnoredActors(ActorsToIgnore);
-
-	FVector TraceStart;
-	FVector TraceEnd;
-	
-	APlayerController* PC = Ability->GetCurrentActorInfo()->PlayerController.Get();
-	if (PC == nullptr)
-		return;
 	
 	FVector CameraStart;
 	FRotator CameraRotation;
-	PC->GetPlayerViewPoint(CameraStart, CameraRotation);
-		
-	TraceStart = CameraStart;
-	TraceEnd = CameraStart + (CameraRotation.Vector() * InteractionScanRange);
+	AvatarController->GetPlayerViewPoint(CameraStart, CameraRotation);
+	
+	FVector TraceStart = CameraStart;
+	FVector TraceEnd = CameraStart + (CameraRotation.Vector() * InteractionScanRange);
 	
 	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, D1_TraceChannel_Interaction, Params);

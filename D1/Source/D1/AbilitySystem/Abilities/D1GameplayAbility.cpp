@@ -3,6 +3,7 @@
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Character/D1Character.h"
 #include "Player/D1PlayerController.h"
+#include "UI/D1HUD.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility)
 
@@ -58,6 +59,21 @@ AD1Character* UD1GameplayAbility::GetCharacter() const
 AD1PlayerController* UD1GameplayAbility::GetPlayerController() const
 {
 	return (CurrentActorInfo ? Cast<AD1PlayerController>(CurrentActorInfo->PlayerController.Get()) : nullptr);
+}
+
+AD1HUD* UD1GameplayAbility::GetHUD() const
+{
+	AD1HUD* HUD = nullptr;
+	
+	if (CurrentActorInfo)
+	{
+		if (AD1PlayerController* PC = GetPlayerController())
+		{
+			HUD = Cast<AD1HUD>(PC->GetHUD());
+		}
+	}
+
+	return HUD;
 }
 
 bool UD1GameplayAbility::IsInputPressed() const

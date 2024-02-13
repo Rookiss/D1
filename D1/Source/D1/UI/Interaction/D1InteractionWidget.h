@@ -20,13 +20,16 @@ protected:
 
 public:
 	void ShowInteractionPressWidget(const FText& InteractionTitle, const FText& InteractionContent);
-	void ShowInteractionHasDurationWidget(float HoldTime);
+	void ShowInteractionDurationWidget(float HoldTime);
 	void HideInteractionWidget();
+
+public:
+	bool IsShowingDurationWidget() const;
 	
 protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UWidgetSwitcher> WidgetSwitcher;
-
+	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_InteractionTitle;
 
