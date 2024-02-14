@@ -1,28 +1,8 @@
 ﻿#pragma once
 
+#include "D1Define.h"
 #include "D1ItemFragment_Equippable.h"
 #include "D1ItemFragment_Equippable_Weapon.generated.h"
-
-UENUM()
-enum class EWeaponType
-{
-	Sword,
-	Dagger,
-	MagicStuff,
-	Shield,
-
-	Count	UMETA(Hidden)
-};
-
-UENUM()
-enum class EWeaponHandType
-{
-	LeftHand,
-	RightHand,
-	TwoHand,
-
-	Count	UMETA(Hidden)
-};
 
 USTRUCT()
 struct FD1WeaponAttachInfo

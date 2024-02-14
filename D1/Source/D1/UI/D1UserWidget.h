@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "GameplayTags.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/D1AttributeSet.h"
 #include "Blueprint/UserWidget.h"

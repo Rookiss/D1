@@ -4,9 +4,9 @@
 #include "D1SceneWidget.generated.h"
 
 class UD1ItemInstance;
+class UD1InteractionWidget;
 class UD1PlayerInventoryWidget;
 class UD1ItemHoverWidget;
-class UD1InteractionWidget;
 
 UCLASS()
 class UD1SceneWidget : public UD1UserWidget

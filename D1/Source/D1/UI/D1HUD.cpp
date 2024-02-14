@@ -54,3 +54,8 @@ void AD1HUD::HideItemHoverWidget()
 		SceneWidget->HideItemHoverWidget();
 	}
 }
+
+UD1InteractionWidget* AD1HUD::GetInteractionWidget() const
+{
+	return SceneWidget ? SceneWidget->GetInteractionWidget() : nullptr;
+}

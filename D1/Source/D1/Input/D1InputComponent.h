@@ -1,11 +1,9 @@
 ﻿#pragma once
 
-#include "EnhancedInputComponent.h"
 #include "GameplayTagContainer.h"
 #include "Data/D1InputData.h"
+#include "EnhancedInputComponent.h"
 #include "D1InputComponent.generated.h"
-
-struct FGameplayTag;
 
 UCLASS()
 class UD1InputComponent : public UEnhancedInputComponent

@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "D1Define.h"
 #include "Data/D1ItemData.h"
 #include "System/D1AssetManager.h"
 #include "System/D1GameplayTagStack.h"

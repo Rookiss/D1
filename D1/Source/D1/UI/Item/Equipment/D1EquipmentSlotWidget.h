@@ -1,11 +1,10 @@
 ﻿#pragma once
 
-#include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "D1Define.h"
 #include "UI/Item/Inventory/D1InventorySlotWidget.h"
 #include "D1EquipmentSlotWidget.generated.h"
 
-class UD1EquipmentSlotsWidget;
-class USizeBox;
+class UD1ItemInstance;
 class UOverlay;
 class UD1EquipmentManagerComponent;
 class UD1EquipmentEntryWidget;

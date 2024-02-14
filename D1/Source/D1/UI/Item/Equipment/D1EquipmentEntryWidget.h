@@ -1,12 +1,11 @@
 ﻿#pragma once
 
-#include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "D1Define.h"
 #include "UI/D1UserWidget.h"
 #include "D1EquipmentEntryWidget.generated.h"
 
 class UImage;
 class USizeBox;
-class UTextBlock;
 class UD1ItemInstance;
 class UD1ItemDragWidget;
 class UD1EquipmentManagerComponent;

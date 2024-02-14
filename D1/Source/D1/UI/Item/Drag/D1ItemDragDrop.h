@@ -1,13 +1,13 @@
 ﻿#pragma once
 
+#include "D1Define.h"
 #include "Blueprint/DragDropOperation.h"
-#include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "D1ItemDragDrop.generated.h"
 
+class UD1InventoryEntryWidget;
+class UD1InventoryManagerComponent;
 class UD1EquipmentEntryWidget;
 class UD1EquipmentManagerComponent;
-class UD1InventoryManagerComponent;
-class UD1InventoryEntryWidget;
 
 UCLASS()
 class UD1ItemDragDrop : public UDragDropOperation

@@ -3,8 +3,6 @@
 #include "Abilities/Tasks/AbilityTask.h"
 #include "D1AbilityTask_WaitForLineTraceHitInteractable.generated.h"
 
-class ID1Interactable;
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractableFocusChanged, const FGameplayAbilityTargetDataHandle&, TargetDataHandle);
 
 UCLASS()

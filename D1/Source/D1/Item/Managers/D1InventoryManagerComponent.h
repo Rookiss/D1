@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include "D1EquipmentManagerComponent.h"
+#include "D1Define.h"
 #include "Net/Serialization/FastArraySerializer.h"
 #include "D1InventoryManagerComponent.generated.h"
 
+class UD1ItemInstance;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
-class UD1ItemInstance;
 
 DECLARE_MULTICAST_DELEGATE_FiveParams(FOnInventoryEntryChanged, const FIntPoint&/*ItemSlotPos*/, UD1ItemInstance*/*ItemInstance*/, int32/*ItemID*/, int32/*OldItemCount*/, int32/*NewItemCount*/);
 

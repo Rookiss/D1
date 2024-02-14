@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include "D1SceneWidget.h"
 #include "GameFramework/HUD.h"
 #include "D1HUD.generated.h"
 
-class UD1InteractionWidget;
+class UD1ItemInstance;
 class UD1SceneWidget;
+class UD1InteractionWidget;
 
 UCLASS()
 class AD1HUD : public AHUD
@@ -26,7 +26,7 @@ public:
 	
 public:
 	UD1SceneWidget* GetSceneWidget() const { return SceneWidget; }
-	UD1InteractionWidget* GetInteractionWidget() const { return SceneWidget ? SceneWidget->GetInteractionWidget() : nullptr; }
+	UD1InteractionWidget* GetInteractionWidget() const;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

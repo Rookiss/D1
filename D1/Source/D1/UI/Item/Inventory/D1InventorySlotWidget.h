@@ -1,18 +1,11 @@
 ﻿#pragma once
 
+#include "D1Define.h"
 #include "UI/D1UserWidget.h"
 #include "D1InventorySlotWidget.generated.h"
 
 class USizeBox;
 class UImage;
-
-UENUM()
-enum class ESlotState : uint8
-{
-	Default,
-	InValid,
-	Valid
-};
 
 UCLASS()
 class UD1InventorySlotWidget : public UD1UserWidget

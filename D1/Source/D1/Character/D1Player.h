@@ -1,9 +1,9 @@
 ﻿#pragma once
 
+#include "D1Define.h"
 #include "D1Character.h"
 #include "D1Player.generated.h"
 
-enum class EArmorType;
 class UCameraComponent;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;

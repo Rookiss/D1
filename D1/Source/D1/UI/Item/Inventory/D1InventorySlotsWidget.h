@@ -3,11 +3,11 @@
 #include "UI/D1UserWidget.h"
 #include "D1InventorySlotsWidget.generated.h"
 
-class UCanvasPanel;
-class UUniformGridPanel;
-class UD1InventorySlotWidget;
 class UD1InventoryEntryWidget;
+class UD1InventorySlotWidget;
 class UD1InventoryManagerComponent;
+class UUniformGridPanel;
+class UCanvasPanel;
 
 UCLASS()
 class UD1InventorySlotsWidget : public UD1UserWidget

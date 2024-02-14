@@ -1,5 +1,6 @@
 ﻿#include "D1InventoryManagerComponent.h"
 
+#include "D1EquipmentManagerComponent.h"
 #include "Data/D1ItemData.h"
 #include "Engine/ActorChannel.h"
 #include "Item/D1ItemInstance.h"

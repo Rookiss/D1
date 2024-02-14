@@ -3,6 +3,7 @@
 #include "Components/HorizontalBox.h"
 #include "Components/TextBlock.h"
 #include "Data/D1ItemData.h"
+#include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Consumable.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"

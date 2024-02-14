@@ -4,6 +4,7 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Overlay.h"
 #include "Components/SizeBox.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "System/D1AssetManager.h"
 #include "UI/Item/Drag/D1ItemDragDrop.h"

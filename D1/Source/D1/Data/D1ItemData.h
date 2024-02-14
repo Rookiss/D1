@@ -1,22 +1,8 @@
 ﻿#pragma once
 
+#include "D1Define.h"
 #include "Item/Fragments/D1ItemFragment.h"
 #include "D1ItemData.generated.h"
-
-UENUM()
-enum class EItemRarity : uint8
-{
-	Junk,
-	Poor,
-	Common,
-	Uncommon,
-	Rare,
-	Epic,
-	Legendary,
-	Unique,
-
-	Count	UMETA(Hidden)
-};
 
 USTRUCT()
 struct FD1ItemRarityProbability

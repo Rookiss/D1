@@ -1,5 +1,6 @@
 ﻿#include "D1PlayerInventoryWidget.h"
 
+#include "D1Define.h"
 #include "Components/TextBlock.h"
 #include "Equipment/D1EquipmentSlotsWidget.h"
 #include "Inventory/D1InventorySlotsWidget.h"
@@ -28,7 +29,7 @@ void UD1PlayerInventoryWidget::Init(UD1EquipmentManagerComponent* EquipmentManag
 
 void UD1PlayerInventoryWidget::OnInventoryEntryChanged_Implementation(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemID, int32 OldItemCount, int32 NewItemCount)
 {
-	if (ItemID == 9999)
+	if (ItemID == ITEM_ID_COIN)
 	{
 		CachedGoldCount += (NewItemCount - OldItemCount);
 	}

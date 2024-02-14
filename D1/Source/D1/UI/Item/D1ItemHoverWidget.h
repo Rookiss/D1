@@ -3,10 +3,9 @@
 #include "UI/D1UserWidget.h"
 #include "D1ItemHoverWidget.generated.h"
 
-class UHorizontalBox;
-class UWidgetSwitcher;
 class UD1ItemInstance;
 class UTextBlock;
+class UHorizontalBox;
 
 UCLASS()
 class UD1ItemHoverWidget : public UD1UserWidget

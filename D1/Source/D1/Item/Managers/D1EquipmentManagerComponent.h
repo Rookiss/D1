@@ -1,34 +1,14 @@
 ﻿#pragma once
 
+#include "D1Define.h"
 #include "Data/D1AbilitySystemData.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Net/Serialization/FastArraySerializer.h"
 #include "D1EquipmentManagerComponent.generated.h"
 
 class UD1ItemInstance;
 class UD1AbilitySystemComponent;
 class UD1EquipmentManagerComponent;
-
-UENUM()
-enum EEquipmentSlotType
-{
-	Weapon_Primary_LeftHand,
-	Weapon_Primary_RightHand,
-	Weapon_Primary_TwoHand,
-	
-	Weapon_Secondary_LeftHand,
-	Weapon_Secondary_RightHand,
-	Weapon_Secondary_TwoHand,
-	
-	Helmet,
-	Chest,
-	Legs,
-	Hands,
-	Foot,
-	
-	EquipmentSlotCount	UMETA(Hidden)
-};
+class UD1InventoryManagerComponent;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEquipmentEntryChanged, EEquipmentSlotType, UD1ItemInstance*)
 

@@ -7,11 +7,11 @@
 #include "Character/D1Player.h"
 #include "Engine/ActorChannel.h"
 #include "GameFramework/Character.h"
-#include "Item/Fragments/D1ItemFragment_Consumable.h"
-#include "Item/Fragments/D1ItemFragment_Equippable.h"
+#include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Net/UnrealNetwork.h"
+#include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentManagerComponent)
 

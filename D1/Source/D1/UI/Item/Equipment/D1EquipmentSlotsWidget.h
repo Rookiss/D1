@@ -1,11 +1,10 @@
 ﻿#pragma once
 
-#include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "D1Define.h"
 #include "UI/D1UserWidget.h"
 #include "D1EquipmentSlotsWidget.generated.h"
 
 class UD1EquipmentSlotWidget;
-class UD1EquipmentSEntryWidget;
 class UD1EquipmentManagerComponent;
 
 UCLASS()

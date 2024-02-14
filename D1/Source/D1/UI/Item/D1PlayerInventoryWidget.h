@@ -3,11 +3,11 @@
 #include "UI/D1UserWidget.h"
 #include "D1PlayerInventoryWidget.generated.h"
 
-class UTextBlock;
-class UD1InventoryManagerComponent;
 class UD1EquipmentManagerComponent;
-class UD1InventorySlotsWidget;
+class UD1InventoryManagerComponent;
 class UD1EquipmentSlotsWidget;
+class UD1InventorySlotsWidget;
+class UTextBlock;
 
 UCLASS()
 class UD1PlayerInventoryWidget : public UD1UserWidget

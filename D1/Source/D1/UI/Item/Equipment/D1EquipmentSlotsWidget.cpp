@@ -1,6 +1,7 @@
 ﻿#include "D1EquipmentSlotsWidget.h"
 
 #include "D1EquipmentSlotWidget.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "UI/Item/Inventory/D1InventoryEntryWidget.h"
 #include "UI/Item/Drag/D1ItemDragDrop.h"
 

@@ -5,7 +5,6 @@
 #include "Engine/AssetManager.h"
 #include "D1AssetManager.generated.h"
 
-class UD1GameData;
 class UD1ItemData;
 
 DECLARE_DELEGATE_OneParam(FAsyncLoadUpdateDelegate, float/*Progress*/);

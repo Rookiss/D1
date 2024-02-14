@@ -1,16 +1,15 @@
 ﻿#include "D1ItemData.h"
 
 #include "Item/Fragments/D1ItemFragment_Consumable.h"
-#include "Item/Fragments/D1ItemFragment_Equippable.h"
 #include "Item/Fragments/D1ItemFragment_Stackable.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "UObject/ObjectSaveContext.h"
 
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
 #endif
 
-#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemData)
 

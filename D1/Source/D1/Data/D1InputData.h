@@ -3,8 +3,8 @@
 #include "GameplayTagContainer.h"
 #include "D1InputData.generated.h"
 
-class UInputMappingContext;
 class UInputAction;
+class UInputMappingContext;
 
 USTRUCT()
 struct FD1InputAction

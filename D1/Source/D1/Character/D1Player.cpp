@@ -3,6 +3,7 @@
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Data/D1ItemData.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"

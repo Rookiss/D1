@@ -1,20 +1,12 @@
 ﻿#pragma once
 
+#include "D1Define.h"
+#include "GameplayTags.h"
 #include "D1ItemFragment.h"
-#include "Item/D1ItemInstance.h"
 #include "D1ItemFragment_Equippable.generated.h"
 
+class UD1ItemInstance;
 class UD1AbilitySystemData;
-class UD1EquipmentInstance;
-
-UENUM()
-enum class EEquipmentType
-{
-	Weapon,
-	Armor,
-	
-	Count	UMETA(Hidden)
-};
 
 USTRUCT()
 struct FStatRange

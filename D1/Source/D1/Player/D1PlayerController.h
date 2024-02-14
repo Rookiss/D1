@@ -2,7 +2,6 @@
 
 #include "D1PlayerController.generated.h"
 
-class UD1UserWidget;
 struct FInputActionValue;
 struct FGameplayTag;
 

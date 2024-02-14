@@ -13,6 +13,8 @@ UD1GameplayAbility_Interact_Active::UD1GameplayAbility_Interact_Active(const FOb
 	ActivationPolicy = ED1AbilityActivationPolicy::Manual;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
+	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ServerOnlyTermination;
+	bServerRespectsRemoteAbilityCancellation = false;
 }
 
 void UD1GameplayAbility_Interact_Active::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)

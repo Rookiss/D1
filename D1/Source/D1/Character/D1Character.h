@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "AbilitySystemInterface.h"
 #include "Data/D1AbilitySystemData.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "D1Character.generated.h"
 
