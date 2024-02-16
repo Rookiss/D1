@@ -1,7 +1,6 @@
 ﻿#include "D1InventoryEntryWidget.h"
 
 #include "D1InventorySlotsWidget.h"
-#include "D1InventorySlotWidget.h"
 #include "Components/Image.h"
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
@@ -78,10 +77,9 @@ FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 {
 	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 	
-	const FVector2D& UnitSlotSize = UD1InventorySlotWidget::UnitSlotSize;
 	FVector2D MouseWidgetPos = SlotsWidget->GetCachedGeometry().AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-	FVector2D ItemWidgetPos = SlotsWidget->GetCachedGeometry().AbsoluteToLocal(InGeometry.LocalToAbsolute(UnitSlotSize / 2.f));
-	FIntPoint ItemSlotPos = FIntPoint(ItemWidgetPos.X / UnitSlotSize.X, ItemWidgetPos.Y / UnitSlotSize.Y);
+	FVector2D ItemWidgetPos = SlotsWidget->GetCachedGeometry().AbsoluteToLocal(InGeometry.LocalToAbsolute(UnitInventorySlotSize / 2.f));
+	FIntPoint ItemSlotPos = FIntPoint(ItemWidgetPos.X / UnitInventorySlotSize.X, ItemWidgetPos.Y / UnitInventorySlotSize.Y);
 	
 	CachedFromSlotPos = ItemSlotPos;
 	CachedDeltaWidgetPos = MouseWidgetPos - ItemWidgetPos;
@@ -103,8 +101,7 @@ void UD1InventoryEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
 	
 	UD1ItemDragWidget* DragWidget = CreateWidget<UD1ItemDragWidget>(GetOwningPlayer(), DragWidgetClass);
-	const FVector2D& UnitSlotSize = UD1InventorySlotWidget::UnitSlotSize;
-	FVector2D EntityWidgetSize = FVector2D(ItemDef.ItemSlotCount.X * UnitSlotSize.X, ItemDef.ItemSlotCount.Y * UnitSlotSize.Y);
+	FVector2D EntityWidgetSize = FVector2D(ItemDef.ItemSlotCount.X * UnitInventorySlotSize.X, ItemDef.ItemSlotCount.Y * UnitInventorySlotSize.Y);
 	DragWidget->Init(EntityWidgetSize, ItemDef.IconTexture, ItemCount);
 	
 	UD1ItemDragDrop* DragDrop = NewObject<UD1ItemDragDrop>();

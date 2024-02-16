@@ -340,13 +340,13 @@ bool UD1EquipmentManagerComponent::CanEquipItem(UD1ItemInstance* FromItemInstanc
 		{
 			if (WeaponHandType == EWeaponHandType::LeftHand || WeaponHandType == EWeaponHandType::RightHand)
 			{
-				const FD1EquipmentEntry& TwoHandEntry = Entries[Weapon_Primary_TwoHand];
+				const FD1EquipmentEntry& TwoHandEntry = Entries[Primary_TwoHand];
 				return (TwoHandEntry.ItemInstance == nullptr);
 			}
 			else if (WeaponHandType == EWeaponHandType::TwoHand)
 			{
-				const FD1EquipmentEntry& LeftHandEntry = Entries[Weapon_Primary_LeftHand];
-				const FD1EquipmentEntry& RightHandEntry = Entries[Weapon_Primary_RightHand];
+				const FD1EquipmentEntry& LeftHandEntry = Entries[Primary_LeftHand];
+				const FD1EquipmentEntry& RightHandEntry = Entries[Primary_RightHand];
 				return (LeftHandEntry.ItemInstance == nullptr && RightHandEntry.ItemInstance == nullptr);
 			}
 		}
@@ -354,13 +354,13 @@ bool UD1EquipmentManagerComponent::CanEquipItem(UD1ItemInstance* FromItemInstanc
 		{
 			if (WeaponHandType == EWeaponHandType::LeftHand || WeaponHandType == EWeaponHandType::RightHand)
 			{
-				const FD1EquipmentEntry& TwoHandEntry = Entries[Weapon_Secondary_TwoHand];
+				const FD1EquipmentEntry& TwoHandEntry = Entries[Secondary_TwoHand];
 				return (TwoHandEntry.ItemInstance == nullptr);
 			}
 			else if (WeaponHandType == EWeaponHandType::TwoHand)
 			{
-				const FD1EquipmentEntry& LeftHandEntry = Entries[Weapon_Secondary_LeftHand];
-				const FD1EquipmentEntry& RightHandEntry = Entries[Weapon_Secondary_RightHand];
+				const FD1EquipmentEntry& LeftHandEntry = Entries[Secondary_LeftHand];
+				const FD1EquipmentEntry& RightHandEntry = Entries[Secondary_RightHand];
 				return (LeftHandEntry.ItemInstance == nullptr && RightHandEntry.ItemInstance == nullptr);
 			}
 		}
@@ -375,9 +375,9 @@ bool UD1EquipmentManagerComponent::CanEquipItem(UD1ItemInstance* FromItemInstanc
 
 bool UD1EquipmentManagerComponent::IsSameWeaponHandType(EEquipmentSlotType EquipmentSlotType, EWeaponHandType WeaponHandType) const
 {
-	return ((EquipmentSlotType == EEquipmentSlotType::Weapon_Primary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Weapon_Secondary_LeftHand)  && WeaponHandType == EWeaponHandType::LeftHand  ||
-			(EquipmentSlotType == EEquipmentSlotType::Weapon_Primary_RightHand || EquipmentSlotType == EEquipmentSlotType::Weapon_Secondary_RightHand) && WeaponHandType == EWeaponHandType::RightHand ||
-			(EquipmentSlotType == EEquipmentSlotType::Weapon_Primary_TwoHand   || EquipmentSlotType == EEquipmentSlotType::Weapon_Secondary_TwoHand)   && WeaponHandType == EWeaponHandType::TwoHand);
+	return ((EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand)  && WeaponHandType == EWeaponHandType::LeftHand  ||
+			(EquipmentSlotType == EEquipmentSlotType::Primary_RightHand || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand) && WeaponHandType == EWeaponHandType::RightHand ||
+			(EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand   || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand)   && WeaponHandType == EWeaponHandType::TwoHand);
 }
 
 bool UD1EquipmentManagerComponent::IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType) const
@@ -389,12 +389,12 @@ bool UD1EquipmentManagerComponent::IsSameArmorType(EEquipmentSlotType EquipmentS
 
 bool UD1EquipmentManagerComponent::IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const
 {
-	return (EquipmentSlotType == EEquipmentSlotType::Weapon_Primary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Weapon_Primary_RightHand || EquipmentSlotType == EEquipmentSlotType::Weapon_Primary_TwoHand);
+	return (EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Primary_RightHand || EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand);
 }
 
 bool UD1EquipmentManagerComponent::IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const
 {
-	return (EquipmentSlotType == EEquipmentSlotType::Weapon_Secondary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Weapon_Secondary_RightHand || EquipmentSlotType == EEquipmentSlotType::Weapon_Secondary_TwoHand);
+	return (EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand);
 }
 
 const TArray<FD1EquipmentEntry>& UD1EquipmentManagerComponent::GetAllEntries() const

@@ -1,16 +1,17 @@
 ﻿#pragma once
 
 #include "D1Define.h"
-#include "UI/D1UserWidget.h"
+#include "UI/Item/D1ItemSlotWidget.h"
 #include "D1EquipmentSlotWeaponWidget.generated.h"
 
+class UD1ItemInstance;
+class UImage;
+class UOverlay;
 class UD1EquipmentEntryWidget;
 class UD1EquipmentManagerComponent;
-class UOverlay;
-class UImage;
 
 UCLASS()
-class UD1EquipmentSlotWeaponWidget : public UD1UserWidget
+class UD1EquipmentSlotWeaponWidget : public UD1ItemSlotWidget
 {
 	GENERATED_BODY()
 	
@@ -23,7 +24,14 @@ public:
 protected:
 	virtual void NativeConstruct() override;
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
+private:
+	void FinishDrag();
+	void OnEquipmentEntryChanged(EWeaponHandType InWeaponHandType, UD1ItemInstance* NewItemInstance);
+	EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const;
+	
 private:
 	UPROPERTY()
 	TSubclassOf<UD1EquipmentEntryWidget> EntryWidgetClass;

@@ -1,7 +1,7 @@
 ﻿#include "D1EquipmentEntryWidget.h"
 
 #include "D1EquipmentSlotsWidget.h"
-#include "D1EquipmentSlotWidget.h"
+#include "Character/D1Player.h"
 #include "Components/Image.h"
 #include "Components/SizeBox.h"
 #include "Data/D1ItemData.h"
@@ -13,37 +13,37 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentEntryWidget)
 
+class AD1Player;
+
 UD1EquipmentEntryWidget::UD1EquipmentEntryWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1EquipmentEntryWidget::Init(UD1EquipmentManagerComponent* InEquipmentManagerComponent, const FVector2D& WidgetSize, UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType)
+void UD1EquipmentEntryWidget::Init(UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType)
 {
-	EquipmentManagerComponent = InEquipmentManagerComponent;
 	ItemInstance = InItemInstance;
-	
-	SizeBox_Root->SetWidthOverride(WidgetSize.X);
-	SizeBox_Root->SetHeightOverride(WidgetSize.Y);
+	EquipmentSlotType = InEquipmentSlotType;
 
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
 	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
 	Image_Icon->SetBrushFromTexture(ItemDef.IconTexture);
-
-	ItemInstance = InItemInstance;
-	EquipmentSlotType = InEquipmentSlotType;
-	
-	EntryWidgetOffset = (WidgetSize - ItemDef.ItemSlotCount * UD1InventorySlotWidget::UnitSlotSize) / 2.f / WidgetSize;
 }
 
 void UD1EquipmentEntryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	DragWidgetClass = UD1AssetManager::GetSubclassByName<UD1ItemDragWidget>("DragWidget");
+	AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(Player);
 
+	EquipmentManagerComponent = Player->EquipmentManagerComponent;
+	check(EquipmentManagerComponent);
+	
 	Image_Hover->SetRenderOpacity(0.f);
+
+	DragWidgetClass = UD1AssetManager::GetSubclassByName<UD1ItemDragWidget>("DragWidget");
 }
 
 void UD1EquipmentEntryWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -73,14 +73,12 @@ void UD1EquipmentEntryWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEve
 FReply UD1EquipmentEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-
-	CachedDeltaWidgetPos = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
 	
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
-	{
-		Reply.DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
-	}
-	return Reply;
+   	{
+   		Reply.DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
+   	}
+   	return Reply;
 }
 
 void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
@@ -93,8 +91,8 @@ void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
 	
 	UD1ItemDragWidget* DragWidget = CreateWidget<UD1ItemDragWidget>(GetOwningPlayer(), DragWidgetClass);
-	FVector2D EntityWidgetSize = FVector2D(ItemDef.ItemSlotCount * UD1InventorySlotWidget::UnitSlotSize);
-	DragWidget->Init(EntityWidgetSize, ItemDef.IconTexture, 0);
+	FVector2D EntityWidgetSize = FVector2D(ItemDef.ItemSlotCount * UnitInventorySlotSize);
+	DragWidget->Init(EntityWidgetSize, ItemDef.IconTexture, 1);
 	
 	UD1ItemDragDrop* DragDrop = NewObject<UD1ItemDragDrop>();
 	DragDrop->DefaultDragVisual = DragWidget;
@@ -102,7 +100,7 @@ void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	DragDrop->EquipmentEntryWidget = this;
 	DragDrop->FromEquipmentManager = EquipmentManagerComponent;
 	DragDrop->FromEquipmentSlotType = EquipmentSlotType;
-	DragDrop->DeltaWidgetPos = (EntityWidgetSize / 2.f) - (UD1InventorySlotWidget::UnitSlotSize / 2.f);
+	DragDrop->DeltaWidgetPos = (EntityWidgetSize / 2.f) - (UnitInventorySlotSize / 2.f);
 	OutOperation = DragDrop;
 }
 
@@ -110,12 +108,12 @@ void UD1EquipmentEntryWidget::NativeOnDragCancelled(const FDragDropEvent& InDrag
 {
 	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
 
-	if (UD1ItemDragDrop* DragDrop = Cast<UD1ItemDragDrop>(InOperation))
+	UD1ItemDragDrop* DragDrop = Cast<UD1ItemDragDrop>(InOperation);
+	check(DragDrop);
+	
+	if (UD1EquipmentEntryWidget* EntryWidget = DragDrop->EquipmentEntryWidget)
 	{
-		if (UD1EquipmentEntryWidget* EntryWidget = DragDrop->EquipmentEntryWidget)
-		{
-			EntryWidget->RefreshWidgetOpacity(true);
-		}
+		EntryWidget->RefreshWidgetOpacity(true);
 	}
 }
 

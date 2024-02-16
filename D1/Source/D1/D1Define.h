@@ -2,6 +2,8 @@
 
 #define ITEM_ID_COIN 9999
 
+static inline FIntPoint UnitInventorySlotSize = FIntPoint(50.f, 50.f);
+
 UENUM()
 enum class ESlotState : uint8
 {
@@ -21,13 +23,13 @@ namespace D1ItemSlotColor
 UENUM()
 enum EEquipmentSlotType
 {
-	Weapon_Primary_LeftHand,
-	Weapon_Primary_RightHand,
-	Weapon_Primary_TwoHand,
+	Primary_LeftHand,
+	Primary_RightHand,
+	Primary_TwoHand,
 	
-	Weapon_Secondary_LeftHand,
-	Weapon_Secondary_RightHand,
-	Weapon_Secondary_TwoHand,
+	Secondary_LeftHand,
+	Secondary_RightHand,
+	Secondary_TwoHand,
 	
 	Helmet,
 	Chest,

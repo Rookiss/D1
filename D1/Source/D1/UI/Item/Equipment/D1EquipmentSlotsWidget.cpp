@@ -1,6 +1,7 @@
 ﻿#include "D1EquipmentSlotsWidget.h"
 
-#include "D1EquipmentSlotWidget.h"
+#include "D1EquipmentSlotArmorWidget.h"
+#include "Character/D1Player.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "UI/Item/Inventory/D1InventoryEntryWidget.h"
 #include "UI/Item/Drag/D1ItemDragDrop.h"
@@ -13,11 +14,8 @@ UD1EquipmentSlotsWidget::UD1EquipmentSlotsWidget(const FObjectInitializer& Objec
     
 }
 
-void UD1EquipmentSlotsWidget::Init(UD1EquipmentManagerComponent* InEquipmentManagerComponent)
+void UD1EquipmentSlotsWidget::Init()
 {
-	check(InEquipmentManagerComponent);
-	EquipmentManagerComponent = InEquipmentManagerComponent;
-		
 	SlotWidgets = {
 		Equipment_WeaponPrimary_LeftHand, Equipment_WeaponPrimary_RightHand, Equipment_WeaponPrimary_TwoHand,
 		Equipment_WeaponSecondary_LeftHand, Equipment_WeaponSecondary_RightHand, Equipment_WeaponSecondary_TwoHand,
@@ -26,8 +24,8 @@ void UD1EquipmentSlotsWidget::Init(UD1EquipmentManagerComponent* InEquipmentMana
 
 	for (int32 i = 0; i < SlotWidgets.Num(); i++)
 	{
-		UD1EquipmentSlotWidget* SlotWidget = SlotWidgets[i];
-		SlotWidget->Init(EquipmentManagerComponent, static_cast<EEquipmentSlotType>(i));
+		UD1EquipmentSlotArmorWidget* SlotWidget = SlotWidgets[i];
+		SlotWidget->Init(static_cast<EEquipmentSlotType>(i));
 	}
 
 	const TArray<FD1EquipmentEntry>& Entries = EquipmentManagerComponent->GetAllEntries();
@@ -42,8 +40,19 @@ void UD1EquipmentSlotsWidget::Init(UD1EquipmentManagerComponent* InEquipmentMana
 	EquipmentManagerComponent->OnEquipmentEntryChanged.AddUObject(this, &ThisClass::OnEquipmentEntryChanged);
 }
 
-void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged_Implementation(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
+void UD1EquipmentSlotsWidget::NativeConstruct()
 {
-	UD1EquipmentSlotWidget* SlotWidget = SlotWidgets[EquipmentSlotType];
+	Super::NativeConstruct();
+
+	AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(Player);
+
+	EquipmentManagerComponent = Player->EquipmentManagerComponent;
+	check(EquipmentManagerComponent);
+}
+
+void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
+{
+	UD1EquipmentSlotArmorWidget* SlotWidget = SlotWidgets[EquipmentSlotType];
 	SlotWidget->OnEquipmentEntryChanged(ItemInstance);
 }

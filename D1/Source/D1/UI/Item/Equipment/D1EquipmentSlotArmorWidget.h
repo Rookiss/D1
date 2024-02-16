@@ -2,23 +2,24 @@
 
 #include "D1Define.h"
 #include "UI/Item/Inventory/D1InventorySlotWidget.h"
-#include "D1EquipmentSlotWidget.generated.h"
+#include "D1EquipmentSlotArmorWidget.generated.h"
 
-class UD1ItemInstance;
+class UImage;
 class UOverlay;
-class UD1EquipmentManagerComponent;
+class UD1ItemInstance;
 class UD1EquipmentEntryWidget;
+class UD1EquipmentManagerComponent;
 
 UCLASS()
-class UD1EquipmentSlotWidget : public UD1InventorySlotWidget
+class UD1EquipmentSlotArmorWidget : public UD1InventorySlotWidget
 {
 	GENERATED_BODY()
 	
 public:
-	UD1EquipmentSlotWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UD1EquipmentSlotArmorWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void Init(UD1EquipmentManagerComponent* InEquipmentManagerComponent, EEquipmentSlotType InEquipmentSlotType);
+	void Init(EEquipmentSlotType InEquipmentSlotType);
 	
 protected:
 	virtual void NativeConstruct() override;
@@ -28,9 +29,6 @@ protected:
 
 private:
 	void FinishDrag();
-
-public:
-	UFUNCTION(BlueprintNativeEvent)
 	void OnEquipmentEntryChanged(UD1ItemInstance* InItemInstance);
 	
 private:
@@ -42,9 +40,13 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
-	
+
+private:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UOverlay> Overlay_Root;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Slot;
 
 private:
 	bool bAlreadyHovered = false;

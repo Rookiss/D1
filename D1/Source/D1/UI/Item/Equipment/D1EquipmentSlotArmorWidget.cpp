@@ -1,10 +1,12 @@
-﻿#include "D1EquipmentSlotWidget.h"
+﻿#include "D1EquipmentSlotArmorWidget.h"
 
 #include "D1EquipmentSlotsWidget.h"
 #include "Character/D1Player.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Overlay.h"
 #include "Components/SizeBox.h"
+#include "Item/D1ItemInstance.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "System/D1AssetManager.h"
@@ -12,21 +14,21 @@
 #include "UI/Item/Equipment/D1EquipmentEntryWidget.h"
 #include "UI/Item/Inventory/D1InventoryEntryWidget.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentSlotWidget)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentSlotArmorWidget)
 
-UD1EquipmentSlotWidget::UD1EquipmentSlotWidget(const FObjectInitializer& ObjectInitializer)
+UD1EquipmentSlotArmorWidget::UD1EquipmentSlotArmorWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1EquipmentSlotWidget::Init(UD1EquipmentManagerComponent* InEquipmentManagerComponent, EEquipmentSlotType InEquipmentSlotType)
+void UD1EquipmentSlotArmorWidget::Init(EEquipmentSlotType InEquipmentSlotType)
 {
 	check(InEquipmentSlotType != EEquipmentSlotType::EquipmentSlotCount);
 	EquipmentSlotType = InEquipmentSlotType;
 }
 
-void UD1EquipmentSlotWidget::NativeConstruct()
+void UD1EquipmentSlotArmorWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
@@ -39,7 +41,7 @@ void UD1EquipmentSlotWidget::NativeConstruct()
 	EntryWidgetClass = UD1AssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidget");
 }
 
-bool UD1EquipmentSlotWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+bool UD1EquipmentSlotArmorWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragOver(InGeometry, InDragDropEvent, InOperation);
 	
@@ -49,30 +51,37 @@ bool UD1EquipmentSlotWidget::NativeOnDragOver(const FGeometry& InGeometry, const
 	bAlreadyHovered = true;
 	
 	UD1ItemDragDrop* DragDrop = Cast<UD1ItemDragDrop>(InOperation);
+	check(DragDrop);
+
+	UD1ItemInstance* FromItemInstance = DragDrop->ItemInstance;
+	check(FromItemInstance);
 	
 	bool bIsValid = false;
-	
-	if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
+
+	if (FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>())
 	{
-		bIsValid = EquipmentManagerComponent->CanEquipItem_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, EquipmentSlotType);
-	}
-	else if (UD1EquipmentManagerComponent* EquipmentManager = DragDrop->FromEquipmentManager)
-	{
-		bIsValid = EquipmentManagerComponent->CanEquipItem_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, EquipmentSlotType);
+		if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
+		{
+			bIsValid = EquipmentManagerComponent->CanEquipItem_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, EquipmentSlotType);
+		}
+		else if (UD1EquipmentManagerComponent* EquipmentManager = DragDrop->FromEquipmentManager)
+		{
+			bIsValid = EquipmentManagerComponent->CanEquipItem_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, EquipmentSlotType);
+		}
 	}
 	
-	ChangeHoverState(bIsValid ? ESlotState::Valid : ESlotState::InValid);
+	ChangeHoverState(Image_Slot, bIsValid ? ESlotState::Valid : ESlotState::InValid);
 	return true;
 }
 
-void UD1EquipmentSlotWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+void UD1EquipmentSlotArmorWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragLeave(InDragDropEvent, InOperation);
 
 	FinishDrag();
 }
 
-bool UD1EquipmentSlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+bool UD1EquipmentSlotArmorWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
@@ -95,13 +104,13 @@ bool UD1EquipmentSlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDr
 	return true;
 }
 
-void UD1EquipmentSlotWidget::FinishDrag()
+void UD1EquipmentSlotArmorWidget::FinishDrag()
 {
-	ChangeHoverState(ESlotState::Default);
+	ChangeHoverState(Image_Slot, ESlotState::Default);
 	bAlreadyHovered = false;
 }
 
-void UD1EquipmentSlotWidget::OnEquipmentEntryChanged_Implementation(UD1ItemInstance* InItemInstance)
+void UD1EquipmentSlotArmorWidget::OnEquipmentEntryChanged(UD1ItemInstance* InItemInstance)
 {
 	if (InItemInstance)
 	{
@@ -115,12 +124,12 @@ void UD1EquipmentSlotWidget::OnEquipmentEntryChanged_Implementation(UD1ItemInsta
 		Overlay_Root->AddChildToOverlay(EntryWidget);
 
 		UCanvasPanelSlot* CanvasPanelSlot = Cast<UCanvasPanelSlot>(Slot);
-		EntryWidget->Init(EquipmentManagerComponent, CanvasPanelSlot->GetSize(), InItemInstance, EquipmentSlotType);
-		ChangeSlotState(ESlotState::Valid);
+		EntryWidget->Init(InItemInstance, EquipmentSlotType);
+		ChangeSlotState(Image_Slot, ESlotState::Valid);
 	}
 	else
 	{
-		ChangeSlotState(ESlotState::Default);
+		ChangeSlotState(Image_Slot, ESlotState::Default);
 		Overlay_Root->RemoveChild(EntryWidget);
 		EntryWidget = nullptr;
 	}

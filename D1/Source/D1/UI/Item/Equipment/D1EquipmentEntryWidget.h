@@ -19,7 +19,7 @@ public:
 	UD1EquipmentEntryWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void Init(UD1EquipmentManagerComponent* InEquipmentManagerComponent, const FVector2D& WidgetSize, UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType);
+	void Init(UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType);
 	
 protected:
 	virtual void NativeConstruct() override;
@@ -47,19 +47,12 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
 
-	FVector2D CachedDeltaWidgetPos = FVector2D::ZeroVector;
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::EquipmentSlotCount;
 
 protected:
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<USizeBox> SizeBox_Root;
-
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Icon;
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Hover;
-
-private:
-	FVector2D EntryWidgetOffset = FVector2D::ZeroVector;
 };

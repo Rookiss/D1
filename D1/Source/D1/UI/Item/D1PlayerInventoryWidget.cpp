@@ -14,13 +14,13 @@ UD1PlayerInventoryWidget::UD1PlayerInventoryWidget(const FObjectInitializer& Obj
     
 }
 
-void UD1PlayerInventoryWidget::Init(UD1EquipmentManagerComponent* EquipmentManagerComponent, UD1InventoryManagerComponent* InventoryManagerComponent)
+void UD1PlayerInventoryWidget::Init()
 {
 	check(EquipmentManagerComponent);
-	EquipmentSlotsWidget->Init(EquipmentManagerComponent);
+	EquipmentSlotsWidget->Init();
 
 	check(InventoryManagerComponent);
-	InventorySlotsWidget->Init(InventoryManagerComponent);
+	InventorySlotsWidget->Init();
 
 	CachedGoldCount = InventoryManagerComponent->GetTotalCountByID(9999); 
 	Text_Gold->SetText(FText::AsNumber(CachedGoldCount));

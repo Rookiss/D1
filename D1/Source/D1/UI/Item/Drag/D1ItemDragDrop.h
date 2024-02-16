@@ -37,8 +37,8 @@ public:
 	EEquipmentSlotType FromEquipmentSlotType = EEquipmentSlotType::EquipmentSlotCount;
 
 public:
-	FVector2D DeltaWidgetPos = FVector2D::ZeroVector;
-
 	UPROPERTY()
-	TWeakObjectPtr<UD1ItemInstance> ItemInstance;
+	TObjectPtr<UD1ItemInstance> ItemInstance;
+	
+	FVector2D DeltaWidgetPos = FVector2D::ZeroVector;
 };

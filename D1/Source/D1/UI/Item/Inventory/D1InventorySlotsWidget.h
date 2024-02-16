@@ -18,8 +18,7 @@ public:
 	UD1InventorySlotsWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 public:
-	UFUNCTION(BlueprintCallable)
-	void Init(UD1InventoryManagerComponent* InInventoryManagerComponent);
+	void Init();
 
 protected:
 	virtual void NativeConstruct() override;
@@ -30,9 +29,6 @@ protected:
 private:
 	void UnHoverSlots();
 	void FinishDrag();
-	
-protected:
-	UFUNCTION(BlueprintNativeEvent)
 	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemID, int32 OldItemCount, int32 NewItemCount);
 
 public:
