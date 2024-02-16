@@ -4,10 +4,11 @@
 #include "Blueprint/DragDropOperation.h"
 #include "D1ItemDragDrop.generated.h"
 
+class UD1ItemInstance;
 class UD1InventoryEntryWidget;
-class UD1InventoryManagerComponent;
 class UD1EquipmentEntryWidget;
 class UD1EquipmentManagerComponent;
+class UD1InventoryManagerComponent;
 
 UCLASS()
 class UD1ItemDragDrop : public UDragDropOperation
@@ -37,5 +38,7 @@ public:
 
 public:
 	FVector2D DeltaWidgetPos = FVector2D::ZeroVector;
-	int32 ItemID = 0;
+
+	UPROPERTY()
+	TWeakObjectPtr<UD1ItemInstance> ItemInstance;
 };

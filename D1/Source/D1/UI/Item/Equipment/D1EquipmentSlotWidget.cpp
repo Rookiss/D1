@@ -1,6 +1,7 @@
 ﻿#include "D1EquipmentSlotWidget.h"
 
 #include "D1EquipmentSlotsWidget.h"
+#include "Character/D1Player.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Overlay.h"
 #include "Components/SizeBox.h"
@@ -21,9 +22,6 @@ UD1EquipmentSlotWidget::UD1EquipmentSlotWidget(const FObjectInitializer& ObjectI
 
 void UD1EquipmentSlotWidget::Init(UD1EquipmentManagerComponent* InEquipmentManagerComponent, EEquipmentSlotType InEquipmentSlotType)
 {
-	check(InEquipmentManagerComponent);
-	EquipmentManagerComponent = InEquipmentManagerComponent;
-
 	check(InEquipmentSlotType != EEquipmentSlotType::EquipmentSlotCount);
 	EquipmentSlotType = InEquipmentSlotType;
 }
@@ -31,6 +29,12 @@ void UD1EquipmentSlotWidget::Init(UD1EquipmentManagerComponent* InEquipmentManag
 void UD1EquipmentSlotWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(Player);
+
+	EquipmentManagerComponent = Player->EquipmentManagerComponent;
+	check(EquipmentManagerComponent);
 	
 	EntryWidgetClass = UD1AssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidget");
 }

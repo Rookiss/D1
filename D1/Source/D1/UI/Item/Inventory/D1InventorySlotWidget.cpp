@@ -25,9 +25,9 @@ void UD1InventorySlotWidget::ChangeSlotState(ESlotState InSlotState)
 
 	switch (SlotState)
 	{
-	case ESlotState::Default: Image_Foreground->SetColorAndOpacity(DefaultColor);	break;
-	case ESlotState::InValid: Image_Foreground->SetColorAndOpacity(RedColor);		break;
-	case ESlotState::Valid:   Image_Foreground->SetColorAndOpacity(BlueColor);		break;
+	case ESlotState::Default: Image_Foreground->SetColorAndOpacity(D1ItemSlotColor::DefaultColor);	break;
+	case ESlotState::InValid: Image_Foreground->SetColorAndOpacity(D1ItemSlotColor::RedColor);		break;
+	case ESlotState::Valid:   Image_Foreground->SetColorAndOpacity(D1ItemSlotColor::BlueColor);		break;
 	}
 }
 
@@ -35,8 +35,8 @@ void UD1InventorySlotWidget::ChangeHoverState(ESlotState InHoverState)
 {
 	switch (InHoverState)
 	{
-	case ESlotState::Default: ChangeSlotState(SlotState);						break;
-	case ESlotState::InValid: Image_Foreground->SetColorAndOpacity(RedColor);	break;
-	case ESlotState::Valid:   Image_Foreground->SetColorAndOpacity(GreenColor);	break;
+	case ESlotState::Default: ChangeSlotState(SlotState);										    break;
+	case ESlotState::InValid: Image_Foreground->SetColorAndOpacity(D1ItemSlotColor::RedColor);	    break;
+	case ESlotState::Valid:   Image_Foreground->SetColorAndOpacity(D1ItemSlotColor::GreenColor);	break;
 	}
 }

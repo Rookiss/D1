@@ -22,19 +22,6 @@ public:
 	void ChangeSlotState(ESlotState InSlotState);
 	void ChangeHoverState(ESlotState InHoverState);
 
-protected:
-	UPROPERTY(EditDefaultsOnly)
-	FLinearColor DefaultColor = FLinearColor(1.f, 1.f, 1.f, 0.f);
-	
-	UPROPERTY(EditDefaultsOnly)
-	FLinearColor RedColor = FLinearColor(0.28f, 0.02f, 0.f, 0.32f);
-	
-	UPROPERTY(EditDefaultsOnly)
-	FLinearColor GreenColor = FLinearColor(0.02f, 0.28f, 0.f, 0.32f);
-	
-	UPROPERTY(EditDefaultsOnly)
-	FLinearColor BlueColor = FLinearColor(0.f, 0.02f, 0.28f, 0.32f);
-
 public:
 	static inline FIntPoint UnitSlotSize = FIntPoint(50.f, 50.f);
 	

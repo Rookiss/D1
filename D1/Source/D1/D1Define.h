@@ -10,6 +10,14 @@ enum class ESlotState : uint8
 	Valid
 };
 
+namespace D1ItemSlotColor
+{
+	inline FLinearColor DefaultColor = FLinearColor(1.f, 1.f, 1.f, 0.f);
+	inline FLinearColor RedColor     = FLinearColor(0.28f, 0.02f, 0.f, 0.32f);
+	inline FLinearColor GreenColor   = FLinearColor(0.02f, 0.28f, 0.f, 0.32f);
+	inline FLinearColor BlueColor    = FLinearColor(0.f, 0.02f, 0.28f, 0.32f);
+}
+
 UENUM()
 enum EEquipmentSlotType
 {
@@ -47,6 +55,15 @@ enum class EWeaponHandType
 	LeftHand,
 	RightHand,
 	TwoHand,
+
+	Count	UMETA(Hidden)
+};
+
+UENUM()
+enum class EWeaponSlotType
+{
+	Primary,
+	Secondary,
 
 	Count	UMETA(Hidden)
 };
