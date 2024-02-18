@@ -8,17 +8,28 @@ UENUM()
 enum class ESlotState : uint8
 {
 	Default,
-	InValid,
+	Invalid,
 	Valid
 };
 
-namespace D1ItemSlotColor
+namespace ItemSlotColor
 {
 	inline FLinearColor DefaultColor = FLinearColor(1.f, 1.f, 1.f, 0.f);
 	inline FLinearColor RedColor     = FLinearColor(0.28f, 0.02f, 0.f, 0.32f);
 	inline FLinearColor GreenColor   = FLinearColor(0.02f, 0.28f, 0.f, 0.32f);
 	inline FLinearColor BlueColor    = FLinearColor(0.f, 0.02f, 0.28f, 0.32f);
 }
+
+static inline TArray<FLinearColor> ItemRarityColors = {
+	FLinearColor::Gray,
+	FLinearColor(FColor::Silver),
+	FLinearColor::White,
+	FLinearColor(FColor::Green),
+	FLinearColor(FColor::Cyan),
+	FLinearColor(FColor::Purple),
+	FLinearColor(FColor::Orange),
+	FLinearColor(FColor::Yellow)
+};
 
 UENUM()
 enum EEquipmentSlotType
@@ -76,7 +87,7 @@ enum class EArmorType
 	Helmet,
 	Chest,
 	Legs,
-	Hand,
+	Hands,
 	Foot,
 
 	Count	UMETA(Hidden)

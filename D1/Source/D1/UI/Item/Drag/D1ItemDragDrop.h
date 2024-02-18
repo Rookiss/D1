@@ -5,8 +5,7 @@
 #include "D1ItemDragDrop.generated.h"
 
 class UD1ItemInstance;
-class UD1InventoryEntryWidget;
-class UD1EquipmentEntryWidget;
+class UD1ItemEntryWidget;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
@@ -20,23 +19,20 @@ public:
 
 public:
 	UPROPERTY()
-	TObjectPtr<UD1InventoryEntryWidget> InventoryEntryWidget;
-
-	UPROPERTY()
 	TObjectPtr<UD1InventoryManagerComponent> FromInventoryManager;
 
 	FIntPoint FromItemSlotPos = FIntPoint::ZeroValue;
 
 public:
 	UPROPERTY()
-	TObjectPtr<UD1EquipmentEntryWidget> EquipmentEntryWidget;
-
-	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> FromEquipmentManager;
 
 	EEquipmentSlotType FromEquipmentSlotType = EEquipmentSlotType::EquipmentSlotCount;
 
 public:
+	UPROPERTY()
+	TObjectPtr<UD1ItemEntryWidget> FromEntryWidget;
+	
 	UPROPERTY()
 	TObjectPtr<UD1ItemInstance> ItemInstance;
 	

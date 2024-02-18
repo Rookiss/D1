@@ -3,8 +3,8 @@
 #include "UI/Item/D1ItemSlotWidget.h"
 #include "D1InventorySlotWidget.generated.h"
 
-class USizeBox;
 class UImage;
+class USizeBox;
 
 UCLASS()
 class UD1InventorySlotWidget : public UD1ItemSlotWidget
@@ -18,7 +18,7 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
-	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<USizeBox> SizeBox_Root;
 
 	UPROPERTY(meta=(BindWidget))

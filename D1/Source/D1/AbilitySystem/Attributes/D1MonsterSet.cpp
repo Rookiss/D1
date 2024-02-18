@@ -19,6 +19,8 @@ UD1MonsterSet::UD1MonsterSet()
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MaxMana, GetMaxManaAttribute);
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_AttackSpeed, GetAttackSpeedAttribute);
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MoveSpeed, GetMoveSpeedAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_BaseDamage, GetBaseDamageAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_BaseDefense, GetBaseDefenseAttribute);
 }
 
 void UD1MonsterSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -189,4 +191,14 @@ void UD1MonsterSet::OnRep_AttackSpeed(const FGameplayAttributeData& OldValue)
 void UD1MonsterSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MoveSpeed, OldValue);
+}
+
+void UD1MonsterSet::OnRep_BaseDamage(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseDamage, OldValue);
+}
+
+void UD1MonsterSet::OnRep_BaseDefense(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseDefense, OldValue);
 }

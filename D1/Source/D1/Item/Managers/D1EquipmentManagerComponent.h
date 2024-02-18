@@ -33,7 +33,7 @@ private:
 	TObjectPtr<UD1ItemInstance> ItemInstance;
 
 	UPROPERTY()
-	int32 LatestValidItemID = 0;
+	int32 LastValidItemID = 0;
 
 private:
 	UPROPERTY(NotReplicated)

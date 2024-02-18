@@ -4,6 +4,7 @@
 #include "D1Character.h"
 #include "D1Player.generated.h"
 
+class AD1WeaponBase;
 class UCameraComponent;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
@@ -33,19 +34,16 @@ public:
 	void Multicast_SetArmorMesh(EArmorType ArmorType, FSoftObjectPath ArmorMeshPath);
 
 private:
-	UPROPERTY()
-	TObjectPtr<USkeletalMeshComponent> WeaponLeftMeshComponent;
-
-	UPROPERTY()
-	TObjectPtr<USkeletalMeshComponent> WeaponRightMeshComponent;
-	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TArray<TObjectPtr<USkeletalMeshComponent>> ArmorMeshComponents;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TArray<TObjectPtr<USkeletalMesh>> DefaultArmorMeshes;
 
 public:
+	UPROPERTY(BlueprintReadOnly)
+	TArray<TObjectPtr<AD1WeaponBase>> WeaponActors; 
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UCameraComponent> CameraComponent;
 	

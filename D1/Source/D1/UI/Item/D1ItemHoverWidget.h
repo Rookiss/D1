@@ -3,9 +3,9 @@
 #include "UI/D1UserWidget.h"
 #include "D1ItemHoverWidget.generated.h"
 
-class UD1ItemInstance;
 class UTextBlock;
 class UHorizontalBox;
+class UD1ItemInstance;
 
 UCLASS()
 class UD1ItemHoverWidget : public UD1UserWidget
@@ -55,16 +55,4 @@ protected:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UHorizontalBox> HorizontalBox_MaxStackCount;
-
-private:
-	TArray<FLinearColor> ItemRarityColors = {
-		FLinearColor::Gray,
-		FLinearColor(FColor::Silver),
-		FLinearColor::White,
-		FLinearColor(FColor::Green),
-		FLinearColor(FColor::Cyan),
-		FLinearColor(FColor::Purple),
-		FLinearColor(FColor::Orange),
-		FLinearColor(FColor::Yellow)
-	};
 };

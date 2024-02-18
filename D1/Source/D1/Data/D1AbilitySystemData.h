@@ -21,9 +21,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 AbilityLevel = 1;
-
-	UPROPERTY(EditDefaultsOnly)
-	FGameplayTag AbilityTag = FGameplayTag::EmptyTag;
 	
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayTag InputTag = FGameplayTag::EmptyTag;

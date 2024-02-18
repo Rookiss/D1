@@ -38,6 +38,9 @@ void UD1GameplayAbility_Interact::EndAbility(const FGameplayAbilitySpecHandle Ha
 
 void UD1GameplayAbility_Interact::HandleInputPress()
 {
+	if (CurrentTargetDataHandle.Num() <= 0)
+		return;
+	
 	AActor* TargetActor = CurrentTargetDataHandle.Get(0)->GetHitResult()->GetActor();
 	if (TargetActor == nullptr)
 		return;

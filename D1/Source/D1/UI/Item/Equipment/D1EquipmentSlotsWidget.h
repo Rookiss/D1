@@ -4,6 +4,9 @@
 #include "UI/D1UserWidget.h"
 #include "D1EquipmentSlotsWidget.generated.h"
 
+class UD1ItemInstance;
+class UD1ItemSlotWidget;
+class UD1EquipmentSlotWeaponWidget;
 class UD1EquipmentSlotArmorWidget;
 class UD1EquipmentManagerComponent;
 
@@ -15,9 +18,6 @@ class UD1EquipmentSlotsWidget : public UD1UserWidget
 public:
 	UD1EquipmentSlotsWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-public:
-	void Init();
-
 protected:
 	virtual void NativeConstruct() override;
 
@@ -26,29 +26,20 @@ private:
 	
 private:
 	UPROPERTY()
-	TArray<TObjectPtr<UD1EquipmentSlotArmorWidget>> SlotWidgets;
+	TArray<TObjectPtr<UD1EquipmentSlotWeaponWidget>> SlotWeaponWidgets;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UD1EquipmentSlotArmorWidget>> SlotArmorWidgets;
 
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
 
 protected:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_WeaponPrimary_LeftHand;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_WeaponPrimary_RightHand;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_WeaponPrimary_TwoHand;
+	TObjectPtr<UD1EquipmentSlotWeaponWidget> Equipment_Weapon_Primary;
 	
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_WeaponSecondary_LeftHand;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_WeaponSecondary_RightHand;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_WeaponSecondary_TwoHand;
+	TObjectPtr<UD1EquipmentSlotWeaponWidget> Equipment_Weapon_Secondary;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_Armor_Head;

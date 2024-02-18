@@ -18,8 +18,8 @@ public:
 public:
 	void ShowSceneWidget();
 
-	void ShowControlledPlayerInventoryWidget();
-	void HideControlledPlayerInventoryWidget();
+	void ShowControlledInventoryWidget();
+	void HideControlledInventoryWidget();
 	
 	void ShowItemHoverWidget(UD1ItemInstance* ItemInstance);
 	void HideItemHoverWidget();
@@ -29,6 +29,6 @@ public:
 	UD1InteractionWidget* GetInteractionWidget() const;
 	
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY()
 	TObjectPtr<UD1SceneWidget> SceneWidget;
 };

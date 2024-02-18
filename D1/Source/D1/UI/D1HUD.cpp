@@ -23,19 +23,19 @@ void AD1HUD::ShowSceneWidget()
 	}
 }
 
-void AD1HUD::ShowControlledPlayerInventoryWidget()
+void AD1HUD::ShowControlledInventoryWidget()
 {
 	if (SceneWidget)
 	{
-		SceneWidget->ShowControlledPlayerInventoryWidget();
+		SceneWidget->ShowControlledInventoryWidget();
 	}
 }
 
-void AD1HUD::HideControlledPlayerInventoryWidget()
+void AD1HUD::HideControlledInventoryWidget()
 {
 	if (SceneWidget)
 	{
-		SceneWidget->HideControlledPlayerInventoryWidget();
+		SceneWidget->HideControlledInventoryWidget();
 	}
 }
 

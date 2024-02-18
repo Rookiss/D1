@@ -29,23 +29,20 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	GetMesh()->SetOwnerNoSee(true);
 	GetMesh()->SetOnlyOwnerSee(false);
 	GetMesh()->SetCastHiddenShadow(true);
-
-	WeaponLeftMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponLeftMeshComponent");
-	WeaponLeftMeshComponent->SetupAttachment(GetMesh());
-
-	WeaponRightMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponRightMeshComponent");
-	WeaponRightMeshComponent->SetupAttachment(GetMesh());
-
+	
 	int32 ArmorTypeCount = static_cast<int32>(EArmorType::Count);
 	ArmorMeshComponents.SetNum(ArmorTypeCount);
+	ArmorMeshComponents[0] = GetMesh();
 	
-	for (int32 i = 0; i < ArmorTypeCount; i++)
+	for (int32 i = 1; i < ArmorTypeCount; i++)
 	{
 		USkeletalMeshComponent* ArmorMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(FName(FString::Printf(TEXT("ArmorMeshComponent_%d"), i)));
 		ArmorMeshComponent->SetupAttachment(GetMesh());
 		ArmorMeshComponent->SetLeaderPoseComponent(GetMesh());
 		ArmorMeshComponents[i] = ArmorMeshComponent;
 	}
+	
+	WeaponActors.SetNum(static_cast<int32>(EWeaponHandType::Count));
 	
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
@@ -62,31 +59,27 @@ void AD1Player::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	GetMesh()->SetSkeletalMesh(UD1AssetManager::GetAssetByName<USkeletalMesh>("Head_Default"));
 	GetMesh()->SetAnimClass(UD1AssetManager::GetSubclassByName<UAnimInstance>("ABP_Player"));
-	
-	CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("CameraSocket"));
 
-	TArray<FName> DefaultArmorMeshNames = { "None", "Chest_Default", "Legs_Default", "Hands_Default", "Foot_Default" };
+	TArray<FName> DefaultArmorMeshNames = { "Head_Default", "Chest_Default", "Legs_Default", "Hands_Default", "Foot_Default" };
 	DefaultArmorMeshes.SetNum(DefaultArmorMeshNames.Num());
 	
 	for (int i = 0; i < DefaultArmorMeshNames.Num(); i++)
 	{
-		if (DefaultArmorMeshNames[i] == "None")
-			continue;
-		
 		DefaultArmorMeshes[i] = UD1AssetManager::GetAssetByName<USkeletalMesh>(DefaultArmorMeshNames[i]);
 		ArmorMeshComponents[i]->SetSkeletalMesh(DefaultArmorMeshes[i]);
 	}
 
+	CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("CameraSocket"));
+
 	if (HasAuthority())
 	{
 		// @TODO: For Test
-		int32 IterateCount = 2;
+		int32 IterationCount = 2;
 		UD1ItemData* ItemData = UD1AssetManager::GetItemData();
 		const TMap<int32, FD1ItemDefinition>& AllItemDefs = ItemData->GetAllItemDefs();
 	
-		for (int i = 0; i < IterateCount; i++)
+		for (int i = 0; i < IterationCount; i++)
 		{
 			for (const auto& Pair : AllItemDefs)
 			{
@@ -135,7 +128,7 @@ void AD1Player::InitAbilitySystem()
 		check(AbilitySystemComponent);
 		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
 	}
-	ApplyAbilitySystemData("AbilitySystemData_Player");
+	ApplyAbilitySystemData("ASD_Player");
 }
 
 float AD1Player::CalculateAimPitch()

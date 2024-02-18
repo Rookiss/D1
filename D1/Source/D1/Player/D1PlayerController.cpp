@@ -28,7 +28,7 @@ void AD1PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (const UD1InputData* InputData = UD1AssetManager::GetAssetByName<UD1InputData>("InputData_Default"))
+	if (const UD1InputData* InputData = UD1AssetManager::GetAssetByName<UD1InputData>("InputData"))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 		{
@@ -41,7 +41,7 @@ void AD1PlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (const UD1InputData* InputData = UD1AssetManager::GetAssetByName<UD1InputData>("InputData_Default"))
+	if (const UD1InputData* InputData = UD1AssetManager::GetAssetByName<UD1InputData>("InputData"))
 	{
 		UD1InputComponent* D1InputComponent = CastChecked<UD1InputComponent>(InputComponent);
 
@@ -143,7 +143,7 @@ void AD1PlayerController::Input_Inventory()
 {
 	if (AD1HUD* HUD = Cast<AD1HUD>(GetHUD()))
 	{
-		HUD->ShowControlledPlayerInventoryWidget();
+		HUD->ShowControlledInventoryWidget();
 	}
 }
 

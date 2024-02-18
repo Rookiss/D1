@@ -102,7 +102,7 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 			case EArmorType::Helmet:	ArmorType = TEXT("Head");	break;
 			case EArmorType::Chest:		ArmorType = TEXT("Chest");	break;
 			case EArmorType::Legs:		ArmorType = TEXT("Legs");	break;
-			case EArmorType::Hand:		ArmorType = TEXT("Hand");	break;
+			case EArmorType::Hands:		ArmorType = TEXT("Hand");	break;
 			case EArmorType::Foot:		ArmorType = TEXT("Foot");	break;
 			}
 			Text_ArmorType->SetText(FText::FromString(ArmorType));

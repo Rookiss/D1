@@ -12,6 +12,7 @@
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Net/UnrealNetwork.h"
 #include "System/D1AssetManager.h"
+#include "Weapon/D1WeaponBase.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentManagerComponent)
 
@@ -25,7 +26,7 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* InItemInstance)
 	UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(OwnerComponent->GetAbilitySystemComponent());
 	
 	ItemInstance = InItemInstance;
-	LatestValidItemID = ItemInstance->ItemID;
+	LastValidItemID = ItemInstance->ItemID;
 	GrantedHandles.TakeFromAbilitySystem(ASC);
 	
 	if (const UD1AbilitySystemData* AbilitySystemData = Equippable->AbilitySystemDataToGrant)
@@ -68,7 +69,7 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* InItemInstance)
 	{
 		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
 		const FD1WeaponAttachInfo& AttachInfo = Weapon->WeaponAttachInfo;
-		if (AttachInfo.SpawnActorClass)
+		if (AttachInfo.SpawnWeaponClass)
 		{
 			APawn* OwningPawn = Cast<APawn>(OwnerComponent->GetOwner());
 			check(OwningPawn);
@@ -80,12 +81,17 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* InItemInstance)
 			}
 
 			UWorld* World = OwnerComponent->GetWorld();
-			AActor* NewActor = World->SpawnActorDeferred<AActor>(AttachInfo.SpawnActorClass, FTransform::Identity, OwningPawn);
+			AD1WeaponBase* NewActor = World->SpawnActorDeferred<AD1WeaponBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, OwningPawn);
 			NewActor->FinishSpawning(FTransform::Identity, true);
 			NewActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 			NewActor->AttachToComponent(AttachTarget, FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
 		
 			SpawnedActor.Add(NewActor);
+
+			if (AD1Player* Player = Cast<AD1Player>(OwningPawn))
+			{
+				Player->WeaponActors[static_cast<int32>(Weapon->WeaponHandType)] = NewActor;
+			}
 		}
 	}
 	else if (Equippable->EquipmentType == EEquipmentType::Armor)
@@ -121,6 +127,15 @@ void FD1EquipmentEntry::Reset()
 			}
 		}
 		SpawnedActor.Reset();
+
+		APawn* OwningPawn = Cast<APawn>(OwnerComponent->GetOwner());
+		check(OwningPawn);
+
+		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+		if (AD1Player* Player = Cast<AD1Player>(OwningPawn))
+		{
+			Player->WeaponActors[static_cast<int32>(Weapon->WeaponHandType)] = nullptr;
+		}
 	}
 	else if (Equippable->EquipmentType == EEquipmentType::Armor)
 	{
@@ -297,9 +312,6 @@ bool UD1EquipmentManagerComponent::CanEquipItem_FromEquipment(UD1EquipmentManage
 {
 	if (OtherComponent == nullptr)
 		return false;
-
-	if (FromEquipmentSlotType != ToEquipmentSlotType)
-		return false;
 	
 	if (FromEquipmentSlotType == EEquipmentSlotType::EquipmentSlotCount || ToEquipmentSlotType == EEquipmentSlotType::EquipmentSlotCount)
 		return false;
@@ -383,8 +395,8 @@ bool UD1EquipmentManagerComponent::IsSameWeaponHandType(EEquipmentSlotType Equip
 bool UD1EquipmentManagerComponent::IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType) const
 {
 	return (EquipmentSlotType == EEquipmentSlotType::Helmet && ArmorType == EArmorType::Helmet || EquipmentSlotType == EEquipmentSlotType::Chest && ArmorType == EArmorType::Chest ||
-			EquipmentSlotType == EEquipmentSlotType::Legs && ArmorType == EArmorType::Legs || EquipmentSlotType == EEquipmentSlotType::Hands && ArmorType == EArmorType::Hand ||
-			EquipmentSlotType == EEquipmentSlotType::Foot && ArmorType == EArmorType::Foot);
+			EquipmentSlotType == EEquipmentSlotType::Legs   && ArmorType == EArmorType::Legs   || EquipmentSlotType == EEquipmentSlotType::Hands && ArmorType == EArmorType::Hands ||
+			EquipmentSlotType == EEquipmentSlotType::Foot   && ArmorType == EArmorType::Foot);
 }
 
 bool UD1EquipmentManagerComponent::IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const

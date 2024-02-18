@@ -8,6 +8,7 @@ class UD1InventorySlotWidget;
 class UD1InventoryManagerComponent;
 class UUniformGridPanel;
 class UCanvasPanel;
+class UD1ItemInstance;
 
 UCLASS()
 class UD1InventorySlotsWidget : public UD1UserWidget
@@ -16,20 +17,18 @@ class UD1InventorySlotsWidget : public UD1UserWidget
 	
 public:
 	UD1InventorySlotsWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-	
-public:
-	void Init();
 
 protected:
 	virtual void NativeConstruct() override;
+	
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 private:
-	void UnHoverSlots();
+	void UnhoverSlots();
 	void FinishDrag();
-	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemID, int32 OldItemCount, int32 NewItemCount);
+	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 NewItemCount);
 
 public:
 	UD1InventoryManagerComponent* GetInventoryManagerComponent() const { return InventoryManagerComponent; }

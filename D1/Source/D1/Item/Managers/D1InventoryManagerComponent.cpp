@@ -23,7 +23,7 @@ void FD1InventoryEntry::Init(int32 InItemID, int32 InItemCount)
 	InItemCount = Stackable ? FMath::Clamp(InItemCount, 1, Stackable->MaxStackCount) : 1;
 	
 	ItemCount = InItemCount;
-	LatestValidItemID = InItemID;
+	LastValidItemID = InItemID;
 }
 
 void FD1InventoryEntry::Init(UD1ItemInstance* InItemInstance, int32 InItemCount)
@@ -36,7 +36,7 @@ void FD1InventoryEntry::Init(UD1ItemInstance* InItemInstance, int32 InItemCount)
 	const UD1ItemFragment_Stackable* Stackable = ItemInstance->FindFragmentByClass<UD1ItemFragment_Stackable>();
 	ItemCount = Stackable ? FMath::Clamp(InItemCount, 1, Stackable->MaxStackCount) : 1;
 		
-	LatestValidItemID = ItemInstance->ItemID;
+	LastValidItemID = ItemInstance->ItemID;
 }
 
 void FD1InventoryEntry::Reset()
@@ -71,9 +71,7 @@ void FD1InventoryList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, i
 		const FIntPoint& ItemSlotCount = ItemDef.ItemSlotCount;
 
 		OwnerComponent->MarkSlotChecks(true, ItemSlotPos, ItemSlotCount);
-
-		OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemSlotPos, Entry.ItemInstance, Entry.LatestValidItemID, 0, Entry.ItemCount);
-		Entry.LastObservedCount = Entry.ItemCount;
+		OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemSlotPos, Entry.ItemInstance, Entry.ItemCount);
 	}
 }
 
@@ -94,17 +92,15 @@ void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 			continue;
 		}
 
-		if (Entry.LatestValidItemID <= 0)
+		if (Entry.LastValidItemID <= 0)
 			continue;
 
-		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(Entry.LatestValidItemID);
+		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(Entry.LastValidItemID);
 		const FIntPoint ItemSlotPos = FIntPoint(Index % InventorySlotCount.X, Index / InventorySlotCount.X);
 		const FIntPoint& ItemSlotCount = ItemDef.ItemSlotCount;
 
 		OwnerComponent->MarkSlotChecks(false, ItemSlotPos, ItemSlotCount);
-
-		OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemSlotPos, Entry.ItemInstance, Entry.LatestValidItemID, Entry.LastObservedCount, Entry.ItemCount);
-		Entry.LastObservedCount = Entry.ItemCount;
+		OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemSlotPos, Entry.ItemInstance, Entry.ItemCount);
 	}
 
 	for (int32 Index : AliveIndices)
@@ -116,9 +112,7 @@ void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 		const FIntPoint& ItemSlotCount = ItemDef.ItemSlotCount;
 
 		OwnerComponent->MarkSlotChecks(true, ItemSlotPos, ItemSlotCount);
-		
-		OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemSlotPos, Entry.ItemInstance, Entry.LatestValidItemID, Entry.LastObservedCount, Entry.ItemCount);
-		Entry.LastObservedCount = Entry.ItemCount;
+		OwnerComponent->OnInventoryEntryChanged.Broadcast(ItemSlotPos, Entry.ItemInstance, Entry.ItemCount);
 	}
 }
 

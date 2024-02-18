@@ -14,6 +14,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Jump,					"Input.Action.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Inventory,				"Input.Action.Inventory");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Interact,				"Input.Action.Interact");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Attack,					"Input.Action.Attack");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Attack_RightHand,		"Input.Action.Attack.RightHand");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Attack_LeftHand,		"Input.Action.Attack.LeftHand");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Death,						"Ability.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,						"Ability.Jump");

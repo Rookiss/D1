@@ -37,13 +37,6 @@ protected:
 	
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldValue);
-
-protected:
-	UFUNCTION()
-	void OnRep_AttackSpeed(const FGameplayAttributeData& OldValue);
-	
-	UFUNCTION()
-	void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
 	
 private:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Health, meta=(AllowPrivateAccess="true"))
@@ -64,17 +57,31 @@ public:
 	ATTRIBUTE_ACCESSORS(ThisClass, Mana);
 	ATTRIBUTE_ACCESSORS(ThisClass, MaxMana);
 
+protected:
+	UFUNCTION()
+	void OnRep_AttackSpeed(const FGameplayAttributeData& OldValue);
+	
+	UFUNCTION()
+	void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
+	
 private:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_AttackSpeed, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData AttackSpeed;
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MoveSpeed, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MoveSpeed;
-	
+
 public:
 	ATTRIBUTE_ACCESSORS(ThisClass, AttackSpeed);
 	ATTRIBUTE_ACCESSORS(ThisClass, MoveSpeed);
 
+protected:
+	UFUNCTION()
+	void OnRep_BaseDamage(const FGameplayAttributeData& OldValue);
+	
+	UFUNCTION()
+	void OnRep_BaseDefense(const FGameplayAttributeData& OldValue);
+	
 private:
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData BaseDamage;

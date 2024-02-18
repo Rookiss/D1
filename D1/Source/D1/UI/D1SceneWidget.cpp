@@ -1,6 +1,5 @@
 ﻿#include "D1SceneWidget.h"
 
-#include "Character/D1Player.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Interaction/D1InteractionWidget.h"
 #include "Item/D1ItemHoverWidget.h"
@@ -19,13 +18,8 @@ void UD1SceneWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	ControlledPlayerInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+	ControlledInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 	ItemHoverWidget->SetVisibility(ESlateVisibility::Hidden);
-	
-	if (AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn()))
-	{
-		ControlledPlayerInventoryWidget->Init(Player->EquipmentManagerComponent, Player->InventoryManagerComponent);
-	}
 }
 
 FReply UD1SceneWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
@@ -34,7 +28,8 @@ FReply UD1SceneWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 	
 	if (InKeyEvent.IsRepeat() == false && InKeyEvent.GetKey() == EKeys::I)
 	{
-		HideControlledPlayerInventoryWidget();
+		FSlateApplication::Get().CancelDragDrop();
+		HideControlledInventoryWidget();
 		return FReply::Handled();
 	}
 	
@@ -44,11 +39,15 @@ FReply UD1SceneWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 FReply UD1SceneWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	FReply Reply = Super::NativeOnMouseMove(InGeometry, InMouseEvent);
-	if (IsAllMouseInteractionWidgetHidden())
+
+	if (IsAllItemSlotWidgetHidden())
+	{
+		HideItemHoverWidget();
 		return Reply;
+	}
 	
-	FVector2D MouseWidgetPos = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
 	FVector2D Space = FVector2D(5.f, 5.f);
+	FVector2D MouseWidgetPos = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
 	FVector2D ItemHoverWidgetSize = ItemHoverWidget->GetCachedGeometry().Size;
 	FVector2D HoverWidgetStartPos = MouseWidgetPos + Space;
 	FVector2D HoverWidgetEndPos = HoverWidgetStartPos + ItemHoverWidgetSize;
@@ -71,12 +70,12 @@ FReply UD1SceneWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPoi
 	return Reply;
 }
 
-void UD1SceneWidget::ShowControlledPlayerInventoryWidget()
+void UD1SceneWidget::ShowControlledInventoryWidget()
 {
-	if (ControlledPlayerInventoryWidget->GetVisibility() != ESlateVisibility::Hidden)
+	if (ControlledInventoryWidget->GetVisibility() != ESlateVisibility::Hidden)
 		return;
 	
-	ControlledPlayerInventoryWidget->SetVisibility(ESlateVisibility::Visible);
+	ControlledInventoryWidget->SetVisibility(ESlateVisibility::Visible);
 	
 	if (AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer()))
 	{
@@ -84,15 +83,15 @@ void UD1SceneWidget::ShowControlledPlayerInventoryWidget()
 	}
 }
 
-void UD1SceneWidget::HideControlledPlayerInventoryWidget()
+void UD1SceneWidget::HideControlledInventoryWidget()
 {
-	if (ControlledPlayerInventoryWidget->GetVisibility() != ESlateVisibility::Visible)
+	if (ControlledInventoryWidget->GetVisibility() != ESlateVisibility::Visible)
 		return;
 	
-	ControlledPlayerInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+	ControlledInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 
 	AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer());
-	if (PlayerController && IsAllMouseInteractionWidgetHidden())
+	if (PlayerController && IsAllMouseWidgetHidden())
 	{
 		PlayerController->SetInputModeGameOnly();
 	}
@@ -109,10 +108,20 @@ void UD1SceneWidget::HideItemHoverWidget()
 	ItemHoverWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-bool UD1SceneWidget::IsAllMouseInteractionWidgetHidden() const
+bool UD1SceneWidget::IsAllItemSlotWidgetHidden() const
 {
 	bool bAllHidden = true;
-	if (ControlledPlayerInventoryWidget->GetVisibility() == ESlateVisibility::Visible)
+	if (ControlledInventoryWidget->GetVisibility() == ESlateVisibility::Visible)
+	{
+		bAllHidden = false;
+	}
+	return bAllHidden;
+}
+
+bool UD1SceneWidget::IsAllMouseWidgetHidden() const
+{
+	bool bAllHidden = true;
+	if (ControlledInventoryWidget->GetVisibility() == ESlateVisibility::Visible)
 	{
 		bAllHidden = false;
 	}

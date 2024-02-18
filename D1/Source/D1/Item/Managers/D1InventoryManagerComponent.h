@@ -8,7 +8,7 @@ class UD1ItemInstance;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
-DECLARE_MULTICAST_DELEGATE_FiveParams(FOnInventoryEntryChanged, const FIntPoint&/*ItemSlotPos*/, UD1ItemInstance*/*ItemInstance*/, int32/*ItemID*/, int32/*OldItemCount*/, int32/*NewItemCount*/);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnInventoryEntryChanged, const FIntPoint&/*ItemSlotPos*/, UD1ItemInstance*/*ItemInstance*/, int32/*ItemCount*/);
 
 USTRUCT(BlueprintType)
 struct FD1InventoryEntry : public FFastArraySerializerItem
@@ -23,7 +23,6 @@ private:
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
 	int32 GetItemCount() const { return ItemCount; }
-	int32 GetLastObservedCount() const { return LastObservedCount; }
 	FString GetDebugString() const;
 
 private:
@@ -37,10 +36,7 @@ private:
 	int32 ItemCount = 0;
 
 	UPROPERTY()
-	int32 LatestValidItemID = 0;
-
-	UPROPERTY(NotReplicated)
-	int32 LastObservedCount = INDEX_NONE;
+	int32 LastValidItemID = 0;
 };
 
 USTRUCT(BlueprintType)

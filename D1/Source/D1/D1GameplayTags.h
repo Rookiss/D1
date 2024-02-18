@@ -16,6 +16,9 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Jump);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Inventory);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Interact);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Attack);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Attack_RightHand);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Attack_LeftHand);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Death);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Jump);

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "D1Define.h"
-#include "UI/Item/Inventory/D1InventorySlotWidget.h"
+#include "UI/Item/D1ItemSlotWidget.h"
 #include "D1EquipmentSlotArmorWidget.generated.h"
 
 class UImage;
@@ -11,7 +11,7 @@ class UD1EquipmentEntryWidget;
 class UD1EquipmentManagerComponent;
 
 UCLASS()
-class UD1EquipmentSlotArmorWidget : public UD1InventorySlotWidget
+class UD1EquipmentSlotArmorWidget : public UD1ItemSlotWidget
 {
 	GENERATED_BODY()
 	
@@ -19,7 +19,7 @@ public:
 	UD1EquipmentSlotArmorWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void Init(EEquipmentSlotType InEquipmentSlotType);
+	void Init(EArmorType InArmorType);
 	
 protected:
 	virtual void NativeConstruct() override;
@@ -29,14 +29,17 @@ protected:
 
 private:
 	void FinishDrag();
+	EEquipmentSlotType ConvertToEquipmentSlotType() const;
+
+public:
 	void OnEquipmentEntryChanged(UD1ItemInstance* InItemInstance);
 	
 private:
 	UPROPERTY()
-	TSubclassOf<UD1EquipmentEntryWidget> EntryWidgetClass;
-
-	UPROPERTY()
 	TObjectPtr<UD1EquipmentEntryWidget> EntryWidget;
+	
+	UPROPERTY()
+	TSubclassOf<UD1EquipmentEntryWidget> EntryWidgetClass;
 
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
@@ -50,5 +53,5 @@ private:
 
 private:
 	bool bAlreadyHovered = false;
-	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::EquipmentSlotCount;
+	EArmorType ArmorType = EArmorType::Count;
 };

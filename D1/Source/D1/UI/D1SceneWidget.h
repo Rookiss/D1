@@ -22,19 +22,20 @@ protected:
 	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
-	void ShowControlledPlayerInventoryWidget();
-	void HideControlledPlayerInventoryWidget();
+	void ShowControlledInventoryWidget();
+	void HideControlledInventoryWidget();
 	
 	void ShowItemHoverWidget(UD1ItemInstance* ItemInstance);
 	void HideItemHoverWidget();
 
 public:
 	UD1InteractionWidget* GetInteractionWidget() const { return InteractionWidget; }
-	bool IsAllMouseInteractionWidgetHidden() const;
+	bool IsAllItemSlotWidgetHidden() const;
+	bool IsAllMouseWidgetHidden() const;
 	
 protected:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1PlayerInventoryWidget> ControlledPlayerInventoryWidget;
+	TObjectPtr<UD1PlayerInventoryWidget> ControlledInventoryWidget;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UD1ItemHoverWidget> ItemHoverWidget;

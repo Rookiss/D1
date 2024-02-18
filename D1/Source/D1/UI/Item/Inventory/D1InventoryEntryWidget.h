@@ -1,17 +1,15 @@
 ﻿#pragma once
 
-#include "UI/D1UserWidget.h"
+#include "UI/Item/D1ItemEntryWidget.h"
 #include "D1InventoryEntryWidget.generated.h"
 
-class UImage;
 class USizeBox;
 class UTextBlock;
 class UD1ItemInstance;
-class UD1ItemDragWidget;
 class UD1InventorySlotsWidget;
 
 UCLASS()
-class UD1InventoryEntryWidget : public UD1UserWidget
+class UD1InventoryEntryWidget : public UD1ItemEntryWidget
 {
 	GENERATED_BODY()
 	
@@ -19,52 +17,30 @@ public:
 	UD1InventoryEntryWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void Init(UD1InventorySlotsWidget* InSlotsWidget, const FVector2D& InWidgetSize, UD1ItemInstance* InItemInstance, int32 InItemCount);
+	void Init(UD1InventorySlotsWidget* InSlotsWidget, UD1ItemInstance* InItemInstance, int32 InItemCount);
 	
 protected:
 	virtual void NativeConstruct() override;
 	
-	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-	
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
-	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 public:
 	void RefreshItemCount(int32 NewItemCount);
-	void RefreshWidgetOpacity(bool bClearlyVisible);
-
-public:
-	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
-	
-protected:
-	UPROPERTY()
-	TObjectPtr<UD1ItemInstance> ItemInstance;
-
-	UPROPERTY()
-	int32 ItemCount = 0;
 
 private:
 	UPROPERTY()
 	TObjectPtr<UD1InventorySlotsWidget> SlotsWidget;
-	
-	UPROPERTY()
-	TSubclassOf<UD1ItemDragWidget> DragWidgetClass;
 
 	FIntPoint CachedFromSlotPos = FIntPoint::ZeroValue;
 	FVector2D CachedDeltaWidgetPos = FVector2D::ZeroVector;
+
+	int32 ItemCount = 0;
 	
 private:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<USizeBox> SizeBox_Root;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Icon;
-
-	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_Count;
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Hover;
 };
