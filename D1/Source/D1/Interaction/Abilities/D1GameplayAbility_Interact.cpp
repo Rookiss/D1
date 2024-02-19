@@ -49,7 +49,7 @@ void UD1GameplayAbility_Interact::HandleInputPress()
 	Payload.Instigator = GetAvatarActorFromActorInfo();
 	Payload.TargetData = CurrentTargetDataHandle;
 	
-	SendGameplayEvent(D1GameplayTags::Event_Interact_Active, Payload);
+	SendGameplayEvent(D1GameplayTags::Event_Interact, Payload);
 }
 
 void UD1GameplayAbility_Interact::UpdateWidget()

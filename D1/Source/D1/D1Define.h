@@ -4,7 +4,7 @@
 
 static inline FIntPoint UnitInventorySlotSize = FIntPoint(50.f, 50.f);
 
-UENUM()
+UENUM(BlueprintType)
 enum class ESlotState : uint8
 {
 	Default,
@@ -31,7 +31,7 @@ static inline TArray<FLinearColor> ItemRarityColors = {
 	FLinearColor(FColor::Yellow)
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum EEquipmentSlotType
 {
 	Primary_LeftHand,
@@ -51,7 +51,7 @@ enum EEquipmentSlotType
 	EquipmentSlotCount	UMETA(Hidden)
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EWeaponType
 {
 	Sword,
@@ -62,7 +62,7 @@ enum class EWeaponType
 	Count	UMETA(Hidden)
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EWeaponHandType
 {
 	LeftHand,
@@ -72,7 +72,7 @@ enum class EWeaponHandType
 	Count	UMETA(Hidden)
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EWeaponSlotType
 {
 	Primary,
@@ -81,7 +81,7 @@ enum class EWeaponSlotType
 	Count	UMETA(Hidden)
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EArmorType
 {
 	Helmet,
@@ -93,7 +93,7 @@ enum class EArmorType
 	Count	UMETA(Hidden)
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EEquipmentType
 {
 	Weapon,
@@ -102,7 +102,7 @@ enum class EEquipmentType
 	Count	UMETA(Hidden)
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EItemRarity : uint8
 {
 	Junk,

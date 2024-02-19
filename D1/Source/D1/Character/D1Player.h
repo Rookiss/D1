@@ -41,9 +41,6 @@ private:
 	TArray<TObjectPtr<USkeletalMesh>> DefaultArmorMeshes;
 
 public:
-	UPROPERTY(BlueprintReadOnly)
-	TArray<TObjectPtr<AD1WeaponBase>> WeaponActors; 
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UCameraComponent> CameraComponent;
 	

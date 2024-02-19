@@ -45,8 +45,8 @@ struct FD1InventoryList : public FFastArraySerializer
 	GENERATED_BODY()
 
 public:
-	FD1InventoryList() : OwnerComponent(nullptr) { }
-	FD1InventoryList(UD1InventoryManagerComponent* InOwnerComponent) : OwnerComponent(InOwnerComponent) { }
+	FD1InventoryList() : InventoryManagerComponent(nullptr) { }
+	FD1InventoryList(UD1InventoryManagerComponent* InOwnerComponent) : InventoryManagerComponent(InOwnerComponent) { }
 
 public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
@@ -75,7 +75,7 @@ private:
 	TArray<FD1InventoryEntry> Entries;
 	
 	UPROPERTY(NotReplicated)
-	TObjectPtr<UD1InventoryManagerComponent> OwnerComponent;
+	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
 };
 
 template<>

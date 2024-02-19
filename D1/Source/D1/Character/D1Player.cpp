@@ -42,8 +42,6 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 		ArmorMeshComponents[i] = ArmorMeshComponent;
 	}
 	
-	WeaponActors.SetNum(static_cast<int32>(EWeaponHandType::Count));
-	
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 }

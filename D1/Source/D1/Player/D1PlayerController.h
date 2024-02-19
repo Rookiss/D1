@@ -27,6 +27,11 @@ private:
 	void Input_Look(const FInputActionValue& InputValue);
 	void Input_Crouch();
 	void Input_Inventory();
+
+	void Input_EquipWeapon_Primary();
+	void Input_EquipWeapon_Secondary();
+	void Input_EquipWeapon_CycleBackward();
+	void Input_EquipWeapon_CycleForward();
 	
 	void Input_AbilityInputTagPressed(FGameplayTag InputTag);
 	void Input_AbilityInputTagReleased(FGameplayTag InputTag);

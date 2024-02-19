@@ -18,8 +18,10 @@ struct FD1EquipmentEntry : public FFastArraySerializerItem
 	GENERATED_BODY()
 	
 private:
-	void Init(UD1ItemInstance* InItemInstance);
-	void Reset();
+	void Init(UD1ItemInstance* NewItemInstance);
+	
+	void Equip();
+	void Unequip();
 	
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
@@ -37,7 +39,7 @@ private:
 
 private:
 	UPROPERTY(NotReplicated)
-	TArray<TObjectPtr<AActor>> SpawnedActor;
+	TObjectPtr<AActor> SpawnedWeaponActor;
 	
 	UPROPERTY(NotReplicated)
 	FD1AbilitySystemData_GrantedHandles GrantedHandles;
@@ -47,7 +49,10 @@ private:
 
 private:
 	UPROPERTY(NotReplicated)
-	TObjectPtr<UD1EquipmentManagerComponent> OwnerComponent;
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
+
+	UPROPERTY(NotReplicated)
+	EEquipmentSlotType EquipmentSlotType = EquipmentSlotCount;
 };
 
 USTRUCT(BlueprintType)
@@ -56,8 +61,8 @@ struct FD1EquipmentList : public FFastArraySerializer
 	GENERATED_BODY()
 
 public:
-	FD1EquipmentList() : OwnerComponent(nullptr) { }
-	FD1EquipmentList(UD1EquipmentManagerComponent* InOwnerComponent) : OwnerComponent(InOwnerComponent) { }
+	FD1EquipmentList() : EquipmentManagerComponent(nullptr) { }
+	FD1EquipmentList(UD1EquipmentManagerComponent* InOwnerComponent) : EquipmentManagerComponent(InOwnerComponent) { }
 
 public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
@@ -66,10 +71,15 @@ public:
 
 private:
 	void InitOnServer();
-	
-	void EquipItem_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
-	UD1ItemInstance* UnequipItem_Unsafe(EEquipmentSlotType EquipmentSlotType); /* Return Unequipped ItemInstance */
 
+	void SetEntry_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+	UD1ItemInstance* ResetEntry_Unsafe(EEquipmentSlotType EquipmentSlotType);
+	
+	void Equip_Unsafe(EEquipmentSlotType EquipmentSlotType);
+	UD1ItemInstance* Unequip_Unsafe(EEquipmentSlotType EquipmentSlotType); /* Return Unequipped ItemInstance */
+
+	void SetWeaponSlotType_Unsafe(EWeaponSlotType PrevWeaponSlotType, EWeaponSlotType NewWeaponSlotType);
+	
 public:
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const { return Entries; }
 	FD1EquipmentEntry GetEntryBySlotType(EEquipmentSlotType EquipmentSlotType) const;
@@ -82,7 +92,7 @@ private:
 	TArray<FD1EquipmentEntry> Entries;
 	
 	UPROPERTY(NotReplicated)
-	TObjectPtr<UD1EquipmentManagerComponent> OwnerComponent;
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
 };
 
 template<>
@@ -121,15 +131,23 @@ public:
 	bool CanEquipItem(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
 
 public:
+	UFUNCTION(Server, Reliable)
+	void Server_RequestSetWeaponSlotType(EWeaponSlotType NewWeaponSlotType);
+	
+	void CycleWeaponSlotForward();
+	void CycleWeaponSlotBackward();
+	
+public:
 	bool IsSameWeaponHandType(EEquipmentSlotType EquipmentSlotType, EWeaponHandType WeaponHandType) const;
 	bool IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType) const;
-
-	bool IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
-	bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
+	
+	bool IsPrimaryWeaponSlotType(EEquipmentSlotType EquipmentSlotType) const;
+	bool IsSecondaryWeaponSlotType(EEquipmentSlotType EquipmentSlotType) const;
+	bool IsSameWeaponSlotType(EEquipmentSlotType EquipmentSlotType, EWeaponSlotType WeaponSlotType) const;
 	
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const;
-	int32 GetEquipmentSlotCount() const { return EquipmentSlotCount; }
 	UD1AbilitySystemComponent* GetAbilitySystemComponent() const;
+	EWeaponSlotType GetCurrentWeaponSlotType() const { return CurrentWeaponSlotType; }
 
 public:
 	FOnEquipmentEntryChanged OnEquipmentEntryChanged;
@@ -139,4 +157,7 @@ private:
 	
 	UPROPERTY(Replicated)
 	FD1EquipmentList EquipmentList;
+
+protected:
+	EWeaponSlotType CurrentWeaponSlotType = EWeaponSlotType::Primary;
 };
