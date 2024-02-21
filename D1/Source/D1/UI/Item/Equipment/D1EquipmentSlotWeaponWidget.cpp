@@ -37,7 +37,7 @@ void UD1EquipmentSlotWeaponWidget::NativeConstruct()
 	EquipmentManagerComponent = Player->EquipmentManagerComponent;
 	check(EquipmentManagerComponent);
 	
-	EntryWidgets.SetNum(static_cast<int32>(EWeaponHandType::Count));
+	EntryWidgets.SetNum((int32)EWeaponHandType::Count);
 	SlotImages   = { Image_Slot_LeftHand, Image_Slot_RightHand, Image_Slot_TwoHand };
 	SlotOverlays = { Overlay_Slot_LeftHand, Overlay_Slot_RightHand, Overlay_Slot_TwoHand };
 
@@ -64,16 +64,16 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry,
 	
 	if (const UD1ItemFragment_Equippable_Weapon* FromWeapon = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 	{
-		TargetImage = SlotImages[static_cast<int32>(FromWeapon->WeaponHandType)];
+		TargetImage = SlotImages[(int32)FromWeapon->WeaponHandType];
 		EEquipmentSlotType ToEquipmentSlotType = ConvertToEquipmentSlotType(FromWeapon->WeaponHandType);
 	
 		if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
 		{
-			bIsValid = EquipmentManagerComponent->CanEquipItem_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
+			bIsValid = EquipmentManagerComponent->CanSetEntry_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
 		}
 		else if (UD1EquipmentManagerComponent* EquipmentManager = DragDrop->FromEquipmentManager)
 		{
-			bIsValid = EquipmentManagerComponent->CanEquipItem_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+			bIsValid = EquipmentManagerComponent->CanSetEntry_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
 		}
 	}
 
@@ -109,11 +109,11 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDrop(const FGeometry& InGeometry, con
 
 		if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
 		{
-			EquipmentManagerComponent->Server_RequestEquipItem_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
+			EquipmentManagerComponent->Server_RequestSetEntry_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
 		}
 		else if (UD1EquipmentManagerComponent* EquipmentManager = DragDrop->FromEquipmentManager)
 		{
-			EquipmentManagerComponent->Server_RequestEquipItem_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+			EquipmentManagerComponent->Server_RequestSetEntry_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
 		}
 	}
 	
@@ -135,7 +135,7 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 	if (InWeaponHandType == EWeaponHandType::Count)
 		return;
 
-	int32 WeaponHandIndex = static_cast<int32>(InWeaponHandType);
+	int32 WeaponHandIndex = (int32)InWeaponHandType;
 	UOverlay* TargetOverlay = SlotOverlays[WeaponHandIndex];
 	
 	if (NewItemInstance)
@@ -164,24 +164,24 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 
 EEquipmentSlotType UD1EquipmentSlotWeaponWidget::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const
 {
-	EEquipmentSlotType EquipmentSlotType = EquipmentSlotCount;
+	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 
 	if (WeaponSlotType == EWeaponSlotType::Primary)
 	{
 		switch (WeaponHandType)
 		{
-		case EWeaponHandType::LeftHand:  EquipmentSlotType = Primary_LeftHand;  break;
-		case EWeaponHandType::RightHand: EquipmentSlotType = Primary_RightHand; break;
-		case EWeaponHandType::TwoHand:   EquipmentSlotType = Primary_TwoHand;   break;
+		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Primary_LeftHand;  break;
+		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Primary_RightHand; break;
+		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Primary_TwoHand;   break;
 		}
 	}
 	else if (WeaponSlotType == EWeaponSlotType::Secondary)
 	{
 		switch (WeaponHandType)
 		{
-		case EWeaponHandType::LeftHand:  EquipmentSlotType = Secondary_LeftHand;  break;
-		case EWeaponHandType::RightHand: EquipmentSlotType = Secondary_RightHand; break;
-		case EWeaponHandType::TwoHand:   EquipmentSlotType = Secondary_TwoHand;   break;
+		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Secondary_LeftHand;  break;
+		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Secondary_RightHand; break;
+		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Secondary_TwoHand;   break;
 		}
 	}
 	

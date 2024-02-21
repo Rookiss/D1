@@ -2,8 +2,6 @@
 
 #include "D1WeaponBase.generated.h"
 
-class UBoxComponent;
-
 UCLASS()
 class AD1WeaponBase : public AActor
 {
@@ -15,7 +13,4 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> WeaponMesh;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UBoxComponent> HitCollision;
 };

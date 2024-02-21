@@ -2,18 +2,21 @@
 
 namespace D1GameplayTags
 {
-	UE_DEFINE_GAMEPLAY_TAG(State_Dead,								"State.Dead");
 	UE_DEFINE_GAMEPLAY_TAG(State_DamageImmunity,					"State.DamageImmunity");
 	UE_DEFINE_GAMEPLAY_TAG(State_InputBlocked,						"State.InputBlocked");
+	UE_DEFINE_GAMEPLAY_TAG(State_Dead,								"State.Dead");
 	UE_DEFINE_GAMEPLAY_TAG(State_Jump,								"State.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(State_Attack,							"State.Attack");
 	UE_DEFINE_GAMEPLAY_TAG(State_Interact,							"State.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(State_EquipWeapon,						"State.EquipWeapon");
+	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Armed,						"State.Weapon.Armed");
+	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Blocking,					"State.Weapon.Blocking");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Event_Interact,							"Event.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Attack_Begin,						"Event.Attack.Begin");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Attack_Tick,						"Event.Attack.Tick");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Attack_End,						"Event.Attack.End");
+	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon_ToggleArming,			"Event.EquipWeapon.ToggleArming");
 	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon_Primary,				"Event.EquipWeapon.Primary");
 	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon_Secondary,				"Event.EquipWeapon.Secondary");
 	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon_CycleBackward,			"Event.EquipWeapon.CycleBackward");
@@ -27,6 +30,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Interact,					"Input.Action.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Attack_MainHand,			"Input.Action.Attack.MainHand");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Attack_OffHand,				"Input.Action.Attack.OffHand");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_EquipWeapon_ToggleArming,	"Input.Action.EquipWeapon.ToggleArming");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_EquipWeapon_Primary,		"Input.Action.EquipWeapon.Primary");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_EquipWeapon_Secondary,		"Input.Action.EquipWeapon.Secondary");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_EquipWeapon_CycleBackward,	"Input.Action.EquipWeapon.CycleBackward");
@@ -57,4 +61,4 @@ namespace D1GameplayTags
 		
 	UE_DEFINE_GAMEPLAY_TAG(Attack_Physical,							"Attack.Physical");
 	UE_DEFINE_GAMEPLAY_TAG(Attack_Magical,							"Attack.Magical");
-}	
+}

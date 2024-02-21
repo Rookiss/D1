@@ -49,10 +49,10 @@ private:
 
 private:
 	UPROPERTY(NotReplicated)
-	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
 
 	UPROPERTY(NotReplicated)
-	EEquipmentSlotType EquipmentSlotType = EquipmentSlotCount;
+	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 };
 
 USTRUCT(BlueprintType)
@@ -61,8 +61,8 @@ struct FD1EquipmentList : public FFastArraySerializer
 	GENERATED_BODY()
 
 public:
-	FD1EquipmentList() : EquipmentManagerComponent(nullptr) { }
-	FD1EquipmentList(UD1EquipmentManagerComponent* InOwnerComponent) : EquipmentManagerComponent(InOwnerComponent) { }
+	FD1EquipmentList() : EquipmentManager(nullptr) { }
+	FD1EquipmentList(UD1EquipmentManagerComponent* InOwnerComponent) : EquipmentManager(InOwnerComponent) { }
 
 public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
@@ -72,17 +72,11 @@ public:
 private:
 	void InitOnServer();
 
-	void SetEntry_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
-	UD1ItemInstance* ResetEntry_Unsafe(EEquipmentSlotType EquipmentSlotType);
-	
-	void Equip_Unsafe(EEquipmentSlotType EquipmentSlotType);
-	UD1ItemInstance* Unequip_Unsafe(EEquipmentSlotType EquipmentSlotType); /* Return Unequipped ItemInstance */
-
-	void SetWeaponSlotType_Unsafe(EWeaponSlotType PrevWeaponSlotType, EWeaponSlotType NewWeaponSlotType);
+	void SetEntry(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+	UD1ItemInstance* ResetEntry(EEquipmentSlotType EquipmentSlotType); /* Return Prev ItemInstance */
 	
 public:
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const { return Entries; }
-	FD1EquipmentEntry GetEntryBySlotType(EEquipmentSlotType EquipmentSlotType) const;
 	
 private:
 	friend class UD1EquipmentManagerComponent;
@@ -92,7 +86,7 @@ private:
 	TArray<FD1EquipmentEntry> Entries;
 	
 	UPROPERTY(NotReplicated)
-	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
 };
 
 template<>
@@ -119,36 +113,51 @@ protected:
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
 public:
-	// TODO: Auth Check
+	// TODO: With Validation
 	UFUNCTION(Server, Reliable)
-	void Server_RequestEquipItem_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType);
-	bool CanEquipItem_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const;
+	void Server_RequestSetEntry_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType);
+	bool CanSetEntry_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const;
 
 	UFUNCTION(Server, Reliable)
-	void Server_RequestEquipItem_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType);
-	bool CanEquipItem_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
+	void Server_RequestSetEntry_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType);
+	bool CanSetEntry_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
 	
-	bool CanEquipItem(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
+	bool CanSetEntry(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
 
 public:
-	UFUNCTION(Server, Reliable)
-	void Server_RequestSetWeaponSlotType(EWeaponSlotType NewWeaponSlotType);
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void EquipCurrentWeapon();
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void UnequipCurrentWeapon();
 	
-	void CycleWeaponSlotForward();
-	void CycleWeaponSlotBackward();
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void ChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState);
+
+	UFUNCTION(BlueprintCallable)
+	bool CanChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState);
+	
+	UFUNCTION()
+	void OnRep_CurrWeaponEquipState(EWeaponEquipState InPrevWeaponEquipState);
 	
 public:
+	bool IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState) const;
 	bool IsSameWeaponHandType(EEquipmentSlotType EquipmentSlotType, EWeaponHandType WeaponHandType) const;
 	bool IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType) const;
 	
-	bool IsPrimaryWeaponSlotType(EEquipmentSlotType EquipmentSlotType) const;
-	bool IsSecondaryWeaponSlotType(EEquipmentSlotType EquipmentSlotType) const;
-	bool IsSameWeaponSlotType(EEquipmentSlotType EquipmentSlotType, EWeaponSlotType WeaponSlotType) const;
+	bool IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
+	bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
+	bool IsAllEmpty(EWeaponEquipState WeaponEquipState) const;
+	
+	EWeaponEquipState GetBackwardWeaponEquipState(EWeaponEquipState WeaponEquipState) const;
+	EWeaponEquipState GetForwardWeaponEquipState(EWeaponEquipState WeaponEquipState) const;
+	
+	EWeaponEquipState GetCurrWeaponEquipState() const { return CurrWeaponEquipState; }
+	EWeaponEquipState GetPrevWeaponEquipState() const { return PrevWeaponEquipState; }
 	
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const;
 	UD1AbilitySystemComponent* GetAbilitySystemComponent() const;
-	EWeaponSlotType GetCurrentWeaponSlotType() const { return CurrentWeaponSlotType; }
-
+	
 public:
 	FOnEquipmentEntryChanged OnEquipmentEntryChanged;
 	
@@ -157,7 +166,8 @@ private:
 	
 	UPROPERTY(Replicated)
 	FD1EquipmentList EquipmentList;
-
-protected:
-	EWeaponSlotType CurrentWeaponSlotType = EWeaponSlotType::Primary;
+	
+	UPROPERTY(ReplicatedUsing=OnRep_CurrWeaponEquipState)
+	EWeaponEquipState CurrWeaponEquipState = EWeaponEquipState::Unarmed;
+	EWeaponEquipState PrevWeaponEquipState = EWeaponEquipState::Primary;
 };

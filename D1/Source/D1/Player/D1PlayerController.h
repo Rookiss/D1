@@ -1,23 +1,27 @@
 ﻿#pragma once
 
+#include "AbilitySystemInterface.h"
 #include "D1PlayerController.generated.h"
 
 struct FInputActionValue;
 struct FGameplayTag;
 
 UCLASS()
-class AD1PlayerController : public APlayerController
+class AD1PlayerController : public APlayerController, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 	
 public:
 	AD1PlayerController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-public:
+protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused) override;
 
+protected:
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
 public:
 	void SetInputModeGameOnly();
 	void SetInputModeUIOnly(bool bShowCursor = true);
@@ -28,6 +32,7 @@ private:
 	void Input_Crouch();
 	void Input_Inventory();
 
+	void Input_EquipWeapon_ToggleArming();
 	void Input_EquipWeapon_Primary();
 	void Input_EquipWeapon_Secondary();
 	void Input_EquipWeapon_CycleBackward();

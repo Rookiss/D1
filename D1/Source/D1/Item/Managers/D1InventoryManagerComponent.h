@@ -45,8 +45,8 @@ struct FD1InventoryList : public FFastArraySerializer
 	GENERATED_BODY()
 
 public:
-	FD1InventoryList() : InventoryManagerComponent(nullptr) { }
-	FD1InventoryList(UD1InventoryManagerComponent* InOwnerComponent) : InventoryManagerComponent(InOwnerComponent) { }
+	FD1InventoryList() : InventoryManager(nullptr) { }
+	FD1InventoryList(UD1InventoryManagerComponent* InOwnerComponent) : InventoryManager(InOwnerComponent) { }
 
 public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
@@ -75,7 +75,7 @@ private:
 	TArray<FD1InventoryEntry> Entries;
 	
 	UPROPERTY(NotReplicated)
-	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
+	TObjectPtr<UD1InventoryManagerComponent> InventoryManager;
 };
 
 template<>
@@ -104,7 +104,7 @@ public:
 	void Init(FIntPoint InInventorySlotCount);
 	
 public:
-	// TODO: Auth Check
+	// TODO: With Validation
 	UFUNCTION(Server, Reliable)
 	void Server_RequestMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos);
 	int32 CanMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const; /* Return Movable Item Count */

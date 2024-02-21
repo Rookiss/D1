@@ -64,11 +64,11 @@ bool UD1EquipmentSlotArmorWidget::NativeOnDragOver(const FGeometry& InGeometry, 
 		
 		if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
 		{
-			bIsValid = EquipmentManagerComponent->CanEquipItem_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, EquipmentSlotType);
+			bIsValid = EquipmentManagerComponent->CanSetEntry_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, EquipmentSlotType);
 		}
 		else if (UD1EquipmentManagerComponent* EquipmentManager = DragDrop->FromEquipmentManager)
 		{
-			bIsValid = EquipmentManagerComponent->CanEquipItem_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, EquipmentSlotType);
+			bIsValid = EquipmentManagerComponent->CanSetEntry_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, EquipmentSlotType);
 		}
 	}
 	
@@ -104,11 +104,11 @@ bool UD1EquipmentSlotArmorWidget::NativeOnDrop(const FGeometry& InGeometry, cons
 	
 		if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
 		{
-			EquipmentManagerComponent->Server_RequestEquipItem_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
+			EquipmentManagerComponent->Server_RequestSetEntry_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
 		}
 		else if (UD1EquipmentManagerComponent* EquipmentManager = DragDrop->FromEquipmentManager)
 		{
-			EquipmentManagerComponent->Server_RequestEquipItem_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+			EquipmentManagerComponent->Server_RequestSetEntry_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
 		}
 	}
 	
@@ -148,15 +148,15 @@ void UD1EquipmentSlotArmorWidget::OnEquipmentEntryChanged(UD1ItemInstance* InIte
 
 EEquipmentSlotType UD1EquipmentSlotArmorWidget::ConvertToEquipmentSlotType() const
 {
-	EEquipmentSlotType EquipmentSlotType = EquipmentSlotCount;
+	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 
 	switch (ArmorType)
 	{
-	case EArmorType::Helmet: EquipmentSlotType = Helmet; break;
-	case EArmorType::Chest:  EquipmentSlotType = Chest;  break;
-	case EArmorType::Legs:   EquipmentSlotType = Legs;   break;
-	case EArmorType::Hands:  EquipmentSlotType = Hands;  break;
-	case EArmorType::Foot:   EquipmentSlotType = Foot;   break;
+	case EArmorType::Helmet: EquipmentSlotType = EEquipmentSlotType::Helmet; break;
+	case EArmorType::Chest:  EquipmentSlotType = EEquipmentSlotType::Chest;  break;
+	case EArmorType::Legs:   EquipmentSlotType = EEquipmentSlotType::Legs;   break;
+	case EArmorType::Hands:  EquipmentSlotType = EEquipmentSlotType::Hands;  break;
+	case EArmorType::Foot:   EquipmentSlotType = EEquipmentSlotType::Foot;   break;
 	}
 
 	return EquipmentSlotType;

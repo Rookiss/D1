@@ -27,7 +27,7 @@ void UD1InventoryEntryWidget::Init(UD1InventorySlotsWidget* InSlotsWidget, UD1It
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
 	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
 
-	FVector2D WidgetSize = FVector2D(ItemDef.ItemSlotCount.X * UnitInventorySlotSize.X, ItemDef.ItemSlotCount.Y * UnitInventorySlotSize.Y);
+	FVector2D WidgetSize = FVector2D(ItemDef.ItemSlotCount.X * Item::UnitInventorySlotSize.X, ItemDef.ItemSlotCount.Y * Item::UnitInventorySlotSize.Y);
 	SizeBox_Root->SetWidthOverride(WidgetSize.X);
 	SizeBox_Root->SetHeightOverride(WidgetSize.Y);
 	
@@ -49,8 +49,8 @@ FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 	
 	FVector2D MouseWidgetPos = SlotsWidget->GetCachedGeometry().AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-	FVector2D ItemWidgetPos = SlotsWidget->GetCachedGeometry().AbsoluteToLocal(InGeometry.LocalToAbsolute(UnitInventorySlotSize / 2.f));
-	FIntPoint ItemSlotPos = FIntPoint(ItemWidgetPos.X / UnitInventorySlotSize.X, ItemWidgetPos.Y / UnitInventorySlotSize.Y);
+	FVector2D ItemWidgetPos = SlotsWidget->GetCachedGeometry().AbsoluteToLocal(InGeometry.LocalToAbsolute(Item::UnitInventorySlotSize / 2.f));
+	FIntPoint ItemSlotPos = FIntPoint(ItemWidgetPos.X / Item::UnitInventorySlotSize.X, ItemWidgetPos.Y / Item::UnitInventorySlotSize.Y);
 	
 	CachedFromSlotPos = ItemSlotPos;
 	CachedDeltaWidgetPos = MouseWidgetPos - ItemWidgetPos;
@@ -66,7 +66,7 @@ void UD1InventoryEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
 	
 	UD1ItemDragWidget* DragWidget = CreateWidget<UD1ItemDragWidget>(GetOwningPlayer(), DragWidgetClass);
-	FVector2D EntityWidgetSize = FVector2D(ItemDef.ItemSlotCount.X * UnitInventorySlotSize.X, ItemDef.ItemSlotCount.Y * UnitInventorySlotSize.Y);
+	FVector2D EntityWidgetSize = FVector2D(ItemDef.ItemSlotCount.X * Item::UnitInventorySlotSize.X, ItemDef.ItemSlotCount.Y * Item::UnitInventorySlotSize.Y);
 	DragWidget->Init(EntityWidgetSize, ItemDef.IconTexture, ItemCount);
 	
 	UD1ItemDragDrop* DragDrop = NewObject<UD1ItemDragDrop>();

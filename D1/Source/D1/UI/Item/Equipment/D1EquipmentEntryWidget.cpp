@@ -19,6 +19,8 @@ UD1EquipmentEntryWidget::UD1EquipmentEntryWidget(const FObjectInitializer& Objec
 
 void UD1EquipmentEntryWidget::Init(UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType)
 {
+	check(InEquipmentSlotType != EEquipmentSlotType::Count);
+	
 	SetItemInstance(InItemInstance);
 	EquipmentSlotType = InEquipmentSlotType;
 }
@@ -42,7 +44,7 @@ void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
 	
 	UD1ItemDragWidget* DragWidget = CreateWidget<UD1ItemDragWidget>(GetOwningPlayer(), DragWidgetClass);
-	FVector2D EntityWidgetSize = FVector2D(ItemDef.ItemSlotCount * UnitInventorySlotSize);
+	FVector2D EntityWidgetSize = FVector2D(ItemDef.ItemSlotCount * Item::UnitInventorySlotSize);
 	DragWidget->Init(EntityWidgetSize, ItemDef.IconTexture, 1);
 	
 	UD1ItemDragDrop* DragDrop = NewObject<UD1ItemDragDrop>();
@@ -52,6 +54,6 @@ void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	DragDrop->FromEquipmentManager = EquipmentManagerComponent;
 	DragDrop->FromEquipmentSlotType = EquipmentSlotType;
 	DragDrop->ItemInstance = ItemInstance;
-	DragDrop->DeltaWidgetPos = (EntityWidgetSize / 2.f) - (UnitInventorySlotSize / 2.f);
+	DragDrop->DeltaWidgetPos = (EntityWidgetSize / 2.f) - (Item::UnitInventorySlotSize / 2.f);
 	OutOperation = DragDrop;
 }

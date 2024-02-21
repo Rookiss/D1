@@ -23,12 +23,12 @@ void UD1EquipmentSlotsWidget::NativeConstruct()
 	
 	for (int32 i = 0; i < SlotWeaponWidgets.Num(); i++)
 	{
-		SlotWeaponWidgets[i]->Init(static_cast<EWeaponSlotType>(i));
+		SlotWeaponWidgets[i]->Init((EWeaponSlotType)i);
 	}
 
 	for (int32 i = 0; i < SlotArmorWidgets.Num(); i++)
 	{
-		SlotArmorWidgets[i]->Init(static_cast<EArmorType>(i));
+		SlotArmorWidgets[i]->Init((EArmorType)i);
 	}
 
 	AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn());
@@ -43,7 +43,7 @@ void UD1EquipmentSlotsWidget::NativeConstruct()
 		const FD1EquipmentEntry& Entry = Entries[i];
 		if (UD1ItemInstance* ItemInstance = Entry.GetItemInstance())
 		{
-			OnEquipmentEntryChanged(static_cast<EEquipmentSlotType>(i), ItemInstance);
+			OnEquipmentEntryChanged((EEquipmentSlotType)i, ItemInstance);
 		}
 	}
 	EquipmentManagerComponent->OnEquipmentEntryChanged.AddUObject(this, &ThisClass::OnEquipmentEntryChanged);
@@ -51,20 +51,21 @@ void UD1EquipmentSlotsWidget::NativeConstruct()
 
 void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
 {
-	if (EquipmentSlotType == EquipmentSlotCount)
+	if (EquipmentSlotType == EEquipmentSlotType::Count)
 		return;
 
-	int32 WeaponSlotCount = static_cast<int32>(EWeaponSlotType::Count) * static_cast<int32>(EWeaponHandType::Count);
-	if (EquipmentSlotType < WeaponSlotCount)
+	const int32 EquipmentSlotIndex = (int32)EquipmentSlotType;
+	const int32 WeaponSlotCount = (int32)EWeaponSlotType::Count * (int32)EWeaponHandType::Count;
+	if (EquipmentSlotIndex < WeaponSlotCount)
 	{
-		int32 WeaponSlotIndex = EquipmentSlotType / static_cast<int32>(EWeaponHandType::Count);
-		int32 WeaponHandIndex = EquipmentSlotType % static_cast<int32>(EWeaponHandType::Count);
+		const int32 WeaponSlotIndex = EquipmentSlotIndex / (int32)EWeaponHandType::Count;
+		const int32 WeaponHandIndex = EquipmentSlotIndex % (int32)EWeaponHandType::Count;
 		UD1EquipmentSlotWeaponWidget* SlotWeaponWidget = SlotWeaponWidgets[WeaponSlotIndex];
-		SlotWeaponWidget->OnEquipmentEntryChanged(static_cast<EWeaponHandType>(WeaponHandIndex), ItemInstance);
+		SlotWeaponWidget->OnEquipmentEntryChanged((EWeaponHandType)WeaponHandIndex, ItemInstance);
 	}
 	else
 	{
-		UD1EquipmentSlotArmorWidget* SlotArmorWidget = SlotArmorWidgets[EquipmentSlotType - WeaponSlotCount];
+		UD1EquipmentSlotArmorWidget* SlotArmorWidget = SlotArmorWidgets[EquipmentSlotIndex - WeaponSlotCount];
 		SlotArmorWidget->OnEquipmentEntryChanged(ItemInstance);
 	}
 }

@@ -51,6 +51,7 @@ void AD1PlayerController::SetupInputComponent()
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Crouch, ETriggerEvent::Triggered, this, &ThisClass::Input_Crouch, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Inventory, ETriggerEvent::Triggered, this, &ThisClass::Input_Inventory, InputBindHandles);
 		
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_EquipWeapon_ToggleArming, ETriggerEvent::Triggered, this, &ThisClass::Input_EquipWeapon_ToggleArming, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_EquipWeapon_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_EquipWeapon_Primary, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_EquipWeapon_Secondary, ETriggerEvent::Triggered, this, &ThisClass::Input_EquipWeapon_Secondary, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_EquipWeapon_CycleBackward, ETriggerEvent::Triggered, this, &ThisClass::Input_EquipWeapon_CycleBackward, InputBindHandles);
@@ -68,6 +69,15 @@ void AD1PlayerController::PostProcessInput(const float DeltaTime, const bool bGa
 	}
 	
 	Super::PostProcessInput(DeltaTime, bGamePaused);
+}
+
+UAbilitySystemComponent* AD1PlayerController::GetAbilitySystemComponent() const
+{
+	if (AD1PlayerState* PS = GetPlayerState<AD1PlayerState>())
+	{
+		return PS->GetAbilitySystemComponent();
+	}
+	return nullptr;
 }
 
 void AD1PlayerController::SetInputModeGameOnly()
@@ -149,28 +159,39 @@ void AD1PlayerController::Input_Inventory()
 {
 	if (AD1HUD* HUD = Cast<AD1HUD>(GetHUD()))
 	{
+		// TODO: 공격중에는 열수없게 하는 등 조건 추가필요(Ability로의 전환)
 		HUD->ShowControlledInventoryWidget();
 	}
 }
 
+void AD1PlayerController::Input_EquipWeapon_ToggleArming()
+{
+	FGameplayEventData Payload;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_ToggleArming, Payload);
+}
+
 void AD1PlayerController::Input_EquipWeapon_Primary()
 {
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_Primary, FGameplayEventData());
+	FGameplayEventData Payload;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_Primary, Payload);
 }
 
 void AD1PlayerController::Input_EquipWeapon_Secondary()
 {
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_Secondary, FGameplayEventData());
+	FGameplayEventData Payload;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_Secondary, Payload);
 }
 
 void AD1PlayerController::Input_EquipWeapon_CycleBackward()
 {
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_CycleBackward, FGameplayEventData());
+	FGameplayEventData Payload;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_CycleBackward, Payload);
 }
 
 void AD1PlayerController::Input_EquipWeapon_CycleForward()
 {
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_CycleForward, FGameplayEventData());
+	FGameplayEventData Payload;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_CycleForward, Payload);
 }
 
 void AD1PlayerController::Input_AbilityInputTagPressed(FGameplayTag InputTag)

@@ -26,5 +26,5 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
 
-	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::EquipmentSlotCount;
+	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 };

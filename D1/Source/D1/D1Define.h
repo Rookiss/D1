@@ -2,8 +2,6 @@
 
 #define ITEM_ID_COIN 9999
 
-static inline FIntPoint UnitInventorySlotSize = FIntPoint(50.f, 50.f);
-
 UENUM(BlueprintType)
 enum class ESlotState : uint8
 {
@@ -12,27 +10,8 @@ enum class ESlotState : uint8
 	Valid
 };
 
-namespace ItemSlotColor
-{
-	inline FLinearColor DefaultColor = FLinearColor(1.f, 1.f, 1.f, 0.f);
-	inline FLinearColor RedColor     = FLinearColor(0.28f, 0.02f, 0.f, 0.32f);
-	inline FLinearColor GreenColor   = FLinearColor(0.02f, 0.28f, 0.f, 0.32f);
-	inline FLinearColor BlueColor    = FLinearColor(0.f, 0.02f, 0.28f, 0.32f);
-}
-
-static inline TArray<FLinearColor> ItemRarityColors = {
-	FLinearColor::Gray,
-	FLinearColor(FColor::Silver),
-	FLinearColor::White,
-	FLinearColor(FColor::Green),
-	FLinearColor(FColor::Cyan),
-	FLinearColor(FColor::Purple),
-	FLinearColor(FColor::Orange),
-	FLinearColor(FColor::Yellow)
-};
-
 UENUM(BlueprintType)
-enum EEquipmentSlotType
+enum class EEquipmentSlotType : uint8
 {
 	Primary_LeftHand,
 	Primary_RightHand,
@@ -48,11 +27,11 @@ enum EEquipmentSlotType
 	Hands,
 	Foot,
 	
-	EquipmentSlotCount	UMETA(Hidden)
+	Count	UMETA(Hidden)
 };
 
 UENUM(BlueprintType)
-enum class EWeaponType
+enum class EWeaponType : uint8
 {
 	Sword,
 	Dagger,
@@ -63,7 +42,7 @@ enum class EWeaponType
 };
 
 UENUM(BlueprintType)
-enum class EWeaponHandType
+enum class EWeaponHandType : uint8
 {
 	LeftHand,
 	RightHand,
@@ -73,7 +52,17 @@ enum class EWeaponHandType
 };
 
 UENUM(BlueprintType)
-enum class EWeaponSlotType
+enum class EWeaponEquipState : uint8
+{
+	Unarmed,
+	Primary,
+	Secondary,
+
+	Count	UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EWeaponSlotType : uint8
 {
 	Primary,
 	Secondary,
@@ -82,7 +71,7 @@ enum class EWeaponSlotType
 };
 
 UENUM(BlueprintType)
-enum class EArmorType
+enum class EArmorType : uint8
 {
 	Helmet,
 	Chest,
@@ -94,7 +83,7 @@ enum class EArmorType
 };
 
 UENUM(BlueprintType)
-enum class EEquipmentType
+enum class EEquipmentType : uint8
 {
 	Weapon,
 	Armor,
@@ -116,3 +105,30 @@ enum class EItemRarity : uint8
 
 	Count	UMETA(Hidden)
 };
+
+namespace Item
+{
+	const FIntPoint UnitInventorySlotSize = FIntPoint(50.f, 50.f);
+
+	const TArray<TArray<EEquipmentSlotType>> SlotsByWeaponEquipState = {
+		{ },
+		{ EEquipmentSlotType::Primary_LeftHand, EEquipmentSlotType::Primary_RightHand, EEquipmentSlotType::Primary_TwoHand },
+		{ EEquipmentSlotType::Secondary_LeftHand, EEquipmentSlotType::Secondary_RightHand, EEquipmentSlotType::Secondary_TwoHand }
+	};
+	
+	const FLinearColor DefaultColor = FLinearColor(1.f, 1.f, 1.f, 0.f);
+	const FLinearColor RedColor     = FLinearColor(0.28f, 0.02f, 0.f, 0.32f);
+	const FLinearColor GreenColor   = FLinearColor(0.02f, 0.28f, 0.f, 0.32f);
+	const FLinearColor BlueColor    = FLinearColor(0.f, 0.02f, 0.28f, 0.32f);
+
+	const TArray<FLinearColor> ItemRarityColors = {
+		FLinearColor::Gray,
+		FLinearColor(FColor::Silver),
+		FLinearColor::White,
+		FLinearColor(FColor::Green),
+		FLinearColor(FColor::Cyan),
+		FLinearColor(FColor::Purple),
+		FLinearColor(FColor::Orange),
+		FLinearColor(FColor::Yellow)
+	};
+}

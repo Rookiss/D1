@@ -20,9 +20,9 @@ void UD1ItemSlotWidget::ChangeSlotState(UImage* TargetImage, ESlotState NewSlotS
 
 	switch (SlotState)
 	{
-	case ESlotState::Default: TargetImage->SetColorAndOpacity(ItemSlotColor::DefaultColor);	break;
-	case ESlotState::Invalid: TargetImage->SetColorAndOpacity(ItemSlotColor::RedColor);		break;
-	case ESlotState::Valid:   TargetImage->SetColorAndOpacity(ItemSlotColor::BlueColor);	break;
+	case ESlotState::Default: TargetImage->SetColorAndOpacity(Item::DefaultColor);	break;
+	case ESlotState::Invalid: TargetImage->SetColorAndOpacity(Item::RedColor);		break;
+	case ESlotState::Valid:   TargetImage->SetColorAndOpacity(Item::BlueColor);		break;
 	}
 }
 
@@ -34,7 +34,7 @@ void UD1ItemSlotWidget::ChangeHoverState(UImage* TargetImage, ESlotState NewHove
 	switch (NewHoverState)
 	{
 	case ESlotState::Default: ChangeSlotState(TargetImage, ImageToSlotState.FindOrAdd(TargetImage));	break;
-	case ESlotState::Invalid: TargetImage->SetColorAndOpacity(ItemSlotColor::RedColor);					break;
-	case ESlotState::Valid:   TargetImage->SetColorAndOpacity(ItemSlotColor::GreenColor);				break;
+	case ESlotState::Invalid: TargetImage->SetColorAndOpacity(Item::RedColor);							break;
+	case ESlotState::Valid:   TargetImage->SetColorAndOpacity(Item::GreenColor);						break;
 	}
 }

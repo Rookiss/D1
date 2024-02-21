@@ -12,9 +12,5 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
 	SetRootComponent(WeaponMesh);
-	WeaponMesh->SetCollisionProfileName("NoCollision");
-	
-	HitCollision = CreateDefaultSubobject<UBoxComponent>("HitCollision");
-	HitCollision->SetupAttachment(WeaponMesh);
-	HitCollision->SetCollisionProfileName("OverlapAllDynamic");
+	WeaponMesh->SetCollisionProfileName("OverlapAllDynamic");
 }

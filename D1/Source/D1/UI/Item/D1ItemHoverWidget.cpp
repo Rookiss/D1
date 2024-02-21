@@ -25,7 +25,7 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 	const EItemRarity ItemRarity = ItemInstance->GetItemRarity();
 
 	Text_DisplayName->SetText(ItemDef.DisplayName);
-	Text_DisplayName->SetColorAndOpacity(FSlateColor(ItemRarityColors[static_cast<int32>(ItemRarity)]));
+	Text_DisplayName->SetColorAndOpacity(FSlateColor(Item::ItemRarityColors[static_cast<int32>(ItemRarity)]));
 
 	Text_AttributeModifiers->SetVisibility(ESlateVisibility::Collapsed);
 	Text_Description->SetVisibility(ESlateVisibility::Collapsed);

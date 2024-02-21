@@ -27,7 +27,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> FromEquipmentManager;
 
-	EEquipmentSlotType FromEquipmentSlotType = EEquipmentSlotType::EquipmentSlotCount;
+	EEquipmentSlotType FromEquipmentSlotType = EEquipmentSlotType::Count;
 
 public:
 	UPROPERTY()

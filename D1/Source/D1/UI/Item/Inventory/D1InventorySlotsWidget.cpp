@@ -70,7 +70,7 @@ bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, cons
 	
 	FVector2D MouseWidgetPos = InGeometry.AbsoluteToLocal(InDragDropEvent.GetScreenSpacePosition());
 	FVector2D ToWidgetPos = MouseWidgetPos - DragDrop->DeltaWidgetPos;
-	FIntPoint ToSlotPos = FIntPoint(ToWidgetPos.X / UnitInventorySlotSize.X, ToWidgetPos.Y / UnitInventorySlotSize.Y);
+	FIntPoint ToSlotPos = FIntPoint(ToWidgetPos.X / Item::UnitInventorySlotSize.X, ToWidgetPos.Y / Item::UnitInventorySlotSize.Y);
 
 	if (PrevDragOverSlotPos == ToSlotPos)
 		return true;
@@ -146,7 +146,7 @@ bool UD1InventorySlotsWidget::NativeOnDrop(const FGeometry& InGeometry, const FD
 	
 	FVector2D MouseWidgetPos = InGeometry.AbsoluteToLocal(InDragDropEvent.GetScreenSpacePosition());
 	FVector2D ToWidgetPos = MouseWidgetPos - DragDrop->DeltaWidgetPos;
-	FIntPoint ToItemSlotPos = FIntPoint(ToWidgetPos.X / UnitInventorySlotSize.X, ToWidgetPos.Y / UnitInventorySlotSize.Y);
+	FIntPoint ToItemSlotPos = FIntPoint(ToWidgetPos.X / Item::UnitInventorySlotSize.X, ToWidgetPos.Y / Item::UnitInventorySlotSize.Y);
 
 	if (DragDrop->FromInventoryManager)
 	{
@@ -228,7 +228,7 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlo
 
 		UCanvasPanelSlot* CanvasPanelSlot = CanvasPanel_Entries->AddChildToCanvas(EntryWidget);
 		CanvasPanelSlot->SetAutoSize(true);
-		CanvasPanelSlot->SetPosition(FVector2D(InItemSlotPos.X * UnitInventorySlotSize.X, InItemSlotPos.Y * UnitInventorySlotSize.Y));
+		CanvasPanelSlot->SetPosition(FVector2D(InItemSlotPos.X * Item::UnitInventorySlotSize.X, InItemSlotPos.Y * Item::UnitInventorySlotSize.Y));
 		
 		EntryWidget->Init(this, InItemInstance, NewItemCount);
 		
