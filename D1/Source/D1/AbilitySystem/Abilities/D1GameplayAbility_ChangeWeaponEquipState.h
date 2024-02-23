@@ -17,7 +17,8 @@ public:
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
-private:
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
 	void ChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState);
 
 protected:

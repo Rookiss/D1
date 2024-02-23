@@ -23,6 +23,8 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_EquipWeapon_Secondary);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_EquipWeapon_CycleBackward);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_EquipWeapon_CycleForward);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Begin);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_End);
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Move);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Look);

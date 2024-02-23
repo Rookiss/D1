@@ -17,7 +17,7 @@ class UD1PlayerInventoryWidget : public UD1UserWidget
 	
 public:
 	UD1PlayerInventoryWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
+	
 protected:
 	virtual void NativeConstruct() override;
 
@@ -25,6 +25,12 @@ private:
 	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 NewItemCount);
 	
 protected:
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UD1EquipmentSlotsWidget> EquipmentSlotsWidget;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UD1InventorySlotsWidget> InventorySlotsWidget;
+	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_Gold;
 

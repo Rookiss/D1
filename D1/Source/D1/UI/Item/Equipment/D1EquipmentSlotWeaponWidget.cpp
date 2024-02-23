@@ -1,7 +1,6 @@
 ﻿#include "D1EquipmentSlotWeaponWidget.h"
 
 #include "D1Define.h"
-#include "Character/D1Player.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
@@ -9,6 +8,7 @@
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
+#include "Player/D1PlayerController.h"
 #include "System/D1AssetManager.h"
 #include "UI/Item/Drag/D1ItemDragDrop.h"
 #include "UI/Item/Inventory/D1InventoryEntryWidget.h"
@@ -30,17 +30,17 @@ void UD1EquipmentSlotWeaponWidget::Init(EWeaponSlotType InWeaponSlotType)
 void UD1EquipmentSlotWeaponWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn());
-	check(Player);
-
-	EquipmentManagerComponent = Player->EquipmentManagerComponent;
-	check(EquipmentManagerComponent);
 	
 	EntryWidgets.SetNum((int32)EWeaponHandType::Count);
 	SlotImages   = { Image_Slot_LeftHand, Image_Slot_RightHand, Image_Slot_TwoHand };
 	SlotOverlays = { Overlay_Slot_LeftHand, Overlay_Slot_RightHand, Overlay_Slot_TwoHand };
 
+	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
+	check(PC);
+
+	EquipmentManagerComponent = PC->EquipmentManagerComponent;
+	check(EquipmentManagerComponent);
+	
 	EntryWidgetClass = UD1AssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidget");
 }
 

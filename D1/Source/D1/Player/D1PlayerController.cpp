@@ -9,9 +9,12 @@
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Camera/D1PlayerCameraManager.h"
 #include "Data/D1InputData.h"
+#include "Data/D1ItemData.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Input/D1InputComponent.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "Item/Managers/D1InventoryManagerComponent.h"
 #include "System/D1AssetManager.h"
 #include "UI/D1HUD.h"
 #include "UI/D1SceneWidget.h"
@@ -23,6 +26,9 @@ AD1PlayerController::AD1PlayerController(const FObjectInitializer& ObjectInitial
 {
 	bReplicates = true;
 	PlayerCameraManagerClass = AD1PlayerCameraManager::StaticClass();
+
+	EquipmentManagerComponent = CreateDefaultSubobject<UD1EquipmentManagerComponent>("EquipmentManagerComponent");
+	InventoryManagerComponent = CreateDefaultSubobject<UD1InventoryManagerComponent>("InventoryManagerComponent");
 }
 
 void AD1PlayerController::BeginPlay()
@@ -34,6 +40,22 @@ void AD1PlayerController::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(InputData->InputMappingContext, 0);
+		}
+	}
+
+	if (HasAuthority())
+	{
+		// @TODO: For Test
+		int32 IterationCount = 2;
+		UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+		const TMap<int32, FD1ItemDefinition>& AllItemDefs = ItemData->GetAllItemDefs();
+	
+		for (int i = 0; i < IterationCount; i++)
+		{
+			for (const auto& Pair : AllItemDefs)
+			{
+				InventoryManagerComponent->TryAddItem(Pair.Key, FMath::RandRange(1, 2));
+			}
 		}
 	}
 }
@@ -59,6 +81,13 @@ void AD1PlayerController::SetupInputComponent()
 
 		D1InputComponent->BindAbilityActions(InputData, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, InputBindHandles);
 	}
+}
+
+void AD1PlayerController::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	InventoryManagerComponent->Init(FIntPoint(10, 5));
 }
 
 void AD1PlayerController::PostProcessInput(const float DeltaTime, const bool bGamePaused)
@@ -173,12 +202,14 @@ void AD1PlayerController::Input_EquipWeapon_ToggleArming()
 void AD1PlayerController::Input_EquipWeapon_Primary()
 {
 	FGameplayEventData Payload;
+	Payload.EventMagnitude = 1.f;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_Primary, Payload);
 }
 
 void AD1PlayerController::Input_EquipWeapon_Secondary()
 {
 	FGameplayEventData Payload;
+	Payload.EventMagnitude = 2.f;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_Secondary, Payload);
 }
 

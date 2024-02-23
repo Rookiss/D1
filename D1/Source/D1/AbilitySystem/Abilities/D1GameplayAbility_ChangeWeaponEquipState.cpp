@@ -3,6 +3,7 @@
 #include "D1GameplayTags.h"
 #include "Character/D1Player.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "Player/D1PlayerController.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_ChangeWeaponEquipState)
 
@@ -16,10 +17,13 @@ void UD1GameplayAbility_ChangeWeaponEquipState::ActivateAbility(const FGameplayA
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	AD1Player* Player = Cast<AD1Player>(GetAvatarActorFromActorInfo());
-	check(Player);
+	FGameplayAbilitySpec* AbilitySpec = GetCurrentAbilitySpec();
+	check(AbilitySpec);
 	
-	EquipmentManager = Player->EquipmentManagerComponent;
+	AD1PlayerController* PC = Cast<AD1PlayerController>(GetPlayerController());
+	check(PC);
+	
+	EquipmentManager = PC->EquipmentManagerComponent;
 	check(EquipmentManager);
 	
 	const FGameplayTag& EventTag = TriggerEventData->EventTag;
@@ -78,29 +82,8 @@ void UD1GameplayAbility_ChangeWeaponEquipState::ActivateAbility(const FGameplayA
 	{
 		ChangeWeaponEquipState(NewWeaponEquipState);
 	}
-
-	EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateInputDirectly, false);
-}
-
-void UD1GameplayAbility_ChangeWeaponEquipState::ChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState)
-{
-	const FGameplayAbilityActivationInfo& ActivationInfo = GetCurrentActivationInfo();
-	if (HasAuthority(&ActivationInfo) == false)
-		return;
-	
-	if (EquipmentManager->GetCurrWeaponEquipState() == EWeaponEquipState::Unarmed)
-	{
-		EquipmentManager->ChangeWeaponEquipState(NewWeaponEquipState);
-		EquipmentManager->EquipCurrentWeapon();
-	}
 	else
 	{
-		EquipmentManager->UnequipCurrentWeapon();
-		EquipmentManager->ChangeWeaponEquipState(NewWeaponEquipState);
-
-		if (NewWeaponEquipState != EWeaponEquipState::Unarmed)
-		{
-			EquipmentManager->EquipCurrentWeapon();
-		}
+		EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateInputDirectly, true);
 	}
 }

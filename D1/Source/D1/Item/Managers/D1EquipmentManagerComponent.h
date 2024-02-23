@@ -151,7 +151,8 @@ public:
 	
 	EWeaponEquipState GetBackwardWeaponEquipState(EWeaponEquipState WeaponEquipState) const;
 	EWeaponEquipState GetForwardWeaponEquipState(EWeaponEquipState WeaponEquipState) const;
-	
+
+	UFUNCTION(BlueprintCallable)
 	EWeaponEquipState GetCurrWeaponEquipState() const { return CurrWeaponEquipState; }
 	EWeaponEquipState GetPrevWeaponEquipState() const { return PrevWeaponEquipState; }
 	

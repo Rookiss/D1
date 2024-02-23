@@ -21,6 +21,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon_Secondary,				"Event.EquipWeapon.Secondary");
 	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon_CycleBackward,			"Event.EquipWeapon.CycleBackward");
 	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon_CycleForward,			"Event.EquipWeapon.CycleForward");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Begin,						"Event.Montage.Begin");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_End,						"Event.Montage.End");
 		
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Move,						"Input.Action.Move");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Look,						"Input.Action.Look");

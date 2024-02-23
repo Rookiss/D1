@@ -1,10 +1,10 @@
 ﻿#include "D1PlayerInventoryWidget.h"
 
 #include "D1Define.h"
-#include "Character/D1Player.h"
 #include "Components/TextBlock.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
+#include "Player/D1PlayerController.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1PlayerInventoryWidget)
 
@@ -18,14 +18,15 @@ void UD1PlayerInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn());
-	check(Player);
+	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
+	check(PC);
 
-	InventoryManagerComponent = Player->InventoryManagerComponent;
+	InventoryManagerComponent = PC->InventoryManagerComponent;
 	check(InventoryManagerComponent);
+
+	InventoryManagerComponent->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
 	
 	Text_Gold->SetText(FText::AsNumber(InventoryManagerComponent->GetTotalCountByID(ITEM_ID_COIN)));
-	InventoryManagerComponent->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
 }
 
 void UD1PlayerInventoryWidget::OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 NewItemCount)

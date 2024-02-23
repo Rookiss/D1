@@ -124,7 +124,10 @@ void FD1EquipmentEntry::Equip()
 		const FD1WeaponAttachInfo& AttachInfo = Weapon->WeaponAttachInfo;
 		if (AttachInfo.SpawnWeaponClass)
 		{
-			APawn* OwningPawn = Cast<APawn>(EquipmentManager->GetOwner());
+			APlayerController* OwningController = Cast<APlayerController>(EquipmentManager->GetOwner());
+			check(OwningController);
+
+			APawn* OwningPawn = OwningController->GetPawn();
 			check(OwningPawn);
 		
 			USceneComponent* AttachTarget = OwningPawn->GetRootComponent();
@@ -145,9 +148,14 @@ void FD1EquipmentEntry::Equip()
 	else if (Equippable->EquipmentType == EEquipmentType::Armor)
 	{
 		// Apply New Visual
+		APlayerController* OwningController = Cast<APlayerController>(EquipmentManager->GetOwner());
+		check(OwningController);
+
+		AD1Player* OwningPlayer = Cast<AD1Player>(OwningController->GetPawn());
+		check(OwningPlayer);
+		
 		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
-		AD1Player* Player = Cast<AD1Player>(EquipmentManager->GetOwner());
-		Player->Multicast_SetArmorMesh(Armor->ArmorType, Armor->ArmorMesh.ToSoftObjectPath());
+		OwningPlayer->Multicast_SetArmorMesh(Armor->ArmorType, Armor->ArmorMesh.ToSoftObjectPath());
 	}
 }
 
@@ -180,9 +188,14 @@ void FD1EquipmentEntry::Unequip()
 	}
 	else if (Equippable->EquipmentType == EEquipmentType::Armor)
 	{
+		APlayerController* OwningController = Cast<APlayerController>(EquipmentManager->GetOwner());
+		check(OwningController);
+
+		AD1Player* OwningPlayer = Cast<AD1Player>(OwningController->GetPawn());
+		check(OwningPlayer);
+		
 		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
-		AD1Player* Player = Cast<AD1Player>(EquipmentManager->GetOwner());
-		Player->Multicast_SetArmorMesh(Armor->ArmorType, FSoftObjectPath());
+		OwningPlayer->Multicast_SetArmorMesh(Armor->ArmorType, FSoftObjectPath());
 	}
 }
 
@@ -428,7 +441,8 @@ bool UD1EquipmentManagerComponent::CanSetEntry(UD1ItemInstance* FromItemInstance
 
 void UD1EquipmentManagerComponent::EquipCurrentWeapon()
 {
-	check(GetOwner()->HasAuthority());
+	if (GetOwner()->HasAuthority() == false)
+		return;
 	
 	for (EEquipmentSlotType SlotType : Item::SlotsByWeaponEquipState[(int32)CurrWeaponEquipState])
 	{
@@ -439,7 +453,8 @@ void UD1EquipmentManagerComponent::EquipCurrentWeapon()
 
 void UD1EquipmentManagerComponent::UnequipCurrentWeapon()
 {
-	check(GetOwner()->HasAuthority());
+	if (GetOwner()->HasAuthority() == false)
+		return;
 
 	for (EEquipmentSlotType SlotType : Item::SlotsByWeaponEquipState[(int32)CurrWeaponEquipState])
 	{
@@ -450,7 +465,8 @@ void UD1EquipmentManagerComponent::UnequipCurrentWeapon()
 
 void UD1EquipmentManagerComponent::ChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState)
 {
-	check(GetOwner()->HasAuthority());
+	if (GetOwner()->HasAuthority() == false)
+		return;
 	
 	if (CanChangeWeaponEquipState(NewWeaponEquipState))
 	{

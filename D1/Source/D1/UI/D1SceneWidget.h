@@ -15,7 +15,7 @@ class UD1SceneWidget : public UD1UserWidget
 	
 public:
 	UD1SceneWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
+	
 protected:
 	virtual void NativeConstruct() override;
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;

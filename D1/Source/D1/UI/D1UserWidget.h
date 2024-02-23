@@ -12,7 +12,7 @@ class UD1UserWidget : public UUserWidget
 	
 public:
 	UD1UserWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
+	
 public:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;

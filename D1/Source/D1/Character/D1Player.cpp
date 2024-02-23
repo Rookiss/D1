@@ -5,8 +5,6 @@
 #include "Components/CapsuleComponent.h"
 #include "Data/D1ItemData.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Item/Managers/D1EquipmentManagerComponent.h"
-#include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/D1PlayerController.h"
@@ -19,9 +17,6 @@
 AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	EquipmentManagerComponent = CreateDefaultSubobject<UD1EquipmentManagerComponent>("EquipmentManagerComponent");
-	InventoryManagerComponent = CreateDefaultSubobject<UD1InventoryManagerComponent>("InventoryManagerComponent");
-	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->bUsePawnControlRotation = true;
 
@@ -46,13 +41,6 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 }
 
-void AD1Player::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	InventoryManagerComponent->Init(FIntPoint(10, 5));
-}
-
 void AD1Player::BeginPlay()
 {
 	Super::BeginPlay();
@@ -67,24 +55,8 @@ void AD1Player::BeginPlay()
 		DefaultArmorMeshes[i] = UD1AssetManager::GetAssetByName<USkeletalMesh>(DefaultArmorMeshNames[i]);
 		ArmorMeshComponents[i]->SetSkeletalMesh(DefaultArmorMeshes[i]);
 	}
-
-	CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("CameraSocket"));
-
-	if (HasAuthority())
-	{
-		// @TODO: For Test
-		int32 IterationCount = 2;
-		UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-		const TMap<int32, FD1ItemDefinition>& AllItemDefs = ItemData->GetAllItemDefs();
 	
-		for (int i = 0; i < IterationCount; i++)
-		{
-			for (const auto& Pair : AllItemDefs)
-			{
-				InventoryManagerComponent->TryAddItem(Pair.Key, FMath::RandRange(1, 2));
-			}
-		}
-	}
+	CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("CameraSocket"));
 }
 
 void AD1Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
