@@ -29,6 +29,7 @@ public:
 	void HideItemHoverWidget();
 
 public:
+	UD1PlayerInventoryWidget* GetControlledInventoryWidget() const { return ControlledInventoryWidget; }
 	UD1InteractionWidget* GetInteractionWidget() const { return InteractionWidget; }
 	bool IsAllItemSlotWidgetHidden() const;
 	bool IsAllMouseWidgetHidden() const;

@@ -20,8 +20,8 @@ struct FD1EquipmentEntry : public FFastArraySerializerItem
 private:
 	void Init(UD1ItemInstance* NewItemInstance);
 	
-	void Equip();
-	void Unequip();
+	void TryEquip();
+	void TryUnequip();
 	
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
@@ -130,15 +130,22 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void UnequipCurrentWeapon();
-	
+
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void ChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState);
-
-	UFUNCTION(BlueprintCallable)
-	bool CanChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState);
+	bool CanChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState) const;
 	
 	UFUNCTION()
 	void OnRep_CurrWeaponEquipState(EWeaponEquipState InPrevWeaponEquipState);
+
+	UFUNCTION(BlueprintCallable)
+	UAnimMontage* DetermineEquipMontage() const;
+
+	UFUNCTION(BlueprintCallable)
+	UAnimMontage* DetermineUnequipMontage() const;
+
+	UFUNCTION(BlueprintCallable)
+	void RefreshAnimInstance() const;
 	
 public:
 	bool IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState) const;
@@ -148,12 +155,15 @@ public:
 	bool IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
 	bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
 	bool IsAllEmpty(EWeaponEquipState WeaponEquipState) const;
-	
-	EWeaponEquipState GetBackwardWeaponEquipState(EWeaponEquipState WeaponEquipState) const;
-	EWeaponEquipState GetForwardWeaponEquipState(EWeaponEquipState WeaponEquipState) const;
+
+	EWeaponEquipState GetToggleArmingWeaponEquipState() const;
+	EWeaponEquipState GetBackwardWeaponEquipState() const;
+	EWeaponEquipState GetForwardWeaponEquipState() const;
 
 	UFUNCTION(BlueprintCallable)
 	EWeaponEquipState GetCurrWeaponEquipState() const { return CurrWeaponEquipState; }
+
+	UFUNCTION(BlueprintCallable)
 	EWeaponEquipState GetPrevWeaponEquipState() const { return PrevWeaponEquipState; }
 	
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const;

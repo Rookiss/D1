@@ -18,11 +18,7 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Attack_Begin);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Attack_Tick);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Attack_End);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_EquipWeapon_ToggleArming);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_EquipWeapon_Primary);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_EquipWeapon_Secondary);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_EquipWeapon_CycleBackward);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_EquipWeapon_CycleForward);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_EquipWeapon);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Begin);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_End);
 	

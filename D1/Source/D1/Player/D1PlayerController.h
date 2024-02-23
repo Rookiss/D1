@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
 #include "D1PlayerController.generated.h"
 
 struct FGameplayTag;
@@ -33,8 +34,7 @@ private:
 	void Input_Move(const FInputActionValue& InputValue);
 	void Input_Look(const FInputActionValue& InputValue);
 	void Input_Crouch();
-	void Input_Inventory();
-
+	
 	void Input_EquipWeapon_ToggleArming();
 	void Input_EquipWeapon_Primary();
 	void Input_EquipWeapon_Secondary();

@@ -71,7 +71,6 @@ void AD1PlayerController::SetupInputComponent()
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Crouch, ETriggerEvent::Triggered, this, &ThisClass::Input_Crouch, InputBindHandles);
-		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Inventory, ETriggerEvent::Triggered, this, &ThisClass::Input_Inventory, InputBindHandles);
 		
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_EquipWeapon_ToggleArming, ETriggerEvent::Triggered, this, &ThisClass::Input_EquipWeapon_ToggleArming, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_EquipWeapon_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_EquipWeapon_Primary, InputBindHandles);
@@ -184,45 +183,39 @@ void AD1PlayerController::Input_Crouch()
 	}
 }
 
-void AD1PlayerController::Input_Inventory()
-{
-	if (AD1HUD* HUD = Cast<AD1HUD>(GetHUD()))
-	{
-		// TODO: 공격중에는 열수없게 하는 등 조건 추가필요(Ability로의 전환)
-		HUD->ShowControlledInventoryWidget();
-	}
-}
-
 void AD1PlayerController::Input_EquipWeapon_ToggleArming()
 {
 	FGameplayEventData Payload;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_ToggleArming, Payload);
+	Payload.EventMagnitude = (int32)EquipmentManagerComponent->GetToggleArmingWeaponEquipState();
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
 }
 
 void AD1PlayerController::Input_EquipWeapon_Primary()
 {
 	FGameplayEventData Payload;
-	Payload.EventMagnitude = 1.f;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_Primary, Payload);
+	Payload.EventMagnitude = (int32)EWeaponEquipState::Primary;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
 }
 
 void AD1PlayerController::Input_EquipWeapon_Secondary()
 {
 	FGameplayEventData Payload;
-	Payload.EventMagnitude = 2.f;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_Secondary, Payload);
+	Payload.EventMagnitude = (int32)EWeaponEquipState::Secondary;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
 }
 
 void AD1PlayerController::Input_EquipWeapon_CycleBackward()
 {
 	FGameplayEventData Payload;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_CycleBackward, Payload);
+	Payload.EventMagnitude = (int32)EquipmentManagerComponent->GetBackwardWeaponEquipState();
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
 }
 
 void AD1PlayerController::Input_EquipWeapon_CycleForward()
 {
 	FGameplayEventData Payload;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon_CycleForward, Payload);
+	Payload.EventMagnitude = (int32)EquipmentManagerComponent->GetForwardWeaponEquipState();
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
 }
 
 void AD1PlayerController::Input_AbilityInputTagPressed(FGameplayTag InputTag)

@@ -55,6 +55,11 @@ void AD1HUD::HideItemHoverWidget()
 	}
 }
 
+UD1PlayerInventoryWidget* AD1HUD::GetControlledInventoryWidget() const
+{
+	return SceneWidget ? SceneWidget->GetControlledInventoryWidget() : nullptr;
+}
+
 UD1InteractionWidget* AD1HUD::GetInteractionWidget() const
 {
 	return SceneWidget ? SceneWidget->GetInteractionWidget() : nullptr;

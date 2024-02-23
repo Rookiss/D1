@@ -25,7 +25,7 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* NewItemInstance)
 	
 	if (ItemInstance)
 	{
-		Unequip();
+		TryUnequip();
 	}
 
 	ItemInstance = NewItemInstance;
@@ -36,28 +36,19 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* NewItemInstance)
 
 	if (ItemInstance)
 	{
-		Equip();
-	}
-	else
-	{
-		EWeaponEquipState CurrWeaponEquipState = EquipmentManager->GetCurrWeaponEquipState();
-		if (EquipmentManager->IsSameWeaponEquipState(EquipmentSlotType, CurrWeaponEquipState) && EquipmentManager->IsAllEmpty(CurrWeaponEquipState))
-		{
-			EquipmentManager->ChangeWeaponEquipState(EWeaponEquipState::Unarmed);
-		}
+		TryEquip();
 	}
 }
 
-void FD1EquipmentEntry::Equip()
+void FD1EquipmentEntry::TryEquip()
 {
 	if (ItemInstance == nullptr)
 		return;
 
 	const UD1ItemFragment_Equippable* Equippable = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
 	check(Equippable);
-
-	EWeaponEquipState CurrWeaponEquipState = EquipmentManager->GetCurrWeaponEquipState();
-	if (Equippable->EquipmentType == EEquipmentType::Weapon && EquipmentManager->IsSameWeaponEquipState(EquipmentSlotType, CurrWeaponEquipState) == false)
+	
+	if (Equippable->EquipmentType == EEquipmentType::Weapon && EquipmentManager->IsSameWeaponEquipState(EquipmentSlotType, EquipmentManager->GetCurrWeaponEquipState()) == false)
 		return;
 	
 	UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(EquipmentManager->GetAbilitySystemComponent());
@@ -120,16 +111,16 @@ void FD1EquipmentEntry::Equip()
 		}
 
 		// Add New Visual
+		APlayerController* OwningController = Cast<APlayerController>(EquipmentManager->GetOwner());
+		check(OwningController);
+
+		APawn* OwningPawn = OwningController->GetPawn();
+		check(OwningPawn);
+		
 		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
 		const FD1WeaponAttachInfo& AttachInfo = Weapon->WeaponAttachInfo;
 		if (AttachInfo.SpawnWeaponClass)
 		{
-			APlayerController* OwningController = Cast<APlayerController>(EquipmentManager->GetOwner());
-			check(OwningController);
-
-			APawn* OwningPawn = OwningController->GetPawn();
-			check(OwningPawn);
-		
 			USceneComponent* AttachTarget = OwningPawn->GetRootComponent();
 			if (ACharacter* OwningCharacter = Cast<ACharacter>(OwningPawn))
 			{
@@ -144,6 +135,8 @@ void FD1EquipmentEntry::Equip()
 		
 			SpawnedWeaponActor = NewActor;
 		}
+
+		EquipmentManager->RefreshAnimInstance();
 	}
 	else if (Equippable->EquipmentType == EEquipmentType::Armor)
 	{
@@ -159,7 +152,7 @@ void FD1EquipmentEntry::Equip()
 	}
 }
 
-void FD1EquipmentEntry::Unequip()
+void FD1EquipmentEntry::TryUnequip()
 {
 	if (ItemInstance == nullptr)
 		return;
@@ -167,23 +160,34 @@ void FD1EquipmentEntry::Unequip()
 	UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(EquipmentManager->GetAbilitySystemComponent());
 	check(ASC);
 	
-	// Ability
+	// Remove Ability
 	GrantedHandles.TakeFromAbilitySystem(ASC);
 
-	// Stat
+	// Remove Stat
 	for (const FActiveGameplayEffectHandle& Handle : StatHandles)
 	{
 		ASC->RemoveActiveGameplayEffect(Handle);
 	}
 	StatHandles.Reset();
 
-	// Visual
+	// Remove Visual
 	const UD1ItemFragment_Equippable* Equippable = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
 	if (Equippable->EquipmentType == EEquipmentType::Weapon)
 	{
 		if (IsValid(SpawnedWeaponActor))
 		{
 			SpawnedWeaponActor->Destroy();
+			
+			if (EquipmentManager->IsAllEmpty(EquipmentManager->GetCurrWeaponEquipState()))
+			{
+				FGameplayEventData Payload;
+				Payload.EventMagnitude = (int32)EWeaponEquipState::Unarmed;
+				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(EquipmentManager->GetOwner(), D1GameplayTags::Event_EquipWeapon, Payload);
+			}
+			else
+			{
+				EquipmentManager->RefreshAnimInstance();
+			}
 		}
 	}
 	else if (Equippable->EquipmentType == EEquipmentType::Armor)
@@ -290,9 +294,12 @@ void UD1EquipmentManagerComponent::BeginPlay()
 
 void UD1EquipmentManagerComponent::UninitializeComponent()
 {
-	for (FD1EquipmentEntry& Entry : EquipmentList.Entries)
+	if (GetOwner() && GetOwner()->HasAuthority())
 	{
-		Entry.Init(nullptr);
+		for (FD1EquipmentEntry& Entry : EquipmentList.Entries)
+		{
+			Entry.Init(nullptr);
+		}
 	}
 	
 	Super::UninitializeComponent();
@@ -441,50 +448,58 @@ bool UD1EquipmentManagerComponent::CanSetEntry(UD1ItemInstance* FromItemInstance
 
 void UD1EquipmentManagerComponent::EquipCurrentWeapon()
 {
-	if (GetOwner()->HasAuthority() == false)
-		return;
+	check(GetOwner()->HasAuthority());
 	
 	for (EEquipmentSlotType SlotType : Item::SlotsByWeaponEquipState[(int32)CurrWeaponEquipState])
 	{
 		FD1EquipmentEntry& Entry = EquipmentList.Entries[(int32)SlotType];
-		Entry.Equip();
+		Entry.TryEquip();
 	}
 }
 
 void UD1EquipmentManagerComponent::UnequipCurrentWeapon()
 {
-	if (GetOwner()->HasAuthority() == false)
-		return;
+	check(GetOwner()->HasAuthority());
 
 	for (EEquipmentSlotType SlotType : Item::SlotsByWeaponEquipState[(int32)CurrWeaponEquipState])
 	{
 		FD1EquipmentEntry& Entry = EquipmentList.Entries[(int32)SlotType];
-		Entry.Unequip();
+		Entry.TryUnequip();
 	}
 }
 
 void UD1EquipmentManagerComponent::ChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState)
 {
-	if (GetOwner()->HasAuthority() == false)
-		return;
+	check(GetOwner()->HasAuthority());
+
+	UD1AbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	check(ASC);
+	
+	APlayerController* OwningController = Cast<APlayerController>(GetOwner());
+	check(OwningController);
+
+	AD1Player* OwningPlayer = Cast<AD1Player>(OwningController->GetPawn());
+	check(OwningPlayer);
 	
 	if (CanChangeWeaponEquipState(NewWeaponEquipState))
 	{
 		PrevWeaponEquipState = CurrWeaponEquipState;
 		CurrWeaponEquipState = NewWeaponEquipState;
-
+		
 		if (CurrWeaponEquipState == EWeaponEquipState::Unarmed)
 		{
-			GetAbilitySystemComponent()->RemoveDynamicTagToSelf(D1GameplayTags::State_Weapon_Armed);
+			ASC->RemoveDynamicTagToSelf(D1GameplayTags::State_Weapon_Armed);
 		}
 		else
 		{
-			GetAbilitySystemComponent()->AddDynamicTagToSelf(D1GameplayTags::State_Weapon_Armed);
+			ASC->AddDynamicTagToSelf(D1GameplayTags::State_Weapon_Armed);
 		}
+		
+		RefreshAnimInstance();
 	}
 }
 
-bool UD1EquipmentManagerComponent::CanChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState)
+bool UD1EquipmentManagerComponent::CanChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState) const
 {
 	if (NewWeaponEquipState == EWeaponEquipState::Count || CurrWeaponEquipState == NewWeaponEquipState)
 		return false;
@@ -495,6 +510,41 @@ bool UD1EquipmentManagerComponent::CanChangeWeaponEquipState(EWeaponEquipState N
 void UD1EquipmentManagerComponent::OnRep_CurrWeaponEquipState(EWeaponEquipState InPrevWeaponEquipState)
 {
 	PrevWeaponEquipState = InPrevWeaponEquipState;
+}
+
+UAnimMontage* UD1EquipmentManagerComponent::DetermineEquipMontage() const
+{
+	// TODO
+	UAnimMontage* AnimMontage = UD1AssetManager::GetAssetByName<UAnimMontage>("AM_Equip");
+	return AnimMontage;
+}
+
+UAnimMontage* UD1EquipmentManagerComponent::DetermineUnequipMontage() const
+{
+	// TODO
+	UAnimMontage* AnimMontage = UD1AssetManager::GetAssetByName<UAnimMontage>("AM_Unequip_EndLoop");
+	return AnimMontage;
+}
+
+void UD1EquipmentManagerComponent::RefreshAnimInstance() const
+{
+	// TODO
+	APlayerController* OwningController = Cast<APlayerController>(GetOwner());
+	check(OwningController);
+
+	AD1Player* OwningPlayer = Cast<AD1Player>(OwningController->GetPawn());
+	check(OwningPlayer);
+
+	TSubclassOf<UAnimInstance> AnimInstanceClass = UD1AssetManager::GetSubclassByName<UAnimInstance>("ABP_Player_SwordAndShield");
+	OwningPlayer->GetMesh()->SetAnimInstanceClass(AnimInstanceClass);
+
+
+	// TODO: Test-Case (애님인스턴스 전환, 착용/미착용 애니메이션, 스폰/디스폰 액터, ASC Debug Console 확인)
+	// 1. 빈 상태에서 T 연타
+	// 2. 인벤토리에서 방패와 검을 하나씩 착용
+	// 3. T키 연타해서 어색한것 없는지 테스트
+	// 4. 착용 상태에서 장비창에서 하나씩 인벤토리로 내릴 경우 테스트 (모두 내릴 경우 Unarmed 상태로 전환)
+	// 5. Primary와 Secondary 슬롯 사이의 전환 및 T키 테스트
 }
 
 bool UD1EquipmentManagerComponent::IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState) const
@@ -548,16 +598,45 @@ bool UD1EquipmentManagerComponent::IsAllEmpty(EWeaponEquipState WeaponEquipState
 	return bAllEmpty;
 }
 
-EWeaponEquipState UD1EquipmentManagerComponent::GetBackwardWeaponEquipState(EWeaponEquipState WeaponEquipState) const
+EWeaponEquipState UD1EquipmentManagerComponent::GetToggleArmingWeaponEquipState() const
 {
-	int32 WeaponEquipStateCount = (int32)EWeaponEquipState::Count;
-	return (EWeaponEquipState)(((int32)WeaponEquipState + WeaponEquipStateCount - 1) % WeaponEquipStateCount);
+	if (CurrWeaponEquipState == EWeaponEquipState::Unarmed)
+	{
+		if (CanChangeWeaponEquipState(PrevWeaponEquipState))
+		{
+			return PrevWeaponEquipState;
+		}
+		else
+		{
+			for (int32 i = (int32)EWeaponEquipState::Unarmed + 1; i < (int32)EWeaponEquipState::Count; i++)
+			{
+				if ((EWeaponEquipState)i == PrevWeaponEquipState)
+					continue;
+
+				if (CanChangeWeaponEquipState((EWeaponEquipState)i))
+				{
+					return (EWeaponEquipState)i;
+				}
+			}
+			return EWeaponEquipState::Unarmed;
+		}
+	}
+	else
+	{
+		return EWeaponEquipState::Unarmed;
+	}
 }
 
-EWeaponEquipState UD1EquipmentManagerComponent::GetForwardWeaponEquipState(EWeaponEquipState WeaponEquipState) const
+EWeaponEquipState UD1EquipmentManagerComponent::GetBackwardWeaponEquipState() const
 {
 	int32 WeaponEquipStateCount = (int32)EWeaponEquipState::Count;
-	return (EWeaponEquipState)(((int32)WeaponEquipState + 1) % WeaponEquipStateCount);
+	return (EWeaponEquipState)(((int32)CurrWeaponEquipState + WeaponEquipStateCount - 1) % WeaponEquipStateCount);
+}
+
+EWeaponEquipState UD1EquipmentManagerComponent::GetForwardWeaponEquipState() const
+{
+	int32 WeaponEquipStateCount = (int32)EWeaponEquipState::Count;
+	return (EWeaponEquipState)(((int32)CurrWeaponEquipState + 1) % WeaponEquipStateCount);
 }
 
 const TArray<FD1EquipmentEntry>& UD1EquipmentManagerComponent::GetAllEntries() const

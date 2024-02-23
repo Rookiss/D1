@@ -16,11 +16,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Attack_Begin,						"Event.Attack.Begin");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Attack_Tick,						"Event.Attack.Tick");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Attack_End,						"Event.Attack.End");
-	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon_ToggleArming,			"Event.EquipWeapon.ToggleArming");
-	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon_Primary,				"Event.EquipWeapon.Primary");
-	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon_Secondary,				"Event.EquipWeapon.Secondary");
-	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon_CycleBackward,			"Event.EquipWeapon.CycleBackward");
-	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon_CycleForward,			"Event.EquipWeapon.CycleForward");
+	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon,						"Event.EquipWeapon");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Begin,						"Event.Montage.Begin");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_End,						"Event.Montage.End");
 		
