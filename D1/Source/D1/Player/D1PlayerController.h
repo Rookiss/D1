@@ -35,7 +35,6 @@ private:
 	void Input_Look(const FInputActionValue& InputValue);
 	void Input_Crouch();
 	
-	void Input_EquipWeapon_ToggleArming();
 	void Input_EquipWeapon_Primary();
 	void Input_EquipWeapon_Secondary();
 	void Input_EquipWeapon_CycleBackward();

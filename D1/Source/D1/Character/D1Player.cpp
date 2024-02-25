@@ -44,8 +44,6 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 void AD1Player::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	GetMesh()->SetAnimClass(UD1AssetManager::GetSubclassByName<UAnimInstance>("ABP_Player"));
 
 	TArray<FName> DefaultArmorMeshNames = { "Head_Default", "Chest_Default", "Legs_Default", "Hands_Default", "Foot_Default" };
 	DefaultArmorMeshes.SetNum(DefaultArmorMeshNames.Num());

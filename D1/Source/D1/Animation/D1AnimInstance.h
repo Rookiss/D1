@@ -44,4 +44,10 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsFalling = false;
+
+	UPROPERTY(BlueprintReadOnly)
+	float LeftHandWeights = 0.f;
+
+	UPROPERTY(BlueprintReadOnly)
+	float RightHandWeights = 0.f;
 };

@@ -20,8 +20,8 @@ struct FD1EquipmentEntry : public FFastArraySerializerItem
 private:
 	void Init(UD1ItemInstance* NewItemInstance);
 	
-	void TryEquip();
-	void TryUnequip();
+	void Equip();
+	void Unequip();
 	
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
@@ -63,7 +63,7 @@ struct FD1EquipmentList : public FFastArraySerializer
 public:
 	FD1EquipmentList() : EquipmentManager(nullptr) { }
 	FD1EquipmentList(UD1EquipmentManagerComponent* InOwnerComponent) : EquipmentManager(InOwnerComponent) { }
-
+	
 public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
 	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
@@ -125,27 +125,12 @@ public:
 	bool CanSetEntry(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void EquipCurrentWeapon();
+	void EquipWeaponInSlot();
+	void UnequipWeaponInSlot();
 
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void UnequipCurrentWeapon();
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void ChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState);
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_RequestChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState);
 	bool CanChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState) const;
-	
-	UFUNCTION()
-	void OnRep_CurrWeaponEquipState(EWeaponEquipState InPrevWeaponEquipState);
-
-	UFUNCTION(BlueprintCallable)
-	UAnimMontage* DetermineEquipMontage() const;
-
-	UFUNCTION(BlueprintCallable)
-	UAnimMontage* DetermineUnequipMontage() const;
-
-	UFUNCTION(BlueprintCallable)
-	void RefreshAnimInstance() const;
 	
 public:
 	bool IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState) const;
@@ -155,16 +140,10 @@ public:
 	bool IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
 	bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
 	bool IsAllEmpty(EWeaponEquipState WeaponEquipState) const;
-
-	EWeaponEquipState GetToggleArmingWeaponEquipState() const;
+	
+	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }
 	EWeaponEquipState GetBackwardWeaponEquipState() const;
 	EWeaponEquipState GetForwardWeaponEquipState() const;
-
-	UFUNCTION(BlueprintCallable)
-	EWeaponEquipState GetCurrWeaponEquipState() const { return CurrWeaponEquipState; }
-
-	UFUNCTION(BlueprintCallable)
-	EWeaponEquipState GetPrevWeaponEquipState() const { return PrevWeaponEquipState; }
 	
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const;
 	UD1AbilitySystemComponent* GetAbilitySystemComponent() const;
@@ -178,7 +157,6 @@ private:
 	UPROPERTY(Replicated)
 	FD1EquipmentList EquipmentList;
 	
-	UPROPERTY(ReplicatedUsing=OnRep_CurrWeaponEquipState)
-	EWeaponEquipState CurrWeaponEquipState = EWeaponEquipState::Unarmed;
-	EWeaponEquipState PrevWeaponEquipState = EWeaponEquipState::Primary;
+	UPROPERTY(Replicated)
+	EWeaponEquipState CurrentWeaponEquipState = EWeaponEquipState::Unarmed;
 };

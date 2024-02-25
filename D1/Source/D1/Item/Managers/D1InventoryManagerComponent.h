@@ -91,7 +91,7 @@ UCLASS(BlueprintType)
 class UD1InventoryManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
-	
+
 public:
 	UD1InventoryManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 

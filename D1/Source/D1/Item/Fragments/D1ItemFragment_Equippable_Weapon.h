@@ -39,4 +39,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	FD1WeaponAttachInfo WeaponAttachInfo;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UAnimMontage> EquipMontage;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UAnimInstance> AnimInstanceClass;
 };

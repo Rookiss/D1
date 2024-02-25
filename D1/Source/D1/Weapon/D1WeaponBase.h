@@ -9,7 +9,7 @@ class AD1WeaponBase : public AActor
 	
 public:
 	AD1WeaponBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
+	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> WeaponMesh;
