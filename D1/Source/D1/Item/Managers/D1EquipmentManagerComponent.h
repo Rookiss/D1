@@ -128,9 +128,12 @@ public:
 	void EquipWeaponInSlot();
 	void UnequipWeaponInSlot();
 
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void Server_RequestChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState);
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void ChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState);
 	bool CanChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState) const;
+
+	UFUNCTION()
+	void OnRep_CurrentWeaponEquipState();
 	
 public:
 	bool IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState) const;
@@ -147,6 +150,14 @@ public:
 	
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const;
 	UD1AbilitySystemComponent* GetAbilitySystemComponent() const;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayMontage(FSoftObjectPath MontagePath);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetAnimInstance(TSubclassOf<UAnimInstance> AnimInstanceClass);
+
+	void Refresh();
 	
 public:
 	FOnEquipmentEntryChanged OnEquipmentEntryChanged;
@@ -157,6 +168,6 @@ private:
 	UPROPERTY(Replicated)
 	FD1EquipmentList EquipmentList;
 	
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentWeaponEquipState)
 	EWeaponEquipState CurrentWeaponEquipState = EWeaponEquipState::Unarmed;
 };

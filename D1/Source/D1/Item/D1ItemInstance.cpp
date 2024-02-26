@@ -29,7 +29,7 @@ void UD1ItemInstance::Init(int32 InItemID)
 	ItemRarity = DetermineItemRarity();
 
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemID);
+	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemID);
 	
 	for (const UD1ItemFragment* Fragment : ItemDef.Fragments)
 	{

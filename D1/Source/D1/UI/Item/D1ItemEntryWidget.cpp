@@ -83,6 +83,6 @@ void UD1ItemEntryWidget::SetItemInstance(UD1ItemInstance* NewItemInstance)
 	check(ItemInstance);
 
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
+	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemInstance->GetItemID());
 	Image_Icon->SetBrushFromTexture(ItemDef.IconTexture, true);
 }

@@ -21,7 +21,7 @@ UD1ItemHoverWidget::UD1ItemHoverWidget(const FObjectInitializer& ObjectInitializ
 void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 {
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
+	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemInstance->GetItemID());
 	const EItemRarity ItemRarity = ItemInstance->GetItemRarity();
 
 	Text_DisplayName->SetText(ItemDef.DisplayName);

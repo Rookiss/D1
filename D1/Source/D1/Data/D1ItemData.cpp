@@ -129,7 +129,7 @@ EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) 
 }
 #endif // #if WITH_EDITOR
 
-const FD1ItemDefinition& UD1ItemData::GetItemDefByID(int32 ItemID) const
+const FD1ItemDefinition& UD1ItemData::FindItemDefByID(int32 ItemID) const
 {
 	const FD1ItemDefinition* ItemDef = ItemIDToDef.Find(ItemID);
 	ensureAlwaysMsgf(ItemDef, TEXT("Can't find Item Def from ID [%d]."), ItemID);

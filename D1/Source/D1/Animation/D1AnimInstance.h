@@ -50,4 +50,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	float RightHandWeights = 0.f;
+
+private:
+	TArray<TArray<float*>> HandWeights = { { &LeftHandWeights }, { &RightHandWeights }, { &LeftHandWeights, &RightHandWeights } };
 };

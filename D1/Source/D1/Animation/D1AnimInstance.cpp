@@ -6,7 +6,8 @@
 #include "Character/D1Player.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetMathLibrary.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "Player/D1PlayerController.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AnimInstance)
 
@@ -51,6 +52,39 @@ void UD1AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			bShouldMove = (GroundSpeed > 3.f && MovementComponent->GetCurrentAcceleration() != FVector::ZeroVector);
 			bIsCrouching = MovementComponent->IsCrouching();
 			bIsFalling = MovementComponent->IsFalling();
+		}
+
+		UD1EquipmentManagerComponent* EquipmentManager = Character->EquipmentManagerComponent;
+
+		LeftHandWeights = 0.f;
+		RightHandWeights = 0.f;
+			
+		EWeaponEquipState WeaponEquipState = EquipmentManager->GetCurrentWeaponEquipState();
+		if (WeaponEquipState == EWeaponEquipState::Unarmed)
+		{
+			LeftHandWeights = 1.f;
+			RightHandWeights = 1.f;
+		}
+		else
+		{
+			const TArray<EEquipmentSlotType>& SlotTypes = Item::SlotsByWeaponEquipState[(int32)WeaponEquipState];
+			for (int32 i = 0; i < SlotTypes.Num(); i++)
+			{
+				EEquipmentSlotType SlotType = SlotTypes[i];
+				const TArray<FD1EquipmentEntry>& Entries = EquipmentManager->GetAllEntries();
+				const FD1EquipmentEntry& Entry = Entries[(int32)SlotType];
+					
+				if (Entry.GetItemInstance())
+				{
+					for (float* Weights : HandWeights[i])
+					{
+						if (Weights)
+						{
+							*Weights = 1.f;
+						}
+					}
+				}
+			}
 		}
 	}
 }

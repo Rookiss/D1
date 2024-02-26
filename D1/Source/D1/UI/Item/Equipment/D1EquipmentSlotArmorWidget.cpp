@@ -1,6 +1,7 @@
 ﻿#include "D1EquipmentSlotArmorWidget.h"
 
 #include "D1EquipmentSlotsWidget.h"
+#include "Character/D1Player.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Components/SizeBox.h"
@@ -8,7 +9,6 @@
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
-#include "Player/D1PlayerController.h"
 #include "System/D1AssetManager.h"
 #include "UI/Item/Drag/D1ItemDragDrop.h"
 #include "UI/Item/Equipment/D1EquipmentEntryWidget.h"
@@ -32,10 +32,10 @@ void UD1EquipmentSlotArmorWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
-	check(PC);
+	AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(Player);
 
-	EquipmentManagerComponent = PC->EquipmentManagerComponent;
+	EquipmentManagerComponent = Player->EquipmentManagerComponent;
 	check(EquipmentManagerComponent);
 	
 	EntryWidgetClass = UD1AssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidget");

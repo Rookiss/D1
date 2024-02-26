@@ -1,10 +1,10 @@
 ﻿#include "D1EquipmentEntryWidget.h"
 
 #include "D1EquipmentSlotsWidget.h"
+#include "Character/D1Player.h"
 #include "Components/SizeBox.h"
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
-#include "Player/D1PlayerController.h"
 #include "System/D1AssetManager.h"
 #include "UI/Item/Drag/D1ItemDragDrop.h"
 #include "UI/Item/Drag/D1ItemDragWidget.h"
@@ -29,10 +29,10 @@ void UD1EquipmentEntryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
-	check(PC);
-
-	EquipmentManagerComponent = PC->EquipmentManagerComponent;
+	AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(Player);
+	
+	EquipmentManagerComponent = Player->EquipmentManagerComponent;
 	check(EquipmentManagerComponent);
 }
 
@@ -41,7 +41,7 @@ void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
+	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemInstance->GetItemID());
 	
 	UD1ItemDragWidget* DragWidget = CreateWidget<UD1ItemDragWidget>(GetOwningPlayer(), DragWidgetClass);
 	FVector2D EntityWidgetSize = FVector2D(ItemDef.ItemSlotCount * Item::UnitInventorySlotSize);

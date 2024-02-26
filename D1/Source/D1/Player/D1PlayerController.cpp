@@ -8,13 +8,12 @@
 #include "D1PlayerState.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Camera/D1PlayerCameraManager.h"
+#include "Character/D1Player.h"
 #include "Data/D1InputData.h"
-#include "Data/D1ItemData.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Input/D1InputComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
-#include "Item/Managers/D1InventoryManagerComponent.h"
 #include "System/D1AssetManager.h"
 #include "UI/D1HUD.h"
 #include "UI/D1SceneWidget.h"
@@ -26,9 +25,6 @@ AD1PlayerController::AD1PlayerController(const FObjectInitializer& ObjectInitial
 {
 	bReplicates = true;
 	PlayerCameraManagerClass = AD1PlayerCameraManager::StaticClass();
-
-	EquipmentManagerComponent = CreateDefaultSubobject<UD1EquipmentManagerComponent>("EquipmentManagerComponent");
-	InventoryManagerComponent = CreateDefaultSubobject<UD1InventoryManagerComponent>("InventoryManagerComponent");
 }
 
 void AD1PlayerController::BeginPlay()
@@ -40,22 +36,6 @@ void AD1PlayerController::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(InputData->InputMappingContext, 0);
-		}
-	}
-
-	if (HasAuthority())
-	{
-		// @TODO: For Test
-		int32 IterationCount = 2;
-		UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-		const TMap<int32, FD1ItemDefinition>& AllItemDefs = ItemData->GetAllItemDefs();
-	
-		for (int i = 0; i < IterationCount; i++)
-		{
-			for (const auto& Pair : AllItemDefs)
-			{
-				InventoryManagerComponent->TryAddItem(Pair.Key, FMath::RandRange(1, 2));
-			}
 		}
 	}
 }
@@ -79,13 +59,6 @@ void AD1PlayerController::SetupInputComponent()
 
 		D1InputComponent->BindAbilityActions(InputData, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, InputBindHandles);
 	}
-}
-
-void AD1PlayerController::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	InventoryManagerComponent->Init(FIntPoint(10, 5));
 }
 
 void AD1PlayerController::PostProcessInput(const float DeltaTime, const bool bGamePaused)
@@ -198,16 +171,22 @@ void AD1PlayerController::Input_EquipWeapon_Secondary()
 
 void AD1PlayerController::Input_EquipWeapon_CycleBackward()
 {
-	FGameplayEventData Payload;
-	Payload.EventMagnitude = (int32)EquipmentManagerComponent->GetBackwardWeaponEquipState();
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
+	if (AD1Player* PlayerPawn = Cast<AD1Player>(GetPawn()))
+	{
+		FGameplayEventData Payload;
+		Payload.EventMagnitude = (int32)PlayerPawn->EquipmentManagerComponent->GetBackwardWeaponEquipState();
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
+	}
 }
 
 void AD1PlayerController::Input_EquipWeapon_CycleForward()
 {
-	FGameplayEventData Payload;
-	Payload.EventMagnitude = (int32)EquipmentManagerComponent->GetForwardWeaponEquipState();
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
+	if (AD1Player* PlayerPawn = Cast<AD1Player>(GetPawn()))
+	{
+		FGameplayEventData Payload;
+		Payload.EventMagnitude = (int32)PlayerPawn->EquipmentManagerComponent->GetForwardWeaponEquipState();
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
+	}
 }
 
 void AD1PlayerController::Input_AbilityInputTagPressed(FGameplayTag InputTag)

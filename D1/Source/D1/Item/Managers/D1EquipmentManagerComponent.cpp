@@ -111,10 +111,7 @@ void FD1EquipmentEntry::Equip()
 		}
 
 		// Add New Visual
-		APlayerController* OwningController = Cast<APlayerController>(EquipmentManager->GetOwner());
-		check(OwningController);
-
-		APawn* OwningPawn = OwningController->GetPawn();
+		APawn* OwningPawn = Cast<APawn>(EquipmentManager->GetOwner());
 		check(OwningPawn);
 		
 		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
@@ -134,6 +131,15 @@ void FD1EquipmentEntry::Equip()
 			NewActor->AttachToComponent(AttachTarget, FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
 		
 			SpawnedWeaponActor = NewActor;
+
+			if (AD1Player* OwningPlayer = Cast<AD1Player>(OwningPawn))
+			{
+				if (OwningPlayer->GetMesh()->GetAnimClass() != Weapon->AnimInstanceClass)
+				{
+					EquipmentManager->Multicast_SetAnimInstance(Weapon->AnimInstanceClass);
+				}
+			}
+			EquipmentManager->Multicast_PlayMontage(Weapon->EquipMontage.ToSoftObjectPath());
 		}
 	}
 	else if (Equippable->EquipmentType == EEquipmentType::Armor)
@@ -186,10 +192,7 @@ void FD1EquipmentEntry::Unequip()
 	}
 	else if (Equippable->EquipmentType == EEquipmentType::Armor)
 	{
-		APlayerController* OwningController = Cast<APlayerController>(EquipmentManager->GetOwner());
-		check(OwningController);
-
-		AD1Player* OwningPlayer = Cast<AD1Player>(OwningController->GetPawn());
+		AD1Player* OwningPlayer = Cast<AD1Player>(EquipmentManager->GetOwner());
 		check(OwningPlayer);
 		
 		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
@@ -464,13 +467,17 @@ void UD1EquipmentManagerComponent::UnequipWeaponInSlot()
 	}
 }
 
-void UD1EquipmentManagerComponent::Server_RequestChangeWeaponEquipState_Implementation(EWeaponEquipState NewWeaponEquipState)
+void UD1EquipmentManagerComponent::ChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState)
 {
+	check(GetOwner()->HasAuthority());
+
 	if (CanChangeWeaponEquipState(NewWeaponEquipState))
 	{
 		UnequipWeaponInSlot();
 		CurrentWeaponEquipState = NewWeaponEquipState;
 		EquipWeaponInSlot();
+
+		OnRep_CurrentWeaponEquipState();
 	}
 }
 
@@ -480,6 +487,20 @@ bool UD1EquipmentManagerComponent::CanChangeWeaponEquipState(EWeaponEquipState N
 		return false;
 
 	return (IsAllEmpty(NewWeaponEquipState) == false);
+}
+
+void UD1EquipmentManagerComponent::OnRep_CurrentWeaponEquipState()
+{
+	if (CurrentWeaponEquipState == EWeaponEquipState::Count)
+		return;
+
+	AD1Player* OwningPlayer = Cast<AD1Player>(GetOwner());
+	check(OwningPlayer);
+
+	if (CurrentWeaponEquipState == EWeaponEquipState::Unarmed)
+	{
+		OwningPlayer->GetMesh()->SetAnimClass(UD1AssetManager::GetSubclassByName<UAnimInstance>("ABP_Player_Unarmed"));
+	}
 }
 
 bool UD1EquipmentManagerComponent::IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState) const
@@ -553,4 +574,62 @@ const TArray<FD1EquipmentEntry>& UD1EquipmentManagerComponent::GetAllEntries() c
 UD1AbilitySystemComponent* UD1EquipmentManagerComponent::GetAbilitySystemComponent() const
 {
 	return Cast<UD1AbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwner()));
+}
+
+void UD1EquipmentManagerComponent::Refresh()
+{
+	// AD1Player* OwningPlayer = Cast<AD1Player>(GetOwner());
+	// check(OwningPlayer);
+	//
+	// UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	// check(ItemData);
+	//
+	// TSubclassOf<UAnimInstance> AnimInstanceClass = nullptr;
+	// TArray<FSoftObjectPath> AnimMontagePaths;
+	// 	
+	// for (EEquipmentSlotType SlotType : Item::SlotsByWeaponEquipState[(int32)CurrentWeaponEquipState])
+	// {
+	// 	const TArray<FD1EquipmentEntry>& Entries = EquipmentList.GetAllEntries();
+	// 	const FD1EquipmentEntry& Entry = Entries[(int32)SlotType];
+	// 		
+	// 	if (UD1ItemInstance* ItemInstance = Entry.GetItemInstance())
+	// 	{
+	// 		const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemInstance->GetItemID());
+	// 		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+	// 			
+	// 		AnimInstanceClass = Weapon->AnimInstanceClass;
+	// 		AnimMontagePaths.Add(Weapon->EquipMontage.ToSoftObjectPath());
+	// 	}
+	// }
+	//
+	// OwningPlayer->GetMesh()->SetAnimClass(AnimInstanceClass);
+	// 	
+	// for (const FSoftObjectPath& MontagePath : AnimMontagePaths)
+	// {
+	// 	UD1AssetManager::GetAssetByPath(MontagePath, FAsyncLoadCompletedDelegate::CreateLambda(
+	// 	[OwningPlayer](const FName& AssetName, UObject* LoadedAsset)
+	// 	{
+	// 		OwningPlayer->PlayAnimMontage(Cast<UAnimMontage>(LoadedAsset));
+	// 	}));
+	// }
+}
+
+void UD1EquipmentManagerComponent::Multicast_PlayMontage_Implementation(FSoftObjectPath MontagePath)
+{
+	AD1Player* OwningPlayer = Cast<AD1Player>(GetOwner());
+	check(OwningPlayer);
+
+	UD1AssetManager::GetAssetByPath(MontagePath, FAsyncLoadCompletedDelegate::CreateLambda(
+	[OwningPlayer](const FName& AssetName, UObject* LoadedAsset)
+	{
+		OwningPlayer->PlayAnimMontage(Cast<UAnimMontage>(LoadedAsset));
+	}));
+}
+
+void UD1EquipmentManagerComponent::Multicast_SetAnimInstance_Implementation(TSubclassOf<UAnimInstance> AnimInstanceClass)
+{
+	AD1Player* OwningPlayer = Cast<AD1Player>(GetOwner());
+	check(OwningPlayer);
+
+	OwningPlayer->GetMesh()->SetAnimClass(AnimInstanceClass);
 }

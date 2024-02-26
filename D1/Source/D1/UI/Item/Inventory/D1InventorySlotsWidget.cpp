@@ -2,13 +2,13 @@
 
 #include "D1InventoryEntryWidget.h"
 #include "D1InventorySlotWidget.h"
+#include "Character/D1Player.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/UniformGridPanel.h"
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
-#include "Player/D1PlayerController.h"
 #include "System/D1AssetManager.h"
 #include "UI/Item/Drag/D1ItemDragDrop.h"
 #include "UI/Item/Equipment/D1EquipmentEntryWidget.h"
@@ -28,10 +28,10 @@ void UD1InventorySlotsWidget::NativeConstruct()
 	SlotWidgetClass = UD1AssetManager::GetSubclassByName<UD1InventorySlotWidget>("InventorySlotWidget");
 	EntryWidgetClass = UD1AssetManager::GetSubclassByName<UD1InventoryEntryWidget>("InventoryEntryWidget");
 
-	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
-	check(PC);
+	AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(Player);
 
-	InventoryManagerComponent = PC->InventoryManagerComponent;
+	InventoryManagerComponent = Player->InventoryManagerComponent;
 	check(InventoryManagerComponent);
 	
 	const FIntPoint& InventorySlotCount = InventoryManagerComponent->GetInventorySlotCount();
@@ -82,7 +82,7 @@ bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, cons
 	check(FromItemInstance);
 
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& FromItemDef = ItemData->GetItemDefByID(FromItemInstance->GetItemID());
+	const FD1ItemDefinition& FromItemDef = ItemData->FindItemDefByID(FromItemInstance->GetItemID());
 	const FIntPoint& FromItemSlotCount = FromItemDef.ItemSlotCount;
 
 	int32 MovableCount = 0;
@@ -194,7 +194,7 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlo
 		{
 			if (UD1ItemInstance* ItemInstance = EntryWidget->GetItemInstance())
 			{
-				const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemInstance->GetItemID());
+				const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemInstance->GetItemID());
 
 				const FIntPoint StartSlotPos = InItemSlotPos;
 				const FIntPoint EndSlotPos = InItemSlotPos + ItemDef.ItemSlotCount;
@@ -221,7 +221,7 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlo
 	}
 	else if (NewItemCount > 0)
 	{
-		const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(InItemInstance->GetItemID());
+		const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(InItemInstance->GetItemID());
 		
 		EntryWidget = CreateWidget<UD1InventoryEntryWidget>(GetOwningPlayer(), EntryWidgetClass);
 		EntryWidgets[SlotIndex] = EntryWidget;

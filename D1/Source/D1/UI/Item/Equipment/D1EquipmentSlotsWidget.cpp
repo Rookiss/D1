@@ -2,8 +2,8 @@
 
 #include "D1EquipmentSlotArmorWidget.h"
 #include "D1EquipmentSlotWeaponWidget.h"
+#include "Character/D1Player.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
-#include "Player/D1PlayerController.h"
 #include "UI/Item/Drag/D1ItemDragDrop.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentSlotsWidget)
@@ -31,10 +31,10 @@ void UD1EquipmentSlotsWidget::NativeConstruct()
 		SlotArmorWidgets[i]->Init((EArmorType)i);
 	}
 	
-	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
-	check(PC);
+	AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(Player);
 
-	EquipmentManagerComponent = PC->EquipmentManagerComponent;
+	EquipmentManagerComponent = Player->EquipmentManagerComponent;
 	check(EquipmentManagerComponent);
 	
 	const TArray<FD1EquipmentEntry>& Entries = EquipmentManagerComponent->GetAllEntries();

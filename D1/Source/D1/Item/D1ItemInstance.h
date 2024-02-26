@@ -64,6 +64,6 @@ template <typename FragmentClass>
 const FragmentClass* UD1ItemInstance::FindFragmentByClass() const
 {
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->GetItemDefByID(ItemID);
+	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemID);
 	return ItemDef.FindFragmentByClass<FragmentClass>();
 }

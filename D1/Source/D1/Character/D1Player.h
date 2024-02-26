@@ -6,6 +6,8 @@
 
 class AD1WeaponBase;
 class UCameraComponent;
+class UD1EquipmentManagerComponent;
+class UD1InventoryManagerComponent;
 
 UCLASS()
 class AD1Player : public AD1Character
@@ -17,6 +19,7 @@ public:
 
 public:
 	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
@@ -40,6 +43,12 @@ private:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UCameraComponent> CameraComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
