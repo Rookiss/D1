@@ -6,6 +6,8 @@
 
 struct FGameplayTag;
 struct FInputActionValue;
+class UD1EquipmentManagerComponent;
+class UD1InventoryManagerComponent;
 
 UCLASS()
 class AD1PlayerController : public APlayerController, public IAbilitySystemInterface
@@ -17,6 +19,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 	virtual void SetupInputComponent() override;
 	virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused) override;
 
@@ -41,6 +44,13 @@ private:
 	void Input_AbilityInputTagReleased(FGameplayTag InputTag);
 	
 	void ResetInput();
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
 	
 private:
 	TArray<uint32> InputBindHandles;

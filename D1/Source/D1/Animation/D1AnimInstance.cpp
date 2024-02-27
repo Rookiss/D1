@@ -6,6 +6,7 @@
 #include "Character/D1Player.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Player/D1PlayerController.h"
 
@@ -54,12 +55,12 @@ void UD1AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			bIsFalling = MovementComponent->IsFalling();
 		}
 
-		UD1EquipmentManagerComponent* EquipmentManager = Character->EquipmentManagerComponent;
-
+		UD1EquipManagerComponent* EquipManager = Character->EquipManagerComponent;
+		
 		LeftHandWeights = 0.f;
 		RightHandWeights = 0.f;
 			
-		EWeaponEquipState WeaponEquipState = EquipmentManager->GetCurrentWeaponEquipState();
+		EWeaponEquipState WeaponEquipState = EquipManager->GetCurrentWeaponEquipState();
 		if (WeaponEquipState == EWeaponEquipState::Unarmed)
 		{
 			LeftHandWeights = 1.f;
@@ -71,8 +72,8 @@ void UD1AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			for (int32 i = 0; i < SlotTypes.Num(); i++)
 			{
 				EEquipmentSlotType SlotType = SlotTypes[i];
-				const TArray<FD1EquipmentEntry>& Entries = EquipmentManager->GetAllEntries();
-				const FD1EquipmentEntry& Entry = Entries[(int32)SlotType];
+				const TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
+				const FD1EquipEntry& Entry = Entries[(int32)SlotType];
 					
 				if (Entry.GetItemInstance())
 				{

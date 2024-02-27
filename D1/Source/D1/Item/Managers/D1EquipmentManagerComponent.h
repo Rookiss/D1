@@ -5,7 +5,9 @@
 #include "Net/Serialization/FastArraySerializer.h"
 #include "D1EquipmentManagerComponent.generated.h"
 
+class AD1Player;
 class UD1ItemInstance;
+class AD1PlayerController;
 class UD1AbilitySystemComponent;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
@@ -20,12 +22,8 @@ struct FD1EquipmentEntry : public FFastArraySerializerItem
 private:
 	void Init(UD1ItemInstance* NewItemInstance);
 	
-	void Equip();
-	void Unequip();
-	
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
-	FString GetDebugString() const;
 	
 private:
 	friend struct FD1EquipmentList;
@@ -36,16 +34,6 @@ private:
 
 	UPROPERTY()
 	int32 LastValidItemID = 0;
-
-private:
-	UPROPERTY(NotReplicated)
-	TObjectPtr<AActor> SpawnedWeaponActor;
-	
-	UPROPERTY(NotReplicated)
-	FD1AbilitySystemData_GrantedHandles GrantedHandles;
-
-	UPROPERTY(NotReplicated)
-	TArray<FActiveGameplayEffectHandle> StatHandles;
 
 private:
 	UPROPERTY(NotReplicated)
@@ -70,8 +58,6 @@ public:
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
 
 private:
-	void InitOnServer();
-
 	void SetEntry(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
 	UD1ItemInstance* ResetEntry(EEquipmentSlotType EquipmentSlotType); /* Return Prev ItemInstance */
 	
@@ -108,7 +94,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void UninitializeComponent() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
@@ -123,17 +108,6 @@ public:
 	bool CanSetEntry_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
 	
 	bool CanSetEntry(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
-
-public:
-	void EquipWeaponInSlot();
-	void UnequipWeaponInSlot();
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void ChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState);
-	bool CanChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState) const;
-
-	UFUNCTION()
-	void OnRep_CurrentWeaponEquipState();
 	
 public:
 	bool IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState) const;
@@ -143,21 +117,11 @@ public:
 	bool IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
 	bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
 	bool IsAllEmpty(EWeaponEquipState WeaponEquipState) const;
-	
-	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }
-	EWeaponEquipState GetBackwardWeaponEquipState() const;
-	EWeaponEquipState GetForwardWeaponEquipState() const;
-	
+
+	AD1Player* GetPlayerCharacter() const;
+	AD1PlayerController* GetPlayerController() const;
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const;
 	UD1AbilitySystemComponent* GetAbilitySystemComponent() const;
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_PlayMontage(FSoftObjectPath MontagePath);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_SetAnimInstance(TSubclassOf<UAnimInstance> AnimInstanceClass);
-
-	void Refresh();
 	
 public:
 	FOnEquipmentEntryChanged OnEquipmentEntryChanged;
@@ -167,7 +131,4 @@ private:
 	
 	UPROPERTY(Replicated)
 	FD1EquipmentList EquipmentList;
-	
-	UPROPERTY(ReplicatedUsing=OnRep_CurrentWeaponEquipState)
-	EWeaponEquipState CurrentWeaponEquipState = EWeaponEquipState::Unarmed;
 };

@@ -9,6 +9,7 @@
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
+#include "Player/D1PlayerController.h"
 #include "System/D1AssetManager.h"
 #include "UI/Item/Drag/D1ItemDragDrop.h"
 #include "UI/Item/Equipment/D1EquipmentEntryWidget.h"
@@ -28,10 +29,10 @@ void UD1InventorySlotsWidget::NativeConstruct()
 	SlotWidgetClass = UD1AssetManager::GetSubclassByName<UD1InventorySlotWidget>("InventorySlotWidget");
 	EntryWidgetClass = UD1AssetManager::GetSubclassByName<UD1InventoryEntryWidget>("InventoryEntryWidget");
 
-	AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn());
-	check(Player);
+	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
+	check(PC);
 
-	InventoryManagerComponent = Player->InventoryManagerComponent;
+	InventoryManagerComponent = PC->InventoryManagerComponent;
 	check(InventoryManagerComponent);
 	
 	const FIntPoint& InventorySlotCount = InventoryManagerComponent->GetInventorySlotCount();

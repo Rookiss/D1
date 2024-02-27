@@ -1,7 +1,6 @@
 ﻿#include "D1PlayerInventoryWidget.h"
 
 #include "D1Define.h"
-#include "Character/D1Player.h"
 #include "Components/TextBlock.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
@@ -18,11 +17,11 @@ UD1PlayerInventoryWidget::UD1PlayerInventoryWidget(const FObjectInitializer& Obj
 void UD1PlayerInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	
+	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
+	check(PC);
 
-	AD1Player* Player = Cast<AD1Player>(GetOwningPlayerPawn());
-	check(Player);
-
-	InventoryManagerComponent = Player->InventoryManagerComponent;
+	InventoryManagerComponent = PC->InventoryManagerComponent;
 	check(InventoryManagerComponent);
 
 	InventoryManagerComponent->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);

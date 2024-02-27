@@ -26,7 +26,7 @@ FReply UD1SceneWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 {
 	FReply Reply = Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 	
-	if (InKeyEvent.IsRepeat() == false && InKeyEvent.GetKey() == EKeys::I)
+	if (InKeyEvent.IsRepeat() == false && InKeyEvent.GetKey() == EKeys::Tab)
 	{
 		FSlateApplication::Get().CancelDragDrop();
 		HideControlledInventoryWidget();

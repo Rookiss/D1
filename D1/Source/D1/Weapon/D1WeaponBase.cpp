@@ -10,7 +10,8 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 	PrimaryActorTick.bCanEverTick = false;
     bReplicates = true;
 
-	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
+	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
 	SetRootComponent(WeaponMesh);
-	WeaponMesh->SetCollisionProfileName("OverlapAllDynamic");
+	WeaponMesh->SetCollisionProfileName("OverlapAll");
+	WeaponMesh->SetGenerateOverlapEvents(true);
 }

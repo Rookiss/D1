@@ -3,10 +3,8 @@
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Data/D1ItemData.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Item/Managers/D1EquipmentManagerComponent.h"
-#include "Item/Managers/D1InventoryManagerComponent.h"
+#include "Item/Managers/D1EquipManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/D1PlayerController.h"
@@ -41,16 +39,8 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
-
-	EquipmentManagerComponent = CreateDefaultSubobject<UD1EquipmentManagerComponent>("EquipmentManagerComponent");
-	InventoryManagerComponent = CreateDefaultSubobject<UD1InventoryManagerComponent>("InventoryManagerComponent");
-}
-
-void AD1Player::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	InventoryManagerComponent->Init(FIntPoint(10, 5));
+	
+	EquipManagerComponent = CreateDefaultSubobject<UD1EquipManagerComponent>("EquipManagerComponent");
 }
 
 void AD1Player::BeginPlay()
@@ -69,21 +59,6 @@ void AD1Player::BeginPlay()
 	}
 	
 	CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("CameraSocket"));
-	
-	if (HasAuthority())
-	{
-		// @TODO: For Test
-		int32 IterationCount = 2;
-		const TArray<int32> ItemIDs = { 1001, 1002, 1003 };
-	
-		for (int i = 0; i < IterationCount; i++)
-		{
-			for (const int32 ItemID : ItemIDs)
-			{
-				InventoryManagerComponent->TryAddItem(ItemID, FMath::RandRange(1, 2));
-			}
-		}
-	}
 }
 
 void AD1Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -108,13 +83,10 @@ void AD1Player::OnRep_PlayerState()
 	
 	if (AD1PlayerController* PC = Cast<AD1PlayerController>(GetController()))
 	{
-		GetWorldTimerManager().SetTimerForNextTick([PC]()
+		if (AD1HUD* HUD = Cast<AD1HUD>(PC->GetHUD()))
 		{
-			if (AD1HUD* HUD = Cast<AD1HUD>(PC->GetHUD()))
-			{
-				HUD->ShowSceneWidget();
-			}
-		});
+			HUD->ShowSceneWidget();
+		}
 	}
 }
 
@@ -162,29 +134,4 @@ void AD1Player::DisableInputAndCollision()
 	check(CollisionComponent);
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
-}
-
-void AD1Player::Multicast_SetArmorMesh_Implementation(EArmorType ArmorType, FSoftObjectPath ArmorMeshPath)
-{
-	if (ArmorType == EArmorType::Count)
-		return;
-
-	if (ArmorMeshPath.IsValid())
-	{
-		UD1AssetManager::GetAssetByPath(ArmorMeshPath, FAsyncLoadCompletedDelegate::CreateLambda(
-		[this, ArmorType](const FName& AssetName, UObject* LoadedAsset)
-		{
-			if (USkeletalMeshComponent* ArmorMeshComponent = ArmorMeshComponents[static_cast<int32>(ArmorType)])
-			{
-				ArmorMeshComponent->SetSkeletalMesh(Cast<USkeletalMesh>(LoadedAsset));
-			}
-		}));
-	}
-	else
-	{
-		if (USkeletalMeshComponent* ArmorMeshComponent = ArmorMeshComponents[static_cast<int32>(ArmorType)])
-		{
-			ArmorMeshComponent->SetSkeletalMesh(DefaultArmorMeshes[static_cast<int32>(ArmorType)]);
-		}
-	}
 }

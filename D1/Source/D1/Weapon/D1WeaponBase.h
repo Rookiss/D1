@@ -12,5 +12,5 @@ public:
 	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UStaticMeshComponent> WeaponMesh;
+	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
 };
