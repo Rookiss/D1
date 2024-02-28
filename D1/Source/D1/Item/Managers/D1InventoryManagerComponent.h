@@ -52,10 +52,8 @@ public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
 	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
-
-private:
-	void InitOnServer();
 	
+private:
 	void AddItem_Unsafe(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount);
 	UD1ItemInstance* RemoveItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemCount); /* Return Removed ItemInstance */
 	

@@ -69,11 +69,11 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry,
 	
 		if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
 		{
-			bIsValid = EquipmentManagerComponent->CanSetEntry_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
+			bIsValid = EquipmentManagerComponent->CanAddEntry_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
 		}
 		else if (UD1EquipmentManagerComponent* EquipmentManager = DragDrop->FromEquipmentManager)
 		{
-			bIsValid = EquipmentManagerComponent->CanSetEntry_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+			bIsValid = EquipmentManagerComponent->CanAddEntry_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
 		}
 	}
 
@@ -109,11 +109,11 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDrop(const FGeometry& InGeometry, con
 
 		if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
 		{
-			EquipmentManagerComponent->Server_RequestSetEntry_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
+			EquipmentManagerComponent->Server_AddEntry_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
 		}
 		else if (UD1EquipmentManagerComponent* EquipmentManager = DragDrop->FromEquipmentManager)
 		{
-			EquipmentManagerComponent->Server_RequestSetEntry_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+			EquipmentManagerComponent->Server_AddEntry_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
 		}
 	}
 	

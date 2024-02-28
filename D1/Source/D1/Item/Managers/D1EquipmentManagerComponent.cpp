@@ -36,7 +36,6 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* NewItemInstance)
 
 		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
 		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
-		
 		if (Armor || Weapon && EquipmentManager->IsSameWeaponEquipState(EquipmentSlotType, EquipManager->GetCurrentWeaponEquipState()))
 		{
 			EquipManager->Equip(EquipmentSlotType, ItemInstance);
@@ -79,14 +78,14 @@ void FD1EquipmentList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 	}
 }
 
-void FD1EquipmentList::SetEntry(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
+void FD1EquipmentList::AddEntry(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
 {
 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 	Entry.Init(ItemInstance);
 	MarkItemDirty(Entry);
 }
 
-UD1ItemInstance* FD1EquipmentList::ResetEntry(EEquipmentSlotType EquipmentSlotType)
+UD1ItemInstance* FD1EquipmentList::RemoveEntry(EEquipmentSlotType EquipmentSlotType)
 {
 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 	UD1ItemInstance* ItemInstance = Entry.ItemInstance;
@@ -144,18 +143,18 @@ bool UD1EquipmentManagerComponent::ReplicateSubobjects(UActorChannel* Channel, F
 	return bWroteSomething;
 }
 
-void UD1EquipmentManagerComponent::Server_RequestSetEntry_FromInventory_Implementation(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType)
+void UD1EquipmentManagerComponent::Server_AddEntry_FromInventory_Implementation(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType)
 {
 	check(GetOwner()->HasAuthority());
 	
-	if (CanSetEntry_FromInventory(OtherComponent, FromItemSlotPos, ToEquipmentSlotType))
+	if (CanAddEntry_FromInventory(OtherComponent, FromItemSlotPos, ToEquipmentSlotType))
 	{
 		UD1ItemInstance* RemovedItemInstance = OtherComponent->InventoryList.RemoveItem_Unsafe(FromItemSlotPos, 1);
-		EquipmentList.SetEntry(ToEquipmentSlotType, RemovedItemInstance);
+		EquipmentList.AddEntry(ToEquipmentSlotType, RemovedItemInstance);
 	}
 }
 
-bool UD1EquipmentManagerComponent::CanSetEntry_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanAddEntry_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const
 {
 	if (OtherComponent == nullptr)
 		return false;
@@ -169,24 +168,24 @@ bool UD1EquipmentManagerComponent::CanSetEntry_FromInventory(UD1InventoryManager
 	const FD1InventoryEntry& FromEntry = FromEntries[FromIndex];
 	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
 
-	return CanSetEntry(FromItemInstance, ToEquipmentSlotType);
+	return CanAddEntry(FromItemInstance, ToEquipmentSlotType);
 }
 
-void UD1EquipmentManagerComponent::Server_RequestSetEntry_FromEquipment_Implementation(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType)
+void UD1EquipmentManagerComponent::Server_AddEntry_FromEquipment_Implementation(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType)
 {
 	check(GetOwner()->HasAuthority());
 
 	if (this == OtherComponent && FromEquipmentSlotType == ToEquipmentSlotType)
 		return;
 	
-	if (CanSetEntry_FromEquipment(OtherComponent, FromEquipmentSlotType, ToEquipmentSlotType))
+	if (CanAddEntry_FromEquipment(OtherComponent, FromEquipmentSlotType, ToEquipmentSlotType))
 	{
-		UD1ItemInstance* RemovedItemInstance = OtherComponent->EquipmentList.ResetEntry(FromEquipmentSlotType);
-		EquipmentList.SetEntry(ToEquipmentSlotType, RemovedItemInstance);
+		UD1ItemInstance* RemovedItemInstance = OtherComponent->EquipmentList.RemoveEntry(FromEquipmentSlotType);
+		EquipmentList.AddEntry(ToEquipmentSlotType, RemovedItemInstance);
 	}
 }
 
-bool UD1EquipmentManagerComponent::CanSetEntry_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanAddEntry_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const
 {
 	if (OtherComponent == nullptr)
 		return false;
@@ -198,10 +197,10 @@ bool UD1EquipmentManagerComponent::CanSetEntry_FromEquipment(UD1EquipmentManager
 	const FD1EquipmentEntry& FromEntry = FromEntries[(int32)FromEquipmentSlotType];
 	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
 
-	return CanSetEntry(FromItemInstance, ToEquipmentSlotType);
+	return CanAddEntry(FromItemInstance, ToEquipmentSlotType);
 }
 
-bool UD1EquipmentManagerComponent::CanSetEntry(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanAddEntry(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const
 {
 	if (ToEquipmentSlotType == EEquipmentSlotType::Count || FromItemInstance == nullptr)
 		return false;
@@ -302,7 +301,7 @@ bool UD1EquipmentManagerComponent::IsAllEmpty(EWeaponEquipState WeaponEquipState
 		return false;
 
 	bool bAllEmpty = true;
-	for (EEquipmentSlotType SlotType : Item::SlotsByWeaponEquipState[(int32)WeaponEquipState])
+	for (EEquipmentSlotType SlotType : Item::EquipmentSlotsByWeaponState[(int32)WeaponEquipState])
 	{
 		const FD1EquipmentEntry& Entry = EquipmentList.Entries[(int32)SlotType];
 		if (Entry.ItemInstance)

@@ -23,7 +23,7 @@ public:
 public:
 	static void Initialize();
 	
-	static UD1ItemData* GetItemData();
+	static const UD1ItemData* GetItemData();
 	
 	static void GetAssetByPath(const FSoftObjectPath& AssetPath, FAsyncLoadCompletedDelegate CompletedDelegate = FAsyncLoadCompletedDelegate());
 	

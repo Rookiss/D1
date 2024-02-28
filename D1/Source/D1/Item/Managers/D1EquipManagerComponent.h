@@ -5,13 +5,14 @@
 #include "Net/Serialization/FastArraySerializer.h"
 #include "D1EquipManagerComponent.generated.h"
 
-class UD1EquipmentManagerComponent;
 class AD1Player;
 class UD1ItemInstance;
 class AD1PlayerController;
 class UD1EquipManagerComponent;
+class UD1EquipmentManagerComponent;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEquipEntryChanged, EEquipmentSlotType, UD1ItemInstance*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponEquipStateChanged, EWeaponEquipState);
 
 USTRUCT(BlueprintType)
 struct FD1EquipEntry : public FFastArraySerializerItem
@@ -120,6 +121,10 @@ public:
 	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }
 	EWeaponEquipState GetBackwardWeaponEquipState() const;
 	EWeaponEquipState GetForwardWeaponEquipState() const;
+
+private:
+	UFUNCTION()
+	void OnRep_CurrentWeaponEquipState();
 	
 public:
 	AD1Player* GetPlayerCharacter() const;
@@ -130,11 +135,12 @@ public:
 	
 public:
 	FOnEquipEntryChanged OnEquipEntryChanged;
+	FOnWeaponEquipStateChanged OnWeaponEquipStateChanged;
 	
 private:
 	UPROPERTY(Replicated)
 	FD1EquipList EquipList;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentWeaponEquipState)
 	EWeaponEquipState CurrentWeaponEquipState = EWeaponEquipState::Unarmed;
 };

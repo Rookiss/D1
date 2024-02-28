@@ -3,6 +3,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemGlobals.h"
 #include "D1EquipmentManagerComponent.h"
+#include "D1GameplayTags.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/D1MonsterSet.h"
 #include "AbilitySystem/Attributes/D1PlayerSet.h"
@@ -193,12 +194,12 @@ void FD1EquipEntry::Unequip()
 				UD1EquipmentManagerComponent* EquipmentManager = PC->EquipmentManagerComponent;
 				check(EquipmentManager);
 				
-				// if (EquipmentManager->IsAllEmpty(EquipmentManager->GetCurrentWeaponEquipState()))
-				// {
-				// 	FGameplayEventData Payload;
-				// 	Payload.EventMagnitude = (int32)EWeaponEquipState::Unarmed;
-				// 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(EquipmentManager->GetOwner(), D1GameplayTags::Event_EquipWeapon, Payload);
-				// }
+				if (EquipmentManager->IsAllEmpty(EquipManager->GetCurrentWeaponEquipState()))
+				{
+					FGameplayEventData Payload;
+					Payload.EventMagnitude = (int32)EWeaponEquipState::Unarmed;
+					UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(EquipmentManager->GetOwner(), D1GameplayTags::Event_EquipWeapon, Payload);
+				}
 			}
 		}
 	}
@@ -209,9 +210,9 @@ void FD1EquipEntry::Unequip()
 		check(Player);
 		
 		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
-		if (USkeletalMeshComponent* ArmorMeshComponent = Player->ArmorMeshComponents[static_cast<int32>(Armor->ArmorType)])
+		if (USkeletalMeshComponent* ArmorMeshComponent = Player->ArmorMeshComponents[(int32)Armor->ArmorType])
 		{
-			ArmorMeshComponent->SetSkeletalMesh(Player->DefaultArmorMeshes[static_cast<int32>(Armor->ArmorType)]);
+			ArmorMeshComponent->SetSkeletalMesh(Player->DefaultArmorMeshes[(int32)Armor->ArmorType]);
 		}
 	}
 }
@@ -331,7 +332,7 @@ void UD1EquipManagerComponent::EquipWeaponInSlot()
 	check(EquipmentManager);
 
 	const TArray<FD1EquipmentEntry>& Entries = EquipmentManager->GetAllEntries();
-	for (EEquipmentSlotType SlotType : Item::SlotsByWeaponEquipState[(int32)CurrentWeaponEquipState])
+	for (EEquipmentSlotType SlotType : Item::EquipmentSlotsByWeaponState[(int32)CurrentWeaponEquipState])
 	{
 		Equip(SlotType, Entries[(int32)SlotType].GetItemInstance());
 	}
@@ -339,10 +340,12 @@ void UD1EquipManagerComponent::EquipWeaponInSlot()
 
 void UD1EquipManagerComponent::UnequipWeaponInSlot()
 {
+	check(GetOwner()->HasAuthority());
+	
 	UD1EquipmentManagerComponent* EquipmentManager = GetEquipmentManagerComponent();
 	check(EquipmentManager);
 	
-	for (EEquipmentSlotType SlotType : Item::SlotsByWeaponEquipState[(int32)CurrentWeaponEquipState])
+	for (EEquipmentSlotType SlotType : Item::EquipmentSlotsByWeaponState[(int32)CurrentWeaponEquipState])
 	{
 		Unequip(SlotType);
 	}
@@ -366,8 +369,6 @@ bool UD1EquipManagerComponent::CanChangeWeaponEquipState(EWeaponEquipState NewWe
 		return false;
 
 	UD1EquipmentManagerComponent* EquipmentManager = GetEquipmentManagerComponent();
-	check(EquipmentManager);
-
 	return (EquipmentManager->IsAllEmpty(NewWeaponEquipState) == false);
 }
 
@@ -381,6 +382,14 @@ EWeaponEquipState UD1EquipManagerComponent::GetForwardWeaponEquipState() const
 {
 	int32 WeaponEquipStateCount = (int32)EWeaponEquipState::Count;
 	return (EWeaponEquipState)(((int32)CurrentWeaponEquipState + 1) % WeaponEquipStateCount);
+}
+
+void UD1EquipManagerComponent::OnRep_CurrentWeaponEquipState()
+{
+	if (OnWeaponEquipStateChanged.IsBound())
+	{
+		OnWeaponEquipStateChanged.Broadcast(CurrentWeaponEquipState);
+	}
 }
 
 AD1Player* UD1EquipManagerComponent::GetPlayerCharacter() const

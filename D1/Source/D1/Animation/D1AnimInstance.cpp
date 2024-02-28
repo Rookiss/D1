@@ -68,7 +68,7 @@ void UD1AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 		else
 		{
-			const TArray<EEquipmentSlotType>& SlotTypes = Item::SlotsByWeaponEquipState[(int32)WeaponEquipState];
+			const TArray<EEquipmentSlotType>& SlotTypes = Item::EquipmentSlotsByWeaponState[(int32)WeaponEquipState];
 			for (int32 i = 0; i < SlotTypes.Num(); i++)
 			{
 				EEquipmentSlotType SlotType = SlotTypes[i];

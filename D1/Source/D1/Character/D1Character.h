@@ -16,7 +16,6 @@ public:
 	AD1Character(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	// TODO: RefreshAbilityActorInfo() / PossessedBy
 	virtual void InitAbilitySystem();
 	virtual void ApplyAbilitySystemData(const FName& DataName);
 

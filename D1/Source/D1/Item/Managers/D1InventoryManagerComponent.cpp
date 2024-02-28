@@ -116,17 +116,6 @@ void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 	}
 }
 
-void FD1InventoryList::InitOnServer()
-{
-	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
-	Entries.SetNum(InventorySlotCount.X * InventorySlotCount.Y);
-	
-	for (FD1InventoryEntry& Entry : Entries)
-	{
-		MarkItemDirty(Entry);
-	}
-}
-
 void FD1InventoryList::AddItem_Unsafe(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount)
 {
 	AActor* OwningActor = InventoryManager->GetOwner();
@@ -355,7 +344,13 @@ void UD1InventoryManagerComponent::BeginPlay()
 
 	if (GetOwner() && GetOwner()->HasAuthority())
 	{
-		InventoryList.InitOnServer();
+		TArray<FD1InventoryEntry>& Entries = InventoryList.Entries;
+		Entries.SetNum(InventorySlotCount.X * InventorySlotCount.Y);
+	
+		for (FD1InventoryEntry& Entry : Entries)
+		{
+			InventoryList.MarkItemDirty(Entry);
+		}
 	}
 }
 
@@ -551,7 +546,7 @@ void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromExternalEqu
 	
 	if (CanMoveOrMergeItem_FromExternalEquipment(OtherComponent, FromEquipmentSlotType, ToItemSlotPos))
 	{
-		UD1ItemInstance* RemovedItemInstance = OtherComponent->EquipmentList.ResetEntry(FromEquipmentSlotType);
+		UD1ItemInstance* RemovedItemInstance = OtherComponent->EquipmentList.RemoveEntry(FromEquipmentSlotType);
 		InventoryList.AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, 1);
 	}
 }

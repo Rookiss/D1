@@ -79,7 +79,14 @@ void AD1Player::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
-	InitAbilitySystem();
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->RefreshAbilityActorInfo();
+	}
+	else
+	{
+		InitAbilitySystem();
+	}
 	
 	if (AD1PlayerController* PC = Cast<AD1PlayerController>(GetController()))
 	{
@@ -90,6 +97,16 @@ void AD1Player::OnRep_PlayerState()
 	}
 }
 
+void AD1Player::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+
+	if (AD1PlayerState* PS = GetPlayerState<AD1PlayerState>())
+	{
+		PS->GetAbilitySystemComponent()->RefreshAbilityActorInfo();
+	}
+}
+
 void AD1Player::InitAbilitySystem()
 {
 	Super::InitAbilitySystem();
@@ -97,7 +114,6 @@ void AD1Player::InitAbilitySystem()
 	if (AD1PlayerState* PS = GetPlayerState<AD1PlayerState>())
 	{
 		AbilitySystemComponent = Cast<UD1AbilitySystemComponent>(PS->GetAbilitySystemComponent());
-		check(AbilitySystemComponent);
 		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
 	}
 	ApplyAbilitySystemData("ASD_Player");
@@ -126,12 +142,10 @@ void AD1Player::DisableInputAndCollision()
 	}
 
 	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
-	check(MovementComponent);
 	MovementComponent->StopMovementImmediately();
 	MovementComponent->DisableMovement();
 	
 	UCapsuleComponent* CollisionComponent = GetCapsuleComponent();
-	check(CollisionComponent);
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 }

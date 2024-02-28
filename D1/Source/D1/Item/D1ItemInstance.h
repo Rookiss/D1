@@ -6,8 +6,6 @@
 #include "System/D1GameplayTagStack.h"
 #include "D1ItemInstance.generated.h"
 
-struct FGameplayTag;
-
 UCLASS(BlueprintType)
 class UD1ItemInstance : public UObject
 {

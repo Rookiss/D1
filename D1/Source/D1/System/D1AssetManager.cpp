@@ -31,7 +31,7 @@ void UD1AssetManager::Initialize()
 	Get().LoadPreloadAssets();
 }
 
-UD1ItemData* UD1AssetManager::GetItemData()
+const UD1ItemData* UD1AssetManager::GetItemData()
 {
 	return GetAssetByName<UD1ItemData>("ItemData");
 }

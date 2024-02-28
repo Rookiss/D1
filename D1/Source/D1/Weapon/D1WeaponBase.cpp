@@ -1,7 +1,5 @@
 ﻿#include "D1WeaponBase.h"
 
-#include "Components/BoxComponent.h"
-
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1WeaponBase)
 
 AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
@@ -10,7 +8,7 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 	PrimaryActorTick.bCanEverTick = false;
     bReplicates = true;
 
-	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
+	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
 	SetRootComponent(WeaponMesh);
 	WeaponMesh->SetCollisionProfileName("OverlapAll");
 	WeaponMesh->SetGenerateOverlapEvents(true);
