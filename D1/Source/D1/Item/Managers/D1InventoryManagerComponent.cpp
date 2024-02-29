@@ -556,7 +556,7 @@ bool UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalEquipment(UD1E
 	if (OtherComponent == nullptr)
 		return false;
 
-	if (FromEquipmentSlotType == EEquipmentSlotType::Count)
+	if (FromEquipmentSlotType == EEquipmentSlotType::Unarmed || FromEquipmentSlotType == EEquipmentSlotType::Count)
 		return false;
 	
 	if (ToItemSlotPos.X < 0 || ToItemSlotPos.Y < 0 || ToItemSlotPos.X >= InventorySlotCount.X || ToItemSlotPos.Y >= InventorySlotCount.Y)

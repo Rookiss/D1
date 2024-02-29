@@ -54,36 +54,37 @@ void UD1AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			bIsCrouching = MovementComponent->IsCrouching();
 			bIsFalling = MovementComponent->IsFalling();
 		}
-
-		UD1EquipManagerComponent* EquipManager = Character->EquipManagerComponent;
 		
-		LeftHandWeights = 0.f;
-		RightHandWeights = 0.f;
-			
+		LeftHandWeight = 0.f;
+		RightHandWeight = 0.f;
+		
+		UD1EquipManagerComponent* EquipManager = Character->EquipManagerComponent;
 		EWeaponEquipState WeaponEquipState = EquipManager->GetCurrentWeaponEquipState();
-		if (WeaponEquipState == EWeaponEquipState::Unarmed)
+		const TArray<EEquipmentSlotType>& SlotTypes = Item::EquipmentSlotsByWeaponState[(int32)WeaponEquipState];
+
+		for (EEquipmentSlotType SlotType : SlotTypes)
 		{
-			LeftHandWeights = 1.f;
-			RightHandWeights = 1.f;
-		}
-		else
-		{
-			const TArray<EEquipmentSlotType>& SlotTypes = Item::EquipmentSlotsByWeaponState[(int32)WeaponEquipState];
-			for (int32 i = 0; i < SlotTypes.Num(); i++)
+			const TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
+			const FD1EquipEntry& Entry = Entries[(int32)SlotType];
+
+			if (Entry.GetItemInstance())
 			{
-				EEquipmentSlotType SlotType = SlotTypes[i];
-				const TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-				const FD1EquipEntry& Entry = Entries[(int32)SlotType];
-					
-				if (Entry.GetItemInstance())
+				switch (SlotType)
 				{
-					for (float* Weights : HandWeights[i])
-					{
-						if (Weights)
-						{
-							*Weights = 1.f;
-						}
-					}
+				case EEquipmentSlotType::Unarmed:
+				case EEquipmentSlotType::Primary_TwoHand:
+				case EEquipmentSlotType::Secondary_TwoHand:
+					LeftHandWeight = 1.f;
+					RightHandWeight = 1.f;
+					break;
+				case EEquipmentSlotType::Primary_LeftHand:
+				case EEquipmentSlotType::Secondary_LeftHand:
+					LeftHandWeight = 1.f;
+					break;
+				case EEquipmentSlotType::Primary_RightHand:
+				case EEquipmentSlotType::Secondary_RightHand:
+					RightHandWeight = 1.f;
+					break;
 				}
 			}
 		}

@@ -189,6 +189,9 @@ bool UD1EquipmentManagerComponent::CanAddEntry_FromEquipment(UD1EquipmentManager
 {
 	if (OtherComponent == nullptr)
 		return false;
+
+	if (FromEquipmentSlotType == EEquipmentSlotType::Unarmed || ToEquipmentSlotType == EEquipmentSlotType::Unarmed)
+		return false;
 	
 	if (FromEquipmentSlotType == EEquipmentSlotType::Count || ToEquipmentSlotType == EEquipmentSlotType::Count)
 		return false;
@@ -202,7 +205,10 @@ bool UD1EquipmentManagerComponent::CanAddEntry_FromEquipment(UD1EquipmentManager
 
 bool UD1EquipmentManagerComponent::CanAddEntry(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const
 {
-	if (ToEquipmentSlotType == EEquipmentSlotType::Count || FromItemInstance == nullptr)
+	if (FromItemInstance == nullptr)
+		return false;
+	
+	if (ToEquipmentSlotType == EEquipmentSlotType::Unarmed || ToEquipmentSlotType == EEquipmentSlotType::Count)
 		return false;
 
 	const TArray<FD1EquipmentEntry>& Entries = GetAllEntries();
@@ -264,7 +270,8 @@ bool UD1EquipmentManagerComponent::CanAddEntry(UD1ItemInstance* FromItemInstance
 
 bool UD1EquipmentManagerComponent::IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState) const
 {
-	return ((EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand   || EquipmentSlotType == EEquipmentSlotType::Primary_RightHand   || EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand)   && WeaponEquipState == EWeaponEquipState::Primary ||
+	return ((EquipmentSlotType == EEquipmentSlotType::Unarmed && WeaponEquipState == EWeaponEquipState::Unarmed) ||
+			(EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand   || EquipmentSlotType == EEquipmentSlotType::Primary_RightHand   || EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand)   && WeaponEquipState == EWeaponEquipState::Primary ||
 		    (EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand) && WeaponEquipState == EWeaponEquipState::Secondary);
 }
 

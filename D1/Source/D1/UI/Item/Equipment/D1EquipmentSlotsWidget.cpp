@@ -54,6 +54,7 @@ void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged(EEquipmentSlotType Equipme
 	if (EquipmentSlotType == EEquipmentSlotType::Count)
 		return;
 
+	// TODO : Check Unarmed Slot
 	const int32 EquipmentSlotIndex = (int32)EquipmentSlotType;
 	const int32 WeaponSlotCount = (int32)EWeaponSlotType::Count * (int32)EWeaponHandType::Count;
 	if (EquipmentSlotIndex < WeaponSlotCount)

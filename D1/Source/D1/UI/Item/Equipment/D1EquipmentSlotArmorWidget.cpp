@@ -24,7 +24,9 @@ UD1EquipmentSlotArmorWidget::UD1EquipmentSlotArmorWidget(const FObjectInitialize
 
 void UD1EquipmentSlotArmorWidget::Init(EArmorType InArmorType)
 {
-	check(InArmorType != EArmorType::Count);
+	if (InArmorType == EArmorType::Count)
+		return;
+	
 	ArmorType = InArmorType;
 }
 

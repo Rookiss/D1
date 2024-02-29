@@ -23,7 +23,9 @@ UD1EquipmentSlotWeaponWidget::UD1EquipmentSlotWeaponWidget(const FObjectInitiali
 
 void UD1EquipmentSlotWeaponWidget::Init(EWeaponSlotType InWeaponSlotType)
 {
-	check(InWeaponSlotType != EWeaponSlotType::Count);
+	if (InWeaponSlotType == EWeaponSlotType::Count)
+		return;
+	
 	WeaponSlotType = InWeaponSlotType;
 }
 

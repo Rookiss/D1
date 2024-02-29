@@ -11,30 +11,10 @@ enum class ESlotState : uint8
 };
 
 UENUM(BlueprintType)
-enum class EEquipSlotType : uint8
+enum class EEquipmentSlotType : uint8
 {
 	Unarmed,
 	
-	Primary_LeftHand,
-	Primary_RightHand,
-	Primary_TwoHand,
-	
-	Secondary_LeftHand,
-	Secondary_RightHand,
-	Secondary_TwoHand,
-	
-	Helmet,
-	Chest,
-	Legs,
-	Hands,
-	Foot,
-	
-	Count	UMETA(Hidden)
-};
-
-UENUM(BlueprintType)
-enum class EEquipmentSlotType : uint8
-{
 	Primary_LeftHand,
 	Primary_RightHand,
 	Primary_TwoHand,
@@ -133,15 +113,9 @@ namespace Item
 	const FIntPoint UnitInventorySlotSize = FIntPoint(50.f, 50.f);
 
 	const TArray<TArray<EEquipmentSlotType>> EquipmentSlotsByWeaponState = {
-		{ },
+		{ EEquipmentSlotType::Unarmed },
 		{ EEquipmentSlotType::Primary_LeftHand,   EEquipmentSlotType::Primary_RightHand,   EEquipmentSlotType::Primary_TwoHand   },
 		{ EEquipmentSlotType::Secondary_LeftHand, EEquipmentSlotType::Secondary_RightHand, EEquipmentSlotType::Secondary_TwoHand }
-	};
-
-	const TArray<TArray<EEquipSlotType>> EquipSlotsByWeaponState = {
-		{ EEquipSlotType::Unarmed },
-		{ EEquipSlotType::Primary_LeftHand,   EEquipSlotType::Primary_RightHand,   EEquipSlotType::Primary_TwoHand   },
-		{ EEquipSlotType::Secondary_LeftHand, EEquipSlotType::Secondary_RightHand, EEquipSlotType::Secondary_TwoHand }
 	};
 	
 	const FLinearColor DefaultColor = FLinearColor(1.f, 1.f, 1.f, 0.f);

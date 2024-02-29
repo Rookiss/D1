@@ -46,11 +46,8 @@ protected:
 	bool bIsFalling = false;
 
 	UPROPERTY(BlueprintReadOnly)
-	float LeftHandWeights = 0.f;
+	float LeftHandWeight = 0.f;
 
 	UPROPERTY(BlueprintReadOnly)
-	float RightHandWeights = 0.f;
-
-private:
-	TArray<TArray<float*>> HandWeights = { { &LeftHandWeights }, { &RightHandWeights }, { &LeftHandWeights, &RightHandWeights } };
+	float RightHandWeight = 0.f;
 };

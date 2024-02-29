@@ -19,7 +19,8 @@ UD1EquipmentEntryWidget::UD1EquipmentEntryWidget(const FObjectInitializer& Objec
 
 void UD1EquipmentEntryWidget::Init(UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType)
 {
-	check(InEquipmentSlotType != EEquipmentSlotType::Count);
+	if (InEquipmentSlotType == EEquipmentSlotType::Unarmed || InEquipmentSlotType == EEquipmentSlotType::Count)
+		return;
 	
 	SetItemInstance(InItemInstance);
 	EquipmentSlotType = InEquipmentSlotType;
