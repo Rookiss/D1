@@ -1,6 +1,7 @@
 ﻿#include "D1PlayerInventoryWidget.h"
 
 #include "D1Define.h"
+#include "Character/D1Player.h"
 #include "Components/TextBlock.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
@@ -18,21 +19,21 @@ void UD1PlayerInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
-	check(PC);
+	AD1Player* PlayerPawn = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(PlayerPawn);
 
-	InventoryManagerComponent = PC->InventoryManagerComponent;
+	InventoryManagerComponent = PlayerPawn->InventoryManagerComponent;
 	check(InventoryManagerComponent);
 
 	InventoryManagerComponent->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
 	
-	Text_Gold->SetText(FText::AsNumber(InventoryManagerComponent->GetTotalCountByID(ITEM_ID_COIN)));
+	Text_Gold->SetText(FText::AsNumber(InventoryManagerComponent->GetTotalCountByID(Item::CoinID)));
 }
 
 void UD1PlayerInventoryWidget::OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 NewItemCount)
 {
-	if (ItemInstance && ItemInstance->GetItemID() != ITEM_ID_COIN)
+	if (ItemInstance && ItemInstance->GetItemID() != Item::CoinID)
 		return;
 	
-	Text_Gold->SetText(FText::AsNumber(InventoryManagerComponent->GetTotalCountByID(ITEM_ID_COIN)));
+	Text_Gold->SetText(FText::AsNumber(InventoryManagerComponent->GetTotalCountByID(Item::CoinID)));
 }

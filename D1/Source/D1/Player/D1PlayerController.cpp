@@ -14,8 +14,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Input/D1InputComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
-#include "Item/Managers/D1EquipmentManagerComponent.h"
-#include "Item/Managers/D1InventoryManagerComponent.h"
 #include "System/D1AssetManager.h"
 #include "UI/D1HUD.h"
 #include "UI/D1SceneWidget.h"
@@ -27,9 +25,6 @@ AD1PlayerController::AD1PlayerController(const FObjectInitializer& ObjectInitial
 {
 	bReplicates = true;
 	PlayerCameraManagerClass = AD1PlayerCameraManager::StaticClass();
-
-	EquipmentManagerComponent = CreateDefaultSubobject<UD1EquipmentManagerComponent>("EquipmentManagerComponent");
-	InventoryManagerComponent = CreateDefaultSubobject<UD1InventoryManagerComponent>("InventoryManagerComponent");
 }
 
 void AD1PlayerController::BeginPlay()
@@ -43,28 +38,6 @@ void AD1PlayerController::BeginPlay()
 			Subsystem->AddMappingContext(InputData->InputMappingContext, 0);
 		}
 	}
-
-	if (HasAuthority())
-	{
-		// @TODO: For Test
-		int32 IterationCount = 2;
-		const TArray<int32> ItemIDs = { 1001, 1002, 1003 };
-	
-		for (int i = 0; i < IterationCount; i++)
-		{
-			for (const int32 ItemID : ItemIDs)
-			{
-				InventoryManagerComponent->TryAddItem(ItemID, FMath::RandRange(1, 2));
-			}
-		}
-	}
-}
-
-void AD1PlayerController::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	InventoryManagerComponent->Init(FIntPoint(10, 5));
 }
 
 void AD1PlayerController::SetupInputComponent()

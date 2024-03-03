@@ -1,6 +1,7 @@
 ﻿#include "D1EquipmentSlotArmorWidget.h"
 
 #include "D1EquipmentSlotsWidget.h"
+#include "Character/D1Player.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Components/SizeBox.h"
@@ -34,10 +35,10 @@ void UD1EquipmentSlotArmorWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
-	check(PC);
+	AD1Player* PlayerPawn = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(PlayerPawn);
 
-	EquipmentManagerComponent = PC->EquipmentManagerComponent;
+	EquipmentManagerComponent = PlayerPawn->EquipmentManagerComponent;
 	check(EquipmentManagerComponent);
 	
 	EntryWidgetClass = UD1AssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidget");

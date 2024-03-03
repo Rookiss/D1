@@ -41,6 +41,13 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* NewItemInstance)
 			EquipManager->Equip(EquipmentSlotType, ItemInstance);
 		}
 	}
+	else
+	{
+		if (EquipmentManager->IsAllEmpty(EquipManager->GetCurrentWeaponEquipState()))
+		{
+			EquipManager->ChangeWeaponEquipState(EWeaponEquipState::Unarmed);
+		}
+	}
 }
 
 bool FD1EquipmentList::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
@@ -141,6 +148,14 @@ bool UD1EquipmentManagerComponent::ReplicateSubobjects(UActorChannel* Channel, F
 	}
 	
 	return bWroteSomething;
+}
+
+void UD1EquipmentManagerComponent::Init()
+{
+	FD1EquipmentEntry& Entry = EquipmentList.Entries[(int32)EEquipmentSlotType::Unarmed];
+	UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+	ItemInstance->Init(Item::UnarmedID);
+	Entry.Init(ItemInstance);
 }
 
 void UD1EquipmentManagerComponent::Server_AddEntry_FromInventory_Implementation(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType)
@@ -322,16 +337,16 @@ bool UD1EquipmentManagerComponent::IsAllEmpty(EWeaponEquipState WeaponEquipState
 
 AD1Player* UD1EquipmentManagerComponent::GetPlayerCharacter() const
 {
-	if (AD1PlayerController* PC = GetPlayerController())
-	{
-		return Cast<AD1Player>(PC->GetPawn());
-	}
-	return nullptr;
+	return Cast<AD1Player>(GetOwner());
 }
 
 AD1PlayerController* UD1EquipmentManagerComponent::GetPlayerController() const
 {
-	return Cast<AD1PlayerController>(GetOwner());
+	if (AD1Player* Character = GetPlayerCharacter())
+	{
+		return Cast<AD1PlayerController>(Character->Controller);
+	}
+	return nullptr;
 }
 
 const TArray<FD1EquipmentEntry>& UD1EquipmentManagerComponent::GetAllEntries() const

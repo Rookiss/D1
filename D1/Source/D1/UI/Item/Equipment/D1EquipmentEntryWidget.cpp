@@ -1,6 +1,7 @@
 ﻿#include "D1EquipmentEntryWidget.h"
 
 #include "D1EquipmentSlotsWidget.h"
+#include "Character/D1Player.h"
 #include "Components/SizeBox.h"
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
@@ -30,10 +31,10 @@ void UD1EquipmentEntryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
-	check(PC);
+	AD1Player* PlayerPawn = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(PlayerPawn);
 	
-	EquipmentManagerComponent = PC->EquipmentManagerComponent;
+	EquipmentManagerComponent = PlayerPawn->EquipmentManagerComponent;
 	check(EquipmentManagerComponent);
 }
 

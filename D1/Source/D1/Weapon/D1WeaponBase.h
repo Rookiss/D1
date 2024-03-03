@@ -2,7 +2,7 @@
 
 #include "D1WeaponBase.generated.h"
 
-UCLASS()
+UCLASS(BlueprintType, Abstract)
 class AD1WeaponBase : public AActor
 {
 	GENERATED_BODY()

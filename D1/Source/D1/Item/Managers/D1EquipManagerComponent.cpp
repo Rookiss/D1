@@ -3,7 +3,6 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemGlobals.h"
 #include "D1EquipmentManagerComponent.h"
-#include "D1GameplayTags.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/D1MonsterSet.h"
 #include "AbilitySystem/Attributes/D1PlayerSet.h"
@@ -137,7 +136,7 @@ void FD1EquipEntry::Equip()
 		}
 
 		UD1AssetManager::GetAssetByPath(Weapon->EquipMontage.ToSoftObjectPath(), FAsyncLoadCompletedDelegate::CreateLambda(
-		[Player](const FName& AssetName, UObject* LoadedAsset)
+		[Player, this](const FName& AssetName, UObject* LoadedAsset)
 		{
 			Player->PlayAnimMontage(Cast<UAnimMontage>(LoadedAsset));
 		}));
@@ -187,19 +186,6 @@ void FD1EquipEntry::Unequip()
 			if (IsValid(SpawnedWeaponActor))
 			{
 				SpawnedWeaponActor->Destroy();
-
-				AD1PlayerController* PC = EquipManager->GetPlayerController();
-				check(PC);
-				
-				UD1EquipmentManagerComponent* EquipmentManager = PC->EquipmentManagerComponent;
-				check(EquipmentManager);
-				
-				if (EquipmentManager->IsAllEmpty(EquipManager->GetCurrentWeaponEquipState()))
-				{
-					FGameplayEventData Payload;
-					Payload.EventMagnitude = (int32)EWeaponEquipState::Unarmed;
-					UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(EquipmentManager->GetOwner(), D1GameplayTags::Event_EquipWeapon, Payload);
-				}
 			}
 		}
 	}
@@ -418,9 +404,9 @@ UD1AbilitySystemComponent* UD1EquipManagerComponent::GetAbilitySystemComponent()
 
 UD1EquipmentManagerComponent* UD1EquipManagerComponent::GetEquipmentManagerComponent() const
 {
-	if (AD1PlayerController* PC = GetPlayerController())
+	if (AD1Player* Character = GetPlayerCharacter())
 	{
-		return PC->EquipmentManagerComponent;
+		return Character->EquipmentManagerComponent;
 	}
 	return nullptr;
 }

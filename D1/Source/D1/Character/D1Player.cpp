@@ -5,6 +5,8 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/D1PlayerController.h"
@@ -39,15 +41,17 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
-	
+
+	InventoryManagerComponent = CreateDefaultSubobject<UD1InventoryManagerComponent>("InventoryManagerComponent");
 	EquipManagerComponent = CreateDefaultSubobject<UD1EquipManagerComponent>("EquipManagerComponent");
+	EquipmentManagerComponent = CreateDefaultSubobject<UD1EquipmentManagerComponent>("EquipmentManagerComponent");
 }
 
 void AD1Player::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetMesh()->SetAnimClass(UD1AssetManager::GetSubclassByName<UAnimInstance>("ABP_Player_Unarmed"));
+	// GetMesh()->SetAnimClass(UD1AssetManager::GetSubclassByName<UAnimInstance>("ABP_Player_Unarmed"));
 
 	TArray<FName> DefaultArmorMeshNames = { "Head_Default", "Chest_Default", "Legs_Default", "Hands_Default", "Foot_Default" };
 	DefaultArmorMeshes.SetNum(DefaultArmorMeshNames.Num());
@@ -59,6 +63,28 @@ void AD1Player::BeginPlay()
 	}
 	
 	CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("CameraSocket"));
+
+	if (HasAuthority())
+	{
+		// @TODO: For Test
+		int32 IterationCount = 2;
+		const TArray<int32> ItemIDs = { 1001, 1002, 1003 };
+	
+		for (int i = 0; i < IterationCount; i++)
+		{
+			for (const int32 ItemID : ItemIDs)
+			{
+				InventoryManagerComponent->TryAddItem(ItemID, FMath::RandRange(1, 2));
+			}
+		}
+	}
+}
+
+void AD1Player::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	InventoryManagerComponent->Init(FIntPoint(10, 5));
 }
 
 void AD1Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -73,6 +99,8 @@ void AD1Player::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	InitAbilitySystem();
+
+	EquipmentManagerComponent->Init();
 }
 
 void AD1Player::OnRep_PlayerState()

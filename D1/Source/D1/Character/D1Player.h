@@ -4,6 +4,8 @@
 #include "D1Player.generated.h"
 
 class UCameraComponent;
+class UD1InventoryManagerComponent;
+class UD1EquipmentManagerComponent;
 class UD1EquipManagerComponent;
 
 UCLASS()
@@ -16,6 +18,7 @@ public:
 
 public:
 	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
@@ -37,6 +40,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UCameraComponent> CameraComponent;
 
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UD1EquipManagerComponent> EquipManagerComponent;
 

@@ -13,9 +13,4 @@ public:
 
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-	
-private:
-	int32 CurrentStage = 0;
-	
-	
 };

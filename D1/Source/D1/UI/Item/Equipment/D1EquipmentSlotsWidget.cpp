@@ -2,6 +2,7 @@
 
 #include "D1EquipmentSlotArmorWidget.h"
 #include "D1EquipmentSlotWeaponWidget.h"
+#include "Character/D1Player.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Player/D1PlayerController.h"
 #include "UI/Item/Drag/D1ItemDragDrop.h"
@@ -31,10 +32,10 @@ void UD1EquipmentSlotsWidget::NativeConstruct()
 		SlotArmorWidgets[i]->Init((EArmorType)i);
 	}
 	
-	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
-	check(PC);
+	AD1Player* PlayerPawn = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(PlayerPawn);
 
-	EquipmentManagerComponent = PC->EquipmentManagerComponent;
+	EquipmentManagerComponent = PlayerPawn->EquipmentManagerComponent;
 	check(EquipmentManagerComponent);
 	
 	const TArray<FD1EquipmentEntry>& Entries = EquipmentManagerComponent->GetAllEntries();
@@ -51,22 +52,24 @@ void UD1EquipmentSlotsWidget::NativeConstruct()
 
 void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
 {
-	if (EquipmentSlotType == EEquipmentSlotType::Count)
+	if (EquipmentSlotType == EEquipmentSlotType::Unarmed || EquipmentSlotType == EEquipmentSlotType::Count)
 		return;
-
-	// TODO : Check Unarmed Slot
+	
 	const int32 EquipmentSlotIndex = (int32)EquipmentSlotType;
 	const int32 WeaponSlotCount = (int32)EWeaponSlotType::Count * (int32)EWeaponHandType::Count;
-	if (EquipmentSlotIndex < WeaponSlotCount)
+	const int32 ArmorStartIndex = WeaponSlotCount + (int32)EEquipmentSlotType::Primary_LeftHand;
+	
+	if (EquipmentSlotIndex < ArmorStartIndex)
 	{
-		const int32 WeaponSlotIndex = EquipmentSlotIndex / (int32)EWeaponHandType::Count;
-		const int32 WeaponHandIndex = EquipmentSlotIndex % (int32)EWeaponHandType::Count;
+		const int32 Index = EquipmentSlotIndex - (int32)EEquipmentSlotType::Primary_LeftHand;
+		const int32 WeaponSlotIndex = Index / (int32)EWeaponHandType::Count;
+		const int32 WeaponHandIndex = Index % (int32)EWeaponHandType::Count;
 		UD1EquipmentSlotWeaponWidget* SlotWeaponWidget = SlotWeaponWidgets[WeaponSlotIndex];
 		SlotWeaponWidget->OnEquipmentEntryChanged((EWeaponHandType)WeaponHandIndex, ItemInstance);
 	}
 	else
 	{
-		UD1EquipmentSlotArmorWidget* SlotArmorWidget = SlotArmorWidgets[EquipmentSlotIndex - WeaponSlotCount];
+		UD1EquipmentSlotArmorWidget* SlotArmorWidget = SlotArmorWidgets[EquipmentSlotIndex - ArmorStartIndex];
 		SlotArmorWidget->OnEquipmentEntryChanged(ItemInstance);
 	}
 }

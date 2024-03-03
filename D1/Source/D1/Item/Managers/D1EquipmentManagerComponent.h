@@ -98,6 +98,8 @@ protected:
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
 public:
+	void Init();
+	
 	// TODO: With Validation
 	UFUNCTION(Server, Reliable)
 	void Server_AddEntry_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType);
@@ -122,7 +124,7 @@ public:
 	AD1PlayerController* GetPlayerController() const;
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const;
 	UD1AbilitySystemComponent* GetAbilitySystemComponent() const;
-	
+
 public:
 	FOnEquipmentEntryChanged OnEquipmentEntryChanged;
 	

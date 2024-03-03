@@ -5,6 +5,7 @@
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "D1EquipmentEntryWidget.h"
+#include "Character/D1Player.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
@@ -37,10 +38,10 @@ void UD1EquipmentSlotWeaponWidget::NativeConstruct()
 	SlotImages   = { Image_Slot_LeftHand, Image_Slot_RightHand, Image_Slot_TwoHand };
 	SlotOverlays = { Overlay_Slot_LeftHand, Overlay_Slot_RightHand, Overlay_Slot_TwoHand };
 
-	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
-	check(PC);
+	AD1Player* PlayerPawn = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(PlayerPawn);
 
-	EquipmentManagerComponent = PC->EquipmentManagerComponent;
+	EquipmentManagerComponent = PlayerPawn->EquipmentManagerComponent;
 	check(EquipmentManagerComponent);
 	
 	EntryWidgetClass = UD1AssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidget");

@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#define ITEM_ID_COIN 9999
-
 UENUM(BlueprintType)
 enum class ESlotState : uint8
 {
@@ -110,6 +108,8 @@ enum class EItemRarity : uint8
 
 namespace Item
 {
+	const int32 CoinID = 9999;
+	const int32 UnarmedID = 1000;
 	const FIntPoint UnitInventorySlotSize = FIntPoint(50.f, 50.f);
 
 	const TArray<TArray<EEquipmentSlotType>> EquipmentSlotsByWeaponState = {

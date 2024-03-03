@@ -29,10 +29,10 @@ void UD1InventorySlotsWidget::NativeConstruct()
 	SlotWidgetClass = UD1AssetManager::GetSubclassByName<UD1InventorySlotWidget>("InventorySlotWidget");
 	EntryWidgetClass = UD1AssetManager::GetSubclassByName<UD1InventoryEntryWidget>("InventoryEntryWidget");
 
-	AD1PlayerController* PC = Cast<AD1PlayerController>(GetOwningPlayer());
-	check(PC);
+	AD1Player* PlayerPawn = Cast<AD1Player>(GetOwningPlayerPawn());
+	check(PlayerPawn);
 
-	InventoryManagerComponent = PC->InventoryManagerComponent;
+	InventoryManagerComponent = PlayerPawn->InventoryManagerComponent;
 	check(InventoryManagerComponent);
 	
 	const FIntPoint& InventorySlotCount = InventoryManagerComponent->GetInventorySlotCount();
