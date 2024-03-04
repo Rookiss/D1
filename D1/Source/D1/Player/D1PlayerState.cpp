@@ -13,6 +13,9 @@ AD1PlayerState::AD1PlayerState(const FObjectInitializer& ObjectInitializer)
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	
 	PlayerSet = CreateDefaultSubobject<UD1PlayerSet>("PlayerSet");
+
+	NetUpdateFrequency = 20.f;
+	MinNetUpdateFrequency = 10.f;
 }
 
 UAbilitySystemComponent* AD1PlayerState::GetAbilitySystemComponent() const

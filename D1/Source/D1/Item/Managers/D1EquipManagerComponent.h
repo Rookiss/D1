@@ -6,6 +6,7 @@
 #include "D1EquipManagerComponent.generated.h"
 
 class AD1Player;
+class AD1WeaponBase;
 class UD1ItemInstance;
 class AD1PlayerController;
 class UD1EquipManagerComponent;
@@ -27,6 +28,7 @@ private:
 
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
+	AD1WeaponBase* GetSpawnedWeaponActor() const { return SpawnedWeaponActor; }
 	
 private:
 	friend struct FD1EquipList;
@@ -37,7 +39,7 @@ private:
 
 private:
 	UPROPERTY(NotReplicated)
-	TObjectPtr<AActor> SpawnedWeaponActor;
+	TObjectPtr<AD1WeaponBase> SpawnedWeaponActor;
 	
 	UPROPERTY(NotReplicated)
 	FD1AbilitySystemData_GrantedHandles GrantedHandles;
