@@ -18,8 +18,11 @@ protected:
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	void CheckWeaponOverlap();
+	void CheckAttackHit();
 
+	UFUNCTION(BlueprintCallable)
+	bool CheckBlockHit();
+	
 	UFUNCTION(BlueprintCallable)
 	bool CheckInputPress();
 	

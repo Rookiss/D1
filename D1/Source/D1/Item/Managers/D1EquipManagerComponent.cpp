@@ -118,7 +118,8 @@ void FD1EquipEntry::Equip()
 				NewActor->FinishSpawning(FTransform::Identity, true);
 				NewActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 				NewActor->AttachToComponent(Player->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
-		
+				NewActor->EquipmentSlotType = EquipmentSlotType;
+				
 				SpawnedWeaponActor = NewActor;
 			}
 		}
@@ -392,7 +393,7 @@ AD1PlayerController* UD1EquipManagerComponent::GetPlayerController() const
 	return nullptr;
 }
 
-const TArray<FD1EquipEntry>& UD1EquipManagerComponent::GetAllEntries() const
+TArray<FD1EquipEntry>& UD1EquipManagerComponent::GetAllEntries()
 {
 	return EquipList.GetAllEntries();
 }
@@ -409,4 +410,34 @@ UD1EquipmentManagerComponent* UD1EquipManagerComponent::GetEquipmentManagerCompo
 		return Character->EquipmentManagerComponent;
 	}
 	return nullptr;
+}
+
+EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const
+{
+	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
+
+	if (CurrentWeaponEquipState == EWeaponEquipState::Unarmed)
+	{
+		EquipmentSlotType = EEquipmentSlotType::Unarmed;
+	}
+	else if (CurrentWeaponEquipState == EWeaponEquipState::Primary)
+	{
+		switch (WeaponHandType)
+		{
+		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Primary_LeftHand;  break;
+		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Primary_RightHand; break;
+		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Primary_TwoHand;   break;
+		}
+	}
+	else if (CurrentWeaponEquipState == EWeaponEquipState::Secondary)
+	{
+		switch (WeaponHandType)
+		{
+		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Secondary_LeftHand;  break;
+		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Secondary_RightHand; break;
+		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Secondary_TwoHand;   break;
+		}
+	}
+	
+	return EquipmentSlotType;
 }

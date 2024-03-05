@@ -13,11 +13,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Blocking,					"State.Weapon.Blocking");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Event_Interact,							"Event.Interact");
-	UE_DEFINE_GAMEPLAY_TAG(Event_Attack_Begin,						"Event.Attack.Begin");
-	UE_DEFINE_GAMEPLAY_TAG(Event_Attack_Tick,						"Event.Attack.Tick");
-	UE_DEFINE_GAMEPLAY_TAG(Event_Attack_End,						"Event.Attack.End");
 	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon,						"Event.EquipWeapon");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Begin,						"Event.Montage.Begin");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Tick,						"Event.Montage.Tick");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_End,						"Event.Montage.End");
 		
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Move,						"Input.Action.Move");

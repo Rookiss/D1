@@ -28,7 +28,6 @@ private:
 
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
-	AD1WeaponBase* GetSpawnedWeaponActor() const { return SpawnedWeaponActor; }
 	
 private:
 	friend struct FD1EquipList;
@@ -37,10 +36,11 @@ private:
 	UPROPERTY()
 	TObjectPtr<UD1ItemInstance> ItemInstance;
 
-private:
+public:
 	UPROPERTY(NotReplicated)
 	TObjectPtr<AD1WeaponBase> SpawnedWeaponActor;
-	
+
+private:
 	UPROPERTY(NotReplicated)
 	FD1AbilitySystemData_GrantedHandles GrantedHandles;
 
@@ -74,7 +74,7 @@ private:
 	void Unequip(EEquipmentSlotType EquipmentSlotType);
 	
 public:
-	const TArray<FD1EquipEntry>& GetAllEntries() const { return Entries; }
+	TArray<FD1EquipEntry>& GetAllEntries() { return Entries; }
 	
 private:
 	friend class UD1EquipManagerComponent;
@@ -131,9 +131,12 @@ private:
 public:
 	AD1Player* GetPlayerCharacter() const;
 	AD1PlayerController* GetPlayerController() const;
-	const TArray<FD1EquipEntry>& GetAllEntries() const;
+	
+	TArray<FD1EquipEntry>& GetAllEntries();
 	UD1AbilitySystemComponent* GetAbilitySystemComponent() const;
 	UD1EquipmentManagerComponent* GetEquipmentManagerComponent() const;
+
+	EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const;
 	
 public:
 	FOnEquipEntryChanged OnEquipEntryChanged;
