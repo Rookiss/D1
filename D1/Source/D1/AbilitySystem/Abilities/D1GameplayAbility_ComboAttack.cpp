@@ -4,9 +4,7 @@
 #include "AbilitySystemComponent.h"
 #include "Weapon/D1WeaponBase.h"
 #include "D1GameplayTags.h"
-#include "Character/D1Player.h"
-#include "Item/Managers/D1EquipManagerComponent.h"
-#include "Kismet/KismetMathLibrary.h"
+#include "Physics/D1CollisionChannels.h"
 #include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_ComboAttack)
@@ -17,57 +15,11 @@ UD1GameplayAbility_ComboAttack::UD1GameplayAbility_ComboAttack(const FObjectInit
     
 }
 
-void UD1GameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	AD1Player* PlayerCharacter = Cast<AD1Player>(ActorInfo->AvatarActor.Get());
-	UD1EquipManagerComponent* EquipManager = PlayerCharacter->EquipManagerComponent;
-	EWeaponEquipState WeaponEquipState = EquipManager->GetCurrentWeaponEquipState();
-	const TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-	
-	const FGameplayAbilitySpec* AbilitySpec = GetCurrentAbilitySpec();
-	if (AbilitySpec->DynamicAbilityTags.HasTagExact(D1GameplayTags::Input_Action_Attack_MainHand))
-	{
-		switch (WeaponEquipState)
-		{
-		case EWeaponEquipState::Primary:
-			WeaponActor = Entries[(int32)EEquipmentSlotType::Primary_RightHand].SpawnedWeaponActor;
-			if (WeaponActor == nullptr)
-			{
-				WeaponActor = Entries[(int32)EEquipmentSlotType::Primary_TwoHand].SpawnedWeaponActor;
-			}
-			break;
-		case EWeaponEquipState::Secondary:
-			WeaponActor = Entries[(int32)EEquipmentSlotType::Secondary_RightHand].SpawnedWeaponActor;
-			if (WeaponActor == nullptr)
-			{
-				WeaponActor = Entries[(int32)EEquipmentSlotType::Secondary_TwoHand].SpawnedWeaponActor;
-			}
-			break;
-		}
-	}
-	else if (AbilitySpec->DynamicAbilityTags.HasTagExact(D1GameplayTags::Input_Action_Attack_OffHand))
-	{
-		switch (WeaponEquipState)
-		{
-		case EWeaponEquipState::Primary:
-			WeaponActor = Entries[(int32)EEquipmentSlotType::Primary_LeftHand].SpawnedWeaponActor;
-			break;
-		case EWeaponEquipState::Secondary:
-			WeaponActor =  Entries[(int32)EEquipmentSlotType::Secondary_LeftHand].SpawnedWeaponActor;
-			break;
-		}
-	}
-
-	if (WeaponActor == nullptr)
-	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-	}
-}
-
 void UD1GameplayAbility_ComboAttack::CheckAttackHit()
 {
+	if (bBlocked)
+		return;
+	
 	if (bIsFirstCheck)
 	{
 		PrevWeaponLocation = WeaponActor->GetActorLocation();
@@ -83,60 +35,101 @@ void UD1GameplayAbility_ComboAttack::CheckAttackHit()
 
 	FVector Start = PrevWeaponLocation;
 	FVector End = WeaponActor->GetActorLocation();
-	GetWorld()->ComponentSweepMulti(OutHitResults, WeaponActor->WeaponMesh, Start, End, WeaponActor->GetActorRotation(), Params);
+	GetWorld()->ComponentSweepMultiByChannel(OutHitResults, WeaponActor->WeaponMesh, Start, End, WeaponActor->GetActorRotation(), D1_TraceChannel_Attack, Params);
 
+	FGameplayAbilityTargetDataHandle TargetDataHandle;
+	
 	for (const FHitResult& HitResult : OutHitResults)
 	{
-		if (AActor* HittedActor = HitResult.GetActor())
+		if (AActor* HitActor = HitResult.GetActor())
 		{
-			if (HittedActor->IsA(AD1Character::StaticClass()) == false)
-				return;
-
-			if (HasAuthority(&CurrentActivationInfo))
+			if (HitActors.Contains(HitActor) == false)
 			{
-				if (HittedActors.Contains(HittedActor) == false)
-				{
-					HittedActors.Add(HittedActor);
+				HitActors.Add(HitActor);
 
-					FGameplayCueParameters CueParameters;
-					CueParameters.Location = HitResult.ImpactPoint;
-					CueParameters.Normal = HitResult.ImpactNormal;
-					CueParameters.PhysicalMaterial = HitResult.PhysMaterial;
+				FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit();
+				TargetData->HitResult = HitResult;
+				TargetDataHandle.Add(TargetData);
 				
-					UAbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Checked();
-					AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact, CueParameters);
-				
-					FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HittedActor);
-					TSubclassOf<UGameplayEffect> DamageEffectClass = UD1AssetManager::GetSubclassByName<UGameplayEffect>("GE_Damage");
-					FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass);
-					EffectSpecHandle.Data->AddDynamicAssetTag(D1GameplayTags::Attack_Physical);
-					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
-				}
+				// FGameplayCueParameters CueParameters;
+				// CueParameters.Location = HitResult.ImpactPoint;
+				// CueParameters.Normal = HitResult.ImpactNormal;
+				// CueParameters.PhysicalMaterial = HitResult.PhysMaterial;
+				//
+				// UAbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Checked();
+				// AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact, CueParameters);
+				//
+				// FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitActor);
+				// TSubclassOf<UGameplayEffect> DamageEffectClass = UD1AssetManager::GetSubclassByName<UGameplayEffect>("GE_Damage");
+				// FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass);
+				// EffectSpecHandle.Data->AddDynamicAssetTag(D1GameplayTags::Attack_Physical);
+				// ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
 			}
 		}
+	}
+
+	if (TargetDataHandle.Num() > 0)
+	{
+		// NotifyTargetDataReady();
 	}
 	
 	PrevWeaponLocation = WeaponActor->GetActorLocation();
 	PrevWeaponRotation = WeaponActor->GetActorRotation();
 	bIsFirstCheck = false;
-
-	return;
 }
 
-bool UD1GameplayAbility_ComboAttack::CheckBlockHit()
+void UD1GameplayAbility_ComboAttack::CheckBlockHit()
 {
-	return true;
+	if (bBlocked)
+		return;
+	
+	if (bIsFirstCheck)
+	{
+		PrevWeaponLocation = WeaponActor->GetActorLocation();
+		PrevWeaponRotation = WeaponActor->GetActorRotation();
+	}
+		
+	TArray<FHitResult> OutHitResults;
+
+	FComponentQueryParams Params = FComponentQueryParams::DefaultComponentQueryParams;
+	Params.bReturnPhysicalMaterial = true;
+	TArray<AActor*> IgnoredActors = { WeaponActor, WeaponActor->GetOwner() };
+	Params.AddIgnoredActors(IgnoredActors);
+
+	FVector Start = PrevWeaponLocation;
+	FVector End = WeaponActor->GetActorLocation();
+	GetWorld()->ComponentSweepMultiByChannel(OutHitResults, WeaponActor->WeaponMesh, Start, End, WeaponActor->GetActorRotation(), D1_TraceChannel_Block, Params);
+
+	for (const FHitResult& HitResult : OutHitResults)
+	{
+		if (HitResult.GetActor())
+		{
+			FGameplayCueParameters CueParameters;
+			CueParameters.Location = HitResult.ImpactPoint;
+			CueParameters.Normal = HitResult.ImpactNormal;
+			CueParameters.PhysicalMaterial = HitResult.PhysMaterial;
+				
+			UAbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Checked();
+			AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact, CueParameters);
+
+			bBlocked = true;
+		}
+	}
+		
+	PrevWeaponLocation = WeaponActor->GetActorLocation();
+	PrevWeaponRotation = WeaponActor->GetActorRotation();
+	bIsFirstCheck = false;
 }
 
 bool UD1GameplayAbility_ComboAttack::CheckInputPress()
 {
-	bool bContinue = CurrentStage < AttackMontages.Num() - 1 && bInputPressed;
-	if (bContinue)
+	bool bCanContinue = CurrentStage < AttackMontages.Num() - 1 && bInputPressed;
+	if (bCanContinue)
 	{
 		CurrentStage++;
-		HittedActors.Reset();
+		HitActors.Reset();
 		bInputPressed = false;
 		bIsFirstCheck = true;
 	}
-	return bContinue;
+	return bCanContinue;
 }

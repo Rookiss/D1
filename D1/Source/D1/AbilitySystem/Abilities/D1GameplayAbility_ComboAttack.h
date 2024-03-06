@@ -1,12 +1,10 @@
 ﻿#pragma once
 
-#include "D1GameplayAbility.h"
+#include "D1GameplayAbility_Weapon.h"
 #include "D1GameplayAbility_ComboAttack.generated.h"
 
-class AD1WeaponBase;
-
 UCLASS()
-class UD1GameplayAbility_ComboAttack : public UD1GameplayAbility
+class UD1GameplayAbility_ComboAttack : public UD1GameplayAbility_Weapon
 {
 	GENERATED_BODY()
 	
@@ -14,22 +12,16 @@ public:
 	UD1GameplayAbility_ComboAttack(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-
-protected:
 	UFUNCTION(BlueprintCallable)
 	void CheckAttackHit();
 
 	UFUNCTION(BlueprintCallable)
-	bool CheckBlockHit();
+	void CheckBlockHit();
 	
 	UFUNCTION(BlueprintCallable)
 	bool CheckInputPress();
 	
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<AD1WeaponBase> WeaponActor;
-
 	UPROPERTY(BlueprintReadWrite)
 	bool bIsFirstCheck = true;
 	
@@ -41,7 +33,7 @@ protected:
 
 protected:
 	UPROPERTY(BlueprintReadWrite)
-	TSet<TObjectPtr<AActor>> HittedActors;
+	TSet<TObjectPtr<AActor>> HitActors;
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<TObjectPtr<UAnimMontage>> AttackMontages;
@@ -51,4 +43,7 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 	bool bInputPressed = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bBlocked = false;
 };

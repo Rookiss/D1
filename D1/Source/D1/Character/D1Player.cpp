@@ -34,7 +34,7 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	for (int32 i = 1; i < ArmorTypeCount; i++)
 	{
 		USkeletalMeshComponent* ArmorMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(FName(FString::Printf(TEXT("ArmorMeshComponent_%d"), i)));
-		ArmorMeshComponent->SetCollisionProfileName("PhysicsActor");
+		ArmorMeshComponent->SetCollisionProfileName("CharacterMesh");
 		ArmorMeshComponent->SetGenerateOverlapEvents(true);
 		ArmorMeshComponent->SetupAttachment(GetMesh());
 		ArmorMeshComponent->SetLeaderPoseComponent(GetMesh());

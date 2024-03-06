@@ -13,12 +13,12 @@ AD1Character::AD1Character(const FObjectInitializer& ObjectInitializer)
 {
 	NetCullDistanceSquared = 900000000.0f;
 	
-	GetCapsuleComponent()->InitCapsuleSize(50.0f, 88.0f);
+	GetCapsuleComponent()->InitCapsuleSize(60.0f, 88.0f);
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 	
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -88.f), FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetGenerateOverlapEvents(true);
-	GetMesh()->SetCollisionProfileName("PhysicsActor");
+	GetMesh()->SetCollisionProfileName("CharacterMesh");
 	
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = false;

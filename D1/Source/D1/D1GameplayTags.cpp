@@ -17,6 +17,10 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Begin,						"Event.Montage.Begin");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Tick,						"Event.Montage.Tick");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_End,						"Event.Montage.End");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Attack_Begin,				"Event.Montage.Attack.Begin");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Attack_Tick,				"Event.Montage.Attack.Tick");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Attack_End,				"Event.Montage.Attack.End");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Block_Tick,				"Event.Montage.Block.Tick");
 		
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Move,						"Input.Action.Move");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Look,						"Input.Action.Look");

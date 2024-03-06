@@ -19,6 +19,10 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Begin);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Tick);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_End);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Attack_Begin);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Attack_Tick);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Attack_End);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Block_Tick);
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Move);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Look);

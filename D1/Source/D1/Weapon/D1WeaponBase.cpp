@@ -3,6 +3,7 @@
 #include "Character/D1Player.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Physics/D1CollisionChannels.h"
 #include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1WeaponBase)
@@ -28,12 +29,28 @@ void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 void AD1WeaponBase::Destroyed()
 {
-	AD1Player* Player = Cast<AD1Player>(GetOwner());
-	UD1EquipManagerComponent* EquipManager = Player->EquipManagerComponent;
-	TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-	Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = nullptr;
+	if (AD1Player* Player = Cast<AD1Player>(GetOwner()))
+	{
+		if (UD1EquipManagerComponent* EquipManager = Player->EquipManagerComponent)
+		{
+			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
+			Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = nullptr;
+		}
+	}
 	
 	Super::Destroyed();
+}
+
+void AD1WeaponBase::SetCanBlock_Implementation(bool bCanBlock)
+{
+	if (bCanBlock)
+	{
+		WeaponMesh->SetCollisionResponseToChannel(D1_TraceChannel_Block, ECR_Block);
+	}
+	else
+	{
+		WeaponMesh->SetCollisionResponseToChannel(D1_TraceChannel_Block, ECR_Ignore);
+	}
 }
 
 void AD1WeaponBase::OnRep_EquipmentSlotType()

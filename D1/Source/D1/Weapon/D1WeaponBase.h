@@ -14,6 +14,10 @@ public:
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Destroyed() override;
+
+public:
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void SetCanBlock(bool bCanBlock);
 	
 private:
 	UFUNCTION()
