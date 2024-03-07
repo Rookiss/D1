@@ -15,7 +15,7 @@
 UD1AnimInstance::UD1AnimInstance(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+	
 }
 
 void UD1AnimInstance::NativeInitializeAnimation()
