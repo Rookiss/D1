@@ -117,14 +117,17 @@ void AD1Player::OnRep_PlayerState()
 	{
 		InitAbilitySystem();
 	}
-	
-	if (AD1PlayerController* PC = Cast<AD1PlayerController>(GetController()))
+
+	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
 	{
-		if (AD1HUD* HUD = Cast<AD1HUD>(PC->GetHUD()))
+		if (AD1PlayerController* PC = Cast<AD1PlayerController>(GetController()))
 		{
-			HUD->ShowSceneWidget();
+			if (AD1HUD* HUD = Cast<AD1HUD>(PC->GetHUD()))
+			{
+				HUD->ShowSceneWidget();
+			}
 		}
-	}
+	});
 }
 
 void AD1Player::OnRep_Controller()

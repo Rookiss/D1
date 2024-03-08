@@ -334,6 +334,11 @@ void UD1AbilitySystemComponent::SlowAnimMontageForSecondsLocal(UAnimMontage* Ani
 		{
 			if (UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance())
 			{
+				if (AnimMontage == nullptr)
+				{
+					AnimMontage = AnimInstance->GetCurrentActiveMontage();
+				}
+				
 				AnimInstance->Montage_SetPlayRate(AnimMontage, PlayRate);
 				
 				GetWorld()->GetTimerManager().SetTimer(SlowAnimMontageTimerHandle, [AnimInstance, AnimMontage]()

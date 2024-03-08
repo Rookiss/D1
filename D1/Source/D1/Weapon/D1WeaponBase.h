@@ -14,10 +14,6 @@ public:
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Destroyed() override;
-
-public:
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void SetCanBlock(bool bCanBlock);
 	
 private:
 	UFUNCTION()
@@ -29,4 +25,7 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> WeaponMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
+	bool bCanBlock = false;
 };

@@ -27,7 +27,7 @@ protected:
 	void PerformHitDetection();
 	
 	UFUNCTION(BlueprintCallable)
-	bool CheckInputPress();
+	bool CanMoveToNextStage();
 
 	void OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InData, FGameplayTag ApplicationTag);
 
@@ -49,7 +49,6 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	bool bInputPressed = false;
 	
-	bool bAttacked = false;
 	bool bBlocked = false;
 
 	FDelegateHandle OnTargetDataReadyDelegateHandle;
