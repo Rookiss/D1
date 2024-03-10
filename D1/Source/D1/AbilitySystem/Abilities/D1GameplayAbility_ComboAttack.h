@@ -3,14 +3,6 @@
 #include "D1GameplayAbility_Weapon.h"
 #include "D1GameplayAbility_ComboAttack.generated.h"
 
-UENUM(BlueprintType)
-enum class EHitState : uint8
-{
-	None,
-	Attacked,
-	Blocked
-};
-
 UCLASS()
 class UD1GameplayAbility_ComboAttack : public UD1GameplayAbility_Weapon
 {
@@ -27,20 +19,21 @@ protected:
 	void PerformHitDetection();
 	
 	UFUNCTION(BlueprintCallable)
-	bool CanMoveToNextStage();
+	bool CanContinueToNextStage();
 
 	void OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InData, FGameplayTag ApplicationTag);
 
 	UFUNCTION()
 	void ProcessTargetData(const FGameplayAbilityTargetDataHandle& InTargetData);
 
+private:
+	void HandleBlockMontage();
+
 protected:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<TObjectPtr<UAnimMontage>> AttackMontages;
 
-	bool bIsFirstTrace = true;
-	FVector PrevWeaponLocation;
-	FRotator PrevWeaponRotation;
+	UPROPERTY()
 	TSet<TObjectPtr<AActor>> HitActors;
 
 	UPROPERTY(BlueprintReadWrite)
@@ -50,6 +43,11 @@ protected:
 	bool bInputPressed = false;
 	
 	bool bBlocked = false;
+	bool bIsFirstTrace = true;
+
+	FVector PrevWeaponLocation;
+	FRotator PrevWeaponRotation;
 
 	FDelegateHandle OnTargetDataReadyDelegateHandle;
+	FTimerHandle BlockMontageTimerHandle;
 };

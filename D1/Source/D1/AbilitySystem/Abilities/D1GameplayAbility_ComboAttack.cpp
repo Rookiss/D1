@@ -2,10 +2,12 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "AIHelpers.h"
 #include "Weapon/D1WeaponBase.h"
 #include "D1GameplayTags.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Character/D1Character.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_ComboAttack)
@@ -28,7 +30,7 @@ void UD1GameplayAbility_ComboAttack::EndAbility(const FGameplayAbilitySpecHandle
 	UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
 	AbilitySystemComponent->AbilityTargetDataSetDelegate(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey()).Remove(OnTargetDataReadyDelegateHandle);
 	AbilitySystemComponent->ConsumeClientReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey());
-		
+	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -51,6 +53,8 @@ void UD1GameplayAbility_ComboAttack::PerformHitDetection()
 	TArray<FHitResult> HitResults;
 	FVector Start = PrevWeaponLocation;
 	FVector End = WeaponActor->GetActorLocation();
+
+	// TODO: Sub-Step Detection
 	GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->WeaponMesh, Start, End, WeaponActor->GetActorRotation(), Params);
 	
 	PrevWeaponLocation = WeaponActor->GetActorLocation();
@@ -67,9 +71,36 @@ void UD1GameplayAbility_ComboAttack::PerformHitDetection()
 			{
 				HitActors.Add(HitActor);
 				
-				FGameplayAbilityTargetData_SingleTargetHit* NewTargetData = new FGameplayAbilityTargetData_SingleTargetHit();
-				NewTargetData->HitResult = HitResult;
-				TargetDataHandle.Add(NewTargetData);
+				bool bShouldAdd = false;
+				if (HitActor->IsA(AD1Character::StaticClass()))
+				{
+					bShouldAdd = true;
+				}
+				else
+				{
+					if (AD1WeaponBase* WeaponBase = Cast<AD1WeaponBase>(HitResult.GetActor()))
+					{
+						if (WeaponBase->bCanBlock)
+						{
+							float Degree = UKismetMathLibrary::DegAcos((HitResult.ImpactPoint - WeaponBase->WeaponMesh->GetComponentLocation()).GetSafeNormal().Dot(WeaponBase->WeaponMesh->GetForwardVector())); 
+							if (Degree <= 90.f)
+							{
+								bShouldAdd = true;
+							}
+						}
+					}
+					else
+					{
+						bShouldAdd = true;
+					}
+				}
+
+				if (bShouldAdd)
+				{
+					FGameplayAbilityTargetData_SingleTargetHit* NewTargetData = new FGameplayAbilityTargetData_SingleTargetHit();
+					NewTargetData->HitResult = HitResult;
+					TargetDataHandle.Add(NewTargetData);
+				}
 			}
 		}
 	}
@@ -104,6 +135,9 @@ void UD1GameplayAbility_ComboAttack::OnTargetDataReady(const FGameplayAbilityTar
 
 void UD1GameplayAbility_ComboAttack::ProcessTargetData(const FGameplayAbilityTargetDataHandle& InTargetData)
 {
+	if (bBlocked)
+		return;
+	
 	// TODO: Check Validation
 	TArray<FHitResult> AttackHitResults;
 	TArray<FHitResult> BlockHitResults;
@@ -120,17 +154,7 @@ void UD1GameplayAbility_ComboAttack::ProcessTargetData(const FGameplayAbilityTar
 				}
 				else
 				{
-					if (AD1WeaponBase* WeaponBase = Cast<AD1WeaponBase>(HitResult->GetActor()))
-					{
-						if (WeaponBase->bCanBlock)
-						{
-							BlockHitResults.Emplace(MoveTemp(*HitResult));
-						}
-					}
-					else
-					{
-						BlockHitResults.Emplace(MoveTemp(*HitResult));
-					}
+					BlockHitResults.Emplace(MoveTemp(*HitResult));
 				}
 			}
 		}
@@ -145,20 +169,15 @@ void UD1GameplayAbility_ComboAttack::ProcessTargetData(const FGameplayAbilityTar
 			
 		UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
 		AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact, CueParameters);
-
-		AbilitySystemComponent->CurrentMontageStop();
 		
-		if (HasAuthority(&CurrentActivationInfo))
-		{
-			AbilitySystemComponent->Multicast_SlowAnimMontageForSeconds(AbilitySystemComponent->GetCurrentActiveMontage(), 0.0f, 1.f);
-		}
-		else
-		{
-			AbilitySystemComponent->SlowAnimMontageForSecondsLocal(AbilitySystemComponent->GetCurrentActiveMontage(), 0.0f, 1.f);
-		}
+		UAnimInstance* AnimInstance = AbilitySystemComponent->AbilityActorInfo->GetAnimInstance();
+		float EffectivePlayRate = AnimInstance->Montage_GetEffectivePlayRate(CurrentMontage);
+		float Position = AnimInstance->Montage_GetPosition(CurrentMontage);
+		
+		AnimInstance->Montage_PlayWithBlendSettings(CurrentMontage, FMontageBlendSettings(0.f), -EffectivePlayRate / 3.f, EMontagePlayReturnType::MontageLength, Position);
+		GetWorld()->GetTimerManager().SetTimer(BlockMontageTimerHandle, this, &ThisClass::HandleBlockMontage, 0.25f, false);
 
 		bBlocked = true;
-		K2_EndAbility();
 		return;
 	}
 
@@ -171,7 +190,7 @@ void UD1GameplayAbility_ComboAttack::ProcessTargetData(const FGameplayAbilityTar
 
 		UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
 		AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact, CueParameters);
-
+		
 		if (HasAuthority(&CurrentActivationInfo))
 		{
 			FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
@@ -189,7 +208,19 @@ void UD1GameplayAbility_ComboAttack::ProcessTargetData(const FGameplayAbilityTar
 	}
 }
 
-bool UD1GameplayAbility_ComboAttack::CanMoveToNextStage()
+void UD1GameplayAbility_ComboAttack::HandleBlockMontage()
+{
+	UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
+	UAnimInstance* AnimInstance = AbilitySystemComponent->AbilityActorInfo->GetAnimInstance();
+	AnimInstance->Montage_Stop(0.2f, CurrentMontage);
+	
+	if (HasAuthority(&CurrentActivationInfo))
+	{
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	}
+}
+
+bool UD1GameplayAbility_ComboAttack::CanContinueToNextStage()
 {
 	bool bCanContinue = (CurrentStage < AttackMontages.Num() - 1) && bInputPressed && (bBlocked == false);
 	if (bCanContinue)
