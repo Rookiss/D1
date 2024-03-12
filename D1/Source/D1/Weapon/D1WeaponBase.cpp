@@ -1,6 +1,7 @@
 ﻿#include "D1WeaponBase.h"
 
 #include "Character/D1Player.h"
+#include "Components/BoxComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "System/D1AssetManager.h"
@@ -17,6 +18,10 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 	SetRootComponent(WeaponMesh);
 	WeaponMesh->SetCollisionProfileName("Weapon");
 	WeaponMesh->SetGenerateOverlapEvents(true);
+
+	DebugCollision = CreateDefaultSubobject<UBoxComponent>("DebugCollision");
+	DebugCollision->SetupAttachment(GetRootComponent());
+	DebugCollision->SetCollisionProfileName("NoCollision");
 }
 
 void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

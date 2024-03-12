@@ -14,14 +14,15 @@ public:
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
-	
+
+protected:
 	UFUNCTION(BlueprintCallable)
-	void PerformHitDetection();
+	void HandleTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle);
 	
 	UFUNCTION(BlueprintCallable)
 	bool CanContinueToNextStage();
 
-	void OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InData, FGameplayTag ApplicationTag);
+	void OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InTargetData, FGameplayTag ApplicationTag);
 
 	UFUNCTION()
 	void ProcessTargetData(const FGameplayAbilityTargetDataHandle& InTargetData);
@@ -43,11 +44,6 @@ protected:
 	bool bInputPressed = false;
 	
 	bool bBlocked = false;
-	bool bIsFirstTrace = true;
-
-	FVector PrevWeaponLocation;
-	FRotator PrevWeaponRotation;
-
 	FDelegateHandle OnTargetDataReadyDelegateHandle;
 	FTimerHandle BlockMontageTimerHandle;
 };

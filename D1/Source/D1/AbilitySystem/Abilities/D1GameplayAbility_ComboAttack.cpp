@@ -2,7 +2,6 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "AIHelpers.h"
 #include "Weapon/D1WeaponBase.h"
 #include "D1GameplayTags.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
@@ -34,84 +33,63 @@ void UD1GameplayAbility_ComboAttack::EndAbility(const FGameplayAbilitySpecHandle
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UD1GameplayAbility_ComboAttack::PerformHitDetection()
+void UD1GameplayAbility_ComboAttack::HandleTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle)
 {
 	if (bBlocked)
 		return;
-	
-	if (bIsFirstTrace)
-	{
-		PrevWeaponLocation = WeaponActor->GetActorLocation();
-		PrevWeaponRotation = WeaponActor->GetActorRotation();
-	}
-	
-	FComponentQueryParams Params = FComponentQueryParams::DefaultComponentQueryParams;
-	Params.bReturnPhysicalMaterial = true;
-	TArray<AActor*> IgnoredActors = { WeaponActor, WeaponActor->GetOwner() };
-	Params.AddIgnoredActors(IgnoredActors);
-
-	TArray<FHitResult> HitResults;
-	FVector Start = PrevWeaponLocation;
-	FVector End = WeaponActor->GetActorLocation();
-
-	// TODO: Sub-Step Detection
-	GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->WeaponMesh, Start, End, WeaponActor->GetActorRotation(), Params);
-	
-	PrevWeaponLocation = WeaponActor->GetActorLocation();
-	PrevWeaponRotation = WeaponActor->GetActorRotation();
-	bIsFirstTrace = false;
 
 	FGameplayAbilityTargetDataHandle TargetDataHandle;
 
-	for (const FHitResult& HitResult : HitResults)
+	for (TSharedPtr<FGameplayAbilityTargetData> TargetData : InTargetDataHandle.Data)
 	{
-		if (AActor* HitActor = HitResult.GetActor())
+		if (FHitResult* HitResult = const_cast<FHitResult*>(TargetData->GetHitResult()))
 		{
-			if (HitActors.Contains(HitActor) == false)
+			if (AActor* HitActor = HitResult->GetActor())
 			{
-				HitActors.Add(HitActor);
+				if (HitActors.Contains(HitActor) == false)
+				{
+					HitActors.Add(HitActor);
 				
-				bool bShouldAdd = false;
-				if (HitActor->IsA(AD1Character::StaticClass()))
-				{
-					bShouldAdd = true;
-				}
-				else
-				{
-					if (AD1WeaponBase* WeaponBase = Cast<AD1WeaponBase>(HitResult.GetActor()))
-					{
-						if (WeaponBase->bCanBlock)
-						{
-							float Degree = UKismetMathLibrary::DegAcos((HitResult.ImpactPoint - WeaponBase->WeaponMesh->GetComponentLocation()).GetSafeNormal().Dot(WeaponBase->WeaponMesh->GetForwardVector())); 
-							if (Degree <= 90.f)
-							{
-								bShouldAdd = true;
-							}
-						}
-					}
-					else
+					bool bShouldAdd = false;
+					if (HitActor->IsA(AD1Character::StaticClass()))
 					{
 						bShouldAdd = true;
 					}
-				}
-
-				if (bShouldAdd)
-				{
-					FGameplayAbilityTargetData_SingleTargetHit* NewTargetData = new FGameplayAbilityTargetData_SingleTargetHit();
-					NewTargetData->HitResult = HitResult;
-					TargetDataHandle.Add(NewTargetData);
+					else
+					{
+						if (AD1WeaponBase* WeaponBase = Cast<AD1WeaponBase>(HitResult->GetActor()))
+						{
+							if (WeaponBase->bCanBlock)
+							{
+								float Degree = UKismetMathLibrary::DegAcos((HitResult->ImpactPoint - WeaponBase->WeaponMesh->GetComponentLocation()).GetSafeNormal().Dot(WeaponBase->WeaponMesh->GetForwardVector())); 
+								if (Degree <= 90.f)
+								{
+									bShouldAdd = true;
+								}
+							}
+						}
+						else
+						{
+							bShouldAdd = true;
+						}
+					}
+					
+					if (bShouldAdd)
+					{
+						TargetDataHandle.Add(TargetData.Get());
+					}
 				}
 			}
 		}
 	}
 
-	if (TargetDataHandle.Num() > 0)
+	if (InTargetDataHandle.Num() > 0)
 	{
 		OnTargetDataReady(TargetDataHandle, FGameplayTag());
 	}
 }
 
-void UD1GameplayAbility_ComboAttack::OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InData, FGameplayTag ApplicationTag)
+void UD1GameplayAbility_ComboAttack::OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InTargetData, FGameplayTag ApplicationTag)
 {
 	UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
 
@@ -119,7 +97,7 @@ void UD1GameplayAbility_ComboAttack::OnTargetDataReady(const FGameplayAbilityTar
 	{
 		FScopedPredictionWindow	ScopedPrediction(AbilitySystemComponent);
 
-		FGameplayAbilityTargetDataHandle LocalTargetDataHandle(MoveTemp(const_cast<FGameplayAbilityTargetDataHandle&>(InData)));
+		FGameplayAbilityTargetDataHandle LocalTargetDataHandle(MoveTemp(const_cast<FGameplayAbilityTargetDataHandle&>(InTargetData)));
 
 		const bool bShouldNotifyServer = CurrentActorInfo->IsLocallyControlled() && CurrentActorInfo->IsNetAuthority() == false;
 		if (bShouldNotifyServer)
@@ -228,7 +206,6 @@ bool UD1GameplayAbility_ComboAttack::CanContinueToNextStage()
 		CurrentStage++;
 		HitActors.Reset();
 		bInputPressed = false;
-		bIsFirstTrace = true;
 	}
 	return bCanContinue;
 }

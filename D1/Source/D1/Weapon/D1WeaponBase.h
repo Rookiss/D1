@@ -3,6 +3,8 @@
 #include "D1Define.h"
 #include "D1WeaponBase.generated.h"
 
+class UBoxComponent;
+
 UCLASS(BlueprintType, Abstract)
 class AD1WeaponBase : public AActor
 {
@@ -25,6 +27,9 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> WeaponMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UBoxComponent> DebugCollision;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	bool bCanBlock = false;
