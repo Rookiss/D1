@@ -11,9 +11,8 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AnimNotifyState_PerformTrace)
 
 UD1AnimNotifyState_PerformTrace::UD1AnimNotifyState_PerformTrace(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+	: Super(ObjectInitializer), TargetTickInterval(0), bIsFirstTrace(false)
 {
-	
 }
 
 void UD1AnimNotifyState_PerformTrace::NotifyBegin(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
@@ -31,7 +30,7 @@ void UD1AnimNotifyState_PerformTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 			WeaponActor = Entries[(int32)EquipManager->ConvertToEquipmentSlotType(WeaponHandType)].SpawnedWeaponActor;
 			TargetTickInterval = 1.f / TargetFPS;
 			bIsFirstTrace = true;
-			AccumulateTime = 0.f;
+			PreviousTransform = WeaponActor->WeaponMesh->GetComponentTransform();
 		}
 	}
 }
@@ -46,67 +45,72 @@ void UD1AnimNotifyState_PerformTrace::NotifyTick(USkeletalMeshComponent* MeshCom
 	if (WeaponActor == nullptr)
 		return;
 
-	if (AccumulateTime < TargetTickInterval)
+	LastTickTime = FApp::GetCurrentTime();
+	PerformTrace(MeshComponent, FrameDeltaTime);
+}
+
+void UD1AnimNotifyState_PerformTrace::NotifyEnd(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
+{
+	Super::NotifyEnd(MeshComponent, Animation, EventReference);
+	
+	if (ExecuteNetRole != MeshComponent->GetOwnerRole())
+		return;
+	
+	if (WeaponActor == nullptr)
+		return;
+
+	PerformTrace(MeshComponent, FApp::GetCurrentTime() - LastTickTime);
+}
+
+void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshComponent, float DeltaTime)
+{
+	const FTransform& CurrentTransform = WeaponActor->WeaponMesh->GetComponentTransform();
+	TArray<FHitResult> HitResults;
+	
+	int SubSteps = FMath::CeilToInt(DeltaTime / TargetTickInterval);
+	SubSteps = FMath::Clamp(SubSteps, 1, 20);
+
+	const float SubstepRatio = 1.f / SubSteps;
+
+	for (int32 i = 0; i < SubSteps; i++)
 	{
-		const FTransform& CurrentTransform = WeaponActor->WeaponMesh->GetComponentTransform();
-		if (bIsFirstTrace)
-		{
-			PreviousTransform = CurrentTransform;
-			bIsFirstTrace = false;
-		}
-		
-		TArray<FHitResult> HitResults;
+		const FTransform& StartTransform = UKismetMathLibrary::TLerp(PreviousTransform, CurrentTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
+		const FTransform& EndTransform = UKismetMathLibrary::TLerp(PreviousTransform, CurrentTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
+		const FTransform& AverageTransform = UKismetMathLibrary::TLerp(StartTransform, EndTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
 
-		int SubSteps = FMath::CeilToInt(AccumulateTime / TargetTickInterval);
-		SubSteps = FMath::Min(10, SubSteps);
-		
-		const float SubstepRatio = 1.f / SubSteps;
-
-		for (int32 i = 0; i < SubSteps; i++)
-		{
-			const FTransform& StartTransform = UKismetMathLibrary::TLerp(PreviousTransform, CurrentTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
-			const FTransform& EndTransform = UKismetMathLibrary::TLerp(PreviousTransform, CurrentTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
-			const FTransform& AverageTransform = UKismetMathLibrary::TLerp(StartTransform, EndTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
-
-			FComponentQueryParams Params = FComponentQueryParams::DefaultComponentQueryParams;
-			Params.bReturnPhysicalMaterial = true;
-			TArray<AActor*> IgnoredActors = { WeaponActor, WeaponActor->GetOwner() };
-			Params.AddIgnoredActors(IgnoredActors);
-				
-			MeshComponent->GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->WeaponMesh, StartTransform.GetLocation(), EndTransform.GetLocation(), AverageTransform.GetRotation(), Params);
-
-			if (bDrawDebugShape)
-			{
-				DrawDebugSweptBox(MeshComponent->GetWorld(), StartTransform.GetLocation(), EndTransform.GetLocation(), AverageTransform.GetRotation().Rotator(),
-					WeaponActor->DebugCollision->GetScaledBoxExtent(), FColor::Red, true, FrameDeltaTime * 2);
-			}
-		}
-
-		AccumulateTime = 0.f;
-		PreviousTransform = CurrentTransform;
-
-		if (HitResults.Num() > 0)
-		{
-			FGameplayAbilityTargetDataHandle TargetDataHandle;
+		FComponentQueryParams Params = FComponentQueryParams::DefaultComponentQueryParams;
+		Params.bReturnPhysicalMaterial = true;
+		TArray<AActor*> IgnoredActors = { WeaponActor, WeaponActor->GetOwner() };
+		Params.AddIgnoredActors(IgnoredActors);
 			
-			for (const FHitResult& HitResult : HitResults)
-			{
-				FGameplayAbilityTargetData_SingleTargetHit* NewTargetData = new FGameplayAbilityTargetData_SingleTargetHit();
-				NewTargetData->HitResult = HitResult;
-				TargetDataHandle.Add(NewTargetData);
-			}
-			
-			FGameplayEventData EventData;
-			EventData.TargetData = TargetDataHandle;
+		MeshComponent->GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->WeaponMesh, StartTransform.GetLocation(), EndTransform.GetLocation(), AverageTransform.GetRotation(), Params);
 
-			if (EventTag.IsValid())
-			{
-				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(MeshComponent->GetOwner(), EventTag, EventData);
-			}
+		if (bDrawDebugShape)
+		{
+			DrawDebugSweptBox(MeshComponent->GetWorld(), StartTransform.GetLocation(), EndTransform.GetLocation(), AverageTransform.GetRotation().Rotator(),
+				WeaponActor->DebugCollision->GetScaledBoxExtent(), FColor::Red, true, DeltaTime * 2);
 		}
 	}
-	else
+	
+	PreviousTransform = CurrentTransform;
+
+	if (HitResults.Num() > 0)
 	{
-		AccumulateTime += FrameDeltaTime;
+		FGameplayAbilityTargetDataHandle TargetDataHandle;
+		
+		for (const FHitResult& HitResult : HitResults)
+		{
+			FGameplayAbilityTargetData_SingleTargetHit* NewTargetData = new FGameplayAbilityTargetData_SingleTargetHit();
+			NewTargetData->HitResult = HitResult;
+			TargetDataHandle.Add(NewTargetData);
+		}
+		
+		FGameplayEventData EventData;
+		EventData.TargetData = TargetDataHandle;
+
+		if (EventTag.IsValid())
+		{
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(MeshComponent->GetOwner(), EventTag, EventData);
+		}
 	}
 }

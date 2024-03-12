@@ -18,6 +18,10 @@ public:
 protected:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
 	virtual void NotifyTick(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
+
+private:
+	void PerformTrace(USkeletalMeshComponent* MeshComponent, float DeltaTime);
 	
 public:
 	UPROPERTY(EditAnywhere)
@@ -39,8 +43,8 @@ private:
 	UPROPERTY()
 	TObjectPtr<AD1WeaponBase> WeaponActor;
 	
-	float TargetTickInterval = 0.f;
-	bool bIsFirstTrace = true;
+	float TargetTickInterval;
+	bool bIsFirstTrace;
 	FTransform PreviousTransform;
-	float AccumulateTime = 0.f;
+	double LastTickTime;
 };
