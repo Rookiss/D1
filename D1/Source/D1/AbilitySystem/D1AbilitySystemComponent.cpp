@@ -7,7 +7,6 @@
 #include "GameplayCueManager.h"
 #include "Abilities/D1GameplayAbility.h"
 #include "Animation/D1AnimInstance.h"
-#include "Data/D1AbilitySystemData.h"
 #include "GameFramework/Character.h"
 #include "System/D1AssetManager.h"
 
@@ -326,7 +325,23 @@ void UD1AbilitySystemComponent::RemoveGameplayCueLocal(const FGameplayTag Gamepl
 	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(GetOwner(), GameplayCueTag, EGameplayCueEvent::Type::Removed, GameplayCueParameters);
 }
 
-void UD1AbilitySystemComponent::SlowAnimMontageForSecondsLocal(UAnimMontage* AnimMontage, float Seconds, float PlayRate)
+UAnimMontage* UD1AbilitySystemComponent::GetCurrentActiveMontage() const
+{
+	if (ACharacter* Character = Cast<ACharacter>(GetAvatarActor()))
+	{
+		if (USkeletalMeshComponent* SkeletalMeshComponent = Character->GetMesh())
+		{
+			if (UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance())
+			{
+				return AnimInstance->GetCurrentActiveMontage();
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+void UD1AbilitySystemComponent::Multicast_SlowAnimMontageForSeconds_Implementation(UAnimMontage* AnimMontage, float Seconds, float PlayRate)
 {
 	if (ACharacter* Character = Cast<ACharacter>(GetAvatarActor()))
 	{
@@ -347,29 +362,5 @@ void UD1AbilitySystemComponent::SlowAnimMontageForSecondsLocal(UAnimMontage* Ani
 				}, Seconds, false);
 			}
 		}
-	}
-}
-
-UAnimMontage* UD1AbilitySystemComponent::GetCurrentActiveMontage() const
-{
-	if (ACharacter* Character = Cast<ACharacter>(GetAvatarActor()))
-	{
-		if (USkeletalMeshComponent* SkeletalMeshComponent = Character->GetMesh())
-		{
-			if (UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance())
-			{
-				return AnimInstance->GetCurrentActiveMontage();
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-void UD1AbilitySystemComponent::Multicast_SlowAnimMontageForSeconds_Implementation(UAnimMontage* AnimMontage, float Seconds, float PlayRate)
-{
-	if (GetAvatarActor()->GetLocalRole() != ROLE_AutonomousProxy)
-	{
-		SlowAnimMontageForSecondsLocal(AnimMontage, Seconds, PlayRate);
 	}
 }

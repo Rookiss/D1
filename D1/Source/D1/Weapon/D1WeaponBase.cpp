@@ -1,6 +1,7 @@
 ﻿#include "D1WeaponBase.h"
 
 #include "Character/D1Player.h"
+#include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -14,14 +15,18 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 	PrimaryActorTick.bCanEverTick = false;
     bReplicates = true;
 
+	ArrowComponent = CreateDefaultSubobject<UArrowComponent>("ArrowComponent");
+	SetRootComponent(ArrowComponent);
+	
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
-	SetRootComponent(WeaponMesh);
-	WeaponMesh->SetCollisionProfileName("Weapon");
-	WeaponMesh->SetGenerateOverlapEvents(true);
-
-	DebugCollision = CreateDefaultSubobject<UBoxComponent>("DebugCollision");
-	DebugCollision->SetupAttachment(GetRootComponent());
-	DebugCollision->SetCollisionProfileName("NoCollision");
+	WeaponMesh->SetupAttachment(GetRootComponent());
+	WeaponMesh->SetCollisionProfileName("NoCollision");
+	WeaponMesh->SetGenerateOverlapEvents(false);
+	
+	TraceCollision = CreateDefaultSubobject<UBoxComponent>("TraceCollision");
+	TraceCollision->SetupAttachment(GetRootComponent());
+	TraceCollision->SetCollisionProfileName("Weapon");
+	TraceCollision->SetGenerateOverlapEvents(true);
 }
 
 void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

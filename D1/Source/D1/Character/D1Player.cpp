@@ -21,6 +21,8 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 {
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->bUsePawnControlRotation = true;
+	CameraComponent->FieldOfView = 100.f;
+	CameraComponent->AddRelativeLocation(FVector(0.f, 10.f, 0.f));
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetOwnerNoSee(true);

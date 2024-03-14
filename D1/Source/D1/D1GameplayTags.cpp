@@ -17,7 +17,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Begin,						"Event.Montage.Begin");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Tick,						"Event.Montage.Tick");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_End,						"Event.Montage.End");
-	UE_DEFINE_GAMEPLAY_TAG(Event_TraceResult,						"Event.TraceResult");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Trace,								"Event.Trace");
 		
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Move,						"Input.Action.Move");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Look,						"Input.Action.Look");
@@ -37,6 +37,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,							"Ability.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact,						"Ability.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack,							"Ability.Attack");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_1,						"Ability.Attack_1");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_2,						"Ability.Attack_2");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_3,						"Ability.Attack_3");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_EquipWeapon,						"Ability.EquipWeapon");
 		
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				"Attribute.Primary.Health");

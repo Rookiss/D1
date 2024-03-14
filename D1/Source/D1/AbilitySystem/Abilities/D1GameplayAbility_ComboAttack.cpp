@@ -17,43 +17,28 @@ UD1GameplayAbility_ComboAttack::UD1GameplayAbility_ComboAttack(const FObjectInit
     
 }
 
-void UD1GameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
-{
-	OnTargetDataReadyDelegateHandle = GetAbilitySystemComponent()->AbilityTargetDataSetDelegate(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey()).AddUObject(this, &ThisClass::OnTargetDataReady);
-	
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-}
-
-void UD1GameplayAbility_ComboAttack::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
-{
-	UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
-	AbilitySystemComponent->AbilityTargetDataSetDelegate(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey()).Remove(OnTargetDataReadyDelegateHandle);
-	AbilitySystemComponent->ConsumeClientReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey());
-	
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-}
-
 void UD1GameplayAbility_ComboAttack::HandleTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle)
 {
 	if (bBlocked)
 		return;
+	
+	TArray<int32> AttackHitIndexes, BlockHitIndexes;
 
-	FGameplayAbilityTargetDataHandle TargetDataHandle;
-
-	for (TSharedPtr<FGameplayAbilityTargetData> TargetData : InTargetDataHandle.Data)
+	for (int32 i = 0; i < InTargetDataHandle.Data.Num(); i++)
 	{
-		if (FHitResult* HitResult = const_cast<FHitResult*>(TargetData->GetHitResult()))
+		const TSharedPtr<FGameplayAbilityTargetData>& TargetData = InTargetDataHandle.Data[i];
+
+		if (const FHitResult* HitResult = TargetData->GetHitResult())
 		{
 			if (AActor* HitActor = HitResult->GetActor())
 			{
 				if (HitActors.Contains(HitActor) == false)
 				{
 					HitActors.Add(HitActor);
-				
-					bool bShouldAdd = false;
+					
 					if (HitActor->IsA(AD1Character::StaticClass()))
 					{
-						bShouldAdd = true;
+						AttackHitIndexes.Add(i);
 					}
 					else
 					{
@@ -64,82 +49,24 @@ void UD1GameplayAbility_ComboAttack::HandleTargetData(const FGameplayAbilityTarg
 								float Degree = UKismetMathLibrary::DegAcos((HitResult->ImpactPoint - WeaponBase->WeaponMesh->GetComponentLocation()).GetSafeNormal().Dot(WeaponBase->WeaponMesh->GetForwardVector())); 
 								if (Degree <= 90.f)
 								{
-									bShouldAdd = true;
+									BlockHitIndexes.Add(i);
 								}
 							}
 						}
 						else
 						{
-							bShouldAdd = true;
+							BlockHitIndexes.Add(i);
 						}
 					}
-					
-					if (bShouldAdd)
-					{
-						TargetDataHandle.Add(TargetData.Get());
-					}
 				}
 			}
 		}
 	}
-
-	if (InTargetDataHandle.Num() > 0)
+	
+	for (int32 BlockHitIndex : BlockHitIndexes)
 	{
-		OnTargetDataReady(TargetDataHandle, FGameplayTag());
-	}
-}
-
-void UD1GameplayAbility_ComboAttack::OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InTargetData, FGameplayTag ApplicationTag)
-{
-	UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
-
-	if (AbilitySystemComponent->FindAbilitySpecFromHandle(CurrentSpecHandle))
-	{
-		FScopedPredictionWindow	ScopedPrediction(AbilitySystemComponent);
-
-		FGameplayAbilityTargetDataHandle LocalTargetDataHandle(MoveTemp(const_cast<FGameplayAbilityTargetDataHandle&>(InTargetData)));
-
-		const bool bShouldNotifyServer = CurrentActorInfo->IsLocallyControlled() && CurrentActorInfo->IsNetAuthority() == false;
-		if (bShouldNotifyServer)
-		{
-			AbilitySystemComponent->CallServerSetReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey(), LocalTargetDataHandle, ApplicationTag, AbilitySystemComponent->ScopedPredictionKey);
-		}
+		const FHitResult& HitResult = *InTargetDataHandle.Data[BlockHitIndex]->GetHitResult();
 		
-		ProcessTargetData(LocalTargetDataHandle);
-	}
-	
-	AbilitySystemComponent->ConsumeClientReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey());
-}
-
-void UD1GameplayAbility_ComboAttack::ProcessTargetData(const FGameplayAbilityTargetDataHandle& InTargetData)
-{
-	if (bBlocked)
-		return;
-	
-	// TODO: Check Validation
-	TArray<FHitResult> AttackHitResults;
-	TArray<FHitResult> BlockHitResults;
-	
-	for (const TSharedPtr<FGameplayAbilityTargetData> TargetData : InTargetData.Data)
-	{
-		if (FHitResult* HitResult = const_cast<FHitResult*>(TargetData->GetHitResult()))
-		{
-			if (AActor* HitActor = HitResult->GetActor())
-			{
-				if (HitActor->IsA(AD1Character::StaticClass()))
-				{
-					AttackHitResults.Emplace(MoveTemp(*HitResult));
-				}
-				else
-				{
-					BlockHitResults.Emplace(MoveTemp(*HitResult));
-				}
-			}
-		}
-	}
-	
-	for (const FHitResult& HitResult : BlockHitResults)
-	{
 		FGameplayCueParameters CueParameters;
 		CueParameters.Location = HitResult.ImpactPoint;
 		CueParameters.Normal = HitResult.ImpactNormal;
@@ -151,16 +78,21 @@ void UD1GameplayAbility_ComboAttack::ProcessTargetData(const FGameplayAbilityTar
 		UAnimInstance* AnimInstance = AbilitySystemComponent->AbilityActorInfo->GetAnimInstance();
 		float EffectivePlayRate = AnimInstance->Montage_GetEffectivePlayRate(CurrentMontage);
 		float Position = AnimInstance->Montage_GetPosition(CurrentMontage);
-		
-		AnimInstance->Montage_PlayWithBlendSettings(CurrentMontage, FMontageBlendSettings(0.f), -EffectivePlayRate / 3.f, EMontagePlayReturnType::MontageLength, Position);
-		GetWorld()->GetTimerManager().SetTimer(BlockMontageTimerHandle, this, &ThisClass::HandleBlockMontage, 0.25f, false);
 
+		if (HasAuthority(&CurrentActivationInfo))
+		{
+			AnimInstance->Montage_PlayWithBlendSettings(CurrentMontage, FMontageBlendSettings(0.f), -EffectivePlayRate / 3.f, EMontagePlayReturnType::MontageLength, Position);
+			GetWorld()->GetTimerManager().SetTimer(BlockMontageTimerHandle, this, &ThisClass::HandleBlockMontage, 0.25f, false);
+		}
+		
 		bBlocked = true;
 		return;
 	}
 
-	for (const FHitResult& HitResult : AttackHitResults)
+	for (int32 AttackHitIndex : AttackHitIndexes)
 	{
+		const FHitResult& HitResult = *InTargetDataHandle.Data[AttackHitIndex]->GetHitResult();
+		
 		FGameplayCueParameters CueParameters;
 		CueParameters.Location = HitResult.ImpactPoint;
 		CueParameters.Normal = HitResult.ImpactNormal;
@@ -179,10 +111,6 @@ void UD1GameplayAbility_ComboAttack::ProcessTargetData(const FGameplayAbilityTar
 				
 			AbilitySystemComponent->Multicast_SlowAnimMontageForSeconds(AbilitySystemComponent->GetCurrentActiveMontage(), 0.2f, 0.1f);
 		}
-		else
-		{
-			AbilitySystemComponent->SlowAnimMontageForSecondsLocal(AbilitySystemComponent->GetCurrentActiveMontage(), 0.2f, 0.1f);
-		}
 	}
 }
 
@@ -198,14 +126,14 @@ void UD1GameplayAbility_ComboAttack::HandleBlockMontage()
 	}
 }
 
-bool UD1GameplayAbility_ComboAttack::CanContinueToNextStage()
+void UD1GameplayAbility_ComboAttack::TryContinueToNextStage()
 {
-	bool bCanContinue = (CurrentStage < AttackMontages.Num() - 1) && bInputPressed && (bBlocked == false);
+	bool bCanContinue = (NextStageTag.IsValid()) && (bInputReleased == false) && (bBlocked == false);
 	if (bCanContinue)
 	{
-		CurrentStage++;
 		HitActors.Reset();
-		bInputPressed = false;
+		bInputReleased = false;
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(NextStageTag.GetSingleTagContainer());
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 	}
-	return bCanContinue;
 }

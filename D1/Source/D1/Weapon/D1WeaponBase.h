@@ -3,6 +3,7 @@
 #include "D1Define.h"
 #include "D1WeaponBase.generated.h"
 
+class UArrowComponent;
 class UBoxComponent;
 
 UCLASS(BlueprintType, Abstract)
@@ -24,12 +25,15 @@ private:
 public:
 	UPROPERTY(ReplicatedUsing=OnRep_EquipmentSlotType)
 	EEquipmentSlotType EquipmentSlotType;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UArrowComponent> ArrowComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> WeaponMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UBoxComponent> DebugCollision;
+	TObjectPtr<UBoxComponent> TraceCollision;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	bool bCanBlock = false;

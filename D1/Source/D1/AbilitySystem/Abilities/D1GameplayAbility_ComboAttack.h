@@ -12,36 +12,27 @@ public:
 	UD1GameplayAbility_ComboAttack(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
-
-protected:
 	UFUNCTION(BlueprintCallable)
 	void HandleTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle);
 	
 	UFUNCTION(BlueprintCallable)
-	bool CanContinueToNextStage();
-
-	void OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InTargetData, FGameplayTag ApplicationTag);
-
-	UFUNCTION()
-	void ProcessTargetData(const FGameplayAbilityTargetDataHandle& InTargetData);
+	void TryContinueToNextStage();
 
 private:
 	void HandleBlockMontage();
 
 protected:
-	UPROPERTY(BlueprintReadWrite)
-	TArray<TObjectPtr<UAnimMontage>> AttackMontages;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<UAnimMontage> AttackMontage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag NextStageTag;
+	
 	UPROPERTY()
 	TSet<TObjectPtr<AActor>> HitActors;
-
+	
 	UPROPERTY(BlueprintReadWrite)
-	int32 CurrentStage = 0;
-
-	UPROPERTY(BlueprintReadWrite)
-	bool bInputPressed = false;
+	bool bInputReleased = false;
 	
 	bool bBlocked = false;
 	FDelegateHandle OnTargetDataReadyDelegateHandle;
