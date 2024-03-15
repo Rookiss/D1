@@ -30,10 +30,10 @@ public:
 	TObjectPtr<UArrowComponent> ArrowComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UStaticMeshComponent> WeaponMesh;
+	TObjectPtr<UStaticMeshComponent> WeaponMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UBoxComponent> TraceCollision;
+	TObjectPtr<UBoxComponent> TraceDebugCollision;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	bool bCanBlock = false;

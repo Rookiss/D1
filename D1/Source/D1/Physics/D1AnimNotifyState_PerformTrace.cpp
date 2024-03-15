@@ -34,7 +34,8 @@ void UD1AnimNotifyState_PerformTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 			WeaponActor = Entries[(int32)EquipManager->ConvertToEquipmentSlotType(WeaponHandType)].SpawnedWeaponActor;
 			TargetTickInterval = 1.f / TargetFPS;
 			bIsFirstTrace = true;
-			PreviousTransform = WeaponActor->TraceCollision->GetComponentTransform();
+			PreviousTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
+			PreviousDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
 		}
 	}
 }
@@ -68,7 +69,9 @@ void UD1AnimNotifyState_PerformTrace::NotifyEnd(USkeletalMeshComponent* MeshComp
 
 void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshComponent, float DeltaTime)
 {
-	const FTransform& CurrentTransform = WeaponActor->TraceCollision->GetComponentTransform();
+	const FTransform& CurrentTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
+	const FTransform& CurrentDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
+	
 	TArray<FHitResult> HitResults;
 	
 	int SubSteps = FMath::CeilToInt(DeltaTime / TargetTickInterval);
@@ -87,16 +90,22 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 		TArray<AActor*> IgnoredActors = { WeaponActor, WeaponActor->GetOwner() };
 		Params.AddIgnoredActors(IgnoredActors);
 
-		MeshComponent->GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->TraceCollision, StartTransform.GetLocation(), EndTransform.GetLocation(), AverageTransform.GetRotation(), Params);
-
+		MeshComponent->GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->WeaponMeshComponent, StartTransform.GetLocation(), EndTransform.GetLocation(), AverageTransform.GetRotation(), Params);
+		
 		if (bDrawDebugShape)
 		{
 			FColor Color = (HitResults.Num() > 0) ? FColor::Green : FColor::Red;
-			DrawDebugSweptBox(MeshComponent->GetWorld(), StartTransform.GetLocation(), EndTransform.GetLocation(), AverageTransform.GetRotation().Rotator(), WeaponActor->TraceCollision->GetScaledBoxExtent(), Color, true, DeltaTime * 2);
+			
+			const FTransform& StartDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
+			const FTransform& EndDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
+			const FTransform& AverageDebugTransform = UKismetMathLibrary::TLerp(StartDebugTransform, EndDebugTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
+			
+			DrawDebugSweptBox(MeshComponent->GetWorld(), StartDebugTransform.GetLocation(), EndDebugTransform.GetLocation(), AverageDebugTransform.GetRotation().Rotator(), WeaponActor->TraceDebugCollision->GetScaledBoxExtent(), Color, true, DeltaTime * 2);
 		}
 	}
 	
 	PreviousTransform = CurrentTransform;
+	PreviousDebugTransform = CurrentDebugTransform;
 
 	if (HitResults.Num() > 0)
 	{

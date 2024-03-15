@@ -18,12 +18,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void TryContinueToNextStage();
 
-private:
-	void HandleBlockMontage();
-
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TObjectPtr<UAnimMontage> AttackMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<UAnimMontage> BackwardMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FGameplayTag NextStageTag;
@@ -35,6 +35,5 @@ protected:
 	bool bInputReleased = false;
 	
 	bool bBlocked = false;
-	FDelegateHandle OnTargetDataReadyDelegateHandle;
 	FTimerHandle BlockMontageTimerHandle;
 };

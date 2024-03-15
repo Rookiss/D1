@@ -46,5 +46,6 @@ private:
 	float TargetTickInterval;
 	bool bIsFirstTrace;
 	FTransform PreviousTransform;
+	FTransform PreviousDebugTransform;
 	double LastTickTime;
 };

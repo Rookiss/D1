@@ -18,15 +18,15 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>("ArrowComponent");
 	SetRootComponent(ArrowComponent);
 	
-	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
-	WeaponMesh->SetupAttachment(GetRootComponent());
-	WeaponMesh->SetCollisionProfileName("NoCollision");
-	WeaponMesh->SetGenerateOverlapEvents(false);
+	WeaponMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
+	WeaponMeshComponent->SetupAttachment(GetRootComponent());
+	WeaponMeshComponent->SetCollisionProfileName("Weapon");
+	WeaponMeshComponent->SetGenerateOverlapEvents(false);
 	
-	TraceCollision = CreateDefaultSubobject<UBoxComponent>("TraceCollision");
-	TraceCollision->SetupAttachment(GetRootComponent());
-	TraceCollision->SetCollisionProfileName("Weapon");
-	TraceCollision->SetGenerateOverlapEvents(true);
+	TraceDebugCollision = CreateDefaultSubobject<UBoxComponent>("TraceDebugCollision");
+	TraceDebugCollision->SetupAttachment(GetRootComponent());
+	TraceDebugCollision->SetCollisionProfileName("NoCollision");
+	TraceDebugCollision->SetGenerateOverlapEvents(false);
 }
 
 void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

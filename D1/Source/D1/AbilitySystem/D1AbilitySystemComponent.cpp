@@ -325,6 +325,29 @@ void UD1AbilitySystemComponent::RemoveGameplayCueLocal(const FGameplayTag Gamepl
 	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(GetOwner(), GameplayCueTag, EGameplayCueEvent::Type::Removed, GameplayCueParameters);
 }
 
+void UD1AbilitySystemComponent::Multicast_BlockAnimMontageForSeconds_Implementation(UAnimMontage* BackwardMontage)
+{
+	if (BackwardMontage == nullptr)
+		return;
+	
+	UAnimInstance* AnimInstance = AbilityActorInfo->GetAnimInstance();
+	if (AnimInstance == nullptr)
+		return;
+
+	UAnimMontage* CurrentMontage = AnimInstance->GetCurrentActiveMontage();
+	float EffectivePlayRate = AnimInstance->Montage_GetEffectivePlayRate(CurrentMontage);
+	float Position = AnimInstance->Montage_GetPosition(CurrentMontage);
+				
+	AnimInstance->Montage_PlayWithBlendSettings(BackwardMontage, FMontageBlendSettings(0.f), -EffectivePlayRate / 3.f, EMontagePlayReturnType::MontageLength, Position);
+	GetWorld()->GetTimerManager().SetTimer(BlockAnimMontageTimerHandle, [AnimInstance, BackwardMontage]()
+	{
+		if (BackwardMontage == AnimInstance->GetCurrentActiveMontage())
+		{
+			AnimInstance->Montage_Stop(0.2f, BackwardMontage);
+		}
+	}, 0.25f, false);
+}
+
 UAnimMontage* UD1AbilitySystemComponent::GetCurrentActiveMontage() const
 {
 	if (ACharacter* Character = Cast<ACharacter>(GetAvatarActor()))
@@ -339,28 +362,4 @@ UAnimMontage* UD1AbilitySystemComponent::GetCurrentActiveMontage() const
 	}
 
 	return nullptr;
-}
-
-void UD1AbilitySystemComponent::Multicast_SlowAnimMontageForSeconds_Implementation(UAnimMontage* AnimMontage, float Seconds, float PlayRate)
-{
-	if (ACharacter* Character = Cast<ACharacter>(GetAvatarActor()))
-	{
-		if (USkeletalMeshComponent* SkeletalMeshComponent = Character->GetMesh())
-		{
-			if (UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance())
-			{
-				if (AnimMontage == nullptr)
-				{
-					AnimMontage = AnimInstance->GetCurrentActiveMontage();
-				}
-				
-				AnimInstance->Montage_SetPlayRate(AnimMontage, PlayRate);
-				
-				GetWorld()->GetTimerManager().SetTimer(SlowAnimMontageTimerHandle, [AnimInstance, AnimMontage]()
-				{
-					AnimInstance->Montage_SetPlayRate(AnimMontage);
-				}, Seconds, false);
-			}
-		}
-	}
 }

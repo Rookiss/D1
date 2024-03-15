@@ -2,12 +2,11 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "Weapon/D1WeaponBase.h"
 #include "D1GameplayTags.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Character/D1Character.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "System/D1AssetManager.h"
+#include "Weapon/D1WeaponBase.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_ComboAttack)
 
@@ -35,28 +34,18 @@ void UD1GameplayAbility_ComboAttack::HandleTargetData(const FGameplayAbilityTarg
 				if (HitActors.Contains(HitActor) == false)
 				{
 					HitActors.Add(HitActor);
-					
-					if (HitActor->IsA(AD1Character::StaticClass()))
+
+					if (Cast<AD1Character>(HitActor))
 					{
 						AttackHitIndexes.Add(i);
 					}
+					else if (Cast<AD1WeaponBase>(HitActor))
+					{
+						BlockHitIndexes.Add(i);
+					}
 					else
 					{
-						if (AD1WeaponBase* WeaponBase = Cast<AD1WeaponBase>(HitResult->GetActor()))
-						{
-							if (WeaponBase->bCanBlock)
-							{
-								float Degree = UKismetMathLibrary::DegAcos((HitResult->ImpactPoint - WeaponBase->WeaponMesh->GetComponentLocation()).GetSafeNormal().Dot(WeaponBase->WeaponMesh->GetForwardVector())); 
-								if (Degree <= 90.f)
-								{
-									BlockHitIndexes.Add(i);
-								}
-							}
-						}
-						else
-						{
-							BlockHitIndexes.Add(i);
-						}
+						BlockHitIndexes.Add(i);
 					}
 				}
 			}
@@ -65,7 +54,7 @@ void UD1GameplayAbility_ComboAttack::HandleTargetData(const FGameplayAbilityTarg
 	
 	for (int32 BlockHitIndex : BlockHitIndexes)
 	{
-		const FHitResult& HitResult = *InTargetDataHandle.Data[BlockHitIndex]->GetHitResult();
+		const FHitResult& HitResult = *(InTargetDataHandle.Data[BlockHitIndex]->GetHitResult());
 		
 		FGameplayCueParameters CueParameters;
 		CueParameters.Location = HitResult.ImpactPoint;
@@ -75,15 +64,14 @@ void UD1GameplayAbility_ComboAttack::HandleTargetData(const FGameplayAbilityTarg
 		UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
 		AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact, CueParameters);
 		
+		AbilitySystemComponent->Multicast_BlockAnimMontageForSeconds(BackwardMontage);
+		
 		UAnimInstance* AnimInstance = AbilitySystemComponent->AbilityActorInfo->GetAnimInstance();
-		float EffectivePlayRate = AnimInstance->Montage_GetEffectivePlayRate(CurrentMontage);
-		float Position = AnimInstance->Montage_GetPosition(CurrentMontage);
-
-		if (HasAuthority(&CurrentActivationInfo))
+		FOnMontageEnded MontageEnded = FOnMontageEnded::CreateWeakLambda(this, [this](UAnimMontage* AnimMontage, bool bInterrupted)
 		{
-			AnimInstance->Montage_PlayWithBlendSettings(CurrentMontage, FMontageBlendSettings(0.f), -EffectivePlayRate / 3.f, EMontagePlayReturnType::MontageLength, Position);
-			GetWorld()->GetTimerManager().SetTimer(BlockMontageTimerHandle, this, &ThisClass::HandleBlockMontage, 0.25f, false);
-		}
+			K2_EndAbility();
+		});
+		AnimInstance->Montage_SetEndDelegate(MontageEnded, BackwardMontage);
 		
 		bBlocked = true;
 		return;
@@ -101,28 +89,11 @@ void UD1GameplayAbility_ComboAttack::HandleTargetData(const FGameplayAbilityTarg
 		UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
 		AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact, CueParameters);
 		
-		if (HasAuthority(&CurrentActivationInfo))
-		{
-			FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
-			TSubclassOf<UGameplayEffect> DamageEffectClass = UD1AssetManager::GetSubclassByName<UGameplayEffect>("GE_Damage");
-			FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass);
-			EffectSpecHandle.Data->AddDynamicAssetTag(D1GameplayTags::Attack_Physical);
-			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
-				
-			AbilitySystemComponent->Multicast_SlowAnimMontageForSeconds(AbilitySystemComponent->GetCurrentActiveMontage(), 0.2f, 0.1f);
-		}
-	}
-}
-
-void UD1GameplayAbility_ComboAttack::HandleBlockMontage()
-{
-	UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
-	UAnimInstance* AnimInstance = AbilitySystemComponent->AbilityActorInfo->GetAnimInstance();
-	AnimInstance->Montage_Stop(0.2f, CurrentMontage);
-	
-	if (HasAuthority(&CurrentActivationInfo))
-	{
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+		FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
+		TSubclassOf<UGameplayEffect> DamageEffectClass = UD1AssetManager::GetSubclassByName<UGameplayEffect>("GE_Damage");
+		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass);
+		EffectSpecHandle.Data->AddDynamicAssetTag(D1GameplayTags::Attack_Physical);
+		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
 	}
 }
 
