@@ -118,6 +118,7 @@ void FD1EquipEntry::Equip()
 				NewActor->FinishSpawning(FTransform::Identity, true);
 				NewActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 				NewActor->AttachToComponent(Player->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
+				NewActor->ItemID = ItemInstance->GetItemID();
 				NewActor->EquipmentSlotType = EquipmentSlotType;
 				
 				SpawnedWeaponActor = NewActor;
@@ -140,6 +141,7 @@ void FD1EquipEntry::Equip()
 		[Player, this](const FName& AssetName, UObject* LoadedAsset)
 		{
 			Player->PlayAnimMontage(Cast<UAnimMontage>(LoadedAsset));
+			SpawnedWeaponActor->WeaponMeshComponent->SetVisibility(true, true);
 		}));
 	}
 	else if (Equippable->EquipmentType == EEquipmentType::Armor)

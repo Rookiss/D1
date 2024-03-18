@@ -13,7 +13,7 @@ AD1Character::AD1Character(const FObjectInitializer& ObjectInitializer)
 {
 	NetCullDistanceSquared = 900000000.0f;
 	
-	GetCapsuleComponent()->InitCapsuleSize(60.0f, 88.0f);
+	GetCapsuleComponent()->InitCapsuleSize(55.0f, 88.0f);
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 	
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -88.f), FRotator(0.f, -90.f, 0.f));

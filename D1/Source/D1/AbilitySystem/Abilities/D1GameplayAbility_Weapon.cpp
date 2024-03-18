@@ -15,8 +15,6 @@ UD1GameplayAbility_Weapon::UD1GameplayAbility_Weapon(const FObjectInitializer& O
 
 void UD1GameplayAbility_Weapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
 	AD1Player* PlayerCharacter = Cast<AD1Player>(ActorInfo->AvatarActor.Get());
 	UD1EquipManagerComponent* EquipManager = PlayerCharacter->EquipManagerComponent;
 	EWeaponEquipState WeaponEquipState = EquipManager->GetCurrentWeaponEquipState();
@@ -56,8 +54,14 @@ void UD1GameplayAbility_Weapon::ActivateAbility(const FGameplayAbilitySpecHandle
 		}
 	}
 
+#if UE_EDITOR
+	check(WeaponActor);
+#endif
+	
 	if (WeaponActor == nullptr)
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 	}
+
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }

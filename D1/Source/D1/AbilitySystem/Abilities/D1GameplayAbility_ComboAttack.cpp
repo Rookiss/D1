@@ -5,6 +5,8 @@
 #include "D1GameplayTags.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Character/D1Character.h"
+#include "Data/D1ItemData.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "System/D1AssetManager.h"
 #include "Weapon/D1WeaponBase.h"
 
@@ -39,13 +41,26 @@ void UD1GameplayAbility_ComboAttack::HandleTargetData(const FGameplayAbilityTarg
 					{
 						AttackHitIndexes.Add(i);
 					}
-					else if (Cast<AD1WeaponBase>(HitActor))
+					else if (AD1WeaponBase* HitWeaponActor = Cast<AD1WeaponBase>(HitActor))
 					{
-						BlockHitIndexes.Add(i);
+						const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+						const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(HitWeaponActor->ItemID);
+						const UD1ItemFragment_Equippable_Weapon* Weapon = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+						if (Weapon->WeaponType == EWeaponType::Shield)
+						{
+							FVector HitWeaponActorToImpactPoint = (HitResult->ImpactPoint - HitWeaponActor->GetActorLocation()).GetSafeNormal();
+							float Dot = HitWeaponActor->GetActorForwardVector().Dot(HitWeaponActorToImpactPoint);
+							if (Dot >= 0.f)
+							{
+								BlockHitIndexes.Add(i);
+								break;
+							}
+						}
 					}
 					else
 					{
 						BlockHitIndexes.Add(i);
+						break;
 					}
 				}
 			}
@@ -64,9 +79,9 @@ void UD1GameplayAbility_ComboAttack::HandleTargetData(const FGameplayAbilityTarg
 		UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
 		AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact, CueParameters);
 		
+		UAnimInstance* AnimInstance = AbilitySystemComponent->AbilityActorInfo->GetAnimInstance();
 		AbilitySystemComponent->Multicast_BlockAnimMontageForSeconds(BackwardMontage);
 		
-		UAnimInstance* AnimInstance = AbilitySystemComponent->AbilityActorInfo->GetAnimInstance();
 		FOnMontageEnded MontageEnded = FOnMontageEnded::CreateWeakLambda(this, [this](UAnimMontage* AnimMontage, bool bInterrupted)
 		{
 			K2_EndAbility();
@@ -94,6 +109,9 @@ void UD1GameplayAbility_ComboAttack::HandleTargetData(const FGameplayAbilityTarg
 		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass);
 		EffectSpecHandle.Data->AddDynamicAssetTag(D1GameplayTags::Attack_Physical);
 		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
+
+		UAnimInstance* AnimInstance = AbilitySystemComponent->AbilityActorInfo->GetAnimInstance();
+		AbilitySystemComponent->Multicast_SlowAnimMontageForSeconds(AnimInstance->GetCurrentActiveMontage(), 0.2f, 0.1f);
 	}
 }
 

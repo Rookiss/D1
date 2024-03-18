@@ -348,6 +348,28 @@ void UD1AbilitySystemComponent::Multicast_BlockAnimMontageForSeconds_Implementat
 	}, 0.25f, false);
 }
 
+void UD1AbilitySystemComponent::Multicast_SlowAnimMontageForSeconds_Implementation(UAnimMontage* AnimMontage, float Seconds, float PlayRate)
+{
+	if (AnimMontage == nullptr)
+		return;
+	
+	if (ACharacter* Character = Cast<ACharacter>(GetAvatarActor()))
+	{
+		if (USkeletalMeshComponent* SkeletalMeshComponent = Character->GetMesh())
+		{
+			if (UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance())
+			{
+				AnimInstance->Montage_SetPlayRate(AnimMontage, PlayRate);
+				
+				GetWorld()->GetTimerManager().SetTimer(SlowAnimMontageTimerHandle, [AnimInstance, AnimMontage]()
+				{
+					AnimInstance->Montage_SetPlayRate(AnimMontage);
+				}, Seconds, false);
+			}
+		}
+	}
+}
+
 UAnimMontage* UD1AbilitySystemComponent::GetCurrentActiveMontage() const
 {
 	if (ACharacter* Character = Cast<ACharacter>(GetAvatarActor()))

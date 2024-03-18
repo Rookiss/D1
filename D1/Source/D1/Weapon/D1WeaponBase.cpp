@@ -29,12 +29,25 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 	TraceDebugCollision->SetGenerateOverlapEvents(false);
 }
 
+void AD1WeaponBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AD1Player* Player = Cast<AD1Player>(GetOwner());
+	UD1EquipManagerComponent* EquipManager = Player->EquipManagerComponent;
+	TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
+	Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = this;
+
+	WeaponMeshComponent->SetVisibility(false, true);
+}
+
 void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ThisClass, EquipmentSlotType, COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(ThisClass, bCanBlock, COND_None);
+	DOREPLIFETIME(ThisClass, ItemID);
+	DOREPLIFETIME(ThisClass, EquipmentSlotType);
+	DOREPLIFETIME(ThisClass, bCanBlock);
 }
 
 void AD1WeaponBase::Destroyed()
@@ -49,12 +62,4 @@ void AD1WeaponBase::Destroyed()
 	}
 	
 	Super::Destroyed();
-}
-
-void AD1WeaponBase::OnRep_EquipmentSlotType()
-{
-	AD1Player* Player = Cast<AD1Player>(GetOwner());
-	UD1EquipManagerComponent* EquipManager = Player->EquipManagerComponent;
-	TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-	Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = this;
 }

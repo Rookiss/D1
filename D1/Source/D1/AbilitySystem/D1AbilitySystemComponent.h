@@ -53,6 +53,9 @@ public:
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
 	void Multicast_BlockAnimMontageForSeconds(UAnimMontage* BackwardMontage);
 
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void Multicast_SlowAnimMontageForSeconds(UAnimMontage* AnimMontage, float Seconds, float PlayRate);
+
 	UAnimMontage* GetCurrentActiveMontage() const;
 	
 public:
