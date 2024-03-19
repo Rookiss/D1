@@ -47,9 +47,17 @@ void UD1GameplayAbility_Weapon::ActivateAbility(const FGameplayAbilitySpecHandle
 		{
 		case EWeaponEquipState::Primary:
 			WeaponActor = Entries[(int32)EEquipmentSlotType::Primary_LeftHand].SpawnedWeaponActor;
+			if (WeaponActor == nullptr)
+			{
+				WeaponActor = Entries[(int32)EEquipmentSlotType::Primary_TwoHand].SpawnedWeaponActor;
+			}
 			break;
 		case EWeaponEquipState::Secondary:
 			WeaponActor = Entries[(int32)EEquipmentSlotType::Secondary_LeftHand].SpawnedWeaponActor;
+			if (WeaponActor == nullptr)
+			{
+				WeaponActor = Entries[(int32)EEquipmentSlotType::Secondary_TwoHand].SpawnedWeaponActor;
+			}
 			break;
 		}
 	}

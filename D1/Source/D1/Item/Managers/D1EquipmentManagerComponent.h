@@ -39,6 +39,7 @@ private:
 	UPROPERTY(NotReplicated)
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
 
+public:
 	UPROPERTY(NotReplicated)
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 };
@@ -112,12 +113,16 @@ public:
 	bool CanAddEntry(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
 	
 public:
-	bool IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState) const;
-	bool IsSameWeaponHandType(EEquipmentSlotType EquipmentSlotType, EWeaponHandType WeaponHandType) const;
-	bool IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType) const;
+	static bool IsWeaponSlot(EEquipmentSlotType EquipmentSlotType);
+	static bool IsArmorSlot(EEquipmentSlotType EquipmentSlotType);
 	
-	bool IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
-	bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType) const;
+	static bool IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState);
+	static bool IsSameWeaponHandType(EEquipmentSlotType EquipmentSlotType, EWeaponHandType WeaponHandType);
+	static bool IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType);
+	
+	static bool IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);
+	static bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);
+	
 	bool IsAllEmpty(EWeaponEquipState WeaponEquipState) const;
 
 	AD1Player* GetPlayerCharacter() const;

@@ -12,7 +12,6 @@ class AD1PlayerController;
 class UD1EquipManagerComponent;
 class UD1EquipmentManagerComponent;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEquipEntryChanged, EEquipmentSlotType, UD1ItemInstance*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnWeaponEquipStateChanged, EWeaponEquipState);
 
 USTRUCT(BlueprintType)
@@ -47,7 +46,7 @@ private:
 	UPROPERTY(NotReplicated)
 	TArray<FActiveGameplayEffectHandle> StatHandles;
 
-private:
+public:
 	UPROPERTY(NotReplicated)
 	TObjectPtr<UD1EquipManagerComponent> EquipManager;
 	
@@ -139,7 +138,6 @@ public:
 	EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const;
 	
 public:
-	FOnEquipEntryChanged OnEquipEntryChanged;
 	FOnWeaponEquipStateChanged OnWeaponEquipStateChanged;
 	
 private:

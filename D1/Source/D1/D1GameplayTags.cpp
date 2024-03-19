@@ -7,10 +7,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_Dead,								"State.Dead");
 	UE_DEFINE_GAMEPLAY_TAG(State_Jump,								"State.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(State_Attack,							"State.Attack");
+	UE_DEFINE_GAMEPLAY_TAG(State_Block,								"State.Block");
 	UE_DEFINE_GAMEPLAY_TAG(State_Interact,							"State.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(State_EquipWeapon,						"State.EquipWeapon");
-	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Armed,						"State.Weapon.Armed");
-	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Blocking,					"State.Weapon.Blocking");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Event_Interact,							"Event.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon,						"Event.EquipWeapon");
@@ -40,6 +39,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_1,						"Ability.Attack_1");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_2,						"Ability.Attack_2");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_3,						"Ability.Attack_3");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Blockk,							"Ability.Block");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_EquipWeapon,						"Ability.EquipWeapon");
 		
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				"Attribute.Primary.Health");
