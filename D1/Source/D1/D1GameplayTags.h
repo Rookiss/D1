@@ -48,10 +48,8 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MaxHealth);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_Mana);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MaxMana);
-	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_AttackSpeed);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MoveSpeed);
-	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_BaseDamage);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_BaseDefense);
 	

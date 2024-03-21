@@ -12,9 +12,6 @@
 
 UD1AnimNotifyState_PerformTrace::UD1AnimNotifyState_PerformTrace(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, TargetTickInterval(0)
-	, bIsFirstTrace(false)
-	, LastTickTime(0)
 {
 	
 }
@@ -32,10 +29,12 @@ void UD1AnimNotifyState_PerformTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 		{
 			const TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
 			WeaponActor = Entries[(int32)EquipManager->ConvertToEquipmentSlotType(WeaponHandType)].SpawnedWeaponActor;
-			TargetTickInterval = 1.f / TargetFPS;
-			bIsFirstTrace = true;
-			PreviousTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
+
+			TargetDeltaTime = 1.f / TargetFPS;
+			
+			PreviousTraceTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
 			PreviousDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
+			PreviousSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceSocketName);
 		}
 	}
 }
@@ -49,6 +48,13 @@ void UD1AnimNotifyState_PerformTrace::NotifyTick(USkeletalMeshComponent* MeshCom
 	
 	if (WeaponActor == nullptr)
 		return;
+	
+	if (TraceType == ETraceType::Distance)
+	{
+		const FTransform& CurrentSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceSocketName);
+		Distance = (PreviousSocketTransform.GetLocation() - CurrentSocketTransform.GetLocation()).Length();
+		PreviousSocketTransform = CurrentSocketTransform;
+	}
 
 	LastTickTime = FApp::GetCurrentTime();
 	PerformTrace(MeshComponent, FrameDeltaTime);
@@ -69,20 +75,28 @@ void UD1AnimNotifyState_PerformTrace::NotifyEnd(USkeletalMeshComponent* MeshComp
 
 void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshComponent, float DeltaTime)
 {
-	const FTransform& CurrentTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
+	const FTransform& CurrentTraceTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
 	const FTransform& CurrentDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
 	
 	TArray<FHitResult> HitResults;
 	
-	int SubSteps = FMath::CeilToInt(DeltaTime / TargetTickInterval);
-	SubSteps = FMath::Clamp(SubSteps, 1, 20);
+	int SubSteps = 1;
+
+	if (TraceType == ETraceType::Distance)
+	{
+		SubSteps = FMath::CeilToInt(Distance / TargetDistance);
+	}
+	else if (TraceType == ETraceType::Frame)
+	{
+		SubSteps = FMath::CeilToInt(DeltaTime / TargetDeltaTime);
+	}
 
 	const float SubstepRatio = 1.f / SubSteps;
 
 	for (int32 i = 0; i < SubSteps; i++)
 	{
-		const FTransform& StartTransform = UKismetMathLibrary::TLerp(PreviousTransform, CurrentTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
-		const FTransform& EndTransform = UKismetMathLibrary::TLerp(PreviousTransform, CurrentTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
+		const FTransform& StartTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
+		const FTransform& EndTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
 		const FTransform& AverageTransform = UKismetMathLibrary::TLerp(StartTransform, EndTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
 
 		FComponentQueryParams Params = FComponentQueryParams::DefaultComponentQueryParams;
@@ -100,11 +114,11 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 			const FTransform& EndDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
 			const FTransform& AverageDebugTransform = UKismetMathLibrary::TLerp(StartDebugTransform, EndDebugTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
 			
-			DrawDebugSweptBox(MeshComponent->GetWorld(), StartDebugTransform.GetLocation(), EndDebugTransform.GetLocation(), AverageDebugTransform.GetRotation().Rotator(), WeaponActor->TraceDebugCollision->GetScaledBoxExtent(), Color, true, DeltaTime * 2);
+			DrawDebugSweptBox(MeshComponent->GetWorld(), StartDebugTransform.GetLocation(), EndDebugTransform.GetLocation(), AverageDebugTransform.GetRotation().Rotator(), WeaponActor->TraceDebugCollision->GetScaledBoxExtent(), Color, false, 2.f);
 		}
 	}
 	
-	PreviousTransform = CurrentTransform;
+	PreviousTraceTransform = CurrentTraceTransform;
 	PreviousDebugTransform = CurrentDebugTransform;
 
 	if (HitResults.Num() > 0)

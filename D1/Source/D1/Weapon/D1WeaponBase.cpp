@@ -3,6 +3,8 @@
 #include "Character/D1Player.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "Data/D1ItemData.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "System/D1AssetManager.h"
@@ -29,25 +31,12 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 	TraceDebugCollision->SetGenerateOverlapEvents(false);
 }
 
-void AD1WeaponBase::BeginPlay()
-{
-	Super::BeginPlay();
-
-	AD1Player* Player = Cast<AD1Player>(GetOwner());
-	UD1EquipManagerComponent* EquipManager = Player->EquipManagerComponent;
-	TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-	Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = this;
-
-	WeaponMeshComponent->SetVisibility(false, true);
-}
-
 void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, ItemID);
 	DOREPLIFETIME(ThisClass, EquipmentSlotType);
-	DOREPLIFETIME(ThisClass, bCanBlock);
 }
 
 void AD1WeaponBase::Destroyed()
@@ -57,9 +46,45 @@ void AD1WeaponBase::Destroyed()
 		if (UD1EquipManagerComponent* EquipManager = Player->EquipManagerComponent)
 		{
 			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-			Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = nullptr;
+			if (Entries[(int32)EquipmentSlotType].SpawnedWeaponActor == this)
+			{
+				Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = nullptr;
+			}
 		}
 	}
 	
 	Super::Destroyed();
+}
+
+void AD1WeaponBase::OnRep_ItemID()
+{
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemID);
+	const UD1ItemFragment_Equippable_Weapon* Weapon = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+
+	if (AD1Character* Character = Cast<AD1Character>(GetOwner()))
+	{
+		if (Character->GetMesh()->GetAnimClass() != Weapon->AnimInstanceClass)
+		{
+			Character->GetMesh()->SetAnimClass(Weapon->AnimInstanceClass);
+		}
+
+		UD1AssetManager::GetAssetByPath(Weapon->EquipMontage.ToSoftObjectPath(), FAsyncLoadCompletedDelegate::CreateLambda(
+		[Character, this](const FName& AssetName, UObject* LoadedAsset)
+		{
+			Character->PlayAnimMontage(Cast<UAnimMontage>(LoadedAsset));
+		}));
+	}
+}
+
+void AD1WeaponBase::OnRep_EquipmentSlotType()
+{
+	if (AD1Player* Player = Cast<AD1Player>(GetOwner()))
+	{
+		if (UD1EquipManagerComponent* EquipManager = Player->EquipManagerComponent)
+		{
+			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
+			Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = this;
+		}
+	}
 }

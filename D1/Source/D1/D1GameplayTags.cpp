@@ -46,10 +46,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MaxHealth, 			"Attribute.Primary.MaxHealth");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Mana,					"Attribute.Primary.Mana");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MaxMana,				"Attribute.Primary.MaxMana");
-		
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_AttackSpeed,			"Attribute.Primary.AttackSpeed");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MoveSpeed,				"Attribute.Primary.MoveSpeed");
-		
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_BaseDamage,			"Attribute.Primary.BaseDamage");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_BaseDefense,			"Attribute.Primary.BaseDefense");
 		

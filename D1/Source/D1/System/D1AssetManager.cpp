@@ -85,30 +85,7 @@ void UD1AssetManager::LoadSyncByName(const FName& AssetName)
 	check(AssetData);
 	
 	const FSoftObjectPath& AssetPath = AssetData->GetAssetPathByName(AssetName);
-	if (AssetPath.IsValid())
-	{
-		UObject* LoadedAsset = AssetPath.ResolveObject();
-		if (LoadedAsset == nullptr)
-		{
-			if (UAssetManager::IsInitialized())
-			{
-				LoadedAsset = UAssetManager::GetStreamableManager().LoadSynchronous(AssetPath, false);
-			}
-			else
-			{
-				LoadedAsset = AssetPath.TryLoad();
-			}
-		}
-	
-		if (LoadedAsset)
-		{
-			Get().AddLoadedAsset(AssetName, LoadedAsset);
-		}
-		else
-		{
-			UE_LOG(LogD1Asset, Fatal, TEXT("Failed to load asset [%s]"), *AssetPath.ToString());
-		}
-	}
+	LoadSyncByPath(AssetPath);
 }
 
 void UD1AssetManager::LoadSyncByLabel(const FName& Label)
@@ -196,27 +173,7 @@ void UD1AssetManager::LoadAsyncByName(const FName& AssetName, FAsyncLoadComplete
 	check(AssetData);
 	
 	const FSoftObjectPath& AssetPath = AssetData->GetAssetPathByName(AssetName);
-	if (AssetPath.IsValid())
-	{
-		if (UObject* LoadedAsset = AssetPath.ResolveObject())
-		{
-			Get().AddLoadedAsset(AssetName, LoadedAsset);
-		}
-		else
-		{
-			TArray<FSoftObjectPath> AssetPaths;
-			AssetPaths.Add(AssetPath);
-			
-			TSharedPtr<FStreamableHandle> Handle = GetStreamableManager().RequestAsyncLoad(AssetPaths);
-			Handle->BindCompleteDelegate(FStreamableDelegate::CreateLambda([AssetName, AssetPath, CompleteDelegate = MoveTemp(CompletedDelegate)]()
-			{
-				UObject* LoadedAsset = AssetPath.ResolveObject();
-				Get().AddLoadedAsset(AssetName,LoadedAsset);
-				if (CompleteDelegate.IsBound())
-					CompleteDelegate.Execute(AssetName, LoadedAsset);
-			}));
-		}
-	}
+	LoadAsyncByPath(AssetPath, CompletedDelegate);
 }
 
 void UD1AssetManager::LoadAsyncByLabel(const FName& Label, FAsyncLoadCompletedDelegate CompletedDelegate, FAsyncLoadUpdateDelegate UpdateDelegate)
@@ -275,18 +232,7 @@ void UD1AssetManager::LoadAsyncByLabel(const FName& Label, FAsyncLoadCompletedDe
 
 void UD1AssetManager::ReleaseByPath(const FSoftObjectPath& AssetPath)
 {
-	UD1AssetManager& AssetManager = Get();
-	FScopeLock LoadedAssetsLock(&AssetManager.LoadedAssetsCritical);
-	FName AssetName = AssetPath.GetAssetFName();
-	
-	if (AssetManager.NameToLoadedAsset.Contains(AssetName))
-	{
-		AssetManager.NameToLoadedAsset.Remove(AssetName);
-	}
-	else
-	{
-		UE_LOG(LogD1Asset, Log, TEXT("Can't find loaded asset by assetName [%s]."), *AssetName.ToString());
-	}
+	ReleaseByName(AssetPath.GetAssetFName());
 }
 
 void UD1AssetManager::ReleaseByName(const FName& AssetName)
@@ -308,19 +254,10 @@ void UD1AssetManager::ReleaseByLabel(const FName& Label)
 	UD1AssetManager& AssetManager = Get();
 	UD1AssetData* LoadedAssetData = AssetManager.LoadedAssetData;
 	const FAssetSet& AssetSet = LoadedAssetData->GetAssetSetByLabel(Label);
-
-	FScopeLock LoadedAssetsLock(&AssetManager.LoadedAssetsCritical);
+	
 	for (const FAssetEntry& AssetEntry : AssetSet.AssetEntries)
 	{
-		const FName& AssetName = AssetEntry.AssetName;
-		if (AssetManager.NameToLoadedAsset.Contains(AssetName))
-		{
-			AssetManager.NameToLoadedAsset.Remove(AssetName);
-		}
-		else
-		{
-			UE_LOG(LogD1Asset, Log, TEXT("Can't find loaded asset by assetName [%s]."), *AssetName.ToString());
-		}
+		ReleaseByName(AssetEntry.AssetName);
 	}
 }
 

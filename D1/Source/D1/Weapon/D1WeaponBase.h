@@ -15,15 +15,21 @@ public:
 	AD1WeaponBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Destroyed() override;
 
+private:
+	UFUNCTION()
+	void OnRep_ItemID();
+
+	UFUNCTION()
+	void OnRep_EquipmentSlotType();
+	
 public:
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing=OnRep_ItemID)
 	int32 ItemID;
 	
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing=OnRep_EquipmentSlotType)
 	EEquipmentSlotType EquipmentSlotType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -34,7 +40,4 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UBoxComponent> TraceDebugCollision;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
-	bool bCanBlock = false;
 };

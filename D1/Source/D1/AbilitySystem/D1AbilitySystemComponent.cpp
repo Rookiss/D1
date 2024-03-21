@@ -335,15 +335,21 @@ void UD1AbilitySystemComponent::Multicast_BlockAnimMontageForSeconds_Implementat
 		return;
 
 	UAnimMontage* CurrentMontage = AnimInstance->GetCurrentActiveMontage();
+	if (CurrentMontage == nullptr)
+		return;
+	
 	float EffectivePlayRate = AnimInstance->Montage_GetEffectivePlayRate(CurrentMontage);
 	float Position = AnimInstance->Montage_GetPosition(CurrentMontage);
-				
-	AnimInstance->Montage_PlayWithBlendSettings(BackwardMontage, FMontageBlendSettings(0.f), -EffectivePlayRate / 3.f, EMontagePlayReturnType::MontageLength, Position);
+	float MontageLength = CurrentMontage->GetPlayLength();
+	float MontageDuration = MontageLength / EffectivePlayRate;
+	// float A = MontageDuration - ;
+	
+	AnimInstance->Montage_PlayWithBlendSettings(BackwardMontage, FMontageBlendSettings(0.f), EffectivePlayRate / 3.f, EMontagePlayReturnType::MontageLength, Position);
 	GetWorld()->GetTimerManager().SetTimer(BlockAnimMontageTimerHandle, [AnimInstance, BackwardMontage]()
 	{
-		if (BackwardMontage == AnimInstance->GetCurrentActiveMontage())
+		if (AnimInstance->GetCurrentActiveMontage() == BackwardMontage)
 		{
-			AnimInstance->Montage_Stop(0.2f, BackwardMontage);
+			AnimInstance->Montage_Stop(0.25f, BackwardMontage);
 		}
 	}, 0.25f, false);
 }
@@ -352,36 +358,22 @@ void UD1AbilitySystemComponent::Multicast_SlowAnimMontageForSeconds_Implementati
 {
 	if (AnimMontage == nullptr)
 		return;
-	
-	if (ACharacter* Character = Cast<ACharacter>(GetAvatarActor()))
-	{
-		if (USkeletalMeshComponent* SkeletalMeshComponent = Character->GetMesh())
-		{
-			if (UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance())
-			{
-				AnimInstance->Montage_SetPlayRate(AnimMontage, PlayRate);
+
+	UAnimInstance* AnimInstance = AbilityActorInfo->GetAnimInstance();
+	if (AnimInstance == nullptr)
+		return;
+
+	if (AnimInstance->GetCurrentActiveMontage() != AnimMontage)
+		return;
+
+	float PrevPlayRate = AnimInstance->Montage_GetPlayRate(AnimMontage);
+	AnimInstance->Montage_SetPlayRate(AnimMontage, PlayRate);
 				
-				GetWorld()->GetTimerManager().SetTimer(SlowAnimMontageTimerHandle, [AnimInstance, AnimMontage]()
-				{
-					AnimInstance->Montage_SetPlayRate(AnimMontage);
-				}, Seconds, false);
-			}
-		}
-	}
-}
-
-UAnimMontage* UD1AbilitySystemComponent::GetCurrentActiveMontage() const
-{
-	if (ACharacter* Character = Cast<ACharacter>(GetAvatarActor()))
+	GetWorld()->GetTimerManager().SetTimer(SlowAnimMontageTimerHandle, [AnimInstance, AnimMontage, PrevPlayRate]()
 	{
-		if (USkeletalMeshComponent* SkeletalMeshComponent = Character->GetMesh())
+		if (AnimInstance->GetCurrentActiveMontage() == AnimMontage)
 		{
-			if (UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance())
-			{
-				return AnimInstance->GetCurrentActiveMontage();
-			}
+			AnimInstance->Montage_SetPlayRate(AnimMontage, PrevPlayRate);
 		}
-	}
-
-	return nullptr;
+	}, Seconds, false);
 }

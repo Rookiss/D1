@@ -2,7 +2,6 @@
 
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
@@ -23,7 +22,6 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->bUsePawnControlRotation = true;
 	CameraComponent->FieldOfView = 100.f;
-	CameraComponent->AddRelativeLocation(FVector(0.f, 10.f, 0.f));
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetOwnerNoSee(true);
@@ -56,7 +54,7 @@ void AD1Player::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// GetMesh()->SetAnimClass(UD1AssetManager::GetSubclassByName<UAnimInstance>("ABP_Player_Unarmed"));
+	GetMesh()->SetAnimClass(UD1AssetManager::GetSubclassByName<UAnimInstance>("ABP_Player_Unarmed"));
 
 	TArray<FName> DefaultArmorMeshNames = { "Head_Default", "Chest_Default", "Legs_Default", "Hands_Default", "Foot_Default" };
 	DefaultArmorMeshes.SetNum(DefaultArmorMeshNames.Num());
@@ -67,7 +65,7 @@ void AD1Player::BeginPlay()
 		ArmorMeshComponents[i]->SetSkeletalMesh(DefaultArmorMeshes[i]);
 	}
 	
-	CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("CameraSocket"));
+	CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("CameraSocket"));
 
 	if (HasAuthority())
 	{

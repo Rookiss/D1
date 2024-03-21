@@ -74,7 +74,6 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 			switch (Weapon->WeaponType)
 			{
 			case EWeaponType::Sword:		WeaponType = TEXT("Sword");			break;
-			case EWeaponType::Dagger:		WeaponType = TEXT("Dagger");		break;
 			case EWeaponType::MagicStuff:	WeaponType = TEXT("Magic Stuff");	break;
 			case EWeaponType::Shield:		WeaponType = TEXT("Shield");		break;
 			}

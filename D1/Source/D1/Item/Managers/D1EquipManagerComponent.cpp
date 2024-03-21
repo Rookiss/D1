@@ -129,22 +129,7 @@ void FD1EquipEntry::Equip()
 	AD1Player* Player = EquipManager->GetPlayerCharacter();
 	check(Player);
 
-	if (Equippable->EquipmentType == EEquipmentType::Weapon)
-	{
-		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
-		if (Player->GetMesh()->GetAnimClass() != Weapon->AnimInstanceClass)
-		{
-			Player->GetMesh()->SetAnimClass(Weapon->AnimInstanceClass);
-		}
-
-		UD1AssetManager::GetAssetByPath(Weapon->EquipMontage.ToSoftObjectPath(), FAsyncLoadCompletedDelegate::CreateLambda(
-		[Player, this](const FName& AssetName, UObject* LoadedAsset)
-		{
-			Player->PlayAnimMontage(Cast<UAnimMontage>(LoadedAsset));
-			SpawnedWeaponActor->WeaponMeshComponent->SetVisibility(true, true);
-		}));
-	}
-	else if (Equippable->EquipmentType == EEquipmentType::Armor)
+	if (Equippable->EquipmentType == EEquipmentType::Armor)
 	{
 		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
 		FSoftObjectPath ArmorMeshPath = Armor->ArmorMesh.ToSoftObjectPath();
