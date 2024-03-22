@@ -18,6 +18,11 @@ UD1GameplayAbility_Weapon_MeleeCombo::UD1GameplayAbility_Weapon_MeleeCombo(const
 
 void UD1GameplayAbility_Weapon_MeleeCombo::HandleTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle)
 {
+	if (HasAuthority(&CurrentActivationInfo) == false)
+	{
+		return;
+	}
+	
 	if (bBlocked)
 		return;
 	

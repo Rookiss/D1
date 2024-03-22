@@ -13,14 +13,14 @@
 UD1AnimNotifyState_PerformTrace::UD1AnimNotifyState_PerformTrace(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	
+	bShouldFireInEditor = false;
 }
 
 void UD1AnimNotifyState_PerformTrace::NotifyBegin(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyBegin(MeshComponent, Animation, TotalDuration, EventReference);
 
-	if (ExecuteNetRole != MeshComponent->GetOwnerRole())
+	if (MeshComponent->GetOwnerRole() != ExecuteNetRole)
 		return;
 	
 	if (AD1Player* PlayerCharacter = Cast<AD1Player>(MeshComponent->GetOwner()))
@@ -43,18 +43,11 @@ void UD1AnimNotifyState_PerformTrace::NotifyTick(USkeletalMeshComponent* MeshCom
 {
 	Super::NotifyTick(MeshComponent, Animation, FrameDeltaTime, EventReference);	
 
-	if (ExecuteNetRole != MeshComponent->GetOwnerRole())
+	if (MeshComponent->GetOwnerRole() != ExecuteNetRole)
 		return;
 	
 	if (WeaponActor == nullptr)
 		return;
-	
-	if (TraceType == ETraceType::Distance)
-	{
-		const FTransform& CurrentSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceSocketName);
-		Distance = (PreviousSocketTransform.GetLocation() - CurrentSocketTransform.GetLocation()).Length();
-		PreviousSocketTransform = CurrentSocketTransform;
-	}
 
 	LastTickTime = FApp::GetCurrentTime();
 	PerformTrace(MeshComponent, FrameDeltaTime);
@@ -64,7 +57,7 @@ void UD1AnimNotifyState_PerformTrace::NotifyEnd(USkeletalMeshComponent* MeshComp
 {
 	Super::NotifyEnd(MeshComponent, Animation, EventReference);
 	
-	if (ExecuteNetRole != MeshComponent->GetOwnerRole())
+	if (MeshComponent->GetOwnerRole() != ExecuteNetRole)
 		return;
 	
 	if (WeaponActor == nullptr)
@@ -78,12 +71,14 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 	const FTransform& CurrentTraceTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
 	const FTransform& CurrentDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
 	
-	TArray<FHitResult> HitResults;
-	
 	int SubSteps = 1;
 
 	if (TraceType == ETraceType::Distance)
 	{
+		const FTransform& CurrentSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceSocketName);
+		Distance = (PreviousSocketTransform.GetLocation() - CurrentSocketTransform.GetLocation()).Length();
+		PreviousSocketTransform = CurrentSocketTransform;
+		
 		SubSteps = FMath::CeilToInt(Distance / TargetDistance);
 	}
 	else if (TraceType == ETraceType::Frame)
@@ -91,8 +86,12 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 		SubSteps = FMath::CeilToInt(DeltaTime / TargetDeltaTime);
 	}
 
-	const float SubstepRatio = 1.f / SubSteps;
+	if (SubSteps <= 0)
+		return;
 
+	TArray<FHitResult> HitResults;
+	const float SubstepRatio = 1.f / SubSteps;
+	
 	for (int32 i = 0; i < SubSteps; i++)
 	{
 		const FTransform& StartTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
@@ -103,12 +102,12 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 		Params.bReturnPhysicalMaterial = true;
 		TArray<AActor*> IgnoredActors = { WeaponActor, WeaponActor->GetOwner() };
 		Params.AddIgnoredActors(IgnoredActors);
-
+		
 		MeshComponent->GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->WeaponMeshComponent, StartTransform.GetLocation(), EndTransform.GetLocation(), AverageTransform.GetRotation(), Params);
 		
 		if (bDrawDebugShape)
 		{
-			FColor Color = (HitResults.Num() > 0) ? FColor::Green : FColor::Red;
+			FColor Color = (HitResults.Num() > 0) ? HitColor : TraceColor;
 			
 			const FTransform& StartDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
 			const FTransform& EndDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);

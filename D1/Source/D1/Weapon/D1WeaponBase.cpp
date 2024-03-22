@@ -31,6 +31,17 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 	TraceDebugCollision->SetGenerateOverlapEvents(false);
 }
 
+void AD1WeaponBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (HasAuthority())
+	{
+		OnRep_ItemID();
+		OnRep_EquipmentSlotType();
+	}
+}
+
 void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

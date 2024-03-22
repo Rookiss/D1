@@ -33,17 +33,17 @@ private:
 public:
 	UPROPERTY(EditAnywhere)
 	EWeaponHandType WeaponHandType = EWeaponHandType::LeftHand;
-
-	UPROPERTY(EditAnywhere)
-	FName TraceSocketName = "TraceSocket";
 	
 	UPROPERTY(EditAnywhere)
 	ETraceType TraceType = ETraceType::Distance;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta=(EditCondition="TraceType==ETraceType::Distance", EditConditionHides))
 	float TargetDistance = 20.f;
+
+	UPROPERTY(EditAnywhere, meta=(EditCondition="TraceType==ETraceType::Distance", EditConditionHides))
+	FName TraceSocketName = "TraceSocket";
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta=(EditCondition="TraceType==ETraceType::Frame", EditConditionHides))
 	int32 TargetFPS = 60;
 
 	UPROPERTY(EditAnywhere)
@@ -53,7 +53,13 @@ public:
 	FGameplayTag EventTag;
 
 	UPROPERTY(EditAnywhere)
-	TEnumAsByte<ENetRole> ExecuteNetRole = ROLE_Authority;
+	TEnumAsByte<ENetRole> ExecuteNetRole;
+
+	UPROPERTY(EditAnywhere)
+	FColor TraceColor = FColor::Red;
+
+	UPROPERTY(EditAnywhere)
+	FColor HitColor = FColor::Green;
 
 private:
 	UPROPERTY()
