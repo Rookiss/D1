@@ -12,6 +12,41 @@ enum class ETraceType : uint8
 	Frame
 };
 
+USTRUCT(BlueprintType)
+struct FTraceParams
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere)
+	ETraceType TraceType = ETraceType::Distance;
+
+	UPROPERTY(EditAnywhere, meta=(EditCondition="TraceType==ETraceType::Distance", EditConditionHides))
+	float TargetDistance = 20.f;
+
+	UPROPERTY(EditAnywhere, meta=(EditCondition="TraceType==ETraceType::Distance", EditConditionHides))
+	FName TraceSocketName = "TraceSocket";
+	
+	UPROPERTY(EditAnywhere, meta=(EditCondition="TraceType==ETraceType::Frame", EditConditionHides))
+	int32 TargetFPS = 60;
+};
+
+USTRUCT(BlueprintType)
+struct FTraceDebugParams
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere)
+	bool bDrawDebugShape = false;
+	
+	UPROPERTY(EditAnywhere)
+	FColor TraceColor = FColor::Red;
+
+	UPROPERTY(EditAnywhere)
+	FColor HitColor = FColor::Green;
+};
+
 class AD1WeaponBase;
 
 UCLASS()
@@ -33,39 +68,26 @@ private:
 public:
 	UPROPERTY(EditAnywhere)
 	EWeaponHandType WeaponHandType = EWeaponHandType::LeftHand;
-	
-	UPROPERTY(EditAnywhere)
-	ETraceType TraceType = ETraceType::Distance;
-
-	UPROPERTY(EditAnywhere, meta=(EditCondition="TraceType==ETraceType::Distance", EditConditionHides))
-	float TargetDistance = 20.f;
-
-	UPROPERTY(EditAnywhere, meta=(EditCondition="TraceType==ETraceType::Distance", EditConditionHides))
-	FName TraceSocketName = "TraceSocket";
-	
-	UPROPERTY(EditAnywhere, meta=(EditCondition="TraceType==ETraceType::Frame", EditConditionHides))
-	int32 TargetFPS = 60;
 
 	UPROPERTY(EditAnywhere)
-	bool bDrawDebugShape = false;
+	TEnumAsByte<ENetRole> ExecuteNetRole = ROLE_Authority;
 	
 	UPROPERTY(EditAnywhere)
 	FGameplayTag EventTag;
+	
+	UPROPERTY(EditAnywhere)
+	FTraceParams TraceParams;
 
 	UPROPERTY(EditAnywhere)
-	TEnumAsByte<ENetRole> ExecuteNetRole;
-
-	UPROPERTY(EditAnywhere)
-	FColor TraceColor = FColor::Red;
-
-	UPROPERTY(EditAnywhere)
-	FColor HitColor = FColor::Green;
+	FTraceDebugParams TraceDebugParams;
 
 private:
 	UPROPERTY()
 	TObjectPtr<AD1WeaponBase> WeaponActor;
 
-	float Distance = 0.f;
+	UPROPERTY()
+	TSet<TObjectPtr<AActor>> HitActors;
+	
 	double LastTickTime = 0;
 	float TargetDeltaTime = 0.f;
 	FTransform PreviousTraceTransform;

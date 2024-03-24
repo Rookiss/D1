@@ -30,13 +30,19 @@ void UD1AnimNotifyState_PerformTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 			const TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
 			WeaponActor = Entries[(int32)EquipManager->ConvertToEquipmentSlotType(WeaponHandType)].SpawnedWeaponActor;
 
-			TargetDeltaTime = 1.f / TargetFPS;
+			TargetDeltaTime = 1.f / TraceParams.TargetFPS;
 			
 			PreviousTraceTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
 			PreviousDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
-			PreviousSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceSocketName);
+			PreviousSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceParams.TraceSocketName);
+
+#if UE_EDITOR
+	check(WeaponActor->WeaponMeshComponent->DoesSocketExist(TraceParams.TraceSocketName));
+#endif
 		}
 	}
+
+	HitActors.Empty();
 }
 
 void UD1AnimNotifyState_PerformTrace::NotifyTick(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
@@ -68,46 +74,59 @@ void UD1AnimNotifyState_PerformTrace::NotifyEnd(USkeletalMeshComponent* MeshComp
 
 void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshComponent, float DeltaTime)
 {
-	const FTransform& CurrentTraceTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
-	const FTransform& CurrentDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
-	
 	int SubSteps = 1;
 
-	if (TraceType == ETraceType::Distance)
+	if (TraceParams.TraceType == ETraceType::Distance)
 	{
-		const FTransform& CurrentSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceSocketName);
-		Distance = (PreviousSocketTransform.GetLocation() - CurrentSocketTransform.GetLocation()).Length();
-		PreviousSocketTransform = CurrentSocketTransform;
+		const FTransform& CurrentSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceParams.TraceSocketName);
+		float Distance = (PreviousSocketTransform.GetLocation() - CurrentSocketTransform.GetLocation()).Length();
 		
-		SubSteps = FMath::CeilToInt(Distance / TargetDistance);
+		SubSteps = FMath::CeilToInt(Distance / TraceParams.TargetDistance);
+		if (SubSteps <= 0)
+			return;
+		
+		PreviousSocketTransform = CurrentSocketTransform;
 	}
-	else if (TraceType == ETraceType::Frame)
+	else if (TraceParams.TraceType == ETraceType::Frame)
 	{
 		SubSteps = FMath::CeilToInt(DeltaTime / TargetDeltaTime);
+		SubSteps = FMath::Clamp(SubSteps, 1, 10);
 	}
-
-	if (SubSteps <= 0)
-		return;
-
-	TArray<FHitResult> HitResults;
+	
 	const float SubstepRatio = 1.f / SubSteps;
+
+	const FTransform& CurrentTraceTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
+	const FTransform& CurrentDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
+
+	TArray<FHitResult> FinalHitResults;
 	
 	for (int32 i = 0; i < SubSteps; i++)
 	{
-		const FTransform& StartTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
-		const FTransform& EndTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
-		const FTransform& AverageTransform = UKismetMathLibrary::TLerp(StartTransform, EndTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
+		const FTransform& StartTraceTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
+		const FTransform& EndTraceTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
+		const FTransform& AverageTraceTransform = UKismetMathLibrary::TLerp(StartTraceTransform, EndTraceTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
 
 		FComponentQueryParams Params = FComponentQueryParams::DefaultComponentQueryParams;
 		Params.bReturnPhysicalMaterial = true;
 		TArray<AActor*> IgnoredActors = { WeaponActor, WeaponActor->GetOwner() };
 		Params.AddIgnoredActors(IgnoredActors);
-		
-		MeshComponent->GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->WeaponMeshComponent, StartTransform.GetLocation(), EndTransform.GetLocation(), AverageTransform.GetRotation(), Params);
-		
-		if (bDrawDebugShape)
+
+		TArray<FHitResult> HitResults;
+		MeshComponent->GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->WeaponMeshComponent, StartTraceTransform.GetLocation(), EndTraceTransform.GetLocation(), AverageTraceTransform.GetRotation(), Params);
+
+		for (const FHitResult& HitResult : HitResults)
 		{
-			FColor Color = (HitResults.Num() > 0) ? HitColor : TraceColor;
+			AActor* HitActor = HitResult.GetActor();
+			if (HitActors.Contains(HitActor) == false)
+			{
+				HitActors.Add(HitActor);
+				FinalHitResults.Add(HitResult);
+			}
+		}
+		
+		if (TraceDebugParams.bDrawDebugShape)
+		{
+			FColor Color = (HitResults.Num() > 0) ? TraceDebugParams.HitColor : TraceDebugParams.TraceColor;
 			
 			const FTransform& StartDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
 			const FTransform& EndDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
@@ -119,12 +138,12 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 	
 	PreviousTraceTransform = CurrentTraceTransform;
 	PreviousDebugTransform = CurrentDebugTransform;
-
-	if (HitResults.Num() > 0)
+	
+	if (FinalHitResults.Num() > 0)
 	{
 		FGameplayAbilityTargetDataHandle TargetDataHandle;
 		
-		for (const FHitResult& HitResult : HitResults)
+		for (const FHitResult& HitResult : FinalHitResults)
 		{
 			FGameplayAbilityTargetData_SingleTargetHit* NewTargetData = new FGameplayAbilityTargetData_SingleTargetHit();
 			NewTargetData->HitResult = HitResult;
