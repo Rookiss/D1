@@ -4,7 +4,6 @@
 #include "D1EquipManagerComponent.h"
 #include "D1InventoryManagerComponent.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
-#include "AbilitySystem/Attributes/D1PlayerSet.h"
 #include "Character/D1Player.h"
 #include "Engine/ActorChannel.h"
 #include "Item/D1ItemInstance.h"
@@ -32,7 +31,7 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* NewItemInstance)
 	ItemInstance = NewItemInstance;
 	if (ItemInstance)
 	{
-		LastValidItemID = ItemInstance->ItemID;
+		LastValidTemplateID = ItemInstance->GetTemplateID();
 
 		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
 		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
@@ -150,12 +149,17 @@ bool UD1EquipmentManagerComponent::ReplicateSubobjects(UActorChannel* Channel, F
 	return bWroteSomething;
 }
 
-void UD1EquipmentManagerComponent::Init()
+void UD1EquipmentManagerComponent::AddUnarmedEquipment()
 {
-	FD1EquipmentEntry& Entry = EquipmentList.Entries[(int32)EEquipmentSlotType::Unarmed];
-	UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-	ItemInstance->Init(Item::UnarmedID);
-	Entry.Init(ItemInstance);
+	FD1EquipmentEntry& Entry1 = EquipmentList.Entries[(int32)EEquipmentSlotType::Unarmed_LeftHand];
+	UD1ItemInstance* ItemInstance1 = NewObject<UD1ItemInstance>();
+	ItemInstance1->Init(Item::UnarmedLeftID);
+	Entry1.Init(ItemInstance1);
+
+	FD1EquipmentEntry& Entry2 = EquipmentList.Entries[(int32)EEquipmentSlotType::Unarmed_RightHand];
+	UD1ItemInstance* ItemInstance2 = NewObject<UD1ItemInstance>();
+	ItemInstance2->Init(Item::UnarmedRightID);
+	Entry2.Init(ItemInstance2);
 }
 
 void UD1EquipmentManagerComponent::Server_AddEntry_FromInventory_Implementation(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType)
@@ -205,7 +209,7 @@ bool UD1EquipmentManagerComponent::CanAddEntry_FromEquipment(UD1EquipmentManager
 	if (OtherComponent == nullptr)
 		return false;
 
-	if (FromEquipmentSlotType == EEquipmentSlotType::Unarmed || ToEquipmentSlotType == EEquipmentSlotType::Unarmed)
+	if (FromEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || ToEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand)
 		return false;
 	
 	if (FromEquipmentSlotType == EEquipmentSlotType::Count || ToEquipmentSlotType == EEquipmentSlotType::Count)
@@ -223,7 +227,7 @@ bool UD1EquipmentManagerComponent::CanAddEntry(UD1ItemInstance* FromItemInstance
 	if (FromItemInstance == nullptr)
 		return false;
 	
-	if (ToEquipmentSlotType == EEquipmentSlotType::Unarmed || ToEquipmentSlotType == EEquipmentSlotType::Count)
+	if (ToEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || ToEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || ToEquipmentSlotType == EEquipmentSlotType::Count)
 		return false;
 
 	const TArray<FD1EquipmentEntry>& Entries = GetAllEntries();
@@ -299,7 +303,7 @@ bool UD1EquipmentManagerComponent::IsArmorSlot(EEquipmentSlotType EquipmentSlotT
 
 bool UD1EquipmentManagerComponent::IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState)
 {
-	return ((EquipmentSlotType == EEquipmentSlotType::Unarmed && WeaponEquipState == EWeaponEquipState::Unarmed) ||
+	return ((EquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand   || EquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand) && WeaponEquipState == EWeaponEquipState::Unarmed ||
 			(EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand   || EquipmentSlotType == EEquipmentSlotType::Primary_RightHand   || EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand)   && WeaponEquipState == EWeaponEquipState::Primary ||
 		    (EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand) && WeaponEquipState == EWeaponEquipState::Secondary);
 }

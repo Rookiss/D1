@@ -71,7 +71,7 @@ void AD1Player::BeginPlay()
 	{
 		// @TODO: For Test
 		int32 IterationCount = 2;
-		const TArray<int32> ItemIDs = { 1001, 1002, 1003 };
+		const TArray<int32> ItemIDs = { 1004, 1005, 1006 };
 	
 		for (int i = 0; i < IterationCount; i++)
 		{
@@ -103,7 +103,7 @@ void AD1Player::PossessedBy(AController* NewController)
 
 	InitAbilitySystem();
 
-	EquipmentManagerComponent->Init();
+	EquipmentManagerComponent->AddUnarmedEquipment();
 }
 
 void AD1Player::OnRep_PlayerState()
@@ -143,14 +143,16 @@ void AD1Player::OnRep_Controller()
 
 void AD1Player::InitAbilitySystem()
 {
-	Super::InitAbilitySystem();
-
 	if (AD1PlayerState* PS = GetPlayerState<AD1PlayerState>())
 	{
 		AbilitySystemComponent = Cast<UD1AbilitySystemComponent>(PS->GetAbilitySystemComponent());
 		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+
+		AttributeSet = PS->GetAttributeSet();
 	}
 	ApplyAbilitySystemData("ASD_Player");
+	
+	Super::InitAbilitySystem();
 }
 
 float AD1Player::CalculateAimPitch()
@@ -166,20 +168,4 @@ float AD1Player::CalculateAimPitch()
 		CurrentAimPitch = FMath::FInterpTo(CurrentAimPitch, TargetAimPitch, GetWorld()->DeltaTimeSeconds, 12.f);
 		return CurrentAimPitch;
 	}
-}
-
-void AD1Player::DisableInputAndCollision()
-{
-	if (Controller)
-	{
-		Controller->SetIgnoreMoveInput(true);
-	}
-
-	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
-	MovementComponent->StopMovementImmediately();
-	MovementComponent->DisableMovement();
-	
-	UCapsuleComponent* CollisionComponent = GetCapsuleComponent();
-	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 }

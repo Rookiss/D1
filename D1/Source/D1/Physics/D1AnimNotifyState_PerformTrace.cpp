@@ -55,7 +55,7 @@ void UD1AnimNotifyState_PerformTrace::NotifyTick(USkeletalMeshComponent* MeshCom
 	if (WeaponActor == nullptr)
 		return;
 
-	LastTickTime = FApp::GetCurrentTime();
+	LastTickTime = MeshComponent->GetWorld()->GetTimeSeconds();
 	PerformTrace(MeshComponent, FrameDeltaTime);
 }
 
@@ -69,7 +69,7 @@ void UD1AnimNotifyState_PerformTrace::NotifyEnd(USkeletalMeshComponent* MeshComp
 	if (WeaponActor == nullptr)
 		return;
 
-	PerformTrace(MeshComponent, FApp::GetCurrentTime() - LastTickTime);
+	PerformTrace(MeshComponent, MeshComponent->GetWorld()->GetTimeSeconds() - LastTickTime);
 }
 
 void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshComponent, float DeltaTime)

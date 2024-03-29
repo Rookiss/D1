@@ -2,6 +2,7 @@
 
 #include "D1GameplayTags.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
+#include "Character/D1Character.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Death)
 
@@ -25,19 +26,18 @@ void UD1GameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UD1GameplayAbility_Death::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
-{
-	FinishDeath();
-	
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-}
-
 void UD1GameplayAbility_Death::StartDeath()
 {
-	
+	if (AD1Character* Character = Cast<AD1Character>(GetAvatarActorFromActorInfo()))
+	{
+		Character->StartDeath();
+	}
 }
 
 void UD1GameplayAbility_Death::FinishDeath()
 {
-	
+	if (AD1Character* Character = Cast<AD1Character>(GetAvatarActorFromActorInfo()))
+	{
+		Character->FinishDeath();
+	}
 }

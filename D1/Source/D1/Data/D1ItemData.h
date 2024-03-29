@@ -18,7 +18,7 @@ public:
 };
 
 USTRUCT()
-struct FD1ItemDefinition
+struct FD1ItemTemplate
 {
 	GENERATED_BODY()
 
@@ -28,10 +28,10 @@ public:
 	
 public:
 	UPROPERTY(EditDefaultsOnly)
-	int32 ItemID = 0;
+	int32 TemplateID = 0;
 
 	UPROPERTY(EditDefaultsOnly)
-	FIntPoint ItemSlotCount = FIntPoint::ZeroValue;
+	FIntPoint SlotCount = FIntPoint::ZeroValue;
 	
 	UPROPERTY(EditDefaultsOnly)
 	FText DisplayName;
@@ -44,7 +44,7 @@ public:
 };
 
 template <typename FragmentClass>
-const FragmentClass* FD1ItemDefinition::FindFragmentByClass() const
+const FragmentClass* FD1ItemTemplate::FindFragmentByClass() const
 {
 	for (UD1ItemFragment* Fragment : Fragments)
 	{
@@ -72,16 +72,16 @@ public:
 #endif
 	
 public:
-	const TArray<FD1ItemRarityProbability>& GetItemRarityProbabilities() const { return ItemRarityProbabilities; }
-	const FD1ItemDefinition& FindItemDefByID(int32 ItemID) const;
-	
+	const TArray<FD1ItemRarityProbability>& GetRarityProbabilities() const { return RarityProbabilities; }
+	const FD1ItemTemplate& FindItemTemplateByID(int32 TemplateID) const;
+
 private:
 	UPROPERTY(EditDefaultsOnly, EditFixedSize)
-	TArray<FD1ItemRarityProbability> ItemRarityProbabilities;
+	TArray<FD1ItemRarityProbability> RarityProbabilities;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TMap<FString, FD1ItemDefinition> ItemNameToDef;
+	TMap<FString, FD1ItemTemplate> NameToTemplate;
 
 	UPROPERTY()
-	TMap<int32, FD1ItemDefinition> ItemIDToDef;
+	TMap<int32, FD1ItemTemplate> IDToTemplate;
 };

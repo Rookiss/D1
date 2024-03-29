@@ -12,7 +12,7 @@ public:
 	UD1GameplayAbility_Weapon_Block(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	UFUNCTION(BlueprintCallable)
 	void ChangeBlockState(bool bShouldBlock);
 	
 protected:

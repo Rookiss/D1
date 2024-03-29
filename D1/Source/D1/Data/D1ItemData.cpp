@@ -15,10 +15,10 @@
 
 UD1ItemData::UD1ItemData()
 {
-	ItemRarityProbabilities.SetNum(static_cast<int32>(EItemRarity::Count));
-	for (int32 i = 0; i < ItemRarityProbabilities.Num(); i++)
+	RarityProbabilities.SetNum(static_cast<int32>(EItemRarity::Count));
+	for (int32 i = 0; i < RarityProbabilities.Num(); i++)
 	{
-		ItemRarityProbabilities[i].Rarity = static_cast<EItemRarity>(i);
+		RarityProbabilities[i].Rarity = static_cast<EItemRarity>(i);
 	}
 }
 
@@ -26,16 +26,16 @@ void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);
 	
-	ItemIDToDef.Empty();
-	ItemNameToDef.ValueSort([](const FD1ItemDefinition& A, const FD1ItemDefinition& B)
+	IDToTemplate.Empty();
+	NameToTemplate.ValueSort([](const FD1ItemTemplate& A, const FD1ItemTemplate& B)
 	{
-		return A.ItemID < B.ItemID;
+		return A.TemplateID < B.TemplateID;
 	});
 	
-	for (const auto& Pair : ItemNameToDef)
+	for (const auto& Pair : NameToTemplate)
 	{
-		const FD1ItemDefinition& ItemDef = Pair.Value;
-		ItemIDToDef.Emplace(ItemDef.ItemID, ItemDef);
+		const FD1ItemTemplate& ItemDef = Pair.Value;
+		IDToTemplate.Emplace(ItemDef.TemplateID, ItemDef);
 	}
 }
 
@@ -45,7 +45,7 @@ EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) 
 	EDataValidationResult Result = Super::IsDataValid(Context);
 
 	int32 TotalProbability = 0;
-	for (const FD1ItemRarityProbability& ItemRarityProbability : ItemRarityProbabilities)
+	for (const FD1ItemRarityProbability& ItemRarityProbability : RarityProbabilities)
 	{
 		TotalProbability += ItemRarityProbability.Probability;
 	}
@@ -58,11 +58,11 @@ EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) 
 
 	TSet<int32> ItemIDSet;
 	
-	for (const auto& Pair : ItemNameToDef)
+	for (const auto& Pair : NameToTemplate)
 	{
 		const FString& Name = Pair.Key;
-		const FD1ItemDefinition& ItemDef = Pair.Value;
-		const int32 ItemID = ItemDef.ItemID;
+		const FD1ItemTemplate& ItemDef = Pair.Value;
+		const int32 ItemID = ItemDef.TemplateID;
 
 		const UD1ItemFragment_Consumable* Consumable = ItemDef.FindFragmentByClass<UD1ItemFragment_Consumable>();
 		const UD1ItemFragment_Equippable* Equippable = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable>();
@@ -129,9 +129,9 @@ EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) 
 }
 #endif // WITH_EDITOR
 
-const FD1ItemDefinition& UD1ItemData::FindItemDefByID(int32 ItemID) const
+const FD1ItemTemplate& UD1ItemData::FindItemTemplateByID(int32 TemplateID) const
 {
-	const FD1ItemDefinition* ItemDef = ItemIDToDef.Find(ItemID);
-	ensureAlwaysMsgf(ItemDef, TEXT("Can't find Item Def from ID [%d]."), ItemID);
-	return *ItemDef;
+	const FD1ItemTemplate* ItemTemplate = IDToTemplate.Find(TemplateID);
+	ensureAlwaysMsgf(ItemTemplate, TEXT("Can't find ItemTemplate from ID [%d]."), TemplateID);
+	return *ItemTemplate;
 }

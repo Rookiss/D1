@@ -4,7 +4,6 @@
 #include "D1EquipmentSlotWeaponWidget.h"
 #include "Character/D1Player.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
-#include "Player/D1PlayerController.h"
 #include "UI/Item/Drag/D1ItemDragDrop.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentSlotsWidget)
@@ -52,7 +51,7 @@ void UD1EquipmentSlotsWidget::NativeConstruct()
 
 void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
 {
-	if (EquipmentSlotType == EEquipmentSlotType::Unarmed || EquipmentSlotType == EEquipmentSlotType::Count)
+	if (EquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || EquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || EquipmentSlotType == EEquipmentSlotType::Count)
 		return;
 	
 	const int32 EquipmentSlotIndex = (int32)EquipmentSlotType;

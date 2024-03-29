@@ -2,8 +2,7 @@
 
 #include "D1GameplayTags.h"
 #include "D1LogChannels.h"
-#include "AbilitySystem/Attributes/D1MonsterSet.h"
-#include "AbilitySystem/Attributes/D1PlayerSet.h"
+#include "AbilitySystem/Attributes/D1AttributeSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1DamageExecutionCalculation)
 
@@ -12,10 +11,10 @@ struct FDamageStatics
 public:
 	FDamageStatics()
 	{
-		BaseDamageDef = FGameplayEffectAttributeCaptureDefinition(UD1MonsterSet::GetBaseDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
-		BaseDefenseDef = FGameplayEffectAttributeCaptureDefinition(UD1MonsterSet::GetBaseDefenseAttribute(), EGameplayEffectAttributeCaptureSource::Target, true);
-		StrengthDef = FGameplayEffectAttributeCaptureDefinition(UD1PlayerSet::GetStrengthAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
-		WillDef = FGameplayEffectAttributeCaptureDefinition(UD1PlayerSet::GetWillAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		BaseDamageDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetBaseDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		BaseDefenseDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetBaseDefenseAttribute(), EGameplayEffectAttributeCaptureSource::Target, true);
+		StrengthDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetStrengthAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		WillDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetWillAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 	}
 
 public:
@@ -77,7 +76,7 @@ void UD1DamageExecutionCalculation::Execute_Implementation(const FGameplayEffect
 	
 	if (FinalDamage > 0.f)
 	{
-		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UD1MonsterSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, FinalDamage));
+		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UD1AttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, FinalDamage));
 	}
 #endif // #if WITH_SERVER_CODE
 }

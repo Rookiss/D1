@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "D1Character.generated.h"
 
+class UD1AttributeSet;
 class UD1AbilitySystemComponent;
 
 UCLASS()
@@ -15,12 +16,23 @@ class AD1Character : public ACharacter, public IAbilitySystemInterface
 public:
 	AD1Character(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-public:
+protected:
 	virtual void InitAbilitySystem();
 	virtual void ApplyAbilitySystemData(const FName& DataName);
 
 public:
+	void StartDeath();
+	void FinishDeath();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnDeath();
+
+private:
+	void HandleOutOfHealth();
+	
+public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	const UD1AttributeSet* GetAttributeSet() { return AttributeSet; }
 	
 protected:
 	UPROPERTY()
@@ -28,4 +40,7 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UD1AbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UD1AttributeSet> AttributeSet;
 };

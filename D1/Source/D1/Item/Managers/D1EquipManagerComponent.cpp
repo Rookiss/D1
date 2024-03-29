@@ -4,8 +4,7 @@
 #include "AbilitySystemGlobals.h"
 #include "D1EquipmentManagerComponent.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
-#include "AbilitySystem/Attributes/D1MonsterSet.h"
-#include "AbilitySystem/Attributes/D1PlayerSet.h"
+#include "AbilitySystem/Attributes/D1AttributeSet.h"
 #include "Character/D1Player.h"
 #include "Engine/ActorChannel.h"
 #include "Item/D1ItemInstance.h"
@@ -69,20 +68,10 @@ void FD1EquipEntry::Equip()
 		const FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
 		const FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(UD1AssetManager::GetSubclassByName<UGameplayEffect>("AttributeModifier"), 1.f, ContextHandle);
 	
-		if (const UD1MonsterSet* MonsterSet = Cast<UD1MonsterSet>(ASC->GetAttributeSet(UD1MonsterSet::StaticClass())))
+		if (const UD1AttributeSet* AttributeSet = Cast<UD1AttributeSet>(ASC->GetAttributeSet(UD1AttributeSet::StaticClass())))
 		{
 			TArray<FGameplayTag> AttributeTags;
-			MonsterSet->GetAllAttributeTags(AttributeTags);
-			for (const FGameplayTag& Tag : AttributeTags)
-			{
-				SpecHandle.Data->SetSetByCallerMagnitude(Tag, 0);
-			}
-		}
-	
-		if (const UD1PlayerSet* PlayerSet = Cast<UD1PlayerSet>(ASC->GetAttributeSet(UD1PlayerSet::StaticClass())))
-		{
-			TArray<FGameplayTag> AttributeTags;
-			PlayerSet->GetAllAttributeTags(AttributeTags);
+			AttributeSet->GetAllAttributeTags(AttributeTags);
 			for (const FGameplayTag& Tag : AttributeTags)
 			{
 				SpecHandle.Data->SetSetByCallerMagnitude(Tag, 0);
@@ -95,7 +84,7 @@ void FD1EquipEntry::Equip()
 		}
 	
 		StatHandles.Add(ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data));
-
+		
 		// Visual
 		if (Equippable->EquipmentType == EEquipmentType::Weapon)
 		{
@@ -115,14 +104,16 @@ void FD1EquipEntry::Equip()
 			{
 				UWorld* World = EquipManager->GetWorld();
 				AD1WeaponBase* NewActor = World->SpawnActorDeferred<AD1WeaponBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Player);
-				NewActor->ItemID = ItemInstance->GetItemID();
+				NewActor->TemplateID = ItemInstance->GetTemplateID();
 				NewActor->EquipmentSlotType = EquipmentSlotType;
 				NewActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 				NewActor->AttachToComponent(Player->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
 				NewActor->FinishSpawning(FTransform::Identity, true);
-				
-				SpawnedWeaponActor = NewActor;
 			}
+		}
+		else if (Equippable->EquipmentType == EEquipmentType::Armor)
+		{
+			
 		}
 	}
 
@@ -405,7 +396,11 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 
 	if (CurrentWeaponEquipState == EWeaponEquipState::Unarmed)
 	{
-		EquipmentSlotType = EEquipmentSlotType::Unarmed;
+		switch (WeaponHandType)
+		{
+		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Unarmed_LeftHand;  break;
+		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Unarmed_RightHand; break;
+		}
 	}
 	else if (CurrentWeaponEquipState == EWeaponEquipState::Primary)
 	{

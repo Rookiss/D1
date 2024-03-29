@@ -2,6 +2,9 @@
 
 #include "Fragments/D1ItemFragment_Stackable.h"
 #include "Net/UnrealNetwork.h"
+#if UE_WITH_IRIS
+#include "Iris/ReplicationSystem/ReplicationFragmentUtil.h"
+#endif // UE_WITH_IRIS
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemInstance)
 
@@ -15,23 +18,29 @@ void UD1ItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, ItemID);
+	DOREPLIFETIME(ThisClass, TemplateID);
 	DOREPLIFETIME(ThisClass, ItemRarity);
 	DOREPLIFETIME(ThisClass, StatContainer);
 }
 
-void UD1ItemInstance::Init(int32 InItemID)
+#if UE_WITH_IRIS
+void UD1ItemInstance::RegisterReplicationFragments(UE::Net::FFragmentRegistrationContext& Context, UE::Net::EFragmentRegistrationFlags RegistrationFlags)
 {
-	if (InItemID <= 0)
+	using namespace UE::Net;
+	FReplicationFragmentUtil::CreateAndRegisterFragmentsForObject(this, Context, RegistrationFlags);
+}
+#endif // UE_WITH_IRIS
+
+void UD1ItemInstance::Init(int32 InTemplateID)
+{
+	if (InTemplateID <= 0)
 		return;
 
-	ItemID = InItemID;
+	TemplateID = InTemplateID;
 	ItemRarity = DetermineItemRarity();
-
-	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemID);
 	
-	for (const UD1ItemFragment* Fragment : ItemDef.Fragments)
+	const FD1ItemTemplate& ItemTemplate = UD1AssetManager::GetItemTemplate(TemplateID);
+	for (const UD1ItemFragment* Fragment : ItemTemplate.Fragments)
 	{
 		if (Fragment)
 		{
@@ -60,15 +69,10 @@ bool UD1ItemInstance::HasStatTag(const FGameplayTag& StatTag) const
 	return StatContainer.ContainsTag(StatTag);
 }
 
-FString UD1ItemInstance::GetDebugString() const
-{
-	return FString::Printf(TEXT("[ID : %d] : [%s]"), ItemID, *StatContainer.GetDebugString());
-}
-
 EItemRarity UD1ItemInstance::DetermineItemRarity()
 {
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const TArray<FD1ItemRarityProbability>& ItemProbabilities = ItemData->GetItemRarityProbabilities();
+	const TArray<FD1ItemRarityProbability>& ItemProbabilities = ItemData->GetRarityProbabilities();
 	
 	int32 TotalPercent = 0.f;
 	int32 RandValue = FMath::RandRange(1, 100);

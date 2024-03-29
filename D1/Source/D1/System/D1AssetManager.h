@@ -6,6 +6,7 @@
 #include "D1AssetManager.generated.h"
 
 class UD1ItemData;
+struct FD1ItemTemplate;
 
 DECLARE_DELEGATE_OneParam(FAsyncLoadUpdateDelegate, float/*Progress*/);
 DECLARE_DELEGATE_TwoParams(FAsyncLoadCompletedDelegate, const FName&/*AssetName or Label*/, UObject*/*LoadedAsset*/);
@@ -24,6 +25,7 @@ public:
 	static void Initialize();
 	
 	static const UD1ItemData* GetItemData();
+	static const FD1ItemTemplate& GetItemTemplate(int32 TemplateID);
 	
 	static void GetAssetByPath(const FSoftObjectPath& AssetPath, FAsyncLoadCompletedDelegate CompletedDelegate = FAsyncLoadCompletedDelegate());
 	

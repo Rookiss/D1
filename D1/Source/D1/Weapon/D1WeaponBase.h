@@ -21,17 +21,17 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnRep_ItemID();
+	void OnRep_TemplateID();
 
 	UFUNCTION()
 	void OnRep_EquipmentSlotType();
 	
 public:
-	UPROPERTY(ReplicatedUsing=OnRep_ItemID)
-	int32 ItemID;
+	UPROPERTY(ReplicatedUsing=OnRep_TemplateID)
+	int32 TemplateID;
 	
 	UPROPERTY(ReplicatedUsing=OnRep_EquipmentSlotType)
-	EEquipmentSlotType EquipmentSlotType;
+	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UArrowComponent> ArrowComponent;
@@ -41,4 +41,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UBoxComponent> TraceDebugCollision;
+
+public:
+	bool bCanBlock = false;
 };

@@ -16,14 +16,13 @@ struct FD1InventoryEntry : public FFastArraySerializerItem
 	GENERATED_BODY()
 
 private:
-	void Init(int32 InItemID, int32 InItemCount);
+	void Init(int32 InTemplateID, int32 InItemCount);
 	void Init(UD1ItemInstance* InItemInstance, int32 InItemCount);
 	void Reset();
 	
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
 	int32 GetItemCount() const { return ItemCount; }
-	FString GetDebugString() const;
 
 private:
 	friend struct FD1InventoryList;
@@ -36,7 +35,7 @@ private:
 	int32 ItemCount = 0;
 
 	UPROPERTY()
-	int32 LastValidItemID = 0;
+	int32 LastValidTemplateID = 0;
 };
 
 USTRUCT(BlueprintType)
@@ -57,13 +56,13 @@ private:
 	void AddItem_Unsafe(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount);
 	UD1ItemInstance* RemoveItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemCount); /* Return Removed ItemInstance */
 	
-	bool TryAddItem(int32 ItemID, int32 ItemCount);
-	bool TryRemoveItem(int32 ItemID, int32 ItemCount);
+	bool TryAddItem(int32 TemplateID, int32 ItemCount);
+	bool TryRemoveItem(int32 TemplateID, int32 ItemCount);
 
 public:
 	const TArray<FD1InventoryEntry>& GetAllEntries() const { return Entries; }
 	FD1InventoryEntry GetEntryByPosition(const FIntPoint& ItemSlotPos) const;
-	int32 GetTotalCountByID(int32 ItemID) const;
+	int32 GetTotalCountByID(int32 TemplateID) const;
 	
 private:
 	friend class UD1InventoryManagerComponent;
@@ -116,8 +115,8 @@ public:
 	bool CanMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const;
 
 public:
-	bool TryAddItem(int32 ItemID, int32 ItemCount);
-	bool TryRemoveItem(int32 ItemID, int32 ItemCount);
+	bool TryAddItem(int32 TemplateID, int32 ItemCount);
+	bool TryRemoveItem(int32 TemplateID, int32 ItemCount);
 
 public:
 	void MarkSlotChecks(TArray<TArray<bool>>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);
@@ -131,7 +130,7 @@ public:
 	const TArray<FD1InventoryEntry>& GetAllEntries() const;
 	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
 	TArray<TArray<bool>>& GetSlotChecks() { return SlotChecks; }
-	int32 GetTotalCountByID(int32 ItemID) const;
+	int32 GetTotalCountByID(int32 TemplateID) const;
 
 public:
 	FOnInventoryEntryChanged OnInventoryEntryChanged;

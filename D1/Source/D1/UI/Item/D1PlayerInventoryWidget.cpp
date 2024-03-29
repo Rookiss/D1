@@ -32,7 +32,7 @@ void UD1PlayerInventoryWidget::NativeConstruct()
 
 void UD1PlayerInventoryWidget::OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 NewItemCount)
 {
-	if (ItemInstance && ItemInstance->GetItemID() != Item::CoinID)
+	if (ItemInstance && ItemInstance->GetTemplateID() != Item::CoinID)
 		return;
 	
 	Text_Gold->SetText(FText::AsNumber(InventoryManagerComponent->GetTotalCountByID(Item::CoinID)));

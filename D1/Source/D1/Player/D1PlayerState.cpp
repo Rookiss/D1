@@ -1,7 +1,7 @@
 ﻿#include "D1PlayerState.h"
 
 #include "AbilitySystem/D1AbilitySystemComponent.h"
-#include "AbilitySystem/Attributes/D1PlayerSet.h"
+#include "AbilitySystem/Attributes/D1AttributeSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1PlayerState)
 
@@ -12,10 +12,10 @@ AD1PlayerState::AD1PlayerState(const FObjectInitializer& ObjectInitializer)
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	
-	PlayerSet = CreateDefaultSubobject<UD1PlayerSet>("PlayerSet");
+	AttributeSet = CreateDefaultSubobject<UD1AttributeSet>("D1AttributeSet");
 
-	NetUpdateFrequency = 20.f;
-	MinNetUpdateFrequency = 10.f;
+	NetUpdateFrequency = 100.f;
+	MinNetUpdateFrequency = 50.f;
 }
 
 UAbilitySystemComponent* AD1PlayerState::GetAbilitySystemComponent() const
@@ -28,7 +28,7 @@ UD1AbilitySystemComponent* AD1PlayerState::GetD1AbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-const UD1PlayerSet* AD1PlayerState::GetPlayerSet() const
+UD1AttributeSet* AD1PlayerState::GetAttributeSet() const
 {
-	return PlayerSet;
+	return AttributeSet;
 }

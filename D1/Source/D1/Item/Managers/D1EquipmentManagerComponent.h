@@ -33,7 +33,7 @@ private:
 	TObjectPtr<UD1ItemInstance> ItemInstance;
 
 	UPROPERTY()
-	int32 LastValidItemID = 0;
+	int32 LastValidTemplateID = 0;
 
 private:
 	UPROPERTY(NotReplicated)
@@ -99,7 +99,7 @@ protected:
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
 public:
-	void Init();
+	void AddUnarmedEquipment();
 	
 	// TODO: With Validation
 	UFUNCTION(Server, Reliable)

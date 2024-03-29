@@ -37,7 +37,7 @@ void AD1WeaponBase::BeginPlay()
 
 	if (HasAuthority())
 	{
-		OnRep_ItemID();
+		OnRep_TemplateID();
 		OnRep_EquipmentSlotType();
 	}
 }
@@ -46,7 +46,7 @@ void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, ItemID);
+	DOREPLIFETIME(ThisClass, TemplateID);
 	DOREPLIFETIME(ThisClass, EquipmentSlotType);
 }
 
@@ -67,11 +67,10 @@ void AD1WeaponBase::Destroyed()
 	Super::Destroyed();
 }
 
-void AD1WeaponBase::OnRep_ItemID()
+void AD1WeaponBase::OnRep_TemplateID()
 {
-	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemID);
-	const UD1ItemFragment_Equippable_Weapon* Weapon = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+	const FD1ItemTemplate& ItemTemplate = UD1AssetManager::GetItemTemplate(TemplateID);
+	const UD1ItemFragment_Equippable_Weapon* Weapon = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
 
 	if (AD1Character* Character = Cast<AD1Character>(GetOwner()))
 	{

@@ -25,9 +25,9 @@ void UD1InventoryEntryWidget::Init(UD1InventorySlotsWidget* InSlotsWidget, UD1It
 	SetItemInstance(InItemInstance);
 	
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemInstance->GetItemID());
+	const FD1ItemTemplate& ItemDef = ItemData->FindItemTemplateByID(ItemInstance->GetTemplateID());
 
-	FVector2D WidgetSize = FVector2D(ItemDef.ItemSlotCount.X * Item::UnitInventorySlotSize.X, ItemDef.ItemSlotCount.Y * Item::UnitInventorySlotSize.Y);
+	FVector2D WidgetSize = FVector2D(ItemDef.SlotCount.X * Item::UnitInventorySlotSize.X, ItemDef.SlotCount.Y * Item::UnitInventorySlotSize.Y);
 	SizeBox_Root->SetWidthOverride(WidgetSize.X);
 	SizeBox_Root->SetHeightOverride(WidgetSize.Y);
 	
@@ -63,10 +63,10 @@ void UD1InventoryEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 	
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemInstance->GetItemID());
+	const FD1ItemTemplate& ItemDef = ItemData->FindItemTemplateByID(ItemInstance->GetTemplateID());
 	
 	UD1ItemDragWidget* DragWidget = CreateWidget<UD1ItemDragWidget>(GetOwningPlayer(), DragWidgetClass);
-	FVector2D EntityWidgetSize = FVector2D(ItemDef.ItemSlotCount.X * Item::UnitInventorySlotSize.X, ItemDef.ItemSlotCount.Y * Item::UnitInventorySlotSize.Y);
+	FVector2D EntityWidgetSize = FVector2D(ItemDef.SlotCount.X * Item::UnitInventorySlotSize.X, ItemDef.SlotCount.Y * Item::UnitInventorySlotSize.Y);
 	DragWidget->Init(EntityWidgetSize, ItemDef.IconTexture, ItemCount);
 	
 	UD1ItemDragDrop* DragDrop = NewObject<UD1ItemDragDrop>();

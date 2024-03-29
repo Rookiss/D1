@@ -1,14 +1,5 @@
 ﻿#pragma once
 
-#define CALLINFO (FString(__FUNCTION__) + TEXT("(") + FString::FromInt(__LINE__) + TEXT(")"))
-#define LOG_CALLINFO(Verbosity) UE_LOG(LogD1, Verbosity, TEXT("%s"), *CALLINFO)
-#define LOG(Format, ...) UE_LOG(LogD1, Display, TEXT("%s %s"), *CALLINFO, *FString::Printf(Format, ##__VA_ARGS__))
-#define LOG_WARNING(Format, ...) UE_LOG(LogD1, Warning, TEXT("%s %s"), *CALLINFO, *FString::Printf(Format, ##__VA_ARGS__))
-#define LOG_ERROR(Format, ...) UE_LOG(LogD1, Error, TEXT("%s %s"), *CALLINFO, *FString::Printf(Format, ##__VA_ARGS__))
-#define	LOG_SCREEN(Format, ...) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(Format, ##__VA_ARGS__))
-#define	LOG_SCREEN_TIME(Time, Format, ...) GEngine->AddOnScreenDebugMessage(-1, Time, FColor::Red, FString::Printf(Format, ##__VA_ARGS__))
-#define	LOG_SCREEN_COLOR(Color ,Format, ...) GEngine->AddOnScreenDebugMessage(-1, 5.f, Color, FString::Printf(Format, ##__VA_ARGS__))
-
 UENUM(BlueprintType)
 enum class ESlotState : uint8
 {
@@ -20,7 +11,8 @@ enum class ESlotState : uint8
 UENUM(BlueprintType)
 enum class EEquipmentSlotType : uint8
 {
-	Unarmed,
+	Unarmed_LeftHand,
+	Unarmed_RightHand,
 	
 	Primary_LeftHand,
 	Primary_RightHand,
@@ -42,9 +34,10 @@ enum class EEquipmentSlotType : uint8
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
+	Unarmed,
 	Sword,
 	Shield,
-	MagicStuff,
+	Staff,
 
 	Count	UMETA(Hidden)
 };
@@ -117,11 +110,11 @@ enum class EItemRarity : uint8
 namespace Item
 {
 	const int32 CoinID = 9999;
-	const int32 UnarmedID = 1000;
+	const int32 UnarmedLeftID = 1001, UnarmedRightID = 1002;
 	const FIntPoint UnitInventorySlotSize = FIntPoint(50.f, 50.f);
 
 	const TArray<TArray<EEquipmentSlotType>> EquipmentSlotsByWeaponState = {
-		{ EEquipmentSlotType::Unarmed },
+		{ EEquipmentSlotType::Unarmed_LeftHand,   EEquipmentSlotType::Unarmed_RightHand                                          },
 		{ EEquipmentSlotType::Primary_LeftHand,   EEquipmentSlotType::Primary_RightHand,   EEquipmentSlotType::Primary_TwoHand   },
 		{ EEquipmentSlotType::Secondary_LeftHand, EEquipmentSlotType::Secondary_RightHand, EEquipmentSlotType::Secondary_TwoHand }
 	};

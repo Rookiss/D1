@@ -3,7 +3,6 @@
 #include "AbilitySystemGlobals.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/D1AttributeSet.h"
-#include "AbilitySystem/Attributes/D1MonsterSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1UserWidget)
 

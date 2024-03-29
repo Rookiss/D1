@@ -27,7 +27,6 @@ public:
 
 public:
 	float CalculateAimPitch();
-	void DisableInputAndCollision();
 
 public:
 	UPROPERTY(VisibleAnywhere)

@@ -50,11 +50,15 @@ public:
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="GameplayCueParameters", GameplayTagFilter="GameplayCue"))
 	void RemoveGameplayCueLocal(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
 	
-	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void BlockAnimMontageForSeconds(UAnimMontage* BackwardMontage);
+	
+	UFUNCTION(BlueprintCallable, NetMulticast, Unreliable)
 	void Multicast_BlockAnimMontageForSeconds(UAnimMontage* BackwardMontage);
-
-	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
-	void Multicast_SlowAnimMontageForSeconds(UAnimMontage* AnimMontage, float Seconds, float PlayRate);
+	
+	void SlowAnimMontageForSeconds(UAnimMontage* AttackMontage);
+	
+	UFUNCTION(BlueprintCallable, NetMulticast, Unreliable)
+	void Multicast_SlowAnimMontageForSeconds(UAnimMontage* AttackMontage);
 	
 public:
 	FTimerHandle SlowAnimMontageTimerHandle;

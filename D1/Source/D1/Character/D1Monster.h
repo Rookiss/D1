@@ -3,6 +3,8 @@
 #include "D1Character.h"
 #include "D1Monster.generated.h"
 
+class UD1AttributeSet;
+
 UCLASS()
 class AD1Monster : public AD1Character
 {

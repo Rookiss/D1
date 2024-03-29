@@ -21,7 +21,7 @@ UD1ItemHoverWidget::UD1ItemHoverWidget(const FObjectInitializer& ObjectInitializ
 void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 {
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemInstance->GetItemID());
+	const FD1ItemTemplate& ItemDef = ItemData->FindItemTemplateByID(ItemInstance->GetTemplateID());
 	const EItemRarity ItemRarity = ItemInstance->GetItemRarity();
 
 	Text_DisplayName->SetText(ItemDef.DisplayName);
@@ -74,7 +74,7 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 			switch (Weapon->WeaponType)
 			{
 			case EWeaponType::Sword:		WeaponType = TEXT("Sword");			break;
-			case EWeaponType::MagicStuff:	WeaponType = TEXT("Magic Stuff");	break;
+			case EWeaponType::Staff:		WeaponType = TEXT("Staff");			break;
 			case EWeaponType::Shield:		WeaponType = TEXT("Shield");		break;
 			}
 			Text_WeaponType->SetText(FText::FromString(WeaponType));

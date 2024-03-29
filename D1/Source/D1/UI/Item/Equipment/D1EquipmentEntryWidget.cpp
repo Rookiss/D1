@@ -20,7 +20,7 @@ UD1EquipmentEntryWidget::UD1EquipmentEntryWidget(const FObjectInitializer& Objec
 
 void UD1EquipmentEntryWidget::Init(UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType)
 {
-	if (InEquipmentSlotType == EEquipmentSlotType::Unarmed || InEquipmentSlotType == EEquipmentSlotType::Count)
+	if (InEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || InEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || InEquipmentSlotType == EEquipmentSlotType::Count)
 		return;
 	
 	SetItemInstance(InItemInstance);
@@ -43,10 +43,10 @@ void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemInstance->GetItemID());
+	const FD1ItemTemplate& ItemDef = ItemData->FindItemTemplateByID(ItemInstance->GetTemplateID());
 	
 	UD1ItemDragWidget* DragWidget = CreateWidget<UD1ItemDragWidget>(GetOwningPlayer(), DragWidgetClass);
-	FVector2D EntityWidgetSize = FVector2D(ItemDef.ItemSlotCount * Item::UnitInventorySlotSize);
+	FVector2D EntityWidgetSize = FVector2D(ItemDef.SlotCount * Item::UnitInventorySlotSize);
 	DragWidget->Init(EntityWidgetSize, ItemDef.IconTexture, 1);
 	
 	UD1ItemDragDrop* DragDrop = NewObject<UD1ItemDragDrop>();

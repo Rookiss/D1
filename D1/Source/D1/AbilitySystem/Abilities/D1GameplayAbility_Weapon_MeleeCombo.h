@@ -35,5 +35,6 @@ protected:
 	bool bInputReleased = false;
 	
 	bool bBlocked = false;
+	bool bAttacked = false;
 	FTimerHandle BlockMontageTimerHandle;
 };

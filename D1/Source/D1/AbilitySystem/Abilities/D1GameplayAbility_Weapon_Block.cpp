@@ -14,9 +14,6 @@ void UD1GameplayAbility_Weapon_Block::ChangeBlockState(bool bShouldBlock)
 {
 	if (WeaponActor)
 	{
-		if (UStaticMeshComponent* StaticMeshComponent = WeaponActor->WeaponMeshComponent)
-		{
-			StaticMeshComponent->SetGenerateOverlapEvents(bShouldBlock);
-		}
+		WeaponActor->bCanBlock = bShouldBlock;
 	}
 }

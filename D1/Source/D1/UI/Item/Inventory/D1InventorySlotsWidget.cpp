@@ -83,8 +83,8 @@ bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, cons
 	check(FromItemInstance);
 
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& FromItemDef = ItemData->FindItemDefByID(FromItemInstance->GetItemID());
-	const FIntPoint& FromItemSlotCount = FromItemDef.ItemSlotCount;
+	const FD1ItemTemplate& FromItemDef = ItemData->FindItemTemplateByID(FromItemInstance->GetTemplateID());
+	const FIntPoint& FromItemSlotCount = FromItemDef.SlotCount;
 
 	int32 MovableCount = 0;
 	if (DragDrop->FromInventoryManager)
@@ -195,10 +195,10 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlo
 		{
 			if (UD1ItemInstance* ItemInstance = EntryWidget->GetItemInstance())
 			{
-				const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemInstance->GetItemID());
+				const FD1ItemTemplate& ItemDef = ItemData->FindItemTemplateByID(ItemInstance->GetTemplateID());
 
 				const FIntPoint StartSlotPos = InItemSlotPos;
-				const FIntPoint EndSlotPos = InItemSlotPos + ItemDef.ItemSlotCount;
+				const FIntPoint EndSlotPos = InItemSlotPos + ItemDef.SlotCount;
 				
 				for (int y = StartSlotPos.Y; y < EndSlotPos.Y; y++)
 				{
@@ -222,7 +222,7 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlo
 	}
 	else if (NewItemCount > 0)
 	{
-		const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(InItemInstance->GetItemID());
+		const FD1ItemTemplate& ItemDef = ItemData->FindItemTemplateByID(InItemInstance->GetTemplateID());
 		
 		EntryWidget = CreateWidget<UD1InventoryEntryWidget>(GetOwningPlayer(), EntryWidgetClass);
 		EntryWidgets[SlotIndex] = EntryWidget;
@@ -234,7 +234,7 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlo
 		EntryWidget->Init(this, InItemInstance, NewItemCount);
 		
 		const FIntPoint StartSlotPos = InItemSlotPos;
-		const FIntPoint EndSlotPos = InItemSlotPos + ItemDef.ItemSlotCount;
+		const FIntPoint EndSlotPos = InItemSlotPos + ItemDef.SlotCount;
 		
 		for (int y = StartSlotPos.Y; y < EndSlotPos.Y; y++)
 		{

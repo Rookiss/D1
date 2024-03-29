@@ -36,6 +36,12 @@ const UD1ItemData* UD1AssetManager::GetItemData()
 	return GetAssetByName<UD1ItemData>("ItemData");
 }
 
+const FD1ItemTemplate& UD1AssetManager::GetItemTemplate(int32 TemplateID)
+{
+	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
+	return ItemData->FindItemTemplateByID(TemplateID);
+}
+
 void UD1AssetManager::GetAssetByPath(const FSoftObjectPath& AssetPath, FAsyncLoadCompletedDelegate CompletedDelegate)
 {
 	if (AssetPath.IsValid())

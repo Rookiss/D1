@@ -14,26 +14,27 @@ class UD1ItemInstance : public UObject
 public:
 	UD1ItemInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-protected:
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 public:
-	void Init(int32 InItemID);
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual bool IsSupportedForNetworking() const override { return true; }
+
+#if UE_WITH_IRIS
+	virtual void RegisterReplicationFragments(UE::Net::FFragmentRegistrationContext& Context, UE::Net::EFragmentRegistrationFlags RegistrationFlags) override;
+#endif // UE_WITH_IRIS
+	
+public:
+	void Init(int32 InTemplateID);
 	
 	void AddStatTagStack(const FGameplayTag& StatTag, int32 StackCount);
 	void RemoveStatTagStack(const FGameplayTag& StatTag, int32 StackCount);
-	
-public:
-	virtual bool IsSupportedForNetworking() const override { return true; }
 
-	int32 GetItemID() const { return ItemID; }
+public:
+	int32 GetTemplateID() const { return TemplateID; }
 	EItemRarity GetItemRarity() const { return ItemRarity; }
 
 	const FD1GameplayTagStackContainer& GetStatContainer() const { return StatContainer; }
 	int32 GetStackCountByTag(const FGameplayTag& StatTag) const;
 	bool HasStatTag(const FGameplayTag& StatTag) const;
-
-	FString GetDebugString() const;
 
 	template <typename FragmentClass>
 	const FragmentClass* FindFragmentByClass() const;
@@ -42,14 +43,8 @@ private:
 	EItemRarity DetermineItemRarity();
 	
 private:
-	friend struct FD1EquipmentList;
-	friend struct FD1EquipmentEntry;
-	
-	friend struct FD1InventoryList;
-	friend struct FD1InventoryEntry;
-	
 	UPROPERTY(Replicated)
-	int32 ItemID = 0;
+	int32 TemplateID = 0;
 
 	UPROPERTY(Replicated)
 	EItemRarity ItemRarity = EItemRarity::Junk;
@@ -61,7 +56,6 @@ private:
 template <typename FragmentClass>
 const FragmentClass* UD1ItemInstance::FindFragmentByClass() const
 {
-	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
-	const FD1ItemDefinition& ItemDef = ItemData->FindItemDefByID(ItemID);
-	return ItemDef.FindFragmentByClass<FragmentClass>();
+	const FD1ItemTemplate& ItemTemplate = UD1AssetManager::GetItemTemplate(TemplateID);
+	return ItemTemplate.FindFragmentByClass<FragmentClass>();
 }

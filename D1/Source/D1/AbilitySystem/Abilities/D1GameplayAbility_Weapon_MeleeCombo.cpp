@@ -18,16 +18,11 @@ UD1GameplayAbility_Weapon_MeleeCombo::UD1GameplayAbility_Weapon_MeleeCombo(const
 
 void UD1GameplayAbility_Weapon_MeleeCombo::HandleTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle)
 {
-	if (HasAuthority(&CurrentActivationInfo) == false)
-	{
-		return;
-	}
-	
 	if (bBlocked)
 		return;
-	
+
 	TArray<int32> AttackHitIndexes;
-	int32 BlockHitIndex = -1;
+	int32 BlockHitIndex = INDEX_NONE;
 
 	for (int32 i = 0; i < InTargetDataHandle.Data.Num(); i++)
 	{
@@ -41,30 +36,45 @@ void UD1GameplayAbility_Weapon_MeleeCombo::HandleTargetData(const FGameplayAbili
 				{
 					HitActors.Add(HitActor);
 
+					bool bHitSomething = false;
+					
 					if (HitActor->IsA(AD1Character::StaticClass()))
 					{
+						bHitSomething = true;
 						AttackHitIndexes.Add(i);
 					}
-					else if (AD1WeaponBase* HitWeaponActor = Cast<AD1WeaponBase>(HitActor))
+					else if (AD1WeaponBase* HitWeapon = Cast<AD1WeaponBase>(HitActor))
 					{
-						FVector HitActorToPawn = (GetAvatarActorFromActorInfo()->GetActorLocation() - HitWeaponActor->GetActorLocation()).GetSafeNormal();
-						float Dot = HitWeaponActor->GetActorForwardVector().Dot(HitActorToPawn);
-						if (Dot >= 0.f)
+						if (HitWeapon->bCanBlock)
 						{
+							bHitSomething = true;
 							BlockHitIndex = i;
-							break;
 						}
 					}
 					else
 					{
+						bHitSomething = true;
 						BlockHitIndex = i;
-						break;
 					}
+
+					if (bHitSomething)
+					{
+						FColor Color = (HasAuthority(&CurrentActivationInfo)) ? FColor::Red : FColor::Green;
+						DrawDebugSphere(GetWorld(), HitResult->ImpactPoint, 4, 32, Color, false, 5);
+					}
+					
+					if (BlockHitIndex != INDEX_NONE)
+						break;
 				}
 			}
 		}
 	}
 
+	// TODO: https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking
+	// TODO: https://ftp.cs.wpi.edu/pub/techreports/pdf/21-06.pdf
+	
+	FScopedPredictionWindow ScopedPrediction(GetAbilitySystemComponent(), CurrentActivationInfo.GetActivationPredictionKey());
+	
 	if (BlockHitIndex != -1)
 	{
 		const FHitResult& HitResult = *(InTargetDataHandle.Data[BlockHitIndex]->GetHitResult());
@@ -76,46 +86,63 @@ void UD1GameplayAbility_Weapon_MeleeCombo::HandleTargetData(const FGameplayAbili
 			
 		UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
 		AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact, CueParameters);
-		
-		UAnimInstance* AnimInstance = AbilitySystemComponent->AbilityActorInfo->GetAnimInstance();
-		AbilitySystemComponent->Multicast_BlockAnimMontageForSeconds(BackwardMontage);
-		
-		FOnMontageEnded MontageEnded = FOnMontageEnded::CreateWeakLambda(this, [this](UAnimMontage* AnimMontage, bool bInterrupted)
+
+		if (HasAuthority(&CurrentActivationInfo))
 		{
-			K2_EndAbility();
-		});
-		AnimInstance->Montage_SetEndDelegate(MontageEnded, BackwardMontage);
-		
+			AbilitySystemComponent->Multicast_BlockAnimMontageForSeconds(BackwardMontage);
+			FOnMontageEnded MontageEnded = FOnMontageEnded::CreateWeakLambda(this, [this](UAnimMontage* AnimMontage, bool bInterrupted)
+			{
+				K2_EndAbility();
+			});
+			UAnimInstance* AnimInstance = AbilitySystemComponent->AbilityActorInfo->GetAnimInstance();
+			AnimInstance->Montage_SetEndDelegate(MontageEnded, BackwardMontage);
+		}
+		else
+		{
+			AbilitySystemComponent->BlockAnimMontageForSeconds(BackwardMontage);
+		}
 		bBlocked = true;
 	}
 	else
 	{
+		UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
+		
 		for (int32 AttackHitIndex : AttackHitIndexes)
 		{
 			const FHitResult& HitResult = *InTargetDataHandle.Data[AttackHitIndex]->GetHitResult();
 			
-			FVector Location = HitResult.ImpactPoint;
-			if (HitResult.ImpactPoint.IsNearlyZero())
-			{
-				AD1Character* Character = Cast<AD1Character>(HitResult.GetActor());
-				Location = Character->GetMesh()->GetBoneLocation(HitResult.BoneName);
-			}
-
-			DrawDebugSphere(GetWorld(), Location, 8, 12, FColor::Green, false, 2.f);
-			
 			FGameplayCueParameters CueParameters;
-			CueParameters.Location = Location;
+			CueParameters.Location = HitResult.ImpactPoint;
 			CueParameters.Normal = HitResult.ImpactNormal;
 			CueParameters.PhysicalMaterial = HitResult.PhysMaterial;
-
-			UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
+			
 			AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact, CueParameters);
-		
-			FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
-			TSubclassOf<UGameplayEffect> DamageEffectClass = UD1AssetManager::GetSubclassByName<UGameplayEffect>("GE_Damage");
-			FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass);
-			EffectSpecHandle.Data->AddDynamicAssetTag(D1GameplayTags::Attack_Physical);
-			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
+
+			if (HasAuthority(&CurrentActivationInfo))
+			{
+				FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
+				TSubclassOf<UGameplayEffect> DamageEffectClass = UD1AssetManager::GetSubclassByName<UGameplayEffect>("GE_Damage");
+				FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass);
+				EffectSpecHandle.Data->AddDynamicAssetTag(D1GameplayTags::Attack_Physical);
+				ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
+			}
+		}
+
+		if (AttackHitIndexes.Num() > 0)
+		{
+			if (bAttacked == false)
+			{
+				if (HasAuthority(&CurrentActivationInfo))
+				{
+					AbilitySystemComponent->Multicast_SlowAnimMontageForSeconds(GetCurrentMontage());
+				}
+				else
+				{
+					AbilitySystemComponent->SlowAnimMontageForSeconds(GetCurrentMontage());
+				}
+			}
+			
+			bAttacked = true;
 		}
 	}
 }

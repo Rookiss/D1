@@ -1,6 +1,6 @@
 ﻿#include "D1HealExecutionCalculation.h"
 
-#include "AbilitySystem/Attributes/D1MonsterSet.h"
+#include "AbilitySystem/Attributes/D1AttributeSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1HealExecutionCalculation)
 
@@ -51,7 +51,7 @@ void UD1HealExecutionCalculation::Execute_Implementation(const FGameplayEffectCu
 	const float FinalHeal = FMath::Max(0.f, Strength * 999.f);
 	if (FinalHeal > 0.f)
 	{
-		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UD1MonsterSet::GetIncomingHealAttribute(), EGameplayModOp::Additive, FinalHeal));
+		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UD1AttributeSet::GetIncomingHealAttribute(), EGameplayModOp::Additive, FinalHeal));
 	}
 #endif // #if WITH_SERVER_CODE
 }

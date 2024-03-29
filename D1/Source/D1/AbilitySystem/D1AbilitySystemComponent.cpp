@@ -7,7 +7,6 @@
 #include "GameplayCueManager.h"
 #include "Abilities/D1GameplayAbility.h"
 #include "Animation/D1AnimInstance.h"
-#include "GameFramework/Character.h"
 #include "System/D1AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AbilitySystemComponent)
@@ -325,7 +324,7 @@ void UD1AbilitySystemComponent::RemoveGameplayCueLocal(const FGameplayTag Gamepl
 	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(GetOwner(), GameplayCueTag, EGameplayCueEvent::Type::Removed, GameplayCueParameters);
 }
 
-void UD1AbilitySystemComponent::Multicast_BlockAnimMontageForSeconds_Implementation(UAnimMontage* BackwardMontage)
+void UD1AbilitySystemComponent::BlockAnimMontageForSeconds(UAnimMontage* BackwardMontage)
 {
 	if (BackwardMontage == nullptr)
 		return;
@@ -342,38 +341,53 @@ void UD1AbilitySystemComponent::Multicast_BlockAnimMontageForSeconds_Implementat
 	float Position = AnimInstance->Montage_GetPosition(CurrentMontage);
 	float MontageLength = CurrentMontage->GetPlayLength();
 	float MontageDuration = MontageLength / EffectivePlayRate;
-	// float A = MontageDuration - ;
 	
-	AnimInstance->Montage_PlayWithBlendSettings(BackwardMontage, FMontageBlendSettings(0.f), EffectivePlayRate / 3.f, EMontagePlayReturnType::MontageLength, Position);
-	GetWorld()->GetTimerManager().SetTimer(BlockAnimMontageTimerHandle, [AnimInstance, BackwardMontage]()
+	AnimInstance->Montage_PlayWithBlendSettings(BackwardMontage, FMontageBlendSettings(0.f), EffectivePlayRate / 5.f, EMontagePlayReturnType::MontageLength, Position);
+	GetWorld()->GetTimerManager().SetTimer(BlockAnimMontageTimerHandle, [AnimInstance, BackwardMontage, MontageDuration]()
 	{
 		if (AnimInstance->GetCurrentActiveMontage() == BackwardMontage)
 		{
-			AnimInstance->Montage_Stop(0.25f, BackwardMontage);
+			AnimInstance->Montage_Stop(FMath::Min(MontageDuration / 5.f, 0.35f), BackwardMontage);
 		}
-	}, 0.25f, false);
+	}, FMath::Min(MontageDuration / 12.f, 0.25f), false);
 }
 
-void UD1AbilitySystemComponent::Multicast_SlowAnimMontageForSeconds_Implementation(UAnimMontage* AnimMontage, float Seconds, float PlayRate)
+void UD1AbilitySystemComponent::Multicast_BlockAnimMontageForSeconds_Implementation(UAnimMontage* BackwardMontage)
 {
-	if (AnimMontage == nullptr)
+	if (AbilityActorInfo->IsLocallyControlled() == false)
+	{
+		BlockAnimMontageForSeconds(BackwardMontage);
+	}
+}
+
+void UD1AbilitySystemComponent::SlowAnimMontageForSeconds(UAnimMontage* AttackMontage)
+{
+	if (AttackMontage == nullptr)
 		return;
 
 	UAnimInstance* AnimInstance = AbilityActorInfo->GetAnimInstance();
 	if (AnimInstance == nullptr)
 		return;
 
-	if (AnimInstance->GetCurrentActiveMontage() != AnimMontage)
+	if (AnimInstance->GetCurrentActiveMontage() != AttackMontage)
 		return;
 
-	float PrevPlayRate = AnimInstance->Montage_GetPlayRate(AnimMontage);
-	AnimInstance->Montage_SetPlayRate(AnimMontage, PlayRate);
-				
-	GetWorld()->GetTimerManager().SetTimer(SlowAnimMontageTimerHandle, [AnimInstance, AnimMontage, PrevPlayRate]()
+	float PrevPlayRate = AnimInstance->Montage_GetPlayRate(AttackMontage);
+	AnimInstance->Montage_SetPlayRate(AttackMontage, PrevPlayRate / 10.f);
+	
+	GetWorld()->GetTimerManager().SetTimer(SlowAnimMontageTimerHandle, [AnimInstance, AttackMontage, PrevPlayRate]()
 	{
-		if (AnimInstance->GetCurrentActiveMontage() == AnimMontage)
+		if (AnimInstance->GetCurrentActiveMontage() == AttackMontage)
 		{
-			AnimInstance->Montage_SetPlayRate(AnimMontage, PrevPlayRate);
+			AnimInstance->Montage_SetPlayRate(AttackMontage, PrevPlayRate);
 		}
-	}, Seconds, false);
+	}, 0.15f, false);
+}
+
+void UD1AbilitySystemComponent::Multicast_SlowAnimMontageForSeconds_Implementation(UAnimMontage* AttackMontage)
+{
+	if (AbilityActorInfo->IsLocallyControlled() == false)
+	{
+		SlowAnimMontageForSeconds(AttackMontage);
+	}
 }
