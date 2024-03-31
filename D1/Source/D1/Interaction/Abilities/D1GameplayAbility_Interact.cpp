@@ -1,7 +1,10 @@
 ﻿#include "D1GameplayAbility_Interact.h"
 
 #include "AbilitySystemComponent.h"
+#include "D1GameplayAbility_Interact_Active.h"
 #include "D1GameplayTags.h"
+#include "AbilitySystem/D1AbilitySystemComponent.h"
+#include "Character/D1Character.h"
 #include "Interaction/D1Interactable.h"
 #include "UI/D1HUD.h"
 #include "UI/Interaction/D1InteractionWidget.h"
@@ -54,6 +57,15 @@ void UD1GameplayAbility_Interact::HandleInputPress()
 
 void UD1GameplayAbility_Interact::UpdateWidget()
 {
+	if (FGameplayAbilitySpec* AbilitySpec = GetAbilitySystemComponent()->FindAbilitySpecFromClass(InteractActiveAbilityClass))
+	{
+		if (AbilitySpec->Ability->CanActivateAbility(AbilitySpec->Handle, GetCurrentActorInfo()) == false)
+		{
+			HideInteractionWidget();
+			return;
+		}
+	}
+	
 	if (CurrentTargetDataHandle.Num() <= 0)
 		return;
 

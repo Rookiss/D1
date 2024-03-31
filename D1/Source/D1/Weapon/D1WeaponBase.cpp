@@ -48,6 +48,7 @@ void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 	DOREPLIFETIME(ThisClass, TemplateID);
 	DOREPLIFETIME(ThisClass, EquipmentSlotType);
+	DOREPLIFETIME(ThisClass, bCanBlock);
 }
 
 void AD1WeaponBase::Destroyed()

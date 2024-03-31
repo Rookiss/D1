@@ -1,8 +1,11 @@
 ﻿#include "D1Character.h"
 
 #include "D1GameplayTags.h"
+#include "D1Player.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/D1AttributeSet.h"
+#include "Animation/D1AnimInstance.h"
+#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Data/D1AbilitySystemData.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -60,23 +63,47 @@ void AD1Character::ApplyAbilitySystemData(const FName& DataName)
 
 void AD1Character::StartDeath()
 {
-	if (Controller)
+	if (HasAuthority())
 	{
-		Controller->SetIgnoreMoveInput(true);
+		Multicast_OnDeath();
 	}
 
-	Multicast_OnDeath_Implementation();
+	GetWorldTimerManager().SetTimerForNextTick([this]()
+	{
+		if (AbilitySystemComponent)
+		{
+			if (AbilitySystemComponent->GetAvatarActor() == this)
+			{
+				AbilitySystemComponent->CancelAbilities();
+				AbilitySystemComponent->ClearAbilityInput();
+				AbilitySystemComponent->RemoveAllGameplayCues();
+
+				if (AbilitySystemComponent->GetOwnerActor())
+				{
+					AbilitySystemComponent->SetAvatarActor(nullptr);
+				}
+				else
+				{
+					AbilitySystemComponent->ClearActorInfo();
+				}
+			
+				AbilitySystemComponent = nullptr;
+			}
+		}
+	});
 }
 
-void AD1Character::FinishDeath()
+void AD1Character::HandleOutOfHealth()
 {
-	
+	if (HasAuthority())
+	{
+		FGameplayEventData Payload;
+		AbilitySystemComponent->HandleGameplayEvent(D1GameplayTags::Ability_Death, &Payload);
+	}
 }
 
 void AD1Character::Multicast_OnDeath_Implementation()
 {
-	EquipCom
-	
 	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
 	MovementComponent->StopMovementImmediately();
 	MovementComponent->DisableMovement();
@@ -85,16 +112,7 @@ void AD1Character::Multicast_OnDeath_Implementation()
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	
-}
-
-void AD1Character::HandleOutOfHealth()
-{
-#if WITH_SERVER_CODE
-	FScopedPredictionWindow NewScopedWindow(AbilitySystemComponent, true);
-	FGameplayEventData Payload;
-	AbilitySystemComponent->HandleGameplayEvent(D1GameplayTags::Ability_Death, &Payload);
-#endif // #if WITH_SERVER_CODE
+	PlayAnimMontage(UD1AssetManager::GetAssetByName<UAnimMontage>("DeathMontage"));
 }
 
 UAbilitySystemComponent* AD1Character::GetAbilitySystemComponent() const

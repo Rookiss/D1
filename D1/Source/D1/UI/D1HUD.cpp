@@ -55,6 +55,22 @@ void AD1HUD::HideItemHoverWidget()
 	}
 }
 
+void AD1HUD::ShowSkillSelectWidget()
+{
+	if (SceneWidget)
+	{
+		SceneWidget->ShowSkillSelectWidget();
+	}
+}
+
+void AD1HUD::HideSkillSelectWidget()
+{
+	if (SceneWidget)
+	{
+		SceneWidget->HideSkillSelectWidget();
+	}
+}
+
 UD1PlayerInventoryWidget* AD1HUD::GetControlledInventoryWidget() const
 {
 	return SceneWidget ? SceneWidget->GetControlledInventoryWidget() : nullptr;
@@ -63,4 +79,9 @@ UD1PlayerInventoryWidget* AD1HUD::GetControlledInventoryWidget() const
 UD1InteractionWidget* AD1HUD::GetInteractionWidget() const
 {
 	return SceneWidget ? SceneWidget->GetInteractionWidget() : nullptr;
+}
+
+UD1SkillSelectWidget* AD1HUD::GetSkillSelectWidget() const
+{
+	return SceneWidget ? SceneWidget->GetSkillSelectWidget() : nullptr;
 }

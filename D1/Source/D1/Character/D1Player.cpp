@@ -2,8 +2,6 @@
 
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
@@ -71,13 +69,13 @@ void AD1Player::BeginPlay()
 	{
 		// @TODO: For Test
 		int32 IterationCount = 2;
-		const TArray<int32> ItemIDs = { 1004, 1005, 1006 };
+		const TArray<int32> ItemIDs = { 1004, 1005, 1006, 1007 };
 	
 		for (int i = 0; i < IterationCount; i++)
 		{
 			for (const int32 ItemID : ItemIDs)
 			{
-				InventoryManagerComponent->TryAddItem(ItemID, FMath::RandRange(1, 2));
+				InventoryManagerComponent->TryAddItem(ItemID, 1);
 			}
 		}
 	}
@@ -153,6 +151,24 @@ void AD1Player::InitAbilitySystem()
 	ApplyAbilitySystemData("ASD_Player");
 	
 	Super::InitAbilitySystem();
+}
+
+void AD1Player::StartDeath()
+{
+	Super::StartDeath();
+	
+	if (Controller)
+	{
+		Controller->SetIgnoreMoveInput(true);
+		Controller->SetIgnoreLookInput(true);
+	}
+	
+	CameraComponent->bUsePawnControlRotation = false;
+
+	if (HasAuthority())
+	{
+		EquipManagerComponent->UnequipWeaponInSlot();
+	}
 }
 
 float AD1Player::CalculateAimPitch()

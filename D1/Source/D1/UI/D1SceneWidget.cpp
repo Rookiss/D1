@@ -1,7 +1,7 @@
 ﻿#include "D1SceneWidget.h"
 
+#include "D1SkillSelectWidget.h"
 #include "Components/CanvasPanelSlot.h"
-#include "Interaction/D1InteractionWidget.h"
 #include "Item/D1ItemHoverWidget.h"
 #include "Item/D1PlayerInventoryWidget.h"
 #include "Player/D1PlayerController.h"
@@ -20,12 +20,14 @@ void UD1SceneWidget::NativeConstruct()
 
 	ControlledInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 	ItemHoverWidget->SetVisibility(ESlateVisibility::Hidden);
+	SkillSelectWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 FReply UD1SceneWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
 	FReply Reply = Super::NativeOnKeyDown(InGeometry, InKeyEvent);
-	
+
+	// TODO: Custom Key Binding
 	if (InKeyEvent.IsRepeat() == false && InKeyEvent.GetKey() == EKeys::Tab)
 	{
 		FSlateApplication::Get().CancelDragDrop();
@@ -33,6 +35,20 @@ FReply UD1SceneWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 		return FReply::Handled();
 	}
 	
+	return Reply;
+}
+
+FReply UD1SceneWidget::NativeOnKeyUp(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	FReply Reply = Super::NativeOnKeyUp(InGeometry, InKeyEvent);
+
+	// TODO: Custom Key Binding
+	if (InKeyEvent.IsRepeat() == false && InKeyEvent.GetKey() == EKeys::T)
+	{
+		HideSkillSelectWidget();
+		return FReply::Handled();
+	}
+
 	return Reply;
 }
 
@@ -91,7 +107,7 @@ void UD1SceneWidget::HideControlledInventoryWidget()
 	ControlledInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 
 	AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer());
-	if (PlayerController && IsAllMouseWidgetHidden())
+	if (PlayerController)
 	{
 		PlayerController->SetInputModeGameOnly();
 	}
@@ -108,17 +124,34 @@ void UD1SceneWidget::HideItemHoverWidget()
 	ItemHoverWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-bool UD1SceneWidget::IsAllItemSlotWidgetHidden() const
+void UD1SceneWidget::ShowSkillSelectWidget()
 {
-	bool bAllHidden = true;
-	if (ControlledInventoryWidget->GetVisibility() == ESlateVisibility::Visible)
+	if (SkillSelectWidget->GetVisibility() != ESlateVisibility::Hidden)
+		return;
+
+	SkillSelectWidget->OpenWidget();
+	
+	if (AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer()))
 	{
-		bAllHidden = false;
+		PlayerController->SetInputModeUIOnly();
 	}
-	return bAllHidden;
 }
 
-bool UD1SceneWidget::IsAllMouseWidgetHidden() const
+void UD1SceneWidget::HideSkillSelectWidget()
+{
+	if (SkillSelectWidget->GetVisibility() != ESlateVisibility::Visible)
+		return;
+	
+	SkillSelectWidget->CloseWidget();
+
+	AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer());
+	if (PlayerController)
+	{
+		PlayerController->SetInputModeGameOnly();
+	}
+}
+
+bool UD1SceneWidget::IsAllItemSlotWidgetHidden() const
 {
 	bool bAllHidden = true;
 	if (ControlledInventoryWidget->GetVisibility() == ESlateVisibility::Visible)

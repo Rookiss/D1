@@ -33,11 +33,3 @@ void UD1GameplayAbility_Death::StartDeath()
 		Character->StartDeath();
 	}
 }
-
-void UD1GameplayAbility_Death::FinishDeath()
-{
-	if (AD1Character* Character = Cast<AD1Character>(GetAvatarActorFromActorInfo()))
-	{
-		Character->FinishDeath();
-	}
-}

@@ -151,15 +151,15 @@ bool UD1EquipmentManagerComponent::ReplicateSubobjects(UActorChannel* Channel, F
 
 void UD1EquipmentManagerComponent::AddUnarmedEquipment()
 {
-	FD1EquipmentEntry& Entry1 = EquipmentList.Entries[(int32)EEquipmentSlotType::Unarmed_LeftHand];
-	UD1ItemInstance* ItemInstance1 = NewObject<UD1ItemInstance>();
-	ItemInstance1->Init(Item::UnarmedLeftID);
-	Entry1.Init(ItemInstance1);
+	FD1EquipmentEntry& EntryLH = EquipmentList.Entries[(int32)EEquipmentSlotType::Unarmed_LeftHand];
+	UD1ItemInstance* ItemInstanceLH = NewObject<UD1ItemInstance>();
+	ItemInstanceLH->Init(Item::UnarmedLeftID);
+	EntryLH.Init(ItemInstanceLH);
 
-	FD1EquipmentEntry& Entry2 = EquipmentList.Entries[(int32)EEquipmentSlotType::Unarmed_RightHand];
-	UD1ItemInstance* ItemInstance2 = NewObject<UD1ItemInstance>();
-	ItemInstance2->Init(Item::UnarmedRightID);
-	Entry2.Init(ItemInstance2);
+	FD1EquipmentEntry& EntryRH = EquipmentList.Entries[(int32)EEquipmentSlotType::Unarmed_RightHand];
+	UD1ItemInstance* ItemInstanceRH = NewObject<UD1ItemInstance>();
+	ItemInstanceRH->Init(Item::UnarmedRightID);
+	EntryRH.Init(ItemInstanceRH);
 }
 
 void UD1EquipmentManagerComponent::Server_AddEntry_FromInventory_Implementation(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType)

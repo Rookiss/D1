@@ -3,6 +3,7 @@
 #include "AbilitySystem/Abilities/D1GameplayAbility.h"
 #include "D1GameplayAbility_Interact.generated.h"
 
+class UD1GameplayAbility_Interact_Active;
 struct FD1InteractionInfo;
 
 UCLASS()
@@ -27,6 +28,10 @@ protected:
 	void ShowInteractionPressWidget(const FD1InteractionInfo& InteractionInfo);
 	void HideInteractionWidget();
 
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UD1GameplayAbility_Interact_Active> InteractActiveAbilityClass;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	float InteractionScanRate = 0.1f;

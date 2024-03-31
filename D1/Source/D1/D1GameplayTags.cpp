@@ -10,6 +10,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_Block,								"State.Block");
 	UE_DEFINE_GAMEPLAY_TAG(State_Interact,							"State.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(State_EquipWeapon,						"State.EquipWeapon");
+	UE_DEFINE_GAMEPLAY_TAG(State_OpenUI,							"State.OpenUI");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Event_Interact,							"Event.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon,						"Event.EquipWeapon");
@@ -29,8 +30,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_EquipWeapon_ToggleArming,	"Input.Action.EquipWeapon.ToggleArming");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_EquipWeapon_Primary,		"Input.Action.EquipWeapon.Primary");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_EquipWeapon_Secondary,		"Input.Action.EquipWeapon.Secondary");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_EquipWeapon_CycleBackward,	"Input.Action.EquipWeapon.CycleBackward");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_EquipWeapon_CycleForward,	"Input.Action.EquipWeapon.CycleForward");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_SkillSelect,				"Input.Action.SkillSelect");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Death,							"Ability.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,							"Ability.Jump");

@@ -54,8 +54,6 @@ void AD1PlayerController::SetupInputComponent()
 		
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_EquipWeapon_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_EquipWeapon_Primary, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_EquipWeapon_Secondary, ETriggerEvent::Triggered, this, &ThisClass::Input_EquipWeapon_Secondary, InputBindHandles);
-		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_EquipWeapon_CycleBackward, ETriggerEvent::Triggered, this, &ThisClass::Input_EquipWeapon_CycleBackward, InputBindHandles);
-		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_EquipWeapon_CycleForward, ETriggerEvent::Triggered, this, &ThisClass::Input_EquipWeapon_CycleForward, InputBindHandles);
 
 		D1InputComponent->BindAbilityActions(InputData, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, InputBindHandles);
 	}
@@ -83,8 +81,9 @@ UAbilitySystemComponent* AD1PlayerController::GetAbilitySystemComponent() const
 void AD1PlayerController::SetInputModeGameOnly()
 {
 	FInputModeGameOnly InputMode;
+	InputMode.SetConsumeCaptureMouseDown(true);
 	SetInputMode(InputMode);
-
+	
 	FlushPressedKeys();
 	SetShowMouseCursor(false);
 }
@@ -97,9 +96,29 @@ void AD1PlayerController::SetInputModeUIOnly(bool bShowCursor)
 		{
 			FInputModeUIOnly InputMode;
 			InputMode.SetWidgetToFocus(SceneWidget->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
 			SetInputMode(InputMode);
-	
+
 			FlushPressedKeys();
+			SetShowMouseCursor(bShowCursor);
+
+			int32 X, Y;
+			GetViewportSize(X, Y);
+			SetMouseLocation(X / 2, Y / 2);
+		}
+	}
+}
+
+void AD1PlayerController::SetInputModeGameAndUI(bool bShowCursor)
+{
+	if (AD1HUD* D1HUD = Cast<AD1HUD>(GetHUD()))
+	{
+		if (UD1SceneWidget* SceneWidget = D1HUD->GetSceneWidget())
+		{
+			FInputModeGameAndUI InputMode;
+			InputMode.SetWidgetToFocus(SceneWidget->TakeWidget());
+			SetInputMode(InputMode);
+
 			SetShowMouseCursor(bShowCursor);
 		}
 	}

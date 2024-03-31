@@ -12,6 +12,7 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Block);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Interact);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_EquipWeapon);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_OpenUI);
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Interact);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_EquipWeapon);
@@ -31,8 +32,7 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_EquipWeapon_ToggleArming);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_EquipWeapon_Primary);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_EquipWeapon_Secondary);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_EquipWeapon_CycleBackward);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_EquipWeapon_CycleForward);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_SkillSelect);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Death);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Jump);

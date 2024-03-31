@@ -43,5 +43,6 @@ public:
 	TObjectPtr<UBoxComponent> TraceDebugCollision;
 
 public:
+	UPROPERTY(Replicated)
 	bool bCanBlock = false;
 };

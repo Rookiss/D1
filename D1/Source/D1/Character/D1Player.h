@@ -24,6 +24,7 @@ public:
 	virtual void OnRep_PlayerState() override;
 	virtual void OnRep_Controller() override;
 	virtual void InitAbilitySystem() override;
+	virtual void StartDeath() override;
 
 public:
 	float CalculateAimPitch();

@@ -3,6 +3,7 @@
 #include "D1UserWidget.h"
 #include "D1SceneWidget.generated.h"
 
+class UD1SkillSelectWidget;
 class UD1ItemInstance;
 class UD1InteractionWidget;
 class UD1PlayerInventoryWidget;
@@ -19,6 +20,7 @@ public:
 protected:
 	virtual void NativeConstruct() override;
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual FReply NativeOnKeyUp(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
@@ -28,11 +30,15 @@ public:
 	void ShowItemHoverWidget(UD1ItemInstance* ItemInstance);
 	void HideItemHoverWidget();
 
+	void ShowSkillSelectWidget();
+	void HideSkillSelectWidget();
+
 public:
 	UD1PlayerInventoryWidget* GetControlledInventoryWidget() const { return ControlledInventoryWidget; }
 	UD1InteractionWidget* GetInteractionWidget() const { return InteractionWidget; }
+	UD1SkillSelectWidget* GetSkillSelectWidget() const { return SkillSelectWidget; }
+	
 	bool IsAllItemSlotWidgetHidden() const;
-	bool IsAllMouseWidgetHidden() const;
 	
 protected:
 	UPROPERTY(meta=(BindWidget))
@@ -43,4 +49,7 @@ protected:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UD1InteractionWidget> InteractionWidget;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UD1SkillSelectWidget> SkillSelectWidget;
 };

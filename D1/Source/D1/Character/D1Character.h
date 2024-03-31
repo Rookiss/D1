@@ -21,14 +21,11 @@ protected:
 	virtual void ApplyAbilitySystemData(const FName& DataName);
 
 public:
-	void StartDeath();
-	void FinishDeath();
-
+	void HandleOutOfHealth();
+	virtual void StartDeath();
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OnDeath();
-
-private:
-	void HandleOutOfHealth();
 	
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;

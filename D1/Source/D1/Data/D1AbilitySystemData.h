@@ -88,6 +88,9 @@ public:
 	TArray<FD1AbilitySystemData_Ability> AbilitiesToGrant;
 
 	UPROPERTY(EditDefaultsOnly)
+	TArray<FD1AbilitySystemData_Ability> AbilitiesToPending;
+
+	UPROPERTY(EditDefaultsOnly)
 	TArray<FD1AbilitySystemData_Effect> EffectsToGrant;
 
 	UPROPERTY(EditDefaultsOnly)

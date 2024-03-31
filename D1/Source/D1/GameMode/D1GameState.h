@@ -10,12 +10,4 @@ class AD1GameState : public AGameStateBase
 	
 public:
 	AD1GameState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
-protected:
-	virtual void Tick(float DeltaSeconds) override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-public:
-	UPROPERTY(Replicated)
-	float AvgPing;
 };
