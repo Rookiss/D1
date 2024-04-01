@@ -12,6 +12,9 @@ public:
 	UD1GameplayAbility_Weapon_MeleeCombo(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	
+protected:
 	UFUNCTION(BlueprintCallable)
 	void HandleTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle);
 	

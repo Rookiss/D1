@@ -52,7 +52,7 @@ void FD1EquipEntry::Equip()
 		GrantedHandles.TakeFromAbilitySystem(ASC);
 	
 		// Add New Ability
-		if (const UD1AbilitySystemData* AbilitySystemData = Equippable->AbilitySystemDataToGrant)
+		if (const UD1AbilitySystemData* AbilitySystemData = Equippable->AbilitySystemData)
 		{
 			AbilitySystemData->GiveToAbilitySystem(ASC, &GrantedHandles, ItemInstance);
 		}

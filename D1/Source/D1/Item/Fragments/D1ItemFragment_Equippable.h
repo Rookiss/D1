@@ -52,7 +52,7 @@ public:
 	EEquipmentType EquipmentType = EEquipmentType::Count;
 
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<const UD1AbilitySystemData> AbilitySystemDataToGrant;
+	TObjectPtr<const UD1AbilitySystemData> AbilitySystemData;
 	
 	UPROPERTY(EditDefaultsOnly, meta=(ForceInlineRow))
 	TMap<FGameplayTag, FStatRangeSet> Stats;

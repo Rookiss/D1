@@ -82,6 +82,7 @@ public:
 
 public:
 	void GiveToAbilitySystem(UD1AbilitySystemComponent* ASC, FD1AbilitySystemData_GrantedHandles* OutGrantedHandles, UObject* SourceObject = nullptr) const;
+	void GivePendingAbility(UD1AbilitySystemComponent* ASC, FGameplayAbilitySpecHandle* OutAbilitySpecHandle, int32 AbilityIndex, UObject* SourceObject = nullptr) const;
 	
 public:
 	UPROPERTY(EditDefaultsOnly)

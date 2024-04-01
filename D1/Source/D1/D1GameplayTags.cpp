@@ -9,11 +9,13 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_Attack,							"State.Attack");
 	UE_DEFINE_GAMEPLAY_TAG(State_Block,								"State.Block");
 	UE_DEFINE_GAMEPLAY_TAG(State_Interact,							"State.Interact");
-	UE_DEFINE_GAMEPLAY_TAG(State_EquipWeapon,						"State.EquipWeapon");
+	UE_DEFINE_GAMEPLAY_TAG(State_ChangeEquip,						"State.ChangeEquip");
+	UE_DEFINE_GAMEPLAY_TAG(State_ChangeSkill,						"State.ChangeSkill");
 	UE_DEFINE_GAMEPLAY_TAG(State_OpenUI,							"State.OpenUI");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Event_Interact,							"Event.Interact");
-	UE_DEFINE_GAMEPLAY_TAG(Event_EquipWeapon,						"Event.EquipWeapon");
+	UE_DEFINE_GAMEPLAY_TAG(Event_ChangeEquip,						"Event.ChangeEquip");
+	UE_DEFINE_GAMEPLAY_TAG(Event_ChangeSkill,						"Event.ChangeSkill");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Begin,						"Event.Montage.Begin");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Tick,						"Event.Montage.Tick");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_End,						"Event.Montage.End");
@@ -27,10 +29,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Interact,					"Input.Action.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Attack_MainHand,			"Input.Action.Attack.MainHand");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Attack_OffHand,				"Input.Action.Attack.OffHand");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_EquipWeapon_ToggleArming,	"Input.Action.EquipWeapon.ToggleArming");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_EquipWeapon_Primary,		"Input.Action.EquipWeapon.Primary");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_EquipWeapon_Secondary,		"Input.Action.EquipWeapon.Secondary");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_SkillSelect,				"Input.Action.SkillSelect");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_ChangeEquip_Primary,		"Input.Action.ChangeEquip.Primary");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_ChangeEquip_Secondary,		"Input.Action.ChangeEquip.Secondary");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_ChangeSkill,				"Input.Action.ChangeSkill");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Death,							"Ability.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,							"Ability.Jump");
@@ -40,7 +41,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_2,						"Ability.Attack_2");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_3,						"Ability.Attack_3");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Blockk,							"Ability.Block");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_EquipWeapon,						"Ability.EquipWeapon");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_ChangeEquip,						"Ability.ChangeEquip");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_ChangeSkill,						"Ability.ChangeSkill");
 		
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				"Attribute.Primary.Health");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MaxHealth, 			"Attribute.Primary.MaxHealth");

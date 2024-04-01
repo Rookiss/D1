@@ -52,8 +52,8 @@ void AD1PlayerController::SetupInputComponent()
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Crouch, ETriggerEvent::Triggered, this, &ThisClass::Input_Crouch, InputBindHandles);
 		
-		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_EquipWeapon_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_EquipWeapon_Primary, InputBindHandles);
-		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_EquipWeapon_Secondary, ETriggerEvent::Triggered, this, &ThisClass::Input_EquipWeapon_Secondary, InputBindHandles);
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_ChangeEquip_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Primary, InputBindHandles);
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_ChangeEquip_Secondary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Secondary, InputBindHandles);
 
 		D1InputComponent->BindAbilityActions(InputData, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, InputBindHandles);
 	}
@@ -174,38 +174,18 @@ void AD1PlayerController::Input_Crouch()
 	}
 }
 
-void AD1PlayerController::Input_EquipWeapon_Primary()
+void AD1PlayerController::Input_ChangeEquip_Primary()
 {
 	FGameplayEventData Payload;
 	Payload.EventMagnitude = (int32)EWeaponEquipState::Primary;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_ChangeEquip, Payload);
 }
 
-void AD1PlayerController::Input_EquipWeapon_Secondary()
+void AD1PlayerController::Input_ChangeEquip_Secondary()
 {
 	FGameplayEventData Payload;
 	Payload.EventMagnitude = (int32)EWeaponEquipState::Secondary;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
-}
-
-void AD1PlayerController::Input_EquipWeapon_CycleBackward()
-{
-	AD1Player* ControlledPawn = Cast<AD1Player>(GetPawn());
-	UD1EquipManagerComponent* EquipManager = ControlledPawn->EquipManagerComponent;
-	
-	FGameplayEventData Payload;
-	Payload.EventMagnitude = (int32)EquipManager->GetBackwardWeaponEquipState();
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
-}
-
-void AD1PlayerController::Input_EquipWeapon_CycleForward()
-{
-	AD1Player* ControlledPawn = Cast<AD1Player>(GetPawn());
-	UD1EquipManagerComponent* EquipManager = ControlledPawn->EquipManagerComponent;
-	
-	FGameplayEventData Payload;
-	Payload.EventMagnitude = (int32)EquipManager->GetForwardWeaponEquipState();
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_EquipWeapon, Payload);
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_ChangeEquip, Payload);
 }
 
 void AD1PlayerController::Input_AbilityInputTagPressed(FGameplayTag InputTag)

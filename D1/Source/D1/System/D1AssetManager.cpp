@@ -160,8 +160,11 @@ void UD1AssetManager::LoadAsyncByPath(const FSoftObjectPath& AssetPath, FAsyncLo
 			{
 				UObject* LoadedAsset = AssetPath.ResolveObject();
 				Get().AddLoadedAsset(AssetName, LoadedAsset);
+				
 				if (CompleteDelegate.IsBound())
+				{
 					CompleteDelegate.Execute(AssetName, LoadedAsset);
+				}
 			}));
 		}
 	}
@@ -226,13 +229,17 @@ void UD1AssetManager::LoadAsyncByLabel(const FName& Label, FAsyncLoadCompletedDe
 		}
 
 		if (CompleteDelegate.IsBound())
+		{
 			CompleteDelegate.Execute(Label, nullptr);
+		}
 	}));
 	
 	Handle->BindUpdateDelegate(FStreamableUpdateDelegate::CreateLambda([UpdateDelegate = MoveTemp(UpdateDelegate)](TSharedRef<FStreamableHandle> HandleRef)
 	{
 		if (UpdateDelegate.IsBound())
+		{
 			UpdateDelegate.Execute(HandleRef->GetProgress());
+		}
 	}));
 }
 

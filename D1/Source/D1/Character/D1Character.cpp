@@ -119,3 +119,8 @@ UAbilitySystemComponent* AD1Character::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
 }
+
+UD1AbilitySystemComponent* AD1Character::GetD1AbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}

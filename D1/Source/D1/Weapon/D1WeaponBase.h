@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "D1Define.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "D1WeaponBase.generated.h"
 
 class UArrowComponent;
@@ -19,6 +20,10 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Destroyed() override;
 
+public:
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void ChangeSkill(int32 AbilityIndex);
+	
 private:
 	UFUNCTION()
 	void OnRep_TemplateID();
@@ -45,4 +50,6 @@ public:
 public:
 	UPROPERTY(Replicated)
 	bool bCanBlock = false;
+
+	FGameplayAbilitySpecHandle SkillAbilitySpecHandle;
 };

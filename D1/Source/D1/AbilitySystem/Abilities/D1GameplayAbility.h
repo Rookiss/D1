@@ -17,6 +17,19 @@ enum class ED1AbilityActivationPolicy : uint8
 	InputHeld
 };
 
+USTRUCT(BlueprintType)
+struct FAbilityUIInfo
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UTexture2D> AbilityIcon;
+
+	UPROPERTY(EditDefaultsOnly)
+	FText AbilityName;
+};
+
 UCLASS(Abstract)
 class UD1GameplayAbility : public UGameplayAbility
 {
@@ -52,4 +65,8 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	ED1AbilityActivationPolicy ActivationPolicy;
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	FAbilityUIInfo AbilityUIInfo;
 };

@@ -1,5 +1,8 @@
 ﻿#include "D1WeaponBase.h"
 
+#include "AbilitySystemComponent.h"
+#include "AbilitySystem/D1AbilitySystemComponent.h"
+#include "AbilitySystem/Abilities/D1GameplayAbility_Weapon.h"
 #include "Character/D1Player.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
@@ -64,8 +67,46 @@ void AD1WeaponBase::Destroyed()
 			}
 		}
 	}
+
+	if (SkillAbilitySpecHandle.IsValid())
+	{
+		if (AD1Character* Character = Cast<AD1Character>(GetOwner()))
+		{
+			if (UD1AbilitySystemComponent* ASC = Character->GetD1AbilitySystemComponent())
+			{
+				ASC->ClearAbility(SkillAbilitySpecHandle);
+			}
+		}
+	}
 	
 	Super::Destroyed();
+}
+
+void AD1WeaponBase::ChangeSkill(int32 AbilityIndex)
+{
+	if (HasAuthority() == false)
+		return;
+	
+	AD1Character* Character = Cast<AD1Character>(GetOwner());
+	check(Character);
+	
+	UD1AbilitySystemComponent* ASC = Character->GetD1AbilitySystemComponent();
+	check(ASC);
+	
+	if (SkillAbilitySpecHandle.IsValid())
+	{
+		ASC->ClearAbility(SkillAbilitySpecHandle);
+		SkillAbilitySpecHandle = FGameplayAbilitySpecHandle();
+	}
+
+	const FD1ItemTemplate& ItemTemplate = UD1AssetManager::GetItemTemplate(TemplateID);
+	if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
+	{
+		if (const UD1AbilitySystemData* AbilitySystemData = WeaponFragment->AbilitySystemData)
+		{
+			AbilitySystemData->GivePendingAbility(ASC, &SkillAbilitySpecHandle, AbilityIndex);
+		}
+	}
 }
 
 void AD1WeaponBase::OnRep_TemplateID()

@@ -135,3 +135,28 @@ void UD1AbilitySystemData::GiveToAbilitySystem(UD1AbilitySystemComponent* ASC, F
 		}
 	}
 }
+
+void UD1AbilitySystemData::GivePendingAbility(UD1AbilitySystemComponent* ASC, FGameplayAbilitySpecHandle* OutAbilitySpecHandle, int32 AbilityIndex, UObject* SourceObject) const
+{
+	if (AbilitiesToPending.IsValidIndex(AbilityIndex) == false)
+		return;
+
+	const FD1AbilitySystemData_Ability& AbilityToPending = AbilitiesToPending[AbilityIndex];
+	if (IsValid(AbilityToPending.AbilityClass) == false)
+	{
+		UE_LOG(LogAbilitySystemComponent, Error, TEXT("AbilitiesToPending[%d] on ability system data [%s] is not vaild."), AbilityIndex, *GetNameSafe(this));
+		return;
+	}
+
+	UD1GameplayAbility* AbilityCDO = AbilityToPending.AbilityClass->GetDefaultObject<UD1GameplayAbility>();
+
+	FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityToPending.AbilityLevel);
+	AbilitySpec.SourceObject = SourceObject;
+	AbilitySpec.DynamicAbilityTags.AddTag(AbilityToPending.InputTag);
+	
+	const FGameplayAbilitySpecHandle AbilitySpecHandle = ASC->GiveAbility(AbilitySpec);
+	if (OutAbilitySpecHandle)
+	{
+		*OutAbilitySpecHandle = AbilitySpecHandle;
+	}
+}

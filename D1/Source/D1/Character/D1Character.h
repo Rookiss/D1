@@ -29,6 +29,7 @@ public:
 	
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	UD1AbilitySystemComponent* GetD1AbilitySystemComponent() const;
 	const UD1AttributeSet* GetAttributeSet() { return AttributeSet; }
 	
 protected:

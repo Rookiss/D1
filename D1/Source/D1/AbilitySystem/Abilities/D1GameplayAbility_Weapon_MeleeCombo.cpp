@@ -16,6 +16,16 @@ UD1GameplayAbility_Weapon_MeleeCombo::UD1GameplayAbility_Weapon_MeleeCombo(const
     
 }
 
+void UD1GameplayAbility_Weapon_MeleeCombo::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+{
+	HitActors.Reset();
+	bInputReleased = false;
+	bBlocked = false;
+	bAttacked = false;
+	
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
 void UD1GameplayAbility_Weapon_MeleeCombo::HandleTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle)
 {
 	if (bBlocked)

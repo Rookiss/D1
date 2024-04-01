@@ -43,7 +43,7 @@ FReply UD1SceneWidget::NativeOnKeyUp(const FGeometry& InGeometry, const FKeyEven
 	FReply Reply = Super::NativeOnKeyUp(InGeometry, InKeyEvent);
 
 	// TODO: Custom Key Binding
-	if (InKeyEvent.IsRepeat() == false && InKeyEvent.GetKey() == EKeys::T)
+	if (InKeyEvent.IsRepeat() == false && InKeyEvent.GetKey() == EKeys::E)
 	{
 		HideSkillSelectWidget();
 		return FReply::Handled();
@@ -106,8 +106,7 @@ void UD1SceneWidget::HideControlledInventoryWidget()
 	
 	ControlledInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 
-	AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer());
-	if (PlayerController)
+	if (AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer()))
 	{
 		PlayerController->SetInputModeGameOnly();
 	}
@@ -143,9 +142,8 @@ void UD1SceneWidget::HideSkillSelectWidget()
 		return;
 	
 	SkillSelectWidget->CloseWidget();
-
-	AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer());
-	if (PlayerController)
+	
+	if (AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer()))
 	{
 		PlayerController->SetInputModeGameOnly();
 	}
