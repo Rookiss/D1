@@ -27,6 +27,7 @@ public class D1 : ModuleRules
 			"GameplayAbilities",
 			"AIModule",
 			"AnimGraphRuntime",
+			"Niagara",
 		});
 
 		PublicDefinitions.Add("SHIPPING_DRAW_DEBUG_ERROR=1");

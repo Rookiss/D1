@@ -6,7 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Weapon/D1WeaponBase.h"
+#include "Actors/D1WeaponBase.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AnimNotifyState_PerformTrace)
 

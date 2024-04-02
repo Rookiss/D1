@@ -55,19 +55,35 @@ void AD1HUD::HideItemHoverWidget()
 	}
 }
 
-void AD1HUD::ShowSkillSelectWidget()
+void AD1HUD::ShowSpellSelectWidget()
 {
 	if (SceneWidget)
 	{
-		SceneWidget->ShowSkillSelectWidget();
+		SceneWidget->ShowSpellSelectWidget();
 	}
 }
 
-void AD1HUD::HideSkillSelectWidget()
+void AD1HUD::HideSpellSelectWidget()
 {
 	if (SceneWidget)
 	{
-		SceneWidget->HideSkillSelectWidget();
+		SceneWidget->HideSpellSelectWidget();
+	}
+}
+
+void AD1HUD::ShowSpellProgressWidget(const FText& SpellName, float CastTime)
+{
+	if (SceneWidget)
+	{
+		SceneWidget->ShowSpellProgressWidget(SpellName, CastTime);
+	}
+}
+
+void AD1HUD::HideSpellProgressWidget()
+{
+	if (SceneWidget)
+	{
+		SceneWidget->HideSpellProgressWidget();
 	}
 }
 
@@ -81,7 +97,12 @@ UD1InteractionWidget* AD1HUD::GetInteractionWidget() const
 	return SceneWidget ? SceneWidget->GetInteractionWidget() : nullptr;
 }
 
-UD1SkillSelectWidget* AD1HUD::GetSkillSelectWidget() const
+UD1SpellSelectWidget* AD1HUD::GetSpellSelectWidget() const
 {
-	return SceneWidget ? SceneWidget->GetSkillSelectWidget() : nullptr;
+	return SceneWidget ? SceneWidget->GetSpellSelectWidget() : nullptr;
+}
+
+UD1SpellProgressWidget* AD1HUD::GetSpellProgressWidget() const
+{
+	return SceneWidget ? SceneWidget->GetSpellProgressWidget() : nullptr;
 }

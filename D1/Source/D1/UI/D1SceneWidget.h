@@ -3,7 +3,8 @@
 #include "D1UserWidget.h"
 #include "D1SceneWidget.generated.h"
 
-class UD1SkillSelectWidget;
+class UD1SpellProgressWidget;
+class UD1SpellSelectWidget;
 class UD1ItemInstance;
 class UD1InteractionWidget;
 class UD1PlayerInventoryWidget;
@@ -30,13 +31,17 @@ public:
 	void ShowItemHoverWidget(UD1ItemInstance* ItemInstance);
 	void HideItemHoverWidget();
 
-	void ShowSkillSelectWidget();
-	void HideSkillSelectWidget();
+	void ShowSpellSelectWidget();
+	void HideSpellSelectWidget();
+
+	void ShowSpellProgressWidget(const FText& SpellName, float CastTime);
+	void HideSpellProgressWidget();
 
 public:
 	UD1PlayerInventoryWidget* GetControlledInventoryWidget() const { return ControlledInventoryWidget; }
 	UD1InteractionWidget* GetInteractionWidget() const { return InteractionWidget; }
-	UD1SkillSelectWidget* GetSkillSelectWidget() const { return SkillSelectWidget; }
+	UD1SpellSelectWidget* GetSpellSelectWidget() const { return SpellSelectWidget; }
+	UD1SpellProgressWidget* GetSpellProgressWidget() const { return SpellProgressWidget; }
 	
 	bool IsAllItemSlotWidgetHidden() const;
 	
@@ -51,5 +56,8 @@ protected:
 	TObjectPtr<UD1InteractionWidget> InteractionWidget;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1SkillSelectWidget> SkillSelectWidget;
+	TObjectPtr<UD1SpellSelectWidget> SpellSelectWidget;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UD1SpellProgressWidget> SpellProgressWidget;
 };

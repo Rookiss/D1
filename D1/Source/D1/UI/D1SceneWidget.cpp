@@ -1,6 +1,7 @@
 ﻿#include "D1SceneWidget.h"
 
-#include "D1SkillSelectWidget.h"
+#include "D1SpellSelectWidget.h"
+#include "D1SpellProgressWidget.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Item/D1ItemHoverWidget.h"
 #include "Item/D1PlayerInventoryWidget.h"
@@ -19,8 +20,9 @@ void UD1SceneWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	ControlledInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
-	ItemHoverWidget->SetVisibility(ESlateVisibility::Hidden);
-	SkillSelectWidget->SetVisibility(ESlateVisibility::Hidden);
+	ItemHoverWidget->SetVisibility(ESlateVisibility::Collapsed);
+	SpellSelectWidget->SetVisibility(ESlateVisibility::Hidden);
+	SpellProgressWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 FReply UD1SceneWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
@@ -45,7 +47,7 @@ FReply UD1SceneWidget::NativeOnKeyUp(const FGeometry& InGeometry, const FKeyEven
 	// TODO: Custom Key Binding
 	if (InKeyEvent.IsRepeat() == false && InKeyEvent.GetKey() == EKeys::E)
 	{
-		HideSkillSelectWidget();
+		HideSpellSelectWidget();
 		return FReply::Handled();
 	}
 
@@ -123,12 +125,12 @@ void UD1SceneWidget::HideItemHoverWidget()
 	ItemHoverWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void UD1SceneWidget::ShowSkillSelectWidget()
+void UD1SceneWidget::ShowSpellSelectWidget()
 {
-	if (SkillSelectWidget->GetVisibility() != ESlateVisibility::Hidden)
+	if (SpellSelectWidget->GetVisibility() != ESlateVisibility::Hidden)
 		return;
 
-	SkillSelectWidget->OpenWidget();
+	SpellSelectWidget->ShowWidget();
 	
 	if (AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer()))
 	{
@@ -136,17 +138,27 @@ void UD1SceneWidget::ShowSkillSelectWidget()
 	}
 }
 
-void UD1SceneWidget::HideSkillSelectWidget()
+void UD1SceneWidget::HideSpellSelectWidget()
 {
-	if (SkillSelectWidget->GetVisibility() != ESlateVisibility::Visible)
+	if (SpellSelectWidget->GetVisibility() != ESlateVisibility::Visible)
 		return;
 	
-	SkillSelectWidget->CloseWidget();
+	SpellSelectWidget->HideWidget();
 	
 	if (AD1PlayerController* PlayerController = Cast<AD1PlayerController>(GetOwningPlayer()))
 	{
 		PlayerController->SetInputModeGameOnly();
 	}
+}
+
+void UD1SceneWidget::ShowSpellProgressWidget(const FText& SpellName, float CastTime)
+{
+	SpellProgressWidget->ShowWidget(SpellName, CastTime);
+}
+
+void UD1SceneWidget::HideSpellProgressWidget()
+{
+	SpellProgressWidget->HideWidget();
 }
 
 bool UD1SceneWidget::IsAllItemSlotWidgetHidden() const

@@ -23,10 +23,10 @@ struct FAbilityUIInfo
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UTexture2D> AbilityIcon;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText AbilityName;
 };
 
@@ -67,6 +67,6 @@ protected:
 	ED1AbilityActivationPolicy ActivationPolicy;
 
 public:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FAbilityUIInfo AbilityUIInfo;
 };

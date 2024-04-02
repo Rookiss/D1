@@ -1,6 +1,6 @@
 ﻿#include "D1GameplayAbility_Weapon_Block.h"
 
-#include "Weapon/D1WeaponBase.h"
+#include "Actors/D1WeaponBase.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_Block)
 

@@ -6,7 +6,7 @@
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Character/D1Character.h"
 #include "System/D1AssetManager.h"
-#include "Weapon/D1WeaponBase.h"
+#include "Actors/D1WeaponBase.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_MeleeCombo)
 

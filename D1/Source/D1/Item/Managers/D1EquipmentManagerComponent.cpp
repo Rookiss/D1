@@ -11,7 +11,7 @@
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/D1PlayerController.h"
-#include "Weapon/D1WeaponBase.h"
+#include "Actors/D1WeaponBase.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentManagerComponent)
 
