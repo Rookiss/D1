@@ -8,7 +8,6 @@
 #include "D1PlayerState.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Camera/D1PlayerCameraManager.h"
-#include "Character/D1Player.h"
 #include "Data/D1InputData.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -55,13 +54,17 @@ void AD1PlayerController::SetupInputComponent()
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_ChangeEquip_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Primary, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_ChangeEquip_Secondary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Secondary, InputBindHandles);
 
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Confirm_Targeting, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputConfirm, InputBindHandles);
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Cancel_Targeting, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputCancel, InputBindHandles);
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Cancel_Casting, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputCancel, InputBindHandles);
+
 		D1InputComponent->BindAbilityActions(InputData, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, InputBindHandles);
 	}
 }
 
 void AD1PlayerController::PostProcessInput(const float DeltaTime, const bool bGamePaused)
 {
-	if (UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(PlayerState)))
+	if (UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(GetAbilitySystemComponent()))
 	{
 		ASC->ProcessAbilityInput(DeltaTime, bGamePaused);
 	}
@@ -188,12 +191,34 @@ void AD1PlayerController::Input_ChangeEquip_Secondary()
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, D1GameplayTags::Event_ChangeEquip, Payload);
 }
 
+void AD1PlayerController::Input_LocalInputConfirm()
+{
+	if (GetPawn() == nullptr)
+		return;
+	
+	if (UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(GetAbilitySystemComponent()))
+	{
+		ASC->LocalInputConfirm();
+	}
+}
+
+void AD1PlayerController::Input_LocalInputCancel()
+{
+	if (GetPawn() == nullptr)
+		return;
+	
+	if (UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(GetAbilitySystemComponent()))
+	{
+		ASC->LocalInputCancel();
+	}
+}
+
 void AD1PlayerController::Input_AbilityInputTagPressed(FGameplayTag InputTag)
 {
 	if (GetPawn() == nullptr)
 		return;
 	
-	if (UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(PlayerState)))
+	if (UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(GetAbilitySystemComponent()))
 	{
 		ASC->AbilityInputTagPressed(InputTag);
 	}
@@ -204,7 +229,7 @@ void AD1PlayerController::Input_AbilityInputTagReleased(FGameplayTag InputTag)
 	if (GetPawn() == nullptr)
 		return;
 	
-	if (UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(PlayerState)))
+	if (UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(GetAbilitySystemComponent()))
 	{
    		ASC->AbilityInputTagReleased(InputTag);
 	}

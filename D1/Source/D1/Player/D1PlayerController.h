@@ -35,6 +35,9 @@ private:
 	
 	void Input_ChangeEquip_Primary();
 	void Input_ChangeEquip_Secondary();
+
+	void Input_LocalInputConfirm();
+	void Input_LocalInputCancel();
 	
 	void Input_AbilityInputTagPressed(FGameplayTag InputTag);
 	void Input_AbilityInputTagReleased(FGameplayTag InputTag);

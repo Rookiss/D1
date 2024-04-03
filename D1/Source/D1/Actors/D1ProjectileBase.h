@@ -44,7 +44,6 @@ private:
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
 
 public:
-	UPROPERTY(BlueprintReadWrite, meta=(ExposeOnSpawn="true"))
 	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 
 private:

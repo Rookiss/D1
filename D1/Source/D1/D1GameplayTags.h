@@ -22,7 +22,8 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Tick);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_End);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Trace);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Attack);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Ability_Confirm);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Ability_Cancel);
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Move);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Look);
@@ -35,6 +36,9 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_ChangeEquip_Primary);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_ChangeEquip_Secondary);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_ChangeSkill);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Confirm_Targeting);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Cancel_Targeting);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Cancel_Casting);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Death);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Jump);

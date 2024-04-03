@@ -7,7 +7,7 @@ class UD1GameplayAbility;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FAbilityChangedDelegate, bool, const FGameplayTag&);
 
-UCLASS()
+UCLASS(BlueprintType)
 class UD1AbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
@@ -37,8 +37,11 @@ public:
 	
 	void ProcessAbilityInput(float DeltaTime, bool bGamePaused);
 	void ClearAbilityInput();
-	
+
+	UFUNCTION(BlueprintCallable)
 	void AddDynamicTagToSelf(const FGameplayTag& Tag);
+
+	UFUNCTION(BlueprintCallable)
 	void RemoveDynamicTagToSelf(const FGameplayTag& Tag);
 	
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="GameplayCueParameters", GameplayTagFilter="GameplayCue"))

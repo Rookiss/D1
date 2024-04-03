@@ -29,7 +29,9 @@ void UD1AnimNotifyState_PerformTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 		{
 			const TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
 			WeaponActor = Entries[(int32)EquipManager->ConvertToEquipmentSlotType(WeaponHandType)].SpawnedWeaponActor;
-
+			if (WeaponActor == nullptr)
+				return;
+			
 			TargetDeltaTime = 1.f / TraceParams.TargetFPS;
 			
 			PreviousTraceTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
