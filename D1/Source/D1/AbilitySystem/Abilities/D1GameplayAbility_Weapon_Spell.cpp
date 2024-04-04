@@ -57,13 +57,3 @@ void UD1GameplayAbility_Weapon_Spell::SpawnProjectile()
 	Projectile->DamageEffectSpecHandle = EffectSpecHandle;
 	Projectile->FinishSpawning(SpawnTransform);
 }
-
-FGameplayAbilityTargetingLocationInfo UD1GameplayAbility_Weapon_Spell::GetStartLocation()
-{
-	FGameplayAbilityTargetingLocationInfo LocationInfo;
-	LocationInfo.LocationType = EGameplayAbilityTargetingLocationType::SocketTransform;
-	LocationInfo.SourceComponent = 
-	
-	
-	return {};
-}
