@@ -56,7 +56,6 @@ void AD1PlayerController::SetupInputComponent()
 
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Confirm_Targeting, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputConfirm, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Cancel_Targeting, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputCancel, InputBindHandles);
-		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Cancel_Casting, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputCancel, InputBindHandles);
 
 		D1InputComponent->BindAbilityActions(InputData, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, InputBindHandles);
 	}

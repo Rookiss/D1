@@ -16,6 +16,7 @@ public:
 	AD1ProjectileBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 private:
+	virtual void PreInitializeComponents() override;
 	virtual void BeginPlay() override;
 	virtual void Destroyed() override;
 

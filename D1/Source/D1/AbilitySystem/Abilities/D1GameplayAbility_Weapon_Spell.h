@@ -16,6 +16,9 @@ public:
 protected:
 	UFUNCTION(BlueprintCallable)
 	void SpawnProjectile();
+
+	UFUNCTION(BlueprintCallable)
+	FGameplayAbilityTargetingLocationInfo GetStartLocation();
 	
 protected:
 	UPROPERTY(EditAnywhere)

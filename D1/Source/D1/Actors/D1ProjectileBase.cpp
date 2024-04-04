@@ -21,15 +21,21 @@ AD1ProjectileBase::AD1ProjectileBase(const FObjectInitializer& ObjectInitializer
 	SphereCollisionComponent->SetCollisionProfileName("Projectile");
 	
     ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("UProjectileMovement");
+	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
+}
+
+void AD1ProjectileBase::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+
 	ProjectileMovementComponent->InitialSpeed = Speed;
 	ProjectileMovementComponent->MaxSpeed = Speed;
-	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
 }
 
 void AD1ProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	SetLifeSpan(LifeSpan);
 	SphereCollisionComponent->OnComponentBeginOverlap.AddUniqueDynamic(this, &ThisClass::HandleComponentBeginOverlap);
 }

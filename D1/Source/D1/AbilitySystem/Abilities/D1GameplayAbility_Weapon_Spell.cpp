@@ -3,7 +3,6 @@
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Actors/D1ProjectileBase.h"
 #include "Actors/D1WeaponBase.h"
-#include "Camera/CameraComponent.h"
 #include "Character/D1Player.h"
 #include "System/D1AssetManager.h"
 
@@ -19,10 +18,10 @@ void UD1GameplayAbility_Weapon_Spell::SpawnProjectile()
 {
 	if (HasAuthority(&CurrentActivationInfo) == false)
 		return;
-
+	
 	if (WeaponActor == nullptr)
 		return;
-
+	
 	UStaticMeshComponent* WeaponMesh = WeaponActor->WeaponMeshComponent;
 	if (WeaponMesh == nullptr)
 		return;
@@ -42,7 +41,7 @@ void UD1GameplayAbility_Weapon_Spell::SpawnProjectile()
 	AD1ProjectileBase* Projectile = GetWorld()->SpawnActorDeferred<AD1ProjectileBase>(
 		ProjectileClass,
 		SpawnTransform,
-		GetOwningActorFromActorInfo(),
+		GetAvatarActorFromActorInfo(),
 		Cast<APawn>(GetAvatarActorFromActorInfo()),
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 	);
@@ -57,4 +56,14 @@ void UD1GameplayAbility_Weapon_Spell::SpawnProjectile()
 	const FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
 	Projectile->DamageEffectSpecHandle = EffectSpecHandle;
 	Projectile->FinishSpawning(SpawnTransform);
+}
+
+FGameplayAbilityTargetingLocationInfo UD1GameplayAbility_Weapon_Spell::GetStartLocation()
+{
+	FGameplayAbilityTargetingLocationInfo LocationInfo;
+	LocationInfo.LocationType = EGameplayAbilityTargetingLocationType::SocketTransform;
+	LocationInfo.SourceComponent = 
+	
+	
+	return {};
 }
