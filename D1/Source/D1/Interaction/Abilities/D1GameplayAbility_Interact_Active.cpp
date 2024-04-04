@@ -42,7 +42,10 @@ void UD1GameplayAbility_Interact_Active::Initialize(const FGameplayAbilityTarget
 
 void UD1GameplayAbility_Interact_Active::Interact()
 {
-	ID1Interactable::Execute_Interact(CachedTargetActor.Get(), GetAvatarActorFromActorInfo());
+	if (AActor* TargetActor = CachedTargetActor.Get())
+	{
+		ID1Interactable::Execute_Interact(TargetActor, GetAvatarActorFromActorInfo());
+	}
 }
 
 void UD1GameplayAbility_Interact_Active::ShowInteractionDurationWidget()
