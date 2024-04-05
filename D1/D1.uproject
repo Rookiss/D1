@@ -26,6 +26,15 @@
 			"Name": "BlueprintAssist",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/9e895371fa3a471c87337860d6f341ff"
+		},
+		{
+			"Name": "HoudiniNiagara",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/79d2dd58387c4696a0f3458275f739d6"
+		},
+		{
+			"Name": "HoudiniEngine",
+			"Enabled": true
 		}
 	]
 }

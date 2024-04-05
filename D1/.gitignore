@@ -47,14 +47,15 @@ Plugins/**/BlueprintAssist/NodeSizeCache/*
 *.sdf
 *.VC.db
 *.VC.opendb
+*.sln.DotSettings.user
 
 # Precompiled Assets
 SourceArt/**/*.png
 SourceArt/**/*.tga
 
 # Binary Files
-Binaries/*
-Plugins/*/Binaries/*
+Binaries/**
+Plugins/**/Binaries/**
 
 # Builds
 Build/*
