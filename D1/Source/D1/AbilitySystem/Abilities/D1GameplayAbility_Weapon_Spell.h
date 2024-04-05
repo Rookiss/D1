@@ -23,4 +23,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	FName ProjectileSocketName;
+
+	UPROPERTY(EditDefaultsOnly)
+	float BaseDamage = 0.f;
 };
