@@ -1,5 +1,6 @@
 ﻿#include "D1GameplayAbility_Weapon_Spell.h"
 
+#include "D1GameplayTags.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Actors/D1ProjectileBase.h"
 #include "Actors/D1WeaponBase.h"
@@ -56,4 +57,15 @@ void UD1GameplayAbility_Weapon_Spell::SpawnProjectile()
 	const FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
 	Projectile->DamageEffectSpecHandle = EffectSpecHandle;
 	Projectile->FinishSpawning(SpawnTransform);
+}
+
+void UD1GameplayAbility_Weapon_Spell::ShowCastTrailEffect(const FVector& Location)
+{
+	FScopedPredictionWindow ScopedPrediction(GetAbilitySystemComponent(), CurrentActivationInfo.GetActivationPredictionKey());
+
+	FGameplayCueParameters CueParameters;
+	CueParameters.Location = Location;
+	
+	UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
+	AbilitySystemComponent->AddGameplayCue(D1GameplayTags::GameplayCue_Cast, CueParameters);
 }

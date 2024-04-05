@@ -16,6 +16,9 @@ public:
 protected:
 	UFUNCTION(BlueprintCallable)
 	void SpawnProjectile();
+
+	UFUNCTION(BlueprintCallable)
+	void ShowCastTrailEffect(const FVector& Location);
 	
 protected:
 	UPROPERTY(EditAnywhere)

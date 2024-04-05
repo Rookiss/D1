@@ -70,4 +70,5 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack_Magical);
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Impact);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Cast);
 }

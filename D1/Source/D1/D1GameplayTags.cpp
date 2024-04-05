@@ -68,4 +68,5 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Attack_Magical,							"Attack.Magical");
 	
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Impact,						"GameplayCue.Impact");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Cast,						"GameplayCue.Cast");
 }
