@@ -71,4 +71,5 @@ namespace D1GameplayTags
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Impact);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Cast);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Lightning);
 }

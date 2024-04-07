@@ -24,6 +24,41 @@ void UD1GameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInf
 	TryActivateAbilityOnGiveOrSpawn(ActorInfo, Spec);
 }
 
+void UD1GameplayAbility::ExecuteGameplayCueWithActivationPredictionKey(FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters)
+{
+	check(CurrentActorInfo);
+	const_cast<FGameplayCueParameters&>(GameplayCueParameters).AbilityLevel = GetAbilityLevel();
+
+	UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Checked();
+	FScopedPredictionWindow ScopedPrediction(AbilitySystemComponent, CurrentActivationInfo.GetActivationPredictionKey());
+	AbilitySystemComponent->ExecuteGameplayCue(GameplayCueTag, GameplayCueParameters);
+}
+
+void UD1GameplayAbility::AddGameplayCueWithActivationPredictionKey(FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameter, bool bRemoveOnAbilityEnd)
+{
+	check(CurrentActorInfo);
+
+	UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Checked();
+	FScopedPredictionWindow ScopedPrediction(AbilitySystemComponent, CurrentActivationInfo.GetActivationPredictionKey());
+	AbilitySystemComponent->AddGameplayCue(GameplayCueTag, GameplayCueParameter);
+
+	if (bRemoveOnAbilityEnd)
+	{
+		TrackedGameplayCues.Add(GameplayCueTag);
+	}
+}
+
+void UD1GameplayAbility::RemoveGameplayCueWithActivationPredictionKey(FGameplayTag GameplayCueTag)
+{
+	check(CurrentActorInfo);
+
+	UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Checked();
+	FScopedPredictionWindow ScopedPrediction(AbilitySystemComponent, CurrentActivationInfo.GetActivationPredictionKey());
+	AbilitySystemComponent->RemoveGameplayCue(GameplayCueTag);
+
+	TrackedGameplayCues.Remove(GameplayCueTag);
+}
+
 void UD1GameplayAbility::TryActivateAbilityOnGiveOrSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const
 {
 	const bool bIsPredicting = (Spec.ActivationInfo.ActivationMode == EGameplayAbilityActivationMode::Predicting);
