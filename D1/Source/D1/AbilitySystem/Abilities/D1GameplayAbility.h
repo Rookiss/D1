@@ -3,6 +3,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "D1GameplayAbility.generated.h"
 
+class UInputMappingContext;
 class AD1HUD;
 class AD1PlayerController;
 class AD1Character;
@@ -53,6 +54,13 @@ protected:
 	
 public:
 	void TryActivateAbilityOnGiveOrSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
+
+	UFUNCTION(BlueprintCallable)
+	void AddAbilityInputMappingContext();
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveAbilityInputMappingContext();
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	UD1AbilitySystemComponent* GetAbilitySystemComponent() const;
@@ -78,4 +86,7 @@ protected:
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FAbilityUIInfo AbilityUIInfo;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UInputMappingContext> AbilityIMC;
 };

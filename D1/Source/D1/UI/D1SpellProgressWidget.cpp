@@ -28,8 +28,14 @@ void UD1SpellProgressWidget::ShowWidget(const FText& SpellName, float CastTime)
 			GetWorld()->GetTimerManager().ClearTimer(ProgressTimerHandle);
 		}
 	}, ProgressTickTime, true);
-	
+
+	ProgressBar_SpellProgress->SetFillColorAndOpacity(DefaultColor);
 	SetVisibility(ESlateVisibility::Visible);
+}
+
+void UD1SpellProgressWidget::NotifyWidget()
+{
+	ProgressBar_SpellProgress->SetFillColorAndOpacity(NotifyColor);
 }
 
 void UD1SpellProgressWidget::HideWidget()

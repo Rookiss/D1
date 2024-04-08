@@ -2,7 +2,6 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystemGlobals.h"
 #include "EnhancedInputSubsystems.h"
 #include "D1GameplayTags.h"
 #include "D1PlayerState.h"
@@ -54,8 +53,9 @@ void AD1PlayerController::SetupInputComponent()
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_ChangeEquip_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Primary, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_ChangeEquip_Secondary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Secondary, InputBindHandles);
 
-		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Confirm_Targeting, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputConfirm, InputBindHandles);
-		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Cancel_Targeting, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputCancel, InputBindHandles);
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Ability_AOE_Confirm, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputConfirm, InputBindHandles);
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Ability_AOE_Cancel, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputCancel, InputBindHandles);
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Ability_Projectile_Cancel, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputCancel, InputBindHandles);
 
 		D1InputComponent->BindAbilityActions(InputData, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, InputBindHandles);
 	}
@@ -244,5 +244,6 @@ void AD1PlayerController::ResetInput()
 	if (UD1InputComponent* D1InputComponent = Cast<UD1InputComponent>(InputComponent))
 	{
 		D1InputComponent->RemoveBinds(InputBindHandles);
+		InputBindHandles.Reset();
 	}
 }

@@ -22,6 +22,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Trace,								"Event.Trace");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Ability_Confirm,					"Event.Ability.Confirm");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Ability_Cancel,					"Event.Ability.Cancel");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Ability_Notify,					"Event.Ability.Notify");
 		
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Move,						"Input.Action.Move");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Look,						"Input.Action.Look");
@@ -34,9 +35,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_ChangeEquip_Primary,		"Input.Action.ChangeEquip.Primary");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_ChangeEquip_Secondary,		"Input.Action.ChangeEquip.Secondary");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_ChangeSkill,				"Input.Action.ChangeSkill");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Confirm_Targeting,			"Input.Action.Confirm.Targeting");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Cancel_Targeting,			"Input.Action.Cancel.Targeting");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Cancel_Casting,				"Input.Action.Cancel.Casting");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Ability_AOE_Confirm,		"Input.Action.Ability.AOE.Confirm");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Ability_AOE_Cancel,			"Input.Action.Ability.AOE.Cancel");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Ability_Projectile_Cancel,	"Input.Action.Ability.Projectile.Cancel");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Death,							"Ability.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,							"Ability.Jump");
