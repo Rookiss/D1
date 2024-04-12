@@ -1,12 +1,10 @@
 ﻿#include "D1GameplayAbility.h"
 
 #include "EnhancedInputSubsystems.h"
-#include "InputMappingContext.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Character/D1Character.h"
 #include "Input/D1InputComponent.h"
 #include "Player/D1PlayerController.h"
-#include "System/D1AssetManager.h"
 #include "UI/D1HUD.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility)
@@ -85,29 +83,29 @@ void UD1GameplayAbility::TryActivateAbilityOnGiveOrSpawn(const FGameplayAbilityA
 	}
 }
 
-void UD1GameplayAbility::AddAbilityInputMappingContext()
+void UD1GameplayAbility::AddInputMappingContext(UInputMappingContext* IMC)
 {
-	if (CurrentActorInfo && AbilityIMC)
+	if (CurrentActorInfo && IMC)
 	{
 		if (APlayerController* PlayerController = CurrentActorInfo->PlayerController.Get())
 		{
 			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			{
-				Subsystem->AddMappingContext(AbilityIMC, 0);
+				Subsystem->AddMappingContext(IMC, 0);
 			}
 		}
 	}
 }
 
-void UD1GameplayAbility::RemoveAbilityInputMappingContext()
+void UD1GameplayAbility::RemoveInputMappingContext(UInputMappingContext* IMC)
 {
-	if (CurrentActorInfo && AbilityIMC)
+	if (CurrentActorInfo && IMC)
 	{
 		if (APlayerController* PlayerController = CurrentActorInfo->PlayerController.Get())
 		{
 			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			{
-				Subsystem->RemoveMappingContext(AbilityIMC);
+				Subsystem->RemoveMappingContext(IMC);
 			}
 		}
 	}

@@ -11,14 +11,16 @@ struct FDamageStatics
 public:
 	FDamageStatics()
 	{
-		BaseDamageDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetBaseDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		PhysicalDamageDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetPhysicalDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		MagicalDamageDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetMagicalDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 		BaseDefenseDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetBaseDefenseAttribute(), EGameplayEffectAttributeCaptureSource::Target, true);
 		StrengthDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetStrengthAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 		WillDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetWillAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 	}
 
 public:
-	FGameplayEffectAttributeCaptureDefinition BaseDamageDef;
+	FGameplayEffectAttributeCaptureDefinition PhysicalDamageDef;
+	FGameplayEffectAttributeCaptureDefinition MagicalDamageDef;
 	FGameplayEffectAttributeCaptureDefinition BaseDefenseDef;
 	FGameplayEffectAttributeCaptureDefinition StrengthDef;
 	FGameplayEffectAttributeCaptureDefinition WillDef;
@@ -33,7 +35,8 @@ static const FDamageStatics& DamageStatics()
 UD1DamageExecutionCalculation::UD1DamageExecutionCalculation(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	RelevantAttributesToCapture.Add(DamageStatics().BaseDamageDef);
+	RelevantAttributesToCapture.Add(DamageStatics().PhysicalDamageDef);
+	RelevantAttributesToCapture.Add(DamageStatics().MagicalDamageDef);
 	RelevantAttributesToCapture.Add(DamageStatics().BaseDefenseDef);
 	RelevantAttributesToCapture.Add(DamageStatics().StrengthDef);
 	RelevantAttributesToCapture.Add(DamageStatics().WillDef);
@@ -50,24 +53,27 @@ void UD1DamageExecutionCalculation::Execute_Implementation(const FGameplayEffect
 	FAggregatorEvaluateParameters EvaluateParameters;
 	EvaluateParameters.SourceTags = SourceTags;
 	EvaluateParameters.TargetTags = TargetTags;
-
-	float BaseDamage = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().BaseDamageDef, EvaluateParameters, BaseDamage);
 	
 	float FinalDamage = 0;
 	if (Spec.GetDynamicAssetTags().HasTagExact(D1GameplayTags::Attack_Physical))
 	{
+		float PhysicalDamage = 0.f;
+		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().PhysicalDamageDef, EvaluateParameters, PhysicalDamage);
+		
 		float Strength = 0.f;
 		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().StrengthDef, EvaluateParameters, Strength);
 		
-		FinalDamage = BaseDamage + Strength;
+		FinalDamage = PhysicalDamage + Strength;
 	}
 	else if (Spec.GetDynamicAssetTags().HasTagExact(D1GameplayTags::Attack_Magical))
 	{
+		float MagicalDamage = 0.f;
+		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().MagicalDamageDef, EvaluateParameters, MagicalDamage);
+		
 		float Will = 0.f;
 		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().WillDef, EvaluateParameters, Will);
 
-		FinalDamage = BaseDamage + Will;
+		FinalDamage = MagicalDamage + Will;
 	}
 	else
 	{

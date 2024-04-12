@@ -1,8 +1,10 @@
 ﻿#pragma once
 
+#include "D1Define.h"
 #include "D1GameplayAbility_Weapon.h"
 #include "D1GameplayAbility_Weapon_Spell.generated.h"
 
+class AGameplayAbilityWorldReticle;
 class AD1ProjectileBase;
 
 UCLASS()
@@ -14,19 +16,58 @@ public:
 	UD1GameplayAbility_Weapon_Spell(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+
+protected:
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void NotifyWidget();
+	
 	UFUNCTION(BlueprintCallable)
 	void SpawnProjectile();
 
 	UFUNCTION(BlueprintCallable)
-	void ShowCastTrailEffect(const FVector& Location);
+	void SpawnAOE();
 	
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Setting")
+	float CastTime = 0.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Setting")
+	TSubclassOf<UGameplayEffect> SpellActiveGameplayEffect;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Montage")
+	UAnimMontage* CastStartMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Montage")
+	UAnimMontage* CastEndMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Montage")
+	UAnimMontage* SpellMontage;
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Type")
+	ESpellType SpellType = ESpellType::Projectile;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Spell Type", meta=(EditCondition="SpellType==ESpellType::Projectile", EditConditionHides))
 	TSubclassOf<AD1ProjectileBase> ProjectileClass;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Spell Type", meta=(EditCondition="SpellType==ESpellType::Projectile", EditConditionHides))
 	FName ProjectileSocketName;
 
-	UPROPERTY(EditDefaultsOnly)
-	float BaseDamage = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Type", DisplayName="AOE Reticle Class", meta=(EditCondition="SpellType==ESpellType::AOE", EditConditionHides))
+	TSubclassOf<AGameplayAbilityWorldReticle> AOEReticleClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Spell Type", DisplayName="AOE Actor Class", meta=(EditCondition="SpellType==ESpellType::AOE", EditConditionHides))
+	TSubclassOf<AActor> AOEActorClass;
+
+private:
+	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
+	bool bCastTimePassed = false;
+	
+	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
+	FGameplayAbilityTargetDataHandle TargetDataHandle;
+
+	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
+	FActiveGameplayEffectHandle ActiveGameplayEffectHandle;
 };

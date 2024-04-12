@@ -56,10 +56,10 @@ public:
 	void TryActivateAbilityOnGiveOrSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
 
 	UFUNCTION(BlueprintCallable)
-	void AddAbilityInputMappingContext();
+	void AddInputMappingContext(UInputMappingContext* IMC);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveAbilityInputMappingContext();
+	void RemoveInputMappingContext(UInputMappingContext* IMC);
 	
 public:
 	UFUNCTION(BlueprintCallable)
@@ -86,7 +86,4 @@ protected:
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FAbilityUIInfo AbilityUIInfo;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UInputMappingContext> AbilityIMC;
 };

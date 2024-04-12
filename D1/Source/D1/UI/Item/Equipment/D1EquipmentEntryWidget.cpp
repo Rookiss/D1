@@ -5,7 +5,6 @@
 #include "Components/SizeBox.h"
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
-#include "Player/D1PlayerController.h"
 #include "System/D1AssetManager.h"
 #include "UI/Item/Drag/D1ItemDragDrop.h"
 #include "UI/Item/Drag/D1ItemDragWidget.h"
