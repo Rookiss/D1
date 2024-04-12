@@ -58,8 +58,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Type", DisplayName="AOE Reticle Class", meta=(EditCondition="SpellType==ESpellType::AOE", EditConditionHides))
 	TSubclassOf<AGameplayAbilityWorldReticle> AOEReticleClass;
 
-	UPROPERTY(EditDefaultsOnly, Category="Spell Type", DisplayName="AOE Actor Class", meta=(EditCondition="SpellType==ESpellType::AOE", EditConditionHides))
-	TSubclassOf<AActor> AOEActorClass;
+	UPROPERTY(EditDefaultsOnly, Category="Spell Type", DisplayName="AOE Spawner Class", meta=(EditCondition="SpellType==ESpellType::AOE", EditConditionHides))
+	TSubclassOf<AActor> AOESpawnerClass;
 
 private:
 	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess="true"))

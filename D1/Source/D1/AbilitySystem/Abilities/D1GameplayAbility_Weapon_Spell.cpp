@@ -3,6 +3,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "D1GameplayTags.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
+#include "Actors/D1AOEBase.h"
 #include "Actors/D1ProjectileBase.h"
 #include "Actors/D1WeaponBase.h"
 #include "Character/D1Player.h"
@@ -102,8 +103,8 @@ void UD1GameplayAbility_Weapon_Spell::SpawnAOE()
 					SpawnTransform.SetRotation(Player->GetController()->GetControlRotation().Quaternion());
 				}
 				
-				AActor* AOE = GetWorld()->SpawnActorDeferred<AActor>(
-					AOEActorClass,
+				AD1AOEBase* AOE = GetWorld()->SpawnActorDeferred<AD1AOEBase>(
+					AOESpawnerClass,
 					SpawnTransform,
 					GetAvatarActorFromActorInfo(),
 					Cast<APawn>(GetAvatarActorFromActorInfo()),
@@ -120,9 +121,7 @@ void UD1GameplayAbility_Weapon_Spell::SpawnAOE()
 				const FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
 				EffectSpecHandle.Data->AddDynamicAssetTag(D1GameplayTags::Attack_Magical);
 	
-				Projectile->DamageEffectSpecHandle = EffectSpecHandle;
-
-				
+				AOE->DamageEffectSpecHandle = EffectSpecHandle;
 				AOE->FinishSpawning(SpawnTransform);
 			}
 		}
