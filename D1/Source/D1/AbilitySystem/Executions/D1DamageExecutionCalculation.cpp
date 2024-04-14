@@ -13,7 +13,7 @@ public:
 	{
 		PhysicalDamageDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetPhysicalDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 		MagicalDamageDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetMagicalDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
-		BaseDefenseDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetBaseDefenseAttribute(), EGameplayEffectAttributeCaptureSource::Target, true);
+		BaseDefenseDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetBaseDefenseAttribute(), EGameplayEffectAttributeCaptureSource::Target, false);
 		StrengthDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetStrengthAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 		WillDef = FGameplayEffectAttributeCaptureDefinition(UD1AttributeSet::GetWillAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 	}

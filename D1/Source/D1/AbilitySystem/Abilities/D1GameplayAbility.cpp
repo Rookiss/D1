@@ -3,7 +3,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Character/D1Character.h"
-#include "Input/D1InputComponent.h"
+#include "Input/D1EnhancedPlayerInput.h"
 #include "Player/D1PlayerController.h"
 #include "UI/D1HUD.h"
 
@@ -24,41 +24,6 @@ void UD1GameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInf
 	Super::OnGiveAbility(ActorInfo, Spec);
 
 	TryActivateAbilityOnGiveOrSpawn(ActorInfo, Spec);
-}
-
-void UD1GameplayAbility::ExecuteGameplayCueWithActivationPredictionKey(FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters)
-{
-	check(CurrentActorInfo);
-	const_cast<FGameplayCueParameters&>(GameplayCueParameters).AbilityLevel = GetAbilityLevel();
-
-	UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Checked();
-	FScopedPredictionWindow ScopedPrediction(AbilitySystemComponent, CurrentActivationInfo.GetActivationPredictionKey());
-	AbilitySystemComponent->ExecuteGameplayCue(GameplayCueTag, GameplayCueParameters);
-}
-
-void UD1GameplayAbility::AddGameplayCueWithActivationPredictionKey(FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameter, bool bRemoveOnAbilityEnd)
-{
-	check(CurrentActorInfo);
-
-	UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Checked();
-	FScopedPredictionWindow ScopedPrediction(AbilitySystemComponent, CurrentActivationInfo.GetActivationPredictionKey());
-	AbilitySystemComponent->AddGameplayCue(GameplayCueTag, GameplayCueParameter);
-
-	if (bRemoveOnAbilityEnd)
-	{
-		TrackedGameplayCues.Add(GameplayCueTag);
-	}
-}
-
-void UD1GameplayAbility::RemoveGameplayCueWithActivationPredictionKey(FGameplayTag GameplayCueTag)
-{
-	check(CurrentActorInfo);
-
-	UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Checked();
-	FScopedPredictionWindow ScopedPrediction(AbilitySystemComponent, CurrentActivationInfo.GetActivationPredictionKey());
-	AbilitySystemComponent->RemoveGameplayCue(GameplayCueTag);
-
-	TrackedGameplayCues.Remove(GameplayCueTag);
 }
 
 void UD1GameplayAbility::TryActivateAbilityOnGiveOrSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const
@@ -106,6 +71,20 @@ void UD1GameplayAbility::RemoveInputMappingContext(UInputMappingContext* IMC)
 			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			{
 				Subsystem->RemoveMappingContext(IMC);
+			}
+		}
+	}
+}
+
+void UD1GameplayAbility::FlushPressedInput(UInputAction* InputAction)
+{
+	if (CurrentActorInfo)
+	{
+		if (APlayerController* PlayerController = CurrentActorInfo->PlayerController.Get())
+		{
+			if (UD1EnhancedPlayerInput* PlayerInput = Cast<UD1EnhancedPlayerInput>(PlayerController->PlayerInput))
+			{
+				PlayerInput->FlushPressedInput(InputAction);
 			}
 		}
 	}

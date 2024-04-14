@@ -41,16 +41,6 @@ public:
 
 protected:
 	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
-
-protected:
-	UFUNCTION(BlueprintCallable, meta=(GameplayTagFilter="GameplayCue"))
-	void ExecuteGameplayCueWithActivationPredictionKey(FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
-
-	UFUNCTION(BlueprintCallable, meta=(GameplayTagFilter="GameplayCue"))
-	void AddGameplayCueWithActivationPredictionKey(FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameter, bool bRemoveOnAbilityEnd);
-
-	UFUNCTION(BlueprintCallable, meta=(GameplayTagFilter="GameplayCue"))
-	void RemoveGameplayCueWithActivationPredictionKey(FGameplayTag GameplayCueTag);
 	
 public:
 	void TryActivateAbilityOnGiveOrSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
@@ -60,6 +50,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void RemoveInputMappingContext(UInputMappingContext* IMC);
+
+	UFUNCTION(BlueprintCallable)
+	void FlushPressedInput(UInputAction* InputAction);
 	
 public:
 	UFUNCTION(BlueprintCallable)

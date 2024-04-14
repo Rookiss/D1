@@ -62,6 +62,13 @@ void AD1AOEBase::TickAOE()
 			continue;
 
 		TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+		
+		if (AdditionalGameplayEffectClass && HitActors.Contains(OverlappingCharacter) == false)
+		{
+			HitActors.Add(OverlappingCharacter);
+			const UGameplayEffect* GameplayEffectCDO = AdditionalGameplayEffectClass->GetDefaultObject<UGameplayEffect>();
+			TargetASC->ApplyGameplayEffectToSelf(GameplayEffectCDO, 1.f, TargetASC->MakeEffectContext());
+		}
 	}
 
 	CurrAttackCount++;

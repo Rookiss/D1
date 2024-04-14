@@ -3,6 +3,8 @@
 #include "GameplayEffectTypes.h"
 #include "D1AOEBase.generated.h"
 
+class AD1Character;
+class UGameplayEffect;
 class UBoxComponent;
 class UArrowComponent;
 
@@ -37,9 +39,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Default")
 	float AttackIntervalTime = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Default")
+	TSubclassOf<UGameplayEffect> AdditionalGameplayEffectClass;
 	
 private:
 	int32 CurrAttackCount = 0;
+	TSet<TObjectPtr<AActor>> HitActors;
 	
 public:
 	FTimerHandle AOETimerHandle;
