@@ -5,6 +5,7 @@
 #include "Engine/AssetManager.h"
 #include "D1AssetManager.generated.h"
 
+class UD1InputData;
 class UD1ItemData;
 struct FD1ItemTemplate;
 
@@ -26,6 +27,8 @@ public:
 	
 	static const UD1ItemData* GetItemData();
 	static const FD1ItemTemplate& GetItemTemplate(int32 TemplateID);
+
+	static const UD1InputData* GetInputData();
 	
 	static void GetAssetByPath(const FSoftObjectPath& AssetPath, FAsyncLoadCompletedDelegate CompletedDelegate = FAsyncLoadCompletedDelegate());
 	

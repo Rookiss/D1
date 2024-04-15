@@ -12,23 +12,25 @@ UD1SpellProgressWidget::UD1SpellProgressWidget(const FObjectInitializer& ObjectI
     
 }
 
+void UD1SpellProgressWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	if (GetVisibility() == ESlateVisibility::Visible && PassedCastTime < TargetCastTime)
+	{
+		PassedCastTime = FMath::Min(PassedCastTime + InDeltaTime, TargetCastTime);
+		ProgressBar_SpellProgress->SetPercent(UKismetMathLibrary::SafeDivide(PassedCastTime, TargetCastTime));
+	}
+}
+
 void UD1SpellProgressWidget::ShowWidget(const FText& SpellName, float CastTime)
 {
 	PassedCastTime = 0.f;
+	TargetCastTime = CastTime;
+	
 	Text_SpellName->SetText(SpellName);
 	ProgressBar_SpellProgress->SetPercent(0.f);
 	
-	GetWorld()->GetTimerManager().SetTimer(ProgressTimerHandle, [this, CastTime]()
-	{
-		PassedCastTime = FMath::Min(PassedCastTime + ProgressTickTime, CastTime);
-		ProgressBar_SpellProgress->SetPercent(UKismetMathLibrary::SafeDivide(PassedCastTime, CastTime));
-
-		if (PassedCastTime >= CastTime)
-		{
-			GetWorld()->GetTimerManager().ClearTimer(ProgressTimerHandle);
-		}
-	}, ProgressTickTime, true);
-
 	ProgressBar_SpellProgress->SetFillColorAndOpacity(DefaultColor);
 	SetVisibility(ESlateVisibility::Visible);
 }
@@ -40,10 +42,5 @@ void UD1SpellProgressWidget::NotifyWidget()
 
 void UD1SpellProgressWidget::HideWidget()
 {
-	if (ProgressTimerHandle.IsValid())
-	{
-		GetWorld()->GetTimerManager().ClearTimer(ProgressTimerHandle);
-	}
-	
 	SetVisibility(ESlateVisibility::Collapsed);
 }

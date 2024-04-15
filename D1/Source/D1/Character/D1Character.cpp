@@ -1,11 +1,9 @@
 ﻿#include "D1Character.h"
 
+#include "D1CharacterMovementComponent.h"
 #include "D1GameplayTags.h"
-#include "D1Player.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/D1AttributeSet.h"
-#include "Animation/D1AnimInstance.h"
-#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Data/D1AbilitySystemData.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -14,7 +12,7 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1Character)
 
 AD1Character::AD1Character(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UD1CharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	NetCullDistanceSquared = 900000000.0f;
 	
@@ -31,8 +29,6 @@ AD1Character::AD1Character(const FObjectInitializer& ObjectInitializer)
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	GetCharacterMovement()->bCanWalkOffLedgesWhenCrouching = true;
 	GetCharacterMovement()->SetCrouchedHalfHeight(65.0f);
-	GetCharacterMovement()->MaxWalkSpeed = 300.f;
-	GetCharacterMovement()->MaxWalkSpeedCrouched = 150.f;
 	
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;

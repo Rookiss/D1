@@ -37,9 +37,8 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_ChangeEquip_Primary);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_ChangeEquip_Secondary);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_ChangeSkill);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Ability_AOE_Confirm);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Ability_AOE_Cancel);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Ability_Projectile_Cancel);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Ability_Confirm);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Ability_Cancel);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Death);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Jump);
@@ -58,7 +57,9 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MaxMana);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_AttackSpeed);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MoveSpeed);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_BaseDamage);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MoveSpeedPercent);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_PhysicalDamage);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MagicalDamage);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_BaseDefense);
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Secondary_Strength);
