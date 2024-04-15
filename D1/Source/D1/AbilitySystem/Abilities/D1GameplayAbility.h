@@ -41,25 +41,18 @@ public:
 
 protected:
 	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
-
-protected:
-	UFUNCTION(BlueprintCallable, meta=(GameplayTagFilter="GameplayCue"))
-	void ExecuteGameplayCueWithActivationPredictionKey(FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
-
-	UFUNCTION(BlueprintCallable, meta=(GameplayTagFilter="GameplayCue"))
-	void AddGameplayCueWithActivationPredictionKey(FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameter, bool bRemoveOnAbilityEnd);
-
-	UFUNCTION(BlueprintCallable, meta=(GameplayTagFilter="GameplayCue"))
-	void RemoveGameplayCueWithActivationPredictionKey(FGameplayTag GameplayCueTag);
 	
 public:
 	void TryActivateAbilityOnGiveOrSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
 
 	UFUNCTION(BlueprintCallable)
-	void AddAbilityInputMappingContext();
+	void AddInputMappingContext(UInputMappingContext* IMC);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveAbilityInputMappingContext();
+	void RemoveInputMappingContext(UInputMappingContext* IMC);
+
+	UFUNCTION(BlueprintCallable)
+	void FlushPressedInput(UInputAction* InputAction);
 	
 public:
 	UFUNCTION(BlueprintCallable)
@@ -86,7 +79,4 @@ protected:
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FAbilityUIInfo AbilityUIInfo;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UInputMappingContext> AbilityIMC;
 };

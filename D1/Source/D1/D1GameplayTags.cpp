@@ -35,9 +35,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_ChangeEquip_Primary,		"Input.Action.ChangeEquip.Primary");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_ChangeEquip_Secondary,		"Input.Action.ChangeEquip.Secondary");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_ChangeSkill,				"Input.Action.ChangeSkill");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Ability_AOE_Confirm,		"Input.Action.Ability.AOE.Confirm");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Ability_AOE_Cancel,			"Input.Action.Ability.AOE.Cancel");
-	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Ability_Projectile_Cancel,	"Input.Action.Ability.Projectile.Cancel");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Ability_Confirm,			"Input.Action.Ability.Confirm");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Ability_Cancel,				"Input.Action.Ability.Cancel");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Death,							"Ability.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,							"Ability.Jump");
@@ -56,7 +55,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MaxMana,				"Attribute.Primary.MaxMana");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_AttackSpeed,			"Attribute.Primary.AttackSpeed");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MoveSpeed,				"Attribute.Primary.MoveSpeed");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_BaseDamage,			"Attribute.Primary.BaseDamage");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MoveSpeedPercent,		"Attribute.Primary.MoveSpeePercent");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_PhysicalDamage,		"Attribute.Primary.PhysicalDamage");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MagicalDamage,			"Attribute.Primary.MagicalDamage");
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_BaseDefense,			"Attribute.Primary.BaseDefense");
 		
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Secondary_Strength,			"Attribute.Secondary.Strength");

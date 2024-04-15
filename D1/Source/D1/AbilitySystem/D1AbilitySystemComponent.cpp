@@ -369,9 +369,10 @@ void UD1AbilitySystemComponent::SlowAnimMontageForSeconds(UAnimMontage* AttackMo
 	if (AnimInstance == nullptr)
 		return;
 
-	if (AnimInstance->GetCurrentActiveMontage() != AttackMontage)
+	UAnimMontage* CurrentMontage = AnimInstance->GetCurrentActiveMontage();
+	if (CurrentMontage != AttackMontage)
 		return;
-
+	
 	float PrevPlayRate = AnimInstance->Montage_GetPlayRate(AttackMontage);
 	AnimInstance->Montage_SetPlayRate(AttackMontage, PrevPlayRate / 10.f);
 	

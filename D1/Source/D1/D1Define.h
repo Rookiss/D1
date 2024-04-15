@@ -107,6 +107,16 @@ enum class EItemRarity : uint8
 	Count	UMETA(Hidden)
 };
 
+UENUM(BlueprintType)
+enum class ESpellType : uint8
+{
+	Projectile,
+	AOE,
+
+	Count	UMETA(Hidden)
+};
+
+
 namespace Item
 {
 	const int32 CoinID = 9999;

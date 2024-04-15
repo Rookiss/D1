@@ -42,7 +42,7 @@ void AD1PlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (const UD1InputData* InputData = UD1AssetManager::GetAssetByName<UD1InputData>("InputData"))
+	if (const UD1InputData* InputData = UD1AssetManager::GetInputData())
 	{
 		UD1InputComponent* D1InputComponent = CastChecked<UD1InputComponent>(InputComponent);
 
@@ -52,11 +52,10 @@ void AD1PlayerController::SetupInputComponent()
 		
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_ChangeEquip_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Primary, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_ChangeEquip_Secondary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Secondary, InputBindHandles);
-
-		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Ability_AOE_Confirm, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputConfirm, InputBindHandles);
-		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Ability_AOE_Cancel, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputCancel, InputBindHandles);
-		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Ability_Projectile_Cancel, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputCancel, InputBindHandles);
-
+		
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Ability_Confirm, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputConfirm, InputBindHandles);
+		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Ability_Cancel, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputCancel, InputBindHandles);
+		
 		D1InputComponent->BindAbilityActions(InputData, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, InputBindHandles);
 	}
 }

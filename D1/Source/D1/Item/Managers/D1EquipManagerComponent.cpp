@@ -111,10 +111,6 @@ void FD1EquipEntry::Equip()
 				NewActor->FinishSpawning(FTransform::Identity, true);
 			}
 		}
-		else if (Equippable->EquipmentType == EEquipmentType::Armor)
-		{
-			
-		}
 	}
 
 	AD1Player* Player = EquipManager->GetPlayerCharacter();

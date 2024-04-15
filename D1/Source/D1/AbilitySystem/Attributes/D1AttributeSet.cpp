@@ -19,7 +19,9 @@ UD1AttributeSet::UD1AttributeSet()
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MaxMana, GetMaxManaAttribute);
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_AttackSpeed, GetAttackSpeedAttribute);
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MoveSpeed, GetMoveSpeedAttribute);
-	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_BaseDamage, GetBaseDamageAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MoveSpeedPercent, GetMoveSpeedPercentAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_PhysicalDamage, GetPhysicalDamageAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MagicalDamage, GetMagicalDamageAttribute);
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_BaseDefense, GetBaseDefenseAttribute);
 
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Secondary_Strength, GetStrengthAttribute);
@@ -39,6 +41,10 @@ void UD1AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxMana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, AttackSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeed, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeedPercent, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, PhysicalDamage, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MagicalDamage, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BaseDefense, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Strength, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Will, COND_None, REPNOTIFY_Always);
@@ -205,9 +211,19 @@ void UD1AttributeSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldValue)
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MoveSpeed, OldValue);
 }
 
-void UD1AttributeSet::OnRep_BaseDamage(const FGameplayAttributeData& OldValue)
+void UD1AttributeSet::OnRep_MoveSpeedPercent(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseDamage, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MoveSpeedPercent, OldValue);
+}
+
+void UD1AttributeSet::OnRep_PhysicalDamage(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, PhysicalDamage, OldValue);
+}
+
+void UD1AttributeSet::OnRep_MagicalDamage(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MagicalDamage, OldValue);
 }
 
 void UD1AttributeSet::OnRep_BaseDefense(const FGameplayAttributeData& OldValue)
