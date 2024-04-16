@@ -308,20 +308,43 @@ void UD1AbilitySystemComponent::RemoveDynamicTagToSelf(const FGameplayTag& Tag)
 	RemoveActiveEffects(Query);
 }
 
-void UD1AbilitySystemComponent::ExecuteGameplayCueLocal(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters)
+void UD1AbilitySystemComponent::ExecuteGameplayCue_Local(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters)
 {
 	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(GetOwner(), GameplayCueTag, EGameplayCueEvent::Type::Executed, GameplayCueParameters);
 }
 
-void UD1AbilitySystemComponent::AddGameplayCueLocal(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters)
+void UD1AbilitySystemComponent::AddGameplayCue_Local(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters)
 {
 	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(GetOwner(), GameplayCueTag, EGameplayCueEvent::Type::OnActive, GameplayCueParameters);
 	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(GetOwner(), GameplayCueTag, EGameplayCueEvent::Type::WhileActive, GameplayCueParameters);
 }
 
-void UD1AbilitySystemComponent::RemoveGameplayCueLocal(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters)
+void UD1AbilitySystemComponent::RemoveGameplayCue_Local(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters)
 {
 	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(GetOwner(), GameplayCueTag, EGameplayCueEvent::Type::Removed, GameplayCueParameters);
+}
+
+void UD1AbilitySystemComponent::ExecuteGameplayCue_Extend(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters)
+{
+	if (IsOwnerActorAuthoritative())
+	{
+		Multicast_ExecuteGameplayCue(GameplayCueTag, GameplayCueParameters, true);
+	}
+	else
+	{
+		ExecuteGameplayCue_Local(GameplayCueTag, GameplayCueParameters);
+	}
+}
+
+void UD1AbilitySystemComponent::Multicast_ExecuteGameplayCue_Implementation(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters, bool bIgnoreLocallyControlledPlayer)
+{
+	if (IsOwnerActorAuthoritative())
+		return;
+
+	if (AbilityActorInfo->IsLocallyControlledPlayer() && bIgnoreLocallyControlledPlayer)
+		return;
+	
+	ExecuteGameplayCue_Local(GameplayCueTag, GameplayCueParameters);
 }
 
 void UD1AbilitySystemComponent::BlockAnimMontageForSeconds(UAnimMontage* BackwardMontage)

@@ -30,6 +30,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FGameplayTag NextStageTag;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bShowDebug = false;
 	
 	UPROPERTY()
 	TSet<TObjectPtr<AActor>> HitActors;

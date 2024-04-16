@@ -71,7 +71,9 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack_Physical);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack_Magical);
 	
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Impact);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Cast);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Impact_Weapon);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Impact_Fireball);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Cast_Fireball);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Cast_Lightning);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Lightning);
 }

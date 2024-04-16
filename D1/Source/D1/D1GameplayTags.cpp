@@ -69,7 +69,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Attack_Physical,							"Attack.Physical");
 	UE_DEFINE_GAMEPLAY_TAG(Attack_Magical,							"Attack.Magical");
 	
-	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Impact,						"GameplayCue.Impact");
-	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Cast,						"GameplayCue.Cast");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Impact_Weapon,				"GameplayCue.Impact.Weapon");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Impact_Fireball,				"GameplayCue.Impact.Fireball");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Cast_Fireball,				"GameplayCue.Cast.Fireball");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Cast_Lightning,				"GameplayCue.Cast.Lightning");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Lightning,					"GameplayCue.Lightning");
 }

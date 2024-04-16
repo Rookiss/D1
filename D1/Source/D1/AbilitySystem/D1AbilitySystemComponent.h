@@ -38,21 +38,31 @@ public:
 	void ProcessAbilityInput(float DeltaTime, bool bGamePaused);
 	void ClearAbilityInput();
 
+public:
 	UFUNCTION(BlueprintCallable)
 	void AddDynamicTagToSelf(const FGameplayTag& Tag);
 
 	UFUNCTION(BlueprintCallable)
 	void RemoveDynamicTagToSelf(const FGameplayTag& Tag);
-		
+
+public:
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="GameplayCueParameters", GameplayTagFilter="GameplayCue"))
-	void ExecuteGameplayCueLocal(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
+	void ExecuteGameplayCue_Local(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
 
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="GameplayCueParameters", GameplayTagFilter="GameplayCue"))
-	void AddGameplayCueLocal(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
+	void AddGameplayCue_Local(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
 
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="GameplayCueParameters", GameplayTagFilter="GameplayCue"))
-	void RemoveGameplayCueLocal(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
+	void RemoveGameplayCue_Local(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
+
+public:
+	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="GameplayCueParameters", GameplayTagFilter="GameplayCue"))
+	void ExecuteGameplayCue_Extend(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
 	
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, meta=(AutoCreateRefTerm="GameplayCueParameters", GameplayTagFilter="GameplayCue"))
+	void Multicast_ExecuteGameplayCue(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters, bool bIgnoreLocallyControlledPlayer = true);
+
+public:
 	void BlockAnimMontageForSeconds(UAnimMontage* BackwardMontage);
 	
 	UFUNCTION(BlueprintCallable, NetMulticast, Unreliable)

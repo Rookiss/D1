@@ -117,6 +117,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void ChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState);
+
+	UFUNCTION(BlueprintCallable)
 	bool CanChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState) const;
 	
 	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }

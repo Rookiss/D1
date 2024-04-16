@@ -3,6 +3,8 @@
 #include "GameplayEffectTypes.h"
 #include "D1ProjectileBase.generated.h"
 
+struct FGameplayCueTag;
+class UNiagaraComponent;
 class UNiagaraSystem;
 class USphereComponent;
 class UProjectileMovementComponent;
@@ -23,11 +25,11 @@ private:
 private:
 	UFUNCTION()
 	void HandleComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+	
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	float LifeSpan = 5.f;
-
+	
 	UPROPERTY(EditDefaultsOnly)
 	float Speed = 500.f;
 	
@@ -41,6 +43,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> SphereCollisionComponent;
 
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UNiagaraComponent> TrailNiagaraComponent;
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
 

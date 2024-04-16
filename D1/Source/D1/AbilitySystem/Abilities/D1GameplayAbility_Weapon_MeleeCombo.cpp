@@ -67,11 +67,13 @@ void UD1GameplayAbility_Weapon_MeleeCombo::HandleTargetData(const FGameplayAbili
 						BlockHitIndex = i;
 					}
 
-					if (bHitSomething)
+#if ENABLE_DRAW_DEBUG
+					if (bHitSomething && bShowDebug)
 					{
 						FColor Color = (HasAuthority(&CurrentActivationInfo)) ? FColor::Red : FColor::Green;
 						DrawDebugSphere(GetWorld(), HitResult->ImpactPoint, 4, 32, Color, false, 5);
 					}
+#endif // #if ENABLE_DRAW_DEBUG
 					
 					if (BlockHitIndex != INDEX_NONE)
 						break;
@@ -82,8 +84,7 @@ void UD1GameplayAbility_Weapon_MeleeCombo::HandleTargetData(const FGameplayAbili
 
 	// TODO: https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking
 	// TODO: https://ftp.cs.wpi.edu/pub/techreports/pdf/21-06.pdf
-	
-	FScopedPredictionWindow ScopedPrediction(GetAbilitySystemComponent(), CurrentActivationInfo.GetActivationPredictionKey());
+	// Incoming Delay + Time Warp?
 	
 	if (BlockHitIndex != -1)
 	{
@@ -93,9 +94,9 @@ void UD1GameplayAbility_Weapon_MeleeCombo::HandleTargetData(const FGameplayAbili
 		CueParameters.Location = HitResult.ImpactPoint;
 		CueParameters.Normal = HitResult.ImpactNormal;
 		CueParameters.PhysicalMaterial = HitResult.PhysMaterial;
-			
+		
 		UD1AbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
-		AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact, CueParameters);
+		AbilitySystemComponent->ExecuteGameplayCue_Extend(D1GameplayTags::GameplayCue_Impact_Weapon, CueParameters);
 
 		if (HasAuthority(&CurrentActivationInfo))
 		{
@@ -125,9 +126,9 @@ void UD1GameplayAbility_Weapon_MeleeCombo::HandleTargetData(const FGameplayAbili
 			CueParameters.Location = HitResult.ImpactPoint;
 			CueParameters.Normal = HitResult.ImpactNormal;
 			CueParameters.PhysicalMaterial = HitResult.PhysMaterial;
-			
-			AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact, CueParameters);
 
+			AbilitySystemComponent->ExecuteGameplayCue_Extend(D1GameplayTags::GameplayCue_Impact_Weapon, CueParameters);
+			
 			if (HasAuthority(&CurrentActivationInfo))
 			{
 				FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
