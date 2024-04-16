@@ -43,7 +43,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void RemoveDynamicTagToSelf(const FGameplayTag& Tag);
-	
+		
 	UFUNCTION(BlueprintCallable, meta=(AutoCreateRefTerm="GameplayCueParameters", GameplayTagFilter="GameplayCue"))
 	void ExecuteGameplayCueLocal(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
 

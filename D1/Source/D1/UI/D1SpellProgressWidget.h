@@ -14,6 +14,9 @@ class UD1SpellProgressWidget : public UD1UserWidget
 public:
 	UD1SpellProgressWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+protected:
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	void ShowWidget(const FText& SpellName, float CastTime);
@@ -40,6 +43,5 @@ protected:
 	
 private:
 	float PassedCastTime = 0.f;
-	float ProgressTickTime = 0.025f;
-	FTimerHandle ProgressTimerHandle;
+	float TargetCastTime = 0.f;
 };

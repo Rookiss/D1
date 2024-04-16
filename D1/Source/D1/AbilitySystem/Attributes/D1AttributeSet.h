@@ -73,6 +73,9 @@ protected:
 	
 	UFUNCTION()
 	void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_MoveSpeedPercent(const FGameplayAttributeData& OldValue);
 	
 private:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_AttackSpeed, meta=(AllowPrivateAccess="true"))
@@ -81,26 +84,37 @@ private:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MoveSpeed, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MoveSpeed;
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MoveSpeedPercent, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData MoveSpeedPercent;
+
 public:
 	ATTRIBUTE_ACCESSORS(ThisClass, AttackSpeed);
 	ATTRIBUTE_ACCESSORS(ThisClass, MoveSpeed);
+	ATTRIBUTE_ACCESSORS(ThisClass, MoveSpeedPercent);
 
 protected:
 	UFUNCTION()
-	void OnRep_BaseDamage(const FGameplayAttributeData& OldValue);
+	void OnRep_PhysicalDamage(const FGameplayAttributeData& OldValue);
+	
+	UFUNCTION()
+	void OnRep_MagicalDamage(const FGameplayAttributeData& OldValue);
 	
 	UFUNCTION()
 	void OnRep_BaseDefense(const FGameplayAttributeData& OldValue);
 	
 private:
-	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
-	FGameplayAttributeData BaseDamage;
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_PhysicalDamage, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData PhysicalDamage;
 	
-	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MagicalDamage, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData MagicalDamage;
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_BaseDefense, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData BaseDefense;
 
 public:
-	ATTRIBUTE_ACCESSORS(ThisClass, BaseDamage);
+	ATTRIBUTE_ACCESSORS(ThisClass, PhysicalDamage);
+	ATTRIBUTE_ACCESSORS(ThisClass, MagicalDamage);
 	ATTRIBUTE_ACCESSORS(ThisClass, BaseDefense);
 
 private:

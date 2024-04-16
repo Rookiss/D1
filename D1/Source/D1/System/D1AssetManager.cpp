@@ -2,6 +2,7 @@
 
 #include "D1LogChannels.h"
 #include "Data/D1AssetData.h"
+#include "Data/D1InputData.h"
 #include "Data/D1ItemData.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AssetManager)
@@ -40,6 +41,11 @@ const FD1ItemTemplate& UD1AssetManager::GetItemTemplate(int32 TemplateID)
 {
 	const UD1ItemData* ItemData = UD1AssetManager::GetItemData();
 	return ItemData->FindItemTemplateByID(TemplateID);
+}
+
+const UD1InputData* UD1AssetManager::GetInputData()
+{
+	return GetAssetByName<UD1InputData>("InputData");
 }
 
 void UD1AssetManager::GetAssetByPath(const FSoftObjectPath& AssetPath, FAsyncLoadCompletedDelegate CompletedDelegate)
