@@ -2,6 +2,7 @@
 
 #include "AbilitySystem/D1AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
@@ -17,14 +18,21 @@
 AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
+	SpringArmComponent->SetupAttachment(GetRootComponent());
+	SpringArmComponent->SetUsingAbsoluteRotation(true);
+	SpringArmComponent->SetWorldRotation(FRotator(-40.f, 60.f, 0.f));
+	SpringArmComponent->TargetArmLength = 500.f;
+	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
-	CameraComponent->bUsePawnControlRotation = true;
-	CameraComponent->FieldOfView = 100.f;
-
+	CameraComponent->bUsePawnControlRotation = false;
+	CameraComponent->FieldOfView = 90.f;
+	CameraComponent->SetupAttachment(SpringArmComponent);
+	
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, -90.f, 0.f));
-	GetMesh()->SetOwnerNoSee(true);
-	GetMesh()->SetOnlyOwnerSee(false);
-	GetMesh()->SetCastHiddenShadow(true);
+	// GetMesh()->SetOwnerNoSee(true);
+	// GetMesh()->SetOnlyOwnerSee(false);
+	// GetMesh()->SetCastHiddenShadow(true);
 	
 	int32 ArmorTypeCount = static_cast<int32>(EArmorType::Count);
 	ArmorMeshComponents.SetNum(ArmorTypeCount);
@@ -63,7 +71,7 @@ void AD1Player::BeginPlay()
 		ArmorMeshComponents[i]->SetSkeletalMesh(DefaultArmorMeshes[i]);
 	}
 	
-	CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("CameraSocket"));
+	// CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("CameraSocket"));
 
 	if (HasAuthority())
 	{

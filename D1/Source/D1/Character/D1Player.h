@@ -3,6 +3,7 @@
 #include "D1Character.h"
 #include "D1Player.generated.h"
 
+class USpringArmComponent;
 class UCameraComponent;
 class UD1InventoryManagerComponent;
 class UD1EquipmentManagerComponent;
@@ -39,6 +40,9 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UCameraComponent> CameraComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<USpringArmComponent> SpringArmComponent;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

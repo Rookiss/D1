@@ -3,7 +3,6 @@
 #include "GameplayEffectTypes.h"
 #include "D1ProjectileBase.generated.h"
 
-struct FGameplayCueTag;
 class UNiagaraComponent;
 class UNiagaraSystem;
 class USphereComponent;
@@ -35,7 +34,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UNiagaraSystem> ImpactEffect;
-
+	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USoundBase> ImpactSound;
 

@@ -40,7 +40,6 @@ void AD1ProjectileBase::BeginPlay()
 	Super::BeginPlay();
 	
 	SetLifeSpan(LifeSpan);
-	TrailNiagaraComponent->SetAutoDestroy(true);
 	SphereCollisionComponent->OnComponentBeginOverlap.AddUniqueDynamic(this, &ThisClass::HandleComponentBeginOverlap);
 }
 
@@ -49,10 +48,7 @@ void AD1ProjectileBase::Destroyed()
 	if (bHit == false && HasAuthority() == false)
 	{
 		bHit = true;
-
-		TrailNiagaraComponent->Deactivate();
-		TrailNiagaraComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-			
+		
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
 	}
@@ -82,14 +78,8 @@ void AD1ProjectileBase::HandleComponentBeginOverlap(UPrimitiveComponent* Overlap
 		}
 		else
 		{
-			TrailNiagaraComponent->Deactivate();
-			TrailNiagaraComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-			
 			UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-			
-			SphereCollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			ProjectileMovementComponent->StopMovementImmediately();
 		}
 	}
 }

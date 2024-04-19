@@ -6,10 +6,13 @@
 #include "D1GameplayTags.h"
 #include "D1PlayerState.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
+#include "Camera/CameraComponent.h"
 #include "Camera/D1PlayerCameraManager.h"
+#include "Character/D1Player.h"
 #include "Data/D1InputData.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Input/D1InputComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "System/D1AssetManager.h"
@@ -47,7 +50,7 @@ void AD1PlayerController::SetupInputComponent()
 		UD1InputComponent* D1InputComponent = CastChecked<UD1InputComponent>(InputComponent);
 
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move, InputBindHandles);
-		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look, InputBindHandles);
+		// D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look, InputBindHandles);
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_Crouch, ETriggerEvent::Triggered, this, &ThisClass::Input_Crouch, InputBindHandles);
 		
 		D1InputComponent->BindNativeAction(InputData, D1GameplayTags::Input_Action_ChangeEquip_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Primary, InputBindHandles);
@@ -127,10 +130,11 @@ void AD1PlayerController::SetInputModeGameAndUI(bool bShowCursor)
 
 void AD1PlayerController::Input_Move(const FInputActionValue& InputValue)
 {
-	if (APawn* ControlledPawn = GetPawn())
+	if (AD1Player* ControlledPawn = Cast<AD1Player>(GetPawn()))
 	{
 		const FVector2D Value = InputValue.Get<FVector2D>();
-		const FRotator MovementRotation(0.0f, GetControlRotation().Yaw, 0.0f);
+		const FRotator CameraRotation = ControlledPawn->SpringArmComponent->GetComponentRotation();
+		const FRotator MovementRotation(CameraRotation);
 		
 		if (Value.X != 0.0f)
 		{

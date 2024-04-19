@@ -19,20 +19,21 @@ AD1Character::AD1Character(const FObjectInitializer& ObjectInitializer)
 	GetCapsuleComponent()->InitCapsuleSize(44.0f, 88.0f);
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 	
-	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -88.f), FRotator(0.f, -90.f, 0.f));
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -88.f), FRotator(0.f, -0.f, 0.f));
 	GetMesh()->SetGenerateOverlapEvents(true);
 	GetMesh()->SetCollisionProfileName("CharacterMesh");
 	
-	GetCharacterMovement()->bUseControllerDesiredRotation = false;
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-	GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = false;
-	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
-	GetCharacterMovement()->bCanWalkOffLedgesWhenCrouching = true;
-	GetCharacterMovement()->SetCrouchedHalfHeight(65.0f);
+	// GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
+	// GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = true;
+	// GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+	// GetCharacterMovement()->bCanWalkOffLedgesWhenCrouching = true;
+	// GetCharacterMovement()->SetCrouchedHalfHeight(65.0f);
 	
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = true;
-	bUseControllerRotationRoll = false;
+	// bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	// bUseControllerRotationRoll = false;
 
 	BaseEyeHeight = 80.0f;
 	CrouchedEyeHeight = 50.0f;
