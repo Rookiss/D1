@@ -23,7 +23,6 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	SpringArmComponent->SetUsingAbsoluteRotation(true);
 	SpringArmComponent->SetWorldRotation(FRotator(-40.f, 60.f, 0.f));
 	SpringArmComponent->TargetArmLength = 500.f;
-	SpringArmComponent->bDoCollisionTest = false;
 	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->bUsePawnControlRotation = false;
