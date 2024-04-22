@@ -138,6 +138,7 @@ public:
 	UD1EquipmentManagerComponent* GetEquipmentManagerComponent() const;
 
 	EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const;
+	EArmorType ConvertToArmorType(EEquipmentSlotType EquipmentSlotType) const;
 	
 public:
 	FOnWeaponEquipStateChanged OnWeaponEquipStateChanged;

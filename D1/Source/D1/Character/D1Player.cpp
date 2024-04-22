@@ -20,14 +20,16 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 {
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	SpringArmComponent->SetupAttachment(GetRootComponent());
-	SpringArmComponent->SetUsingAbsoluteRotation(true);
-	SpringArmComponent->SetWorldRotation(FRotator(-40.f, 60.f, 0.f));
-	SpringArmComponent->TargetArmLength = 500.f;
-	SpringArmComponent->bDoCollisionTest = false;
+	// SpringArmComponent->SetUsingAbsoluteRotation(true);
+	// SpringArmComponent->SetWorldRotation(FRotator(-40.f, 60.f, 0.f));
+	SpringArmComponent->TargetArmLength = 125.f;
+	SpringArmComponent->bDoCollisionTest = true;
+	SpringArmComponent->bUsePawnControlRotation = true;
+	SpringArmComponent->SetRelativeLocation(FVector(0.f, 37.f, 63.f));
 	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->bUsePawnControlRotation = false;
-	CameraComponent->FieldOfView = 90.f;
+	CameraComponent->FieldOfView = 92.f;
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, -90.f, 0.f));
@@ -77,8 +79,8 @@ void AD1Player::BeginPlay()
 	if (HasAuthority())
 	{
 		// @TODO: For Test
-		int32 IterationCount = 2;
-		const TArray<int32> ItemIDs = { 1004, 1005, 1006, 1007 };
+		int32 IterationCount = 1;
+		const TArray<int32> ItemIDs = { 1004, 1005, 1006, 1007, 2001, 2002, 2003 };
 	
 		for (int i = 0; i < IterationCount; i++)
 		{

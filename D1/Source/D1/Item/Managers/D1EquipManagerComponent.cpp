@@ -134,12 +134,6 @@ void FD1EquipEntry::Equip()
 
 void FD1EquipEntry::Unequip()
 {
-	if (ItemInstance == nullptr)
-		return;
-
-	const UD1ItemFragment_Equippable* Equippable = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
-	check(Equippable);
-	
 	if (EquipManager->GetOwner()->HasAuthority())
 	{
 		UD1AbilitySystemComponent* ASC = Cast<UD1AbilitySystemComponent>(EquipManager->GetAbilitySystemComponent());
@@ -154,9 +148,11 @@ void FD1EquipEntry::Unequip()
 			ASC->RemoveActiveGameplayEffect(Handle);
 		}
 		StatHandles.Reset();
-
-		// Remove Visual
-		if (Equippable->EquipmentType == EEquipmentType::Weapon)
+	}
+	
+	if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType))
+	{
+		if (EquipManager->GetOwner()->HasAuthority())
 		{
 			if (IsValid(SpawnedWeaponActor))
 			{
@@ -164,19 +160,18 @@ void FD1EquipEntry::Unequip()
 			}
 		}
 	}
-	
-	if (Equippable->EquipmentType == EEquipmentType::Armor)
-	{
-		AD1Player* Player = EquipManager->GetPlayerCharacter();
-		check(Player);
-		
-		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
-		if (USkeletalMeshComponent* ArmorMeshComponent = Player->ArmorMeshComponents[(int32)Armor->ArmorType])
-		{
-			ArmorMeshComponent->SetSkeletalMesh(Player->DefaultArmorMeshes[(int32)Armor->ArmorType]);
-		}
-	}
-}
+	else if (UD1EquipmentManagerComponent::IsArmorSlot(EquipmentSlotType))
+ 	{
+ 		AD1Player* Player = EquipManager->GetPlayerCharacter();
+ 		check(Player);
+ 
+ 		EArmorType ArmorType = EquipManager->ConvertToArmorType(EquipmentSlotType);
+ 		if (USkeletalMeshComponent* ArmorMeshComponent = Player->ArmorMeshComponents[(int32)ArmorType])
+ 		{
+ 			ArmorMeshComponent->SetSkeletalMesh(Player->DefaultArmorMeshes[(int32)ArmorType]);
+ 		}
+ 	}
+ }
 
 bool FD1EquipList::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
 {
@@ -418,4 +413,18 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 	}
 	
 	return EquipmentSlotType;
+}
+
+EArmorType UD1EquipManagerComponent::ConvertToArmorType(EEquipmentSlotType EquipmentSlotType) const
+{
+	switch (EquipmentSlotType)
+	{
+	case EEquipmentSlotType::Helmet:	return EArmorType::Helmet;
+	case EEquipmentSlotType::Chest:		return EArmorType::Chest;
+	case EEquipmentSlotType::Legs:		return EArmorType::Legs;
+	case EEquipmentSlotType::Hands:		return EArmorType::Hands;
+	case EEquipmentSlotType::Foot:		return EArmorType::Foot;
+	}
+
+	return EArmorType::Count;
 }

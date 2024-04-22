@@ -289,7 +289,8 @@ bool UD1EquipmentManagerComponent::CanAddEntry(UD1ItemInstance* FromItemInstance
 
 bool UD1EquipmentManagerComponent::IsWeaponSlot(EEquipmentSlotType EquipmentSlotType)
 {
-	return (EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand  ||
+	return (EquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand   ||
+			EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand  ||
 			EquipmentSlotType == EEquipmentSlotType::Primary_RightHand || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand ||
 			EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand   || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand);
 }
