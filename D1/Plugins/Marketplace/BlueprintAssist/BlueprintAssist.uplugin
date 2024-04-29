@@ -10,7 +10,7 @@
 	"DocsURL": "https://blueprintassist.github.io/",
 	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/9e895371fa3a471c87337860d6f341ff",
 	"SupportURL": "https://forums.unrealengine.com/unreal-engine/marketplace/120671",
-	"EngineVersion": "5.3.0",
+	"EngineVersion": "5.4.0",
 	"CanContainContent": false,
 	"Installed": true,
 	"Modules": [
