@@ -1,9 +1,0 @@
-{
-	"BuildId": "27405482",
-	"Modules": 
-	{
-		"HoudiniEngine": "UnrealEditor-HoudiniEngine.dll",
-		"HoudiniEngineEditor": "UnrealEditor-HoudiniEngineEditor.dll",
-		"HoudiniEngineRuntime": "UnrealEditor-HoudiniEngineRuntime.dll"
-	}
-}

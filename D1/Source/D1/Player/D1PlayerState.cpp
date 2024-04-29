@@ -14,8 +14,8 @@ AD1PlayerState::AD1PlayerState(const FObjectInitializer& ObjectInitializer)
 	
 	AttributeSet = CreateDefaultSubobject<UD1AttributeSet>("D1AttributeSet");
 
-	NetUpdateFrequency = 100.f;
-	MinNetUpdateFrequency = 50.f;
+	NetUpdateFrequency = 120.f;
+	MinNetUpdateFrequency = 60.f;
 }
 
 UAbilitySystemComponent* AD1PlayerState::GetAbilitySystemComponent() const
