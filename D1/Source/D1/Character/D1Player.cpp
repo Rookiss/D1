@@ -20,10 +20,12 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 {
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	SpringArmComponent->SetupAttachment(GetRootComponent());
-	SpringArmComponent->SetUsingAbsoluteRotation(true);
-	SpringArmComponent->SetWorldRotation(FRotator(-40.f, 60.f, 0.f));
-	SpringArmComponent->TargetArmLength = 500.f;
-	SpringArmComponent->bDoCollisionTest = false;
+	// SpringArmComponent->SetUsingAbsoluteRotation(true);
+	// SpringArmComponent->SetWorldRotation(FRotator(-40.f, 60.f, 0.f));
+	SpringArmComponent->SetRelativeLocation(FVector(0.f, 0.f, 45.f));
+	SpringArmComponent->TargetArmLength = 300.f;
+	SpringArmComponent->bDoCollisionTest = true;
+	SpringArmComponent->bUsePawnControlRotation = true;
 	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->bUsePawnControlRotation = false;
