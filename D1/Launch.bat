@@ -11,6 +11,8 @@ dotnet "C:\Program Files\Epic Games\UE_5.4\Engine\Binaries\DotNET\UnrealBuildToo
 -ProjectFiles -VisualStudio -Automated -Minimize -Platforms=Win64 -TargetTypes=Editor ^
 -TargetConfigurations=Development "%~dp0D1.uproject"
 
-call "C:\Program Files\Epic Games\UE_5.4\Engine\Build\BatchFiles\Rebuild.bat" ^
+call "C:\Program Files\Epic Games\UE_5.4\Engine\Build\BatchFiles\Build.bat" ^
 D1Editor Win64 Development -Project="%~dp0\D1.uproject" 
 -WaitMutex -FromMsBuild -architecture=x64
+
+call "%~dp0\D1.uproject"
