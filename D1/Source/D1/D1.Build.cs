@@ -28,6 +28,7 @@ public class D1 : ModuleRules
 			"AIModule",
 			"AnimGraphRuntime",
 			"Niagara",
+			"RenderCore"
 		});
 
 		PublicDefinitions.Add("SHIPPING_DRAW_DEBUG_ERROR=1");
