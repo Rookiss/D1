@@ -17,31 +17,43 @@ void UD1VitalStatusWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	BindAttributeChangedDelegate(D1GameplayTags::Attribute_Primary_Health, UD1AttributeSet::StaticClass(), this, &ThisClass::HandleHealthChanged);
+	CachedCurrentHealth = CachedTargetHealth = AbilitySystemComponent->GetNumericAttribute(UD1AttributeSet::GetHealthAttribute());
+	
 	BindAttributeChangedDelegate(D1GameplayTags::Attribute_Primary_MaxHealth, UD1AttributeSet::StaticClass(), this, &ThisClass::HandleMaxHealthChanged);
-	BindAttributeChangedDelegate(D1GameplayTags::Attribute_Primary_Mana, UD1AttributeSet::StaticClass(), this, &ThisClass::HandleManaChanged);
-	BindAttributeChangedDelegate(D1GameplayTags::Attribute_Primary_MaxMana, UD1AttributeSet::StaticClass(), this, &ThisClass::HandleMaxManaChanged);
+	
+	BindAttributeChangedDelegate(D1GameplayTags::Attribute_Primary_Stamina, UD1AttributeSet::StaticClass(), this, &ThisClass::HandleStaminaChanged);
+	CachedCurrentStamina = CachedTargetStamina = AbilitySystemComponent->GetNumericAttribute(UD1AttributeSet::GetStaminaAttribute());
+	
+	BindAttributeChangedDelegate(D1GameplayTags::Attribute_Primary_MaxStamina, UD1AttributeSet::StaticClass(), this, &ThisClass::HandleMaxStaminaChanged);
+}
+
+void UD1VitalStatusWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	CachedCurrentHealth = UKismetMathLibrary::FInterpTo(CachedCurrentHealth, CachedTargetHealth, InDeltaTime, 8.f);
+	ProgressBar_Health->SetPercent(UKismetMathLibrary::SafeDivide(CachedCurrentHealth, CachedMaxHealth));
+
+	CachedCurrentStamina = UKismetMathLibrary::FInterpTo(CachedCurrentStamina, CachedTargetStamina, InDeltaTime, 8.f);
+	ProgressBar_Stamina->SetPercent(UKismetMathLibrary::SafeDivide(CachedCurrentStamina, CachedMaxStamina));
 }
 
 void UD1VitalStatusWidget::HandleHealthChanged(float NewValue)
 {
-	CachedHealth = NewValue;
-	ProgressBar_Health->SetPercent(UKismetMathLibrary::SafeDivide(CachedHealth, CachedMaxHealth));
+	CachedTargetHealth = NewValue;
 }
 
 void UD1VitalStatusWidget::HandleMaxHealthChanged(float NewValue)
 {
 	CachedMaxHealth = NewValue;
-	ProgressBar_Health->SetPercent(UKismetMathLibrary::SafeDivide(CachedHealth, CachedMaxHealth));
 }
 
-void UD1VitalStatusWidget::HandleManaChanged(float NewValue)
+void UD1VitalStatusWidget::HandleStaminaChanged(float NewValue)
 {
-	CachedMana = NewValue;
-	ProgressBar_Mana->SetPercent(UKismetMathLibrary::SafeDivide(CachedMana, CachedMaxMana));
+	CachedTargetStamina = NewValue;
 }
 
-void UD1VitalStatusWidget::HandleMaxManaChanged(float NewValue)
+void UD1VitalStatusWidget::HandleMaxStaminaChanged(float NewValue)
 {
-	CachedMaxMana = NewValue;
-	ProgressBar_Mana->SetPercent(UKismetMathLibrary::SafeDivide(CachedMana, CachedMaxMana));
+	CachedMaxStamina = NewValue;
 }

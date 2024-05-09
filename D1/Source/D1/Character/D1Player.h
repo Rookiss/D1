@@ -20,12 +20,16 @@ public:
 public:
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual void OnRep_Controller() override;
 	virtual void InitAbilitySystem() override;
 	virtual void StartDeath() override;
+
+	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 
 public:
 	float CalculateAimPitch();
@@ -58,4 +62,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
 	float TargetAimPitch = 0.f;
 	float CurrentAimPitch = 0.f;
+
+	float CurrentCameraHeight = 80.f;
+	float TargetCameraHeight = 80.f;
+	float DefaultCameraHeight = 80.f;
 };

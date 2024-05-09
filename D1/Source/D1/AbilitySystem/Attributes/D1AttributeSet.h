@@ -48,6 +48,12 @@ protected:
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldValue);
 	
+	UFUNCTION()
+	void OnRep_Stamina(const FGameplayAttributeData& OldValue);
+	
+	UFUNCTION()
+	void OnRep_MaxStamina(const FGameplayAttributeData& OldValue);
+	
 private:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Health, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Health;
@@ -61,11 +67,19 @@ private:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxMana, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MaxMana;
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Stamina, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData Stamina;
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxStamina, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData MaxStamina;
+
 public:
 	ATTRIBUTE_ACCESSORS(ThisClass, Health);
 	ATTRIBUTE_ACCESSORS(ThisClass, MaxHealth);
 	ATTRIBUTE_ACCESSORS(ThisClass, Mana);
 	ATTRIBUTE_ACCESSORS(ThisClass, MaxMana);
+	ATTRIBUTE_ACCESSORS(ThisClass, Stamina);
+	ATTRIBUTE_ACCESSORS(ThisClass, MaxStamina);
 
 protected:
 	UFUNCTION()

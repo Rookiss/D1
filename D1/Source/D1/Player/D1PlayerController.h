@@ -2,6 +2,7 @@
 
 #include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
+#include "InputActionValue.h"
 #include "D1PlayerController.generated.h"
 
 struct FGameplayTag;
@@ -17,6 +18,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupInputComponent() override;
 	virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused) override;
 
@@ -31,7 +33,7 @@ public:
 private:
 	void Input_Move(const FInputActionValue& InputValue);
 	void Input_Look(const FInputActionValue& InputValue);
-	void Input_Crouch();
+	void Input_Crouch(const FInputActionValue& InputValue);
 	
 	void Input_ChangeEquip_Primary();
 	void Input_ChangeEquip_Secondary();
@@ -46,4 +48,5 @@ private:
 	
 private:
 	TArray<uint32> InputBindHandles;
+	bool bWantToCrouch = false;
 };

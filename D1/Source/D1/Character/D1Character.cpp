@@ -25,7 +25,6 @@ AD1Character::AD1Character(const FObjectInitializer& ObjectInitializer)
 	
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
-	// GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
 	GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = true;
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	GetCharacterMovement()->bCanWalkOffLedgesWhenCrouching = true;

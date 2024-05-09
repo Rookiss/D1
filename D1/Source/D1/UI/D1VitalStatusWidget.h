@@ -15,23 +15,26 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 private:
 	void HandleHealthChanged(float NewValue);
 	void HandleMaxHealthChanged(float NewValue);
-	void HandleManaChanged(float NewValue);
-	void HandleMaxManaChanged(float NewValue);
+	void HandleStaminaChanged(float NewValue);
+	void HandleMaxStaminaChanged(float NewValue);
 	
 protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UProgressBar> ProgressBar_Health;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UProgressBar> ProgressBar_Mana;
+	TObjectPtr<UProgressBar> ProgressBar_Stamina;
 
 private:
-	float CachedHealth = 0.f;
+	float CachedCurrentHealth = 0.f;
+	float CachedTargetHealth = 0.f;
 	float CachedMaxHealth = 0.f;
-	float CachedMana = 0.f;
-	float CachedMaxMana = 0.f;
+	float CachedCurrentStamina = 0.f;
+	float CachedTargetStamina = 0.f;
+	float CachedMaxStamina = 0.f;
 };

@@ -6,13 +6,11 @@
 #include "D1GameplayTags.h"
 #include "D1PlayerState.h"
 #include "AbilitySystem/D1AbilitySystemComponent.h"
-#include "Camera/CameraComponent.h"
 #include "Camera/D1PlayerCameraManager.h"
 #include "Character/D1Player.h"
 #include "Data/D1InputData.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Input/D1InputComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "System/D1AssetManager.h"
@@ -38,6 +36,19 @@ void AD1PlayerController::BeginPlay()
 		{
 			Subsystem->AddMappingContext(InputData->InputMappingContext, 0);
 		}
+	}
+}
+
+void AD1PlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	
+	if (ACharacter* ControlledCharacter = GetCharacter())
+	{
+		if (ControlledCharacter->GetCharacterMovement()->IsFalling())
+			return;
+		
+		bWantToCrouch ? ControlledCharacter->Crouch() : ControlledCharacter->UnCrouch();
 	}
 }
 
@@ -133,8 +144,7 @@ void AD1PlayerController::Input_Move(const FInputActionValue& InputValue)
 	if (AD1Player* ControlledPawn = Cast<AD1Player>(GetPawn()))
 	{
 		const FVector2D Value = InputValue.Get<FVector2D>();
-		const FRotator CameraRotation = ControlledPawn->SpringArmComponent->GetComponentRotation();
-		const FRotator MovementRotation(CameraRotation);
+		const FRotator MovementRotation(0.0f, ControlRotation.Yaw, 0.0f);
 		
 		if (Value.X != 0.0f)
 		{
@@ -168,15 +178,9 @@ void AD1PlayerController::Input_Look(const FInputActionValue& InputValue)
 	}
 }
 
-void AD1PlayerController::Input_Crouch()
+void AD1PlayerController::Input_Crouch(const FInputActionValue& InputValue)
 {
-	if (ACharacter* ControlledCharacter = GetCharacter())
-	{
-		if (ControlledCharacter->GetCharacterMovement()->IsFalling() == false)
-		{
-			(ControlledCharacter->bIsCrouched) ? ControlledCharacter->UnCrouch() : ControlledCharacter->Crouch();
-		}
-	}
+	bWantToCrouch = InputValue.Get<bool>();
 }
 
 void AD1PlayerController::Input_ChangeEquip_Primary()

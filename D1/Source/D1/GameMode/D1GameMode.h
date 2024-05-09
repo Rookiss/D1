@@ -10,4 +10,6 @@ class AD1GameMode : public AGameModeBase
 	
 public:
 	AD1GameMode(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	
 };

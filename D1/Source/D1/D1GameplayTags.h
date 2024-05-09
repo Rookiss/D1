@@ -10,6 +10,7 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Jump);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Attack);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Block);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Sprint);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Interact);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ChangeEquip);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_ChangeSkill);
@@ -30,6 +31,7 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Look);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Crouch);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Jump);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Sprint);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Inventory);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Interact);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Action_Attack_MainHand);
@@ -42,6 +44,7 @@ namespace D1GameplayTags
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Death);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Jump);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Sprint);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Interact);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Attack);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Attack_1);
@@ -50,11 +53,15 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Block);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_ChangeEquip);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_ChangeSkill);
+	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayEffect_AutoRegenStamina);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_Health);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MaxHealth);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_Mana);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MaxMana);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_Stamina);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MaxStamina);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_AttackSpeed);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MoveSpeed);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_MoveSpeedPercent);

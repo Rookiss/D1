@@ -19,13 +19,12 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
-	SpringArmComponent->SetupAttachment(GetRootComponent());
-	// SpringArmComponent->SetUsingAbsoluteRotation(true);
-	// SpringArmComponent->SetWorldRotation(FRotator(-40.f, 60.f, 0.f));
-	SpringArmComponent->SetRelativeLocation(FVector(0.f, 0.f, 45.f));
+	SpringArmComponent->SetupAttachment(GetMesh());
+	SpringArmComponent->SetRelativeLocation(FVector(0.f, 0.f, DefaultCameraHeight));
 	SpringArmComponent->TargetArmLength = 300.f;
 	SpringArmComponent->bDoCollisionTest = true;
 	SpringArmComponent->bUsePawnControlRotation = true;
+	// SpringArmComponent->bEnableCameraLag = true;
 	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->bUsePawnControlRotation = false;
@@ -33,9 +32,6 @@ AD1Player::AD1Player(const FObjectInitializer& ObjectInitializer)
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, -90.f, 0.f));
-	// GetMesh()->SetOwnerNoSee(true);
-	// GetMesh()->SetOnlyOwnerSee(false);
-	// GetMesh()->SetCastHiddenShadow(true);
 	
 	int32 ArmorTypeCount = static_cast<int32>(EArmorType::Count);
 	ArmorMeshComponents.SetNum(ArmorTypeCount);
@@ -73,8 +69,6 @@ void AD1Player::BeginPlay()
 		DefaultArmorMeshes[i] = UD1AssetManager::GetAssetByName<USkeletalMesh>(DefaultArmorMeshNames[i]);
 		ArmorMeshComponents[i]->SetSkeletalMesh(DefaultArmorMeshes[i]);
 	}
-	
-	// CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, FName("CameraSocket"));
 
 	if (HasAuthority())
 	{
@@ -90,6 +84,8 @@ void AD1Player::BeginPlay()
 			}
 		}
 	}
+
+	CurrentCameraHeight = TargetCameraHeight = DefaultCameraHeight = SpringArmComponent->GetRelativeLocation().Z;
 }
 
 void AD1Player::PostInitializeComponents()
@@ -97,6 +93,15 @@ void AD1Player::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	InventoryManagerComponent->Init(FIntPoint(10, 5));
+}
+
+void AD1Player::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	FVector Location = SpringArmComponent->GetRelativeLocation();
+	CurrentCameraHeight = UKismetMathLibrary::FInterpTo(CurrentCameraHeight, TargetCameraHeight, DeltaSeconds, 8.f);
+	SpringArmComponent->SetRelativeLocation(FVector(Location.X, Location.Y, CurrentCameraHeight));
 }
 
 void AD1Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -180,6 +185,20 @@ void AD1Player::StartDeath()
 	{
 		EquipManagerComponent->UnequipWeaponInSlot();
 	}
+}
+
+void AD1Player::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+
+	TargetCameraHeight = DefaultCameraHeight - ScaledHalfHeightAdjust;
+}
+
+void AD1Player::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	TargetCameraHeight = DefaultCameraHeight;
+
+	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
 }
 
 float AD1Player::CalculateAimPitch()

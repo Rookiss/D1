@@ -17,6 +17,9 @@ UD1AttributeSet::UD1AttributeSet()
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MaxHealth, GetMaxHealthAttribute);
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_Mana, GetManaAttribute);
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MaxMana, GetMaxManaAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_Stamina, GetStaminaAttribute);
+	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MaxStamina, GetMaxStaminaAttribute);
+	
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_AttackSpeed, GetAttackSpeedAttribute);
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MoveSpeed, GetMoveSpeedAttribute);
 	TagToAttributeFunc.Add(D1GameplayTags::Attribute_Primary_MoveSpeedPercent, GetMoveSpeedPercentAttribute);
@@ -39,6 +42,9 @@ void UD1AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxMana, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Stamina, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxStamina, COND_None, REPNOTIFY_Always);
+	
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, AttackSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeedPercent, COND_None, REPNOTIFY_Always);
@@ -102,6 +108,14 @@ void UD1AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
 	}
+	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
+	{
+		SetStamina(FMath::Clamp(GetStamina(), 0.f, GetMaxStamina()));
+	}
+	else if (Data.EvaluatedData.Attribute == GetMaxStaminaAttribute())
+	{
+		SetStamina(FMath::Clamp(GetStamina(), 0.f, GetMaxStamina()));
+	}
 
 	if (GetHealth() <= 0.f && bOutOfHealth == false)
 	{
@@ -148,6 +162,16 @@ void UD1AttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, f
 			D1ASC->ApplyModToAttribute(GetManaAttribute(), EGameplayModOp::Override, NewValue);
 		}
 	}
+	else if (Attribute == GetMaxStaminaAttribute())
+	{
+		if (GetStamina() > NewValue)
+		{
+			UD1AbilitySystemComponent* D1ASC = GetAbilitySystemComponent();
+			check(D1ASC);
+
+			D1ASC->ApplyModToAttribute(GetStaminaAttribute(), EGameplayModOp::Override, NewValue);
+		}
+	}
 
 	if (bOutOfHealth && GetHealth() > 0.f)
 	{
@@ -170,6 +194,14 @@ void UD1AttributeSet::ClampAttribute(const FGameplayAttribute& Attribute, float&
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
 	}
 	else if (Attribute == GetMaxManaAttribute())
+	{
+		NewValue = FMath::Max(NewValue, 0.f);
+	}
+	else if (Attribute == GetStaminaAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxStamina());
+	}
+	else if (Attribute == GetMaxStaminaAttribute())
 	{
 		NewValue = FMath::Max(NewValue, 0.f);
 	}
@@ -199,6 +231,16 @@ void UD1AttributeSet::OnRep_Mana(const FGameplayAttributeData& OldValue)
 void UD1AttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MaxMana, OldValue);
+}
+
+void UD1AttributeSet::OnRep_Stamina(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Stamina, OldValue);
+}
+
+void UD1AttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MaxStamina, OldValue);
 }
 
 void UD1AttributeSet::OnRep_AttackSpeed(const FGameplayAttributeData& OldValue)
