@@ -12,7 +12,7 @@ AD1AOEBase::AD1AOEBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
-	// bReplicates = true;
+	bReplicates = false;
 
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>("ArrowComponent");
 	SetRootComponent(ArrowComponent);
@@ -31,12 +31,17 @@ void AD1AOEBase::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::BeginAOE);
 }
 
+void AD1AOEBase::Init(const FGameplayEffectSpecHandle& InDamageEffectSpecHandle)
+{
+	DamageEffectSpecHandle = InDamageEffectSpecHandle;
+}
+
 void AD1AOEBase::BeginAOE()
 {
-	if (HasAuthority() == false)
-		return;
-
-	GetWorld()->GetTimerManager().SetTimer(AOETimerHandle, this, &ThisClass::TickAOE, AttackIntervalTime, true, 0);
+	if (HasAuthority())
+	{
+		GetWorld()->GetTimerManager().SetTimer(AOETimerHandle, this, &ThisClass::TickAOE, AttackIntervalTime, true, 0);
+	}
 }
 
 void AD1AOEBase::TickAOE()
@@ -54,20 +59,22 @@ void AD1AOEBase::TickAOE()
 			continue;
 		
 		AD1Character* OverlappingCharacter = Cast<AD1Character>(OverlappingActor);
-		if (OverlappingCharacter == nullptr)
-			continue;
+		check(OverlappingCharacter);
 
 		UAbilitySystemComponent* TargetASC = OverlappingCharacter->GetAbilitySystemComponent();
-		if (TargetASC == nullptr)
-			continue;
+		check(TargetASC);
 
 		TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
-		
-		if (AdditionalGameplayEffectClass && HitActors.Contains(OverlappingCharacter) == false)
+
+		if (HitActors.Contains(OverlappingCharacter) == false)
 		{
 			HitActors.Add(OverlappingCharacter);
-			const UGameplayEffect* GameplayEffectCDO = AdditionalGameplayEffectClass->GetDefaultObject<UGameplayEffect>();
-			TargetASC->ApplyGameplayEffectToSelf(GameplayEffectCDO, 1.f, TargetASC->MakeEffectContext());
+
+			if (AdditionalGameplayEffectClass)
+			{
+				const UGameplayEffect* GameplayEffectCDO = AdditionalGameplayEffectClass->GetDefaultObject<UGameplayEffect>();
+				TargetASC->ApplyGameplayEffectToSelf(GameplayEffectCDO, 1.f, TargetASC->MakeEffectContext());
+			}
 		}
 	}
 

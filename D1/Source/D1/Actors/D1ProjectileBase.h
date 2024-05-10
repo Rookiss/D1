@@ -21,6 +21,9 @@ private:
 	virtual void BeginPlay() override;
 	virtual void Destroyed() override;
 
+public:
+	void Init(const FGameplayEffectSpecHandle& InDamageEffectSpecHandle);
+	
 private:
 	UFUNCTION()
 	void HandleComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -47,10 +50,8 @@ private:
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
-
-public:
-	FGameplayEffectSpecHandle DamageEffectSpecHandle;
-
+	
 private:
 	bool bHit = false;
+	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 };

@@ -82,7 +82,7 @@ void UD1GameplayAbility_Weapon_Spell::SpawnProjectile()
 	const FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
 	EffectSpecHandle.Data->AddDynamicAssetTag(D1GameplayTags::Attack_Magical);
 	
-	Projectile->DamageEffectSpecHandle = EffectSpecHandle;
+	Projectile->Init(EffectSpecHandle);
 	Projectile->FinishSpawning(SpawnTransform);
 }
 
@@ -121,7 +121,7 @@ void UD1GameplayAbility_Weapon_Spell::SpawnAOE()
 				const FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
 				EffectSpecHandle.Data->AddDynamicAssetTag(D1GameplayTags::Attack_Magical);
 	
-				AOE->DamageEffectSpecHandle = EffectSpecHandle;
+				AOE->Init(EffectSpecHandle);
 				AOE->FinishSpawning(SpawnTransform);
 			}
 		}

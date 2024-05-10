@@ -37,13 +37,13 @@ protected:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Montage")
-	UAnimMontage* CastStartMontage;
+	UAnimMontage* CastStartMontage = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Montage")
-	UAnimMontage* CastEndMontage;
+	UAnimMontage* CastEndMontage = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Montage")
-	UAnimMontage* SpellMontage;
+	UAnimMontage* SpellMontage = nullptr;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Type")

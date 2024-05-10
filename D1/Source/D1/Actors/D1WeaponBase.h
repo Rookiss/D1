@@ -21,6 +21,8 @@ protected:
 	virtual void Destroyed() override;
 
 public:
+	void Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSlotType);
+	
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void ChangeSkill(int32 AbilityIndex);
 	
@@ -32,12 +34,6 @@ private:
 	void OnRep_EquipmentSlotType();
 	
 public:
-	UPROPERTY(ReplicatedUsing=OnRep_TemplateID)
-	int32 TemplateID;
-	
-	UPROPERTY(ReplicatedUsing=OnRep_EquipmentSlotType)
-	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UArrowComponent> ArrowComponent;
 	
@@ -48,8 +44,16 @@ public:
 	TObjectPtr<UBoxComponent> TraceDebugCollision;
 
 public:
+	UPROPERTY(ReplicatedUsing=OnRep_TemplateID)
+	int32 TemplateID;
+	
+	UPROPERTY(ReplicatedUsing=OnRep_EquipmentSlotType)
+	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
+	
+public:
 	UPROPERTY(Replicated)
 	bool bCanBlock = false;
 
+private:
 	FGameplayAbilitySpecHandle SkillAbilitySpecHandle;
 };

@@ -54,8 +54,8 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 		for (const FD1GameplayTagStack& Stack : StackContainer.GetStacks())
 		{
 			FString Left, Right;
-			Stack.GetStatTag().ToString().Split(TEXT("."), &Left, &Right, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
-			AttributeModifiers.Append(FString::Printf(TEXT("%s %d\n"), *Right, Stack.GetStatCount()));
+			Stack.GetStackTag().ToString().Split(TEXT("."), &Left, &Right, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+			AttributeModifiers.Append(FString::Printf(TEXT("%s %d\n"), *Right, Stack.GetStackCount()));
 		}
 		AttributeModifiers.RemoveFromEnd(TEXT("\n"));
 		
