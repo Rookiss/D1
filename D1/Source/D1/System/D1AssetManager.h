@@ -54,7 +54,7 @@ public:
 private:
 	void LoadPreloadAssets();
 	void AddLoadedAsset(const FName& AssetName, const UObject* Asset);
-	
+
 private:
 	UPROPERTY()
 	TObjectPtr<UD1AssetData> LoadedAssetData;

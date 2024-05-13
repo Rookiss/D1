@@ -80,7 +80,7 @@ void FD1EquipEntry::Equip()
 
 		for (const FD1GameplayTagStack& Stack : ItemInstance->GetStatContainer().GetStacks())
 		{
-			SpecHandle.Data->SetSetByCallerMagnitude(Stack.GetStatTag(), Stack.GetStatCount());
+			SpecHandle.Data->SetSetByCallerMagnitude(Stack.GetStackTag(), Stack.GetStackCount());
 		}
 	
 		StatHandles.Add(ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data));
@@ -104,8 +104,7 @@ void FD1EquipEntry::Equip()
 			{
 				UWorld* World = EquipManager->GetWorld();
 				AD1WeaponBase* NewActor = World->SpawnActorDeferred<AD1WeaponBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Player);
-				NewActor->TemplateID = ItemInstance->GetTemplateID();
-				NewActor->EquipmentSlotType = EquipmentSlotType;
+				NewActor->Init(ItemInstance->GetTemplateID(), EquipmentSlotType);
 				NewActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 				NewActor->AttachToComponent(Player->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
 				NewActor->FinishSpawning(FTransform::Identity, true);

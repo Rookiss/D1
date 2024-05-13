@@ -52,6 +52,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ChangeEquip,						"Ability.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ChangeSkill,						"Ability.ChangeSkill");
 	
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Sprint,							"Cooldown.Sprint");
+	
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEffect_AutoRegenStamina,			"GameplayEffect.AutoRegenStamina");
 		
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				"Attribute.Primary.Health");

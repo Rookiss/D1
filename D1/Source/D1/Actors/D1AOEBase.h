@@ -19,6 +19,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+public:
+	void Init(const FGameplayEffectSpecHandle& InDamageEffectSpecHandle);
+	
 private:
 	void BeginAOE();
 	void TickAOE();
@@ -46,8 +49,6 @@ protected:
 private:
 	int32 CurrAttackCount = 0;
 	TSet<TObjectPtr<AActor>> HitActors;
-	
-public:
 	FTimerHandle AOETimerHandle;
 	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 };

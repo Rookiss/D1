@@ -17,8 +17,8 @@ AD1ProjectileBase::AD1ProjectileBase(const FObjectInitializer& ObjectInitializer
 	bReplicates = true;
 
 	SphereCollisionComponent = CreateDefaultSubobject<USphereComponent>("SphereCollision");
-	SetRootComponent(SphereCollisionComponent);
 	SphereCollisionComponent->SetCollisionProfileName("Projectile");
+	SetRootComponent(SphereCollisionComponent);
 
 	TrailNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>("TrailNiagaraComponent");
 	TrailNiagaraComponent->SetupAttachment(GetRootComponent());
@@ -54,6 +54,11 @@ void AD1ProjectileBase::Destroyed()
 	}
 	
 	Super::Destroyed();
+}
+
+void AD1ProjectileBase::Init(const FGameplayEffectSpecHandle& InDamageEffectSpecHandle)
+{
+	DamageEffectSpecHandle = InDamageEffectSpecHandle;
 }
 
 void AD1ProjectileBase::HandleComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

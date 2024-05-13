@@ -24,14 +24,15 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 	SetRootComponent(ArrowComponent);
 	
 	WeaponMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
-	WeaponMeshComponent->SetupAttachment(GetRootComponent());
 	WeaponMeshComponent->SetCollisionProfileName("Weapon");
 	WeaponMeshComponent->SetGenerateOverlapEvents(false);
+	WeaponMeshComponent->SetHiddenInGame(true);
+	WeaponMeshComponent->SetupAttachment(GetRootComponent());
 	
 	TraceDebugCollision = CreateDefaultSubobject<UBoxComponent>("TraceDebugCollision");
-	TraceDebugCollision->SetupAttachment(GetRootComponent());
 	TraceDebugCollision->SetCollisionProfileName("NoCollision");
 	TraceDebugCollision->SetGenerateOverlapEvents(false);
+	TraceDebugCollision->SetupAttachment(GetRootComponent());
 }
 
 void AD1WeaponBase::BeginPlay()
@@ -56,18 +57,6 @@ void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 void AD1WeaponBase::Destroyed()
 {
-	if (AD1Player* Player = Cast<AD1Player>(GetOwner()))
-	{
-		if (UD1EquipManagerComponent* EquipManager = Player->EquipManagerComponent)
-		{
-			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-			if (Entries[(int32)EquipmentSlotType].SpawnedWeaponActor == this)
-			{
-				Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = nullptr;
-			}
-		}
-	}
-
 	if (SkillAbilitySpecHandle.IsValid())
 	{
 		if (AD1Character* Character = Cast<AD1Character>(GetOwner()))
@@ -79,7 +68,25 @@ void AD1WeaponBase::Destroyed()
 		}
 	}
 	
+	if (AD1Player* Player = Cast<AD1Player>(GetOwner()))
+	{
+		if (UD1EquipManagerComponent* EquipManager = Player->EquipManagerComponent)
+		{
+			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
+			if (Entries[(int32)EquipmentSlotType].SpawnedWeaponActor == this)
+			{
+				Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = nullptr;
+			}
+		}
+	}
+	
 	Super::Destroyed();
+}
+
+void AD1WeaponBase::Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSlotType)
+{
+	TemplateID = InTemplateID;
+	EquipmentSlotType = InEquipmentSlotType;
 }
 
 void AD1WeaponBase::ChangeSkill(int32 AbilityIndex)
@@ -121,11 +128,19 @@ void AD1WeaponBase::OnRep_TemplateID()
 			Character->GetMesh()->SetAnimClass(Weapon->AnimInstanceClass);
 		}
 
-		UD1AssetManager::GetAssetByPath(Weapon->EquipMontage.ToSoftObjectPath(), FAsyncLoadCompletedDelegate::CreateLambda(
-		[Character, this](const FName& AssetName, UObject* LoadedAsset)
+		if (Weapon->EquipMontage == nullptr)
 		{
-			Character->PlayAnimMontage(Cast<UAnimMontage>(LoadedAsset));
-		}));
+			WeaponMeshComponent->SetHiddenInGame(false);
+		}
+		else
+		{
+			UD1AssetManager::GetAssetByPath(Weapon->EquipMontage.ToSoftObjectPath(), FAsyncLoadCompletedDelegate::CreateLambda(
+			[Character, this](const FName& AssetName, UObject* LoadedAsset)
+			{
+				WeaponMeshComponent->SetHiddenInGame(false);
+				Character->PlayAnimMontage(Cast<UAnimMontage>(LoadedAsset));
+			}));
+		}
 	}
 }
 

@@ -40,7 +40,7 @@ void UD1AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	
 	if (AD1Player* Character = Cast<AD1Player>(TryGetPawnOwner()))
 	{
-		AimPitch = Character->CalculateAimPitch();
+		// AimPitch = Character->CalculateAimPitch();
 			
 		if (UCharacterMovementComponent* MovementComponent = Character->GetCharacterMovement())
 		{

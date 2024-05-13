@@ -15,8 +15,8 @@ public:
 		: StatTag(InTag), StackCount(InStackCount) { }
 
 public:
-	const FGameplayTag& GetStatTag() const { return StatTag; }
-	int32 GetStatCount() const { return StackCount; }
+	const FGameplayTag& GetStackTag() const { return StatTag; }
+	int32 GetStackCount() const { return StackCount; }
 	
 	FString GetDebugString() const;
 	

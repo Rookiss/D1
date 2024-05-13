@@ -54,6 +54,8 @@ namespace D1GameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_ChangeEquip);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_ChangeSkill);
 	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Sprint);
+	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayEffect_AutoRegenStamina);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_Health);

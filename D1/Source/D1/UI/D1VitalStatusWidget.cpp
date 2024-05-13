@@ -31,10 +31,10 @@ void UD1VitalStatusWidget::NativeTick(const FGeometry& MyGeometry, float InDelta
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	CachedCurrentHealth = UKismetMathLibrary::FInterpTo(CachedCurrentHealth, CachedTargetHealth, InDeltaTime, 8.f);
+	CachedCurrentHealth = UKismetMathLibrary::FInterpTo(CachedCurrentHealth, CachedTargetHealth, InDeltaTime, 10.f);
 	ProgressBar_Health->SetPercent(UKismetMathLibrary::SafeDivide(CachedCurrentHealth, CachedMaxHealth));
 
-	CachedCurrentStamina = UKismetMathLibrary::FInterpTo(CachedCurrentStamina, CachedTargetStamina, InDeltaTime, 8.f);
+	CachedCurrentStamina = UKismetMathLibrary::FInterpTo(CachedCurrentStamina, CachedTargetStamina, InDeltaTime, 10.f);
 	ProgressBar_Stamina->SetPercent(UKismetMathLibrary::SafeDivide(CachedCurrentStamina, CachedMaxStamina));
 }
 
