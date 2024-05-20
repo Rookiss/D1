@@ -7,6 +7,7 @@
 
 #include "LyraGameState.generated.h"
 
+struct FLyraNotificationMessage;
 struct FLyraVerbMessage;
 
 class APlayerState;
@@ -58,7 +59,7 @@ public:
 	// (use only for client notifications like eliminations, server join messages, etc... that can handle being lost)
 	UFUNCTION(NetMulticast, Unreliable, BlueprintCallable, Category = "Lyra|GameState")
 	void MulticastMessageToClients(const FLyraVerbMessage Message);
-
+	
 	// Send a message that all clients will be guaranteed to get
 	// (use only for client notifications that cannot handle being lost)
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Lyra|GameState")
@@ -99,6 +100,14 @@ protected:
 	void OnRep_RecorderPlayerState();
 
 public:
+	// TODO
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	bool TryApplyCombatPlayer(APlayerState* PlayerState);
+
+public:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerStatesChanged OnPlayerStatesChanged;
+
+	UPROPERTY()
+	TArray<TWeakObjectPtr<APlayerState>> OnCombatAppliedPlayers;
 };

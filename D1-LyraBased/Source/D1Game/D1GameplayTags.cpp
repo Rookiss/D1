@@ -84,6 +84,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_WeaponEquipStateChanged,	        "Message.Item.WeaponEquipStateChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_EquipmentEntryChanged,		        "Message.Item.EquipmentEntryChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_InventoryEntryChanged,		        "Message.Item.InventoryEntryChanged");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Game_NotificationMessage,		        "Message.Game.NotificationMessage");
 
 	// Attribute
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				        "Attribute.Primary.Health");
@@ -102,7 +103,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Bow_Fire,								"Cooldown.Bow.Fire");
 
 	// GamePhase
-	UE_DEFINE_GAMEPLAY_TAG(GamePhase_ParticipantWaiting,					"GamePhase.ParticipantWaiting");
+	UE_DEFINE_GAMEPLAY_TAG(GamePhase_BattleApplyWaiting,					"GamePhase.BattleApplyWaiting");
 	
 	const TMap<uint8, FGameplayTag> MovementModeTagMap =
 	{

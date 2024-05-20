@@ -9,6 +9,8 @@
 #include "Misc/DataValidation.h"
 #endif
 
+#include "AbilitySystem/LyraGlobalAbilitySystem.h"
+
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraGamePhaseAbility)
 
 #define LOCTEXT_NAMESPACE "ULyraGamePhaseAbility"
@@ -27,6 +29,10 @@ void ULyraGamePhaseAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 	if (ActorInfo->IsNetAuthority())
 	{
 		UWorld* World = ActorInfo->AbilitySystemComponent->GetWorld();
+		
+		ULyraGlobalAbilitySystem* GlobalAbilitySystem = UWorld::GetSubsystem<ULyraGlobalAbilitySystem>(World);
+		GlobalAbilitySystem->ApplyDynamicTagToAll(GamePhaseTag);
+		
 		ULyraGamePhaseSubsystem* PhaseSubsystem = UWorld::GetSubsystem<ULyraGamePhaseSubsystem>(World);
 		PhaseSubsystem->OnBeginPhase(this, Handle);
 	}
@@ -39,6 +45,10 @@ void ULyraGamePhaseAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, 
 	if (ActorInfo->IsNetAuthority())
 	{
 		UWorld* World = ActorInfo->AbilitySystemComponent->GetWorld();
+
+		ULyraGlobalAbilitySystem* GlobalAbilitySystem = UWorld::GetSubsystem<ULyraGlobalAbilitySystem>(World);
+		GlobalAbilitySystem->RemoveDynamicTagFromAll(GamePhaseTag);
+
 		ULyraGamePhaseSubsystem* PhaseSubsystem = UWorld::GetSubsystem<ULyraGamePhaseSubsystem>(World);
 		PhaseSubsystem->OnEndPhase(this, Handle);
 	}

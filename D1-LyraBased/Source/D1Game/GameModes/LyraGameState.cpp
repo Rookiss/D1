@@ -9,6 +9,7 @@
 #include "Messages/LyraVerbMessage.h"
 #include "Player/LyraPlayerState.h"
 #include "D1LogChannels.h"
+#include "Messages/LyraNotificationMessage.h"
 #include "Net/UnrealNetwork.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraGameState)
@@ -17,7 +18,6 @@ class APlayerState;
 class FLifetimeProperty;
 
 extern ENGINE_API float GAverageFPS;
-
 
 ALyraGameState::ALyraGameState(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -152,4 +152,12 @@ APlayerState* ALyraGameState::GetRecorderPlayerState() const
 void ALyraGameState::OnRep_RecorderPlayerState()
 {
 	OnRecorderPlayerStateChangedEvent.Broadcast(RecorderPlayerState);
+}
+
+bool ALyraGameState::TryApplyCombatPlayer(APlayerState* PlayerState)
+{
+	if (HasAuthority() == false)
+		return false;
+	
+	return false;
 }

@@ -82,6 +82,7 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Item_WeaponEquipStateChanged);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Item_EquipmentEntryChanged);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Item_InventoryEntryChanged);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Game_NotificationMessage);
 
 	// Attribute
 	D1GAME_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_Health);
@@ -100,7 +101,7 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Bow_Fire);
 
 	// GamePhase
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_ParticipantWaiting);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_BattleApplyWaiting);
 	
 	D1GAME_API	extern const TMap<uint8, FGameplayTag> MovementModeTagMap;
 	D1GAME_API	extern const TMap<uint8, FGameplayTag> CustomMovementModeTagMap;

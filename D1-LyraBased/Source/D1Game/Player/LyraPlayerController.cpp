@@ -24,6 +24,9 @@
 #include "ReplaySubsystem.h"
 #include "Development/LyraDeveloperSettings.h"
 #include "GameMapsSettings.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
+#include "Kismet/GameplayStatics.h"
+#include "Messages/LyraNotificationMessage.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraPlayerController)
 
@@ -37,6 +40,8 @@ namespace Lyra
 			TEXT("Should force feedback effects be played, even if the last input device was not a gamepad?"));
 	}
 }
+
+#define LOCTEXT_NAMESPACE "LyraPlayerController"
 
 ALyraPlayerController::ALyraPlayerController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -529,6 +534,35 @@ void ALyraPlayerController::OnUnPossess()
 //////////////////////////////////////////////////////////////////////
 // ALyraReplayPlayerController
 
+void ALyraPlayerController::Server_RequestApplyBattle_Implementation()
+{
+	FLyraNotificationMessage Message;
+	Message.TargetChannel = D1GameplayTags::Message_Game_NotificationMessage;
+	Message.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Failed", "전투 신청에 실패했습니다"));
+
+	if (ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this)))
+	{
+		// TODO
+	}
+	
+	// if (PlayerState && OnCombatAppliedPlayers.Num() < 2)
+	// {
+	// 	OnCombatAppliedPlayers.Add(PlayerState);
+	// 	Message.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Succeded", "전투 신청이 완료되었습니다"));
+	// }
+	// else
+	// {
+	// 	
+	// }
+
+	Client_MessageToOwningClient(Message);
+}
+
+void ALyraPlayerController::Client_MessageToOwningClient_Implementation(FLyraNotificationMessage Message)
+{
+	UGameplayMessageSubsystem::Get(this).BroadcastMessage(Message.TargetChannel, Message);
+}
+
 void ALyraReplayPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -585,3 +619,4 @@ void ALyraReplayPlayerController::OnPlayerStatePawnSet(APlayerState* ChangedPlay
 	}
 }
 
+#undef LOCTEXT_NAMESPACE

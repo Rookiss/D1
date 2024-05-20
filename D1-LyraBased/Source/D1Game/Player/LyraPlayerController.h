@@ -10,6 +10,7 @@
 
 struct FGenericTeamId;
 
+struct FLyraNotificationMessage;
 class ALyraHUD;
 class ALyraPlayerState;
 class APawn;
@@ -138,6 +139,13 @@ protected:
 	void K2_OnEndAutoRun();
 
 	bool bHideViewTargetPawnNextFrame = false;
+
+public:
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_RequestApplyBattle();
+	
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void Client_MessageToOwningClient(FLyraNotificationMessage Message);
 };
 
 

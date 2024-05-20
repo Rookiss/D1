@@ -5,6 +5,7 @@
 #include "ActiveGameplayEffectHandle.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "GameplayAbilitySpecHandle.h"
+#include "GameplayTagContainer.h"
 #include "Templates/SubclassOf.h"
 
 #include "LyraGlobalAbilitySystem.generated.h"
@@ -56,12 +57,18 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category="Lyra")
 	void ApplyEffectToAll(TSubclassOf<UGameplayEffect> Effect);
+	
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "Lyra")
+	void ApplyDynamicTagToAll(FGameplayTag Tag);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "Lyra")
 	void RemoveAbilityFromAll(TSubclassOf<UGameplayAbility> Ability);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "Lyra")
 	void RemoveEffectFromAll(TSubclassOf<UGameplayEffect> Effect);
+	
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "Lyra")
+	void RemoveDynamicTagFromAll(FGameplayTag Tag);
 
 	/** Register an ASC with global system and apply any active global effects/abilities. */
 	void RegisterASC(ULyraAbilitySystemComponent* ASC);
@@ -76,6 +83,9 @@ private:
 	UPROPERTY()
 	TMap<TSubclassOf<UGameplayEffect>, FGlobalAppliedEffectList> AppliedEffects;
 
+	UPROPERTY()
+	TArray<FGameplayTag> AppliedTags; 
+	
 	UPROPERTY()
 	TArray<TObjectPtr<ULyraAbilitySystemComponent>> RegisteredASCs;
 };

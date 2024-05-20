@@ -123,6 +123,30 @@ void ULyraGlobalAbilitySystem::RemoveEffectFromAll(TSubclassOf<UGameplayEffect> 
 	}
 }
 
+void ULyraGlobalAbilitySystem::ApplyDynamicTagToAll(FGameplayTag Tag)
+{
+	if (Tag.IsValid() && AppliedTags.Contains(Tag) == false)
+	{
+		AppliedTags.Add(Tag);
+		for (ULyraAbilitySystemComponent* ASC : RegisteredASCs)
+		{
+			ASC->AddDynamicTagGameplayEffect(Tag);
+		}
+	}
+}
+
+void ULyraGlobalAbilitySystem::RemoveDynamicTagFromAll(FGameplayTag Tag)
+{
+	if (Tag.IsValid() && AppliedTags.Contains(Tag))
+	{
+		for (ULyraAbilitySystemComponent* ASC : RegisteredASCs)
+		{
+			ASC->RemoveDynamicTagGameplayEffect(Tag);
+		}
+		AppliedTags.Remove(Tag);
+	}
+}
+
 void ULyraGlobalAbilitySystem::RegisterASC(ULyraAbilitySystemComponent* ASC)
 {
 	check(ASC);
@@ -134,6 +158,10 @@ void ULyraGlobalAbilitySystem::RegisterASC(ULyraAbilitySystemComponent* ASC)
 	for (auto& Entry : AppliedEffects)
 	{
 		Entry.Value.AddToASC(Entry.Key, ASC);
+	}
+	for (const FGameplayTag& Tag : AppliedTags)
+	{
+		ASC->AddDynamicTagGameplayEffect(Tag);
 	}
 
 	RegisteredASCs.AddUnique(ASC);
@@ -150,7 +178,10 @@ void ULyraGlobalAbilitySystem::UnregisterASC(ULyraAbilitySystemComponent* ASC)
 	{
 		Entry.Value.RemoveFromASC(ASC);
 	}
+	for (const FGameplayTag& Tag : AppliedTags)
+	{
+		ASC->RemoveDynamicTagGameplayEffect(Tag);
+	}
 
 	RegisteredASCs.Remove(ASC);
 }
-
