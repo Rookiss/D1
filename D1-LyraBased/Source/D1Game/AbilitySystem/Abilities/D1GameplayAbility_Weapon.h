@@ -1,0 +1,27 @@
+﻿#pragma once
+
+#include "D1Define.h"
+#include "LyraGameplayAbility.h"
+#include "D1GameplayAbility_Weapon.generated.h"
+
+class AD1WeaponBase;
+
+UCLASS(Blueprintable)
+class UD1GameplayAbility_Weapon : public ULyraGameplayAbility
+{
+	GENERATED_BODY()
+	
+public:
+	UD1GameplayAbility_Weapon(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+protected:
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	
+public:
+	UPROPERTY(EditDefaultsOnly)
+	EWeaponHandType WeaponHandType = EWeaponHandType::Count;
+
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<AD1WeaponBase> WeaponActor;
+};
