@@ -60,6 +60,11 @@ void ALyraGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ALyraGameState::AddPlayerState(APlayerState* PlayerState)
 {
 	Super::AddPlayerState(PlayerState);
+
+	if (OnPlayerStatesChanged.IsBound())
+	{
+		OnPlayerStatesChanged.Broadcast();
+	}
 }
 
 void ALyraGameState::RemovePlayerState(APlayerState* PlayerState)
@@ -67,6 +72,11 @@ void ALyraGameState::RemovePlayerState(APlayerState* PlayerState)
 	//@TODO: This isn't getting called right now (only the 'rich' AGameMode uses it, not AGameModeBase)
 	// Need to at least comment the engine code, and possibly move things around
 	Super::RemovePlayerState(PlayerState);
+
+	if (OnPlayerStatesChanged.IsBound())
+	{
+		OnPlayerStatesChanged.Broadcast();
+	}
 }
 
 void ALyraGameState::SeamlessTravelTransitionCheckpoint(bool bToTransitionMap)

@@ -92,8 +92,7 @@ void ULyraTeamCreationComponent::ServerChooseTeamForPlayer(ALyraPlayerState* PS)
 	}
 	else
 	{
-		const FGenericTeamId TeamID = IntegerToGenericTeamId(GetLeastPopulatedTeamID());
-		PS->SetGenericTeamId(TeamID);
+		PS->SetGenericTeamId(0);
 	}
 }
 

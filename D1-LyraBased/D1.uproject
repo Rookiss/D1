@@ -334,6 +334,10 @@
 		{
 			"Name": "GASAttachEditor",
 			"Enabled": true
+		},
+		{
+			"Name": "ShooterCore",
+			"Enabled": true
 		}
 	],
 	"EpicSampleNameHash": "451731683"

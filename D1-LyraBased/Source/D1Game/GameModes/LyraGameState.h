@@ -21,6 +21,9 @@ struct FFrame;
  *
  *	The base game state class used by this project.
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerStatesChanged);
+
 UCLASS(Config = Game)
 class D1GAME_API ALyraGameState : public AModularGameStateBase, public IAbilitySystemInterface
 {
@@ -95,4 +98,7 @@ protected:
 	UFUNCTION()
 	void OnRep_RecorderPlayerState();
 
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerStatesChanged OnPlayerStatesChanged;
 };
