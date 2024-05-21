@@ -338,6 +338,10 @@
 		{
 			"Name": "ShooterCore",
 			"Enabled": true
+		},
+		{
+			"Name": "WaterExtras",
+			"Enabled": true
 		}
 	],
 	"EpicSampleNameHash": "451731683"
