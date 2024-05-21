@@ -89,7 +89,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Game_NotificationMessage,		        "Message.Game.NotificationMessage");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Game_ResponseApplyBattle,				"Message.Game.ResponseApplyBattle");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Game_ResponseCancelBattle,				"Message.Game.ResponseCancelBattle");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Game_NextCombatPlayersChanged,			"Message.Game.NextCombatPlayersChanged");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Game_NextBattlePlayersChanged,			"Message.Game.NextBattlePlayersChanged");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Game_CoinChanged,						"Message.Game.CoinChanged");
 
 	// Attribute
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				        "Attribute.Primary.Health");
@@ -109,7 +110,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Jump,									"Cooldown.Jump");
 
 	// GamePhase
-	UE_DEFINE_GAMEPLAY_TAG(GamePhase_WaitApplyBattle,					    "GamePhase.WaitApplyBattle");
+	UE_DEFINE_GAMEPLAY_TAG(GamePhase_WaitForPlayers,					    "GamePhase.WaitForPlayers");
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_Betting,							    "GamePhase.Betting");
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_Battle,							    "GamePhase.Battle");
 	

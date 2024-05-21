@@ -184,4 +184,13 @@ public:
 
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void Client_SendNotificationMessage(const FLyraNotificationMessage Message);
+
+	UFUNCTION()
+	void OnRep_Coin();
+
+	virtual FString GetPlayerNameCustom() const override;
+	
+public:
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Coin);
+	int64 Coin = 50000;
 };

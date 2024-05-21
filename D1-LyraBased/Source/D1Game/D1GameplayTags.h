@@ -87,7 +87,8 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Game_NotificationMessage);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Game_ResponseApplyBattle);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Game_ResponseCancelBattle);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Game_NextCombatPlayersChanged);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Game_NextBattlePlayersChanged);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Game_CoinChanged);
 
 	// Attribute
 	D1GAME_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_Health);
@@ -107,7 +108,7 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Jump);
 
 	// GamePhase
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_WaitApplyBattle);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_WaitForPlayers);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_Betting);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_Battle);
 	

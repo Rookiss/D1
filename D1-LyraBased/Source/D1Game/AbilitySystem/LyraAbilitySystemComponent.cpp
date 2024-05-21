@@ -453,14 +453,14 @@ void ULyraAbilitySystemComponent::InvokeBlockAnimMontageForSeconds(UAnimMontage*
 	float MontageLength = CurrentMontage->GetPlayLength();
 	float MontageDuration = MontageLength / EffectivePlayRate;
 	
-	AnimInstance->Montage_PlayWithBlendSettings(BackwardMontage, FMontageBlendSettings(0.f), EffectivePlayRate / 2.f, EMontagePlayReturnType::MontageLength, Position);
+	AnimInstance->Montage_PlayWithBlendSettings(BackwardMontage, FMontageBlendSettings(0.f), EffectivePlayRate / 5.f, EMontagePlayReturnType::MontageLength, Position);
 	GetWorld()->GetTimerManager().SetTimer(BlockAnimMontageTimerHandle, [AnimInstance, BackwardMontage, MontageDuration]()
 	{
 		if (AnimInstance->GetCurrentActiveMontage() == BackwardMontage)
 		{
 			AnimInstance->Montage_Stop(FMath::Min(MontageDuration / 5.f, 0.35f), BackwardMontage);
 		}
-	}, 0.35f, false);
+	}, 0.25f, false);
 }
 
 bool ULyraAbilitySystemComponent::IsActivationGroupBlocked(ELyraAbilityActivationGroup Group) const

@@ -13,6 +13,7 @@
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "GameModes/LyraExperienceManagerComponent.h"
 //@TODO: Would like to isolate this a bit better to get the pawn data in here without this having to know about other stuff
+#include "D1GameplayTags.h"
 #include "GameModes/LyraGameMode.h"
 #include "D1LogChannels.h"
 #include "LyraPlayerController.h"
@@ -45,6 +46,8 @@ ALyraPlayerState::ALyraPlayerState(const FObjectInitializer& ObjectInitializer)
 
 	MyTeamID = FGenericTeamId::NoTeam;
 	MySquadID = INDEX_NONE;
+
+	bUseCustomPlayerNames = true;
 }
 
 void ALyraPlayerState::PreInitializeComponents()
@@ -304,4 +307,21 @@ void ALyraPlayerState::Client_SendNotificationMessage_Implementation(const FLyra
 	{
 		UGameplayMessageSubsystem::Get(this).BroadcastMessage(Message.TargetChannel, Message);
 	}
+}
+
+void ALyraPlayerState::OnRep_Coin()
+{
+	FLyraVerbMessage VerbMessage;
+	VerbMessage.Verb = D1GameplayTags::Message_Game_CoinChanged;
+	
+	UGameplayMessageSubsystem::Get(this).BroadcastMessage(VerbMessage.Verb, VerbMessage);
+}
+
+FString ALyraPlayerState::GetPlayerNameCustom() const
+{
+	FString PlayerName = Super::GetPlayerNameCustom();
+
+	FString Left, Right;
+	PlayerName.Split(TEXT("-"), &Left, &Right);
+	return Left;
 }

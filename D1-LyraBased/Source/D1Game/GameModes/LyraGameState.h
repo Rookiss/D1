@@ -104,27 +104,27 @@ protected:
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void PollCombatPlayers();
+	void PollBattlePlayers();
 	
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool TryApplyCombatPlayer(APlayerState* PlayerState);
+	bool TryApplyBattlePlayer(APlayerState* PlayerState);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool TryCancelCombatPlayer(APlayerState* PlayerState);
+	bool TryCancelBattlePlayer(APlayerState* PlayerState);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool HasAppliedCombatPlayer(APlayerState* PlayerState);
+	bool HasAppliedBattlePlayer(APlayerState* PlayerState);
 	
 	UFUNCTION()
-	void OnRep_NextCombatPlayers();
+	void OnRep_NextBattlePlayers();
 	
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerStatesChanged OnPlayerStatesChanged;
 
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_NextCombatPlayers);
-	TArray<TObjectPtr<APlayerState>> NextCombatPlayers;
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_NextBattlePlayers);
+	TArray<TObjectPtr<APlayerState>> NextBattlePlayers;
 	
 	UPROPERTY()
-	TArray<TObjectPtr<APlayerState>> AppliedCombatPlayers;
+	TArray<TObjectPtr<APlayerState>> AppliedBattlePlayers;
 };

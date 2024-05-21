@@ -540,7 +540,7 @@ void ALyraPlayerController::Server_RequestApplyBattle_Implementation()
 	ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this));
 	check(LyraGameState);
 	
-	bool bSucceeded = LyraGameState->TryApplyCombatPlayer(LyraPlayerState);
+	bool bSucceeded = LyraGameState->TryApplyBattlePlayer(LyraPlayerState);
 
 	FLyraVerbMessage VerbMessage;
 	VerbMessage.Verb = D1GameplayTags::Message_Game_ResponseApplyBattle;
@@ -571,7 +571,7 @@ void ALyraPlayerController::Server_RequestCancelBattle_Implementation()
 	ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this));
 	check(LyraGameState);
 
-	bool bSucceeded = LyraGameState->TryCancelCombatPlayer(LyraPlayerState);
+	bool bSucceeded = LyraGameState->TryCancelBattlePlayer(LyraPlayerState);
 
 	FLyraVerbMessage VerbMessage;
 	VerbMessage.Verb = D1GameplayTags::Message_Game_ResponseCancelBattle;
@@ -582,12 +582,12 @@ void ALyraPlayerController::Server_RequestCancelBattle_Implementation()
 	if (bSucceeded)
 	{
 		VerbMessage.ContextTags.AddTag(D1GameplayTags::Status_Succeeded);
-		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Succeded", "전투 취소가 완료되었습니다"));
+		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Succeded", "전투 신청이 취소되었습니다"));
 	}
 	else
 	{
 		VerbMessage.ContextTags.AddTag(D1GameplayTags::Status_Failed);
-		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Failed", "전투 취소에 실패했습니다"));
+		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Failed", "전투 신청 취소에 실패했습니다"));
 	}
 
 	LyraPlayerState->Client_SendVerbMessage(VerbMessage);

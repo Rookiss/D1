@@ -10,7 +10,6 @@
 #include "Messages/LyraVerbMessage.h"
 #include "Player/LyraPlayerState.h"
 #include "D1LogChannels.h"
-#include "Kismet/GameplayStatics.h"
 #include "Messages/LyraNotificationMessage.h"
 #include "Net/UnrealNetwork.h"
 
@@ -35,7 +34,7 @@ ALyraGameState::ALyraGameState(const FObjectInitializer& ObjectInitializer)
 	
 	ServerFPS = 0.0f;
 
-	NextCombatPlayers.SetNumZeroed(2);
+	NextBattlePlayers.SetNumZeroed(2);
 }
 
 void ALyraGameState::PreInitializeComponents()
@@ -77,7 +76,7 @@ void ALyraGameState::RemovePlayerState(APlayerState* PlayerState)
 	// Need to at least comment the engine code, and possibly move things around
 	Super::RemovePlayerState(PlayerState);
 
-	TryCancelCombatPlayer(PlayerState);
+	TryCancelBattlePlayer(PlayerState);
 	
 	if (OnPlayerStatesChanged.IsBound())
 	{
@@ -103,7 +102,7 @@ void ALyraGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, ServerFPS);
-	DOREPLIFETIME(ThisClass, NextCombatPlayers);
+	DOREPLIFETIME(ThisClass, NextBattlePlayers);
 	DOREPLIFETIME_CONDITION(ThisClass, RecorderPlayerState, COND_ReplayOnly);
 }
 
@@ -161,82 +160,72 @@ void ALyraGameState::OnRep_RecorderPlayerState()
 	OnRecorderPlayerStateChangedEvent.Broadcast(RecorderPlayerState);
 }
 
-void ALyraGameState::PollCombatPlayers()
+void ALyraGameState::PollBattlePlayers()
 {
-	if (NextCombatPlayers[0] == nullptr)
+	if (AppliedBattlePlayers.Num() <= 0)
+		return;
+	
+	for (int32 i = 0; i < NextBattlePlayers.Num(); i++)
 	{
-		
+		if (NextBattlePlayers[i])
+			continue;
+
+		int32 RandIndex = FMath::RandRange(0, AppliedBattlePlayers.Num() - 1);
+		NextBattlePlayers[i] = AppliedBattlePlayers[RandIndex];
+		AppliedBattlePlayers.RemoveAtSwap(RandIndex);
 	}
 }
 
-bool ALyraGameState::TryApplyCombatPlayer(APlayerState* PlayerState)
+bool ALyraGameState::TryApplyBattlePlayer(APlayerState* PlayerState)
 {
 	if (HasAuthority() == false)
 		return false;
 
-	if (HasAppliedCombatPlayer(PlayerState))
-		return false;
+	for (int32 i = 0; i < NextBattlePlayers.Num(); i++)
+	{
+		if (NextBattlePlayers[i])
+			continue;
 
-	// for (APlayerState* NextCombatPlayer = NextCombatPlayers)
-	{
-		
+		NextBattlePlayers[i] = PlayerState;
+		return true;
 	}
 	
-	if (NextCombatPlayers[0] == nullptr)
-	{
-		NextCombatPlayers[0] = PlayerState;
-	}
-	else if (NextCombatPlayers[1] == nullptr)
-	{
-		NextCombatPlayers[1] = PlayerState;
-	}
-	else
-	{
-		AppliedCombatPlayers.Add(PlayerState);
-	}
-	
+	AppliedBattlePlayers.Add(PlayerState);
 	return true;
 }
 
-bool ALyraGameState::TryCancelCombatPlayer(APlayerState* PlayerState)
+bool ALyraGameState::TryCancelBattlePlayer(APlayerState* PlayerState)
 {
 	if (HasAuthority() == false)
 		return false;
 
-	if (HasAppliedCombatPlayer(PlayerState) == false)
-		return false;
+	for (int32 i = 0; i < NextBattlePlayers.Num(); i++)
+	{
+		if (NextBattlePlayers[i] != PlayerState)
+			continue;
 
-	if (NextCombatPlayers[0] == PlayerState)
-	{
-		NextCombatPlayers[0] = nullptr;
-	}
-	else if (NextCombatPlayers[1] == PlayerState)
-	{
-		NextCombatPlayers[1] = nullptr;
-	}
-	else
-	{
-		AppliedCombatPlayers.Remove(PlayerState);
+		NextBattlePlayers[i] = nullptr;
+		return true;
 	}
 
-	return true;
+	return AppliedBattlePlayers.Remove(PlayerState) > 0;
 }
 
-bool ALyraGameState::HasAppliedCombatPlayer(APlayerState* PlayerState)
+bool ALyraGameState::HasAppliedBattlePlayer(APlayerState* PlayerState)
 {
 	if (PlayerState == nullptr)
 		return false;
 	
-	if (NextCombatPlayers.Contains(PlayerState) || AppliedCombatPlayers.Contains(PlayerState))
+	if (NextBattlePlayers.Contains(PlayerState) || AppliedBattlePlayers.Contains(PlayerState))
 		return true;
 	
 	return false;
 }
 
-void ALyraGameState::OnRep_NextCombatPlayers()
+void ALyraGameState::OnRep_NextBattlePlayers()
 {
 	FLyraVerbMessage VerbMessage;
-	VerbMessage.Verb = D1GameplayTags::Message_Game_NextCombatPlayersChanged;
+	VerbMessage.Verb = D1GameplayTags::Message_Game_NextBattlePlayersChanged;
 	
 	UGameplayMessageSubsystem::Get(this).BroadcastMessage(VerbMessage.Verb, VerbMessage);
 }

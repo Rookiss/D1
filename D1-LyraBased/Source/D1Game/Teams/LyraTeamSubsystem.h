@@ -77,6 +77,7 @@ public:
 
 	// Changes the team associated with this actor if possible
 	// Note: This function can only be called on the authority
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	bool ChangeTeamForActor(AActor* ActorToChange, int32 NewTeamId);
 
 	// Returns the team this object belongs to, or INDEX_NONE if it is not part of a team
