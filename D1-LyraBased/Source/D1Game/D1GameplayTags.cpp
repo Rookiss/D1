@@ -101,6 +101,7 @@ namespace D1GameplayTags
 
 	// Cooldown
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Bow_Fire,								"Cooldown.Bow.Fire");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Jump,									"Cooldown.Jump");
 
 	// GamePhase
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_BattleApplyWaiting,					"GamePhase.BattleApplyWaiting");

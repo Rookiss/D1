@@ -99,6 +99,7 @@ namespace D1GameplayTags
 
 	// Cooldown
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Bow_Fire);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Jump);
 
 	// GamePhase
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_BattleApplyWaiting);

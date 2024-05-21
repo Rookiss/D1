@@ -180,7 +180,10 @@ void UD1GameplayAbility_Weapon_MeleeCombo::TryContinueToNextStage()
 		{
 			AbilitySystemComponent->TryActivateAbilityByClass(NextAbilityClass);
 		}
-		
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	}
+	else if (bBlocked == false)
+	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 	}
 }
