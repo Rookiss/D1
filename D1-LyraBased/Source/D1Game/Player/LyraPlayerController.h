@@ -140,14 +140,15 @@ protected:
 
 	bool bHideViewTargetPawnNextFrame = false;
 
-public:
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void Server_RequestApplyBattle();
+	////////////////////////////////////////////////////////////////////////
 	
-	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void Client_MessageToOwningClient(FLyraNotificationMessage Message);
-};
+public:
+	UFUNCTION(Server, Reliable, BlueprintCallable, BlueprintAuthorityOnly)
+	void Server_RequestApplyBattle();
 
+	UFUNCTION(Server, Reliable, BlueprintCallable, BlueprintAuthorityOnly)
+	void Server_RequestCancelBattle();
+};
 
 // A player controller used for replay capture and playback
 UCLASS()

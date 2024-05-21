@@ -39,6 +39,7 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	//~End of AActor interface
 
 	//~AGameStateBase interface
@@ -99,15 +100,31 @@ protected:
 	UFUNCTION()
 	void OnRep_RecorderPlayerState();
 
+	////////////////////////////////////////////////////////////////////////
+	
 public:
-	// TODO
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void PollCombatPlayers();
+	
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	bool TryApplyCombatPlayer(APlayerState* PlayerState);
 
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	bool TryCancelCombatPlayer(APlayerState* PlayerState);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool HasAppliedCombatPlayer(APlayerState* PlayerState);
+	
+	UFUNCTION()
+	void OnRep_NextCombatPlayers();
+	
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerStatesChanged OnPlayerStatesChanged;
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_NextCombatPlayers);
+	TArray<TObjectPtr<APlayerState>> NextCombatPlayers;
+	
 	UPROPERTY()
-	TArray<TWeakObjectPtr<APlayerState>> OnCombatAppliedPlayers;
+	TArray<TObjectPtr<APlayerState>> AppliedCombatPlayers;
 };

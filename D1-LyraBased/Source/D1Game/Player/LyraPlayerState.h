@@ -120,12 +120,7 @@ public:
 	// Returns true if there is at least one stack of the specified tag
 	UFUNCTION(BlueprintCallable, Category=Teams)
 	bool HasStatTag(FGameplayTag Tag) const;
-
-	// Send a message to just this player
-	// (use only for client notifications like accolades, quest toasts, etc... that can handle being occasionally lost)
-	UFUNCTION(Client, Unreliable, BlueprintCallable, Category = "Lyra|PlayerState")
-	void ClientBroadcastMessage(const FLyraVerbMessage Message);
-
+	
 	// Gets the replicated view rotation of this player, used for spectating
 	FRotator GetReplicatedViewRotation() const;
 
@@ -181,4 +176,12 @@ private:
 
 	UFUNCTION()
 	void OnRep_MySquadID();
+
+	////////////////////////////////////////////////////////////////////////
+public:
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void Client_SendVerbMessage(const FLyraVerbMessage Message);
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void Client_SendNotificationMessage(const FLyraNotificationMessage Message);
 };

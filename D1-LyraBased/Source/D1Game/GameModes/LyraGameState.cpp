@@ -2,6 +2,7 @@
 
 #include "LyraGameState.h"
 
+#include "D1GameplayTags.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Async/TaskGraphInterfaces.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
@@ -9,6 +10,7 @@
 #include "Messages/LyraVerbMessage.h"
 #include "Player/LyraPlayerState.h"
 #include "D1LogChannels.h"
+#include "Kismet/GameplayStatics.h"
 #include "Messages/LyraNotificationMessage.h"
 #include "Net/UnrealNetwork.h"
 
@@ -30,8 +32,10 @@ ALyraGameState::ALyraGameState(const FObjectInitializer& ObjectInitializer)
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
 	ExperienceManagerComponent = CreateDefaultSubobject<ULyraExperienceManagerComponent>(TEXT("ExperienceManagerComponent"));
-
+	
 	ServerFPS = 0.0f;
+
+	NextCombatPlayers.SetNumZeroed(2);
 }
 
 void ALyraGameState::PreInitializeComponents()
@@ -73,6 +77,8 @@ void ALyraGameState::RemovePlayerState(APlayerState* PlayerState)
 	// Need to at least comment the engine code, and possibly move things around
 	Super::RemovePlayerState(PlayerState);
 
+	TryCancelCombatPlayer(PlayerState);
+	
 	if (OnPlayerStatesChanged.IsBound())
 	{
 		OnPlayerStatesChanged.Broadcast();
@@ -97,6 +103,7 @@ void ALyraGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, ServerFPS);
+	DOREPLIFETIME(ThisClass, NextCombatPlayers);
 	DOREPLIFETIME_CONDITION(ThisClass, RecorderPlayerState, COND_ReplayOnly);
 }
 
@@ -154,10 +161,82 @@ void ALyraGameState::OnRep_RecorderPlayerState()
 	OnRecorderPlayerStateChangedEvent.Broadcast(RecorderPlayerState);
 }
 
+void ALyraGameState::PollCombatPlayers()
+{
+	if (NextCombatPlayers[0] == nullptr)
+	{
+		
+	}
+}
+
 bool ALyraGameState::TryApplyCombatPlayer(APlayerState* PlayerState)
 {
 	if (HasAuthority() == false)
 		return false;
+
+	if (HasAppliedCombatPlayer(PlayerState))
+		return false;
+
+	// for (APlayerState* NextCombatPlayer = NextCombatPlayers)
+	{
+		
+	}
+	
+	if (NextCombatPlayers[0] == nullptr)
+	{
+		NextCombatPlayers[0] = PlayerState;
+	}
+	else if (NextCombatPlayers[1] == nullptr)
+	{
+		NextCombatPlayers[1] = PlayerState;
+	}
+	else
+	{
+		AppliedCombatPlayers.Add(PlayerState);
+	}
+	
+	return true;
+}
+
+bool ALyraGameState::TryCancelCombatPlayer(APlayerState* PlayerState)
+{
+	if (HasAuthority() == false)
+		return false;
+
+	if (HasAppliedCombatPlayer(PlayerState) == false)
+		return false;
+
+	if (NextCombatPlayers[0] == PlayerState)
+	{
+		NextCombatPlayers[0] = nullptr;
+	}
+	else if (NextCombatPlayers[1] == PlayerState)
+	{
+		NextCombatPlayers[1] = nullptr;
+	}
+	else
+	{
+		AppliedCombatPlayers.Remove(PlayerState);
+	}
+
+	return true;
+}
+
+bool ALyraGameState::HasAppliedCombatPlayer(APlayerState* PlayerState)
+{
+	if (PlayerState == nullptr)
+		return false;
+	
+	if (NextCombatPlayers.Contains(PlayerState) || AppliedCombatPlayers.Contains(PlayerState))
+		return true;
 	
 	return false;
+}
+
+void ALyraGameState::OnRep_NextCombatPlayers()
+{
+	FLyraVerbMessage VerbMessage;
+	VerbMessage.Verb = D1GameplayTags::Message_Game_NextCombatPlayersChanged;
+	
+	UGameplayMessageSubsystem::Get(this).BroadcastMessage(VerbMessage.Verb, VerbMessage);
 }

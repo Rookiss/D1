@@ -52,6 +52,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_Block,									"Status.Block");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ChangeEquip,								"Status.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS,										"Status.ADS");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Succeeded,								"Status.Succeeded");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Failed,									"Status.Failed");
 	
 	// Gameplay Event
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Death,								"GameplayEvent.Death");
@@ -85,6 +87,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_EquipmentEntryChanged,		        "Message.Item.EquipmentEntryChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_InventoryEntryChanged,		        "Message.Item.InventoryEntryChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Game_NotificationMessage,		        "Message.Game.NotificationMessage");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Game_ResponseApplyBattle,				"Message.Game.ResponseApplyBattle");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Game_ResponseCancelBattle,				"Message.Game.ResponseCancelBattle");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Game_NextCombatPlayersChanged,			"Message.Game.NextCombatPlayersChanged");
 
 	// Attribute
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				        "Attribute.Primary.Health");
@@ -104,7 +109,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Jump,									"Cooldown.Jump");
 
 	// GamePhase
-	UE_DEFINE_GAMEPLAY_TAG(GamePhase_BattleApplyWaiting,					"GamePhase.BattleApplyWaiting");
+	UE_DEFINE_GAMEPLAY_TAG(GamePhase_WaitApplyBattle,					    "GamePhase.WaitApplyBattle");
+	UE_DEFINE_GAMEPLAY_TAG(GamePhase_Betting,							    "GamePhase.Betting");
+	UE_DEFINE_GAMEPLAY_TAG(GamePhase_Battle,							    "GamePhase.Battle");
 	
 	const TMap<uint8, FGameplayTag> MovementModeTagMap =
 	{

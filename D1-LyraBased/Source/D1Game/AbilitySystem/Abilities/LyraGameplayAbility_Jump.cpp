@@ -68,4 +68,3 @@ void ULyraGameplayAbility_Jump::CharacterJumpStop()
 		}
 	}
 }
-

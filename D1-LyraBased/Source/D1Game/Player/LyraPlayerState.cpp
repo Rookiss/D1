@@ -16,6 +16,7 @@
 #include "GameModes/LyraGameMode.h"
 #include "D1LogChannels.h"
 #include "LyraPlayerController.h"
+#include "Messages/LyraNotificationMessage.h"
 #include "Messages/LyraVerbMessage.h"
 #include "Net/UnrealNetwork.h"
 
@@ -289,12 +290,18 @@ bool ALyraPlayerState::HasStatTag(FGameplayTag Tag) const
 	return StatTags.ContainsTag(Tag);
 }
 
-void ALyraPlayerState::ClientBroadcastMessage_Implementation(const FLyraVerbMessage Message)
+void ALyraPlayerState::Client_SendVerbMessage_Implementation(const FLyraVerbMessage Message)
 {
-	// This check is needed to prevent running the action when in standalone mode
 	if (GetNetMode() == NM_Client)
 	{
 		UGameplayMessageSubsystem::Get(this).BroadcastMessage(Message.Verb, Message);
 	}
 }
 
+void ALyraPlayerState::Client_SendNotificationMessage_Implementation(const FLyraNotificationMessage Message)
+{
+	if (GetNetMode() == NM_Client)
+	{
+		UGameplayMessageSubsystem::Get(this).BroadcastMessage(Message.TargetChannel, Message);
+	}
+}

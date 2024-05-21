@@ -50,6 +50,8 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Block);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_ChangeEquip);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_ADS);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Succeeded);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Failed);
 
 	// Gameplay Event
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayEvent_Death);
@@ -83,6 +85,9 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Item_EquipmentEntryChanged);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Item_InventoryEntryChanged);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Game_NotificationMessage);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Game_ResponseApplyBattle);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Game_ResponseCancelBattle);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Game_NextCombatPlayersChanged);
 
 	// Attribute
 	D1GAME_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_Health);
@@ -102,7 +107,9 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Jump);
 
 	// GamePhase
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_BattleApplyWaiting);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_WaitApplyBattle);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_Betting);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_Battle);
 	
 	D1GAME_API	extern const TMap<uint8, FGameplayTag> MovementModeTagMap;
 	D1GAME_API	extern const TMap<uint8, FGameplayTag> CustomMovementModeTagMap;

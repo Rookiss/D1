@@ -27,6 +27,7 @@
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Messages/LyraNotificationMessage.h"
+#include "Messages/LyraVerbMessage.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraPlayerController)
 
@@ -531,36 +532,66 @@ void ALyraPlayerController::OnUnPossess()
 	Super::OnUnPossess();
 }
 
-//////////////////////////////////////////////////////////////////////
-// ALyraReplayPlayerController
-
 void ALyraPlayerController::Server_RequestApplyBattle_Implementation()
 {
-	FLyraNotificationMessage Message;
-	Message.TargetChannel = D1GameplayTags::Message_Game_NotificationMessage;
-	Message.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Failed", "전투 신청에 실패했습니다"));
+	ALyraPlayerState* LyraPlayerState = GetLyraPlayerState();
+	check(LyraPlayerState);
 
-	if (ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this)))
-	{
-		// TODO
-	}
+	ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this));
+	check(LyraGameState);
 	
-	// if (PlayerState && OnCombatAppliedPlayers.Num() < 2)
-	// {
-	// 	OnCombatAppliedPlayers.Add(PlayerState);
-	// 	Message.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Succeded", "전투 신청이 완료되었습니다"));
-	// }
-	// else
-	// {
-	// 	
-	// }
+	bool bSucceeded = LyraGameState->TryApplyCombatPlayer(LyraPlayerState);
 
-	Client_MessageToOwningClient(Message);
+	FLyraVerbMessage VerbMessage;
+	VerbMessage.Verb = D1GameplayTags::Message_Game_ResponseApplyBattle;
+		
+	FLyraNotificationMessage NotificationMessage;
+	NotificationMessage.TargetChannel = D1GameplayTags::Message_Game_NotificationMessage;
+		
+	if (bSucceeded)
+	{
+		VerbMessage.ContextTags.AddTag(D1GameplayTags::Status_Succeeded);
+		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Succeded", "전투 신청이 완료되었습니다"));
+	}
+	else
+	{
+		VerbMessage.ContextTags.AddTag(D1GameplayTags::Status_Failed);
+		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Failed", "전투 신청에 실패했습니다"));
+	}
+
+	LyraPlayerState->Client_SendVerbMessage(VerbMessage);
+	LyraPlayerState->Client_SendNotificationMessage(NotificationMessage);
 }
 
-void ALyraPlayerController::Client_MessageToOwningClient_Implementation(FLyraNotificationMessage Message)
+void ALyraPlayerController::Server_RequestCancelBattle_Implementation()
 {
-	UGameplayMessageSubsystem::Get(this).BroadcastMessage(Message.TargetChannel, Message);
+	ALyraPlayerState* LyraPlayerState = GetLyraPlayerState();
+	check(LyraPlayerState);
+
+	ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this));
+	check(LyraGameState);
+
+	bool bSucceeded = LyraGameState->TryCancelCombatPlayer(LyraPlayerState);
+
+	FLyraVerbMessage VerbMessage;
+	VerbMessage.Verb = D1GameplayTags::Message_Game_ResponseCancelBattle;
+		
+	FLyraNotificationMessage NotificationMessage;
+	NotificationMessage.TargetChannel = D1GameplayTags::Message_Game_NotificationMessage;
+		
+	if (bSucceeded)
+	{
+		VerbMessage.ContextTags.AddTag(D1GameplayTags::Status_Succeeded);
+		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Succeded", "전투 취소가 완료되었습니다"));
+	}
+	else
+	{
+		VerbMessage.ContextTags.AddTag(D1GameplayTags::Status_Failed);
+		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Failed", "전투 취소에 실패했습니다"));
+	}
+
+	LyraPlayerState->Client_SendVerbMessage(VerbMessage);
+	LyraPlayerState->Client_SendNotificationMessage(NotificationMessage);
 }
 
 void ALyraReplayPlayerController::Tick(float DeltaSeconds)
