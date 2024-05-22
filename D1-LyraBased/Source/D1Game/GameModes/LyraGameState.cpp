@@ -161,6 +161,9 @@ void ALyraGameState::OnRep_RecorderPlayerState()
 
 void ALyraGameState::PollBattlePlayers()
 {
+	if (HasAuthority() == false)
+		return;
+	
 	if (QueuedBattlePlayers.Num() > 0 && NextBattlePlayers[0] == nullptr)
 	{
 		NextBattlePlayers[0] = QueuedBattlePlayers[0];
@@ -243,6 +246,9 @@ bool ALyraGameState::IsQueuedBattlePlayer(APlayerState* PlayerState)
 
 bool ALyraGameState::CancelBattlePlayer_Internal(APlayerState* PlayerState)
 {
+	if (HasAuthority() == false)
+		return false;
+	
 	for (int32 i = 0; i < NextBattlePlayers.Num(); i++)
 	{
 		if (NextBattlePlayers[i] != PlayerState)
@@ -257,6 +263,9 @@ bool ALyraGameState::CancelBattlePlayer_Internal(APlayerState* PlayerState)
 
 bool ALyraGameState::TryApplyBettingCoins(FCoinApplyEntry CoinApplyEntry, APlayerState* PlayerState)
 {
+	if (HasAuthority() == false)
+		return false;
+	
 	ALyraPlayerState* LyraPlayerState = Cast<ALyraPlayerState>(PlayerState);
 	if (LyraPlayerState == nullptr)
 		return false;
@@ -265,10 +274,10 @@ bool ALyraGameState::TryApplyBettingCoins(FCoinApplyEntry CoinApplyEntry, APlaye
 	if (GamePhaseSubsystem->IsPhaseActive(D1GameplayTags::GamePhase_Betting) == false)
 		return false;
 	
-	if (CoinApplyEntry.TeamID != 0 || CoinApplyEntry.Coin < 0)
+	if (CoinApplyEntry.TeamID == 0 || CoinApplyEntry.Coin <= 0)
 		return false;
 
-	if (CoinApplyEntry.Coin < LyraPlayerState->Coin)
+	if (CoinApplyEntry.Coin > LyraPlayerState->Coin)
 		return false;
 
 	if (BettingCoins.Contains(LyraPlayerState))
@@ -284,6 +293,9 @@ bool ALyraGameState::TryApplyBettingCoins(FCoinApplyEntry CoinApplyEntry, APlaye
 
 bool ALyraGameState::TryCancelBettingCoins(APlayerState* PlayerState)
 {
+	if (HasAuthority() == false)
+		return false;
+	
 	ALyraPlayerState* LyraPlayerState = Cast<ALyraPlayerState>(PlayerState);
 	if (LyraPlayerState == nullptr)
 		return false;

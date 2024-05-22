@@ -93,6 +93,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Response_ApplyBetting,					"Message.Response.ApplyBetting");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Response_CancelBetting,					"Message.Response.CancelBetting");
 	UE_DEFINE_GAMEPLAY_TAG(Message_NextBattlePlayersChanged,				"Message.NextBattlePlayersChanged");
+	UE_DEFINE_GAMEPLAY_TAG(Message_TeamChanged,								"Message.TeamChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_CoinChanged,								"Message.CoinChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_TimerMessage_Increase,					"Message.TimerMessage.Increase");
 	UE_DEFINE_GAMEPLAY_TAG(Message_TimerMessage_Decrease,					"Message.TimerMessage.Decrease");
