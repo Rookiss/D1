@@ -24,7 +24,6 @@
 #include "ReplaySubsystem.h"
 #include "Development/LyraDeveloperSettings.h"
 #include "GameMapsSettings.h"
-#include "GameFramework/GameplayMessageSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Messages/LyraNotificationMessage.h"
 #include "Messages/LyraVerbMessage.h"
@@ -590,6 +589,70 @@ void ALyraPlayerController::Server_RequestCancelBattle_Implementation()
 	{
 		VerbMessage.ContextTags.AddTag(D1GameplayTags::Status_Failed);
 		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Failed", "전투 신청 취소에 실패했습니다"));
+	}
+
+	LyraPlayerState->Client_SendVerbMessage(VerbMessage);
+	LyraPlayerState->Client_SendNotificationMessage(NotificationMessage);
+}
+
+void ALyraPlayerController::Server_RequestApplyBetting_Implementation(FCoinApplyEntry CoinApplyEntry)
+{
+	ALyraPlayerState* LyraPlayerState = GetLyraPlayerState();
+	check(LyraPlayerState);
+
+	ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this));
+	check(LyraGameState);
+	
+	bool bSucceeded = LyraGameState->TryApplyBettingCoins(CoinApplyEntry, LyraPlayerState);
+
+	FLyraVerbMessage VerbMessage;
+	VerbMessage.Verb = D1GameplayTags::Message_Response_ApplyBetting;
+		
+	FLyraNotificationMessage NotificationMessage;
+	NotificationMessage.TargetChannel = D1GameplayTags::Message_Notification;
+	NotificationMessage.Magnitude = 2.f;
+	
+	if (bSucceeded)
+	{
+		VerbMessage.ContextTags.AddTag(D1GameplayTags::Status_Succeeded);
+		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Succeded", "베팅이 완료되었습니다"));
+	}
+	else
+	{
+		VerbMessage.ContextTags.AddTag(D1GameplayTags::Status_Failed);
+		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Failed", "베팅에 실패했습니다"));
+	}
+
+	LyraPlayerState->Client_SendVerbMessage(VerbMessage);
+	LyraPlayerState->Client_SendNotificationMessage(NotificationMessage);
+}
+
+void ALyraPlayerController::Server_RequestCancelBetting_Implementation()
+{
+	ALyraPlayerState* LyraPlayerState = GetLyraPlayerState();
+	check(LyraPlayerState);
+
+	ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this));
+	check(LyraGameState);
+
+	bool bSucceeded = LyraGameState->TryCancelBettingCoins(LyraPlayerState);
+
+	FLyraVerbMessage VerbMessage;
+	VerbMessage.Verb = D1GameplayTags::Message_Response_CancelBetting;
+		
+	FLyraNotificationMessage NotificationMessage;
+	NotificationMessage.TargetChannel = D1GameplayTags::Message_Notification;
+	NotificationMessage.Magnitude = 2.f;
+		
+	if (bSucceeded)
+	{
+		VerbMessage.ContextTags.AddTag(D1GameplayTags::Status_Succeeded);
+		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Succeded", "베팅이 취소되었습니다"));
+	}
+	else
+	{
+		VerbMessage.ContextTags.AddTag(D1GameplayTags::Status_Failed);
+		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Failed", "베팅 취소에 실패했습니다"));
 	}
 
 	LyraPlayerState->Client_SendVerbMessage(VerbMessage);

@@ -10,6 +10,7 @@
 #include "Messages/LyraVerbMessage.h"
 #include "Player/LyraPlayerState.h"
 #include "D1LogChannels.h"
+#include "AbilitySystem/Phases/LyraGamePhaseSubsystem.h"
 #include "Messages/LyraNotificationMessage.h"
 #include "Net/UnrealNetwork.h"
 
@@ -72,7 +73,7 @@ void ALyraGameState::AddPlayerState(APlayerState* PlayerState)
 
 void ALyraGameState::RemovePlayerState(APlayerState* PlayerState)
 {
-	TryCancelBattlePlayer(PlayerState);
+	CancelBattlePlayer_Internal(PlayerState);
 	
 	Super::RemovePlayerState(PlayerState);
 
@@ -179,6 +180,9 @@ bool ALyraGameState::TryApplyBattlePlayer(APlayerState* PlayerState)
 	if (HasAuthority() == false)
 		return false;
 
+	if (IsAppliedBattlePlayer(PlayerState))
+		return false;
+
 	for (int32 i = 0; i < NextBattlePlayers.Num(); i++)
 	{
 		if (NextBattlePlayers[i])
@@ -197,16 +201,11 @@ bool ALyraGameState::TryCancelBattlePlayer(APlayerState* PlayerState)
 	if (HasAuthority() == false)
 		return false;
 
-	for (int32 i = 0; i < NextBattlePlayers.Num(); i++)
-	{
-		if (NextBattlePlayers[i] != PlayerState)
-			continue;
-
-		NextBattlePlayers[i] = nullptr;
-		return true;
-	}
-
-	return QueuedBattlePlayers.Remove(PlayerState) > 0;
+	ULyraGamePhaseSubsystem* GamePhaseSubsystem = GetWorld()->GetSubsystem<ULyraGamePhaseSubsystem>();
+	if (GamePhaseSubsystem->IsPhaseActive(D1GameplayTags::GamePhase_WaitForPlayers) == false && NextBattlePlayers.Contains(PlayerState))
+		return false;
+	
+	return CancelBattlePlayer_Internal(PlayerState);
 }
 
 bool ALyraGameState::IsAppliedBattlePlayer(APlayerState* PlayerState)
@@ -240,6 +239,89 @@ bool ALyraGameState::IsQueuedBattlePlayer(APlayerState* PlayerState)
 		return true;
 	
 	return false;
+}
+
+bool ALyraGameState::CancelBattlePlayer_Internal(APlayerState* PlayerState)
+{
+	for (int32 i = 0; i < NextBattlePlayers.Num(); i++)
+	{
+		if (NextBattlePlayers[i] != PlayerState)
+			continue;
+
+		NextBattlePlayers[i] = nullptr;
+		return true;
+	}
+
+	return QueuedBattlePlayers.Remove(PlayerState) > 0;
+}
+
+bool ALyraGameState::TryApplyBettingCoins(FCoinApplyEntry CoinApplyEntry, APlayerState* PlayerState)
+{
+	ALyraPlayerState* LyraPlayerState = Cast<ALyraPlayerState>(PlayerState);
+	if (LyraPlayerState == nullptr)
+		return false;
+
+	ULyraGamePhaseSubsystem* GamePhaseSubsystem = GetWorld()->GetSubsystem<ULyraGamePhaseSubsystem>();
+	if (GamePhaseSubsystem->IsPhaseActive(D1GameplayTags::GamePhase_Betting) == false)
+		return false;
+	
+	if (CoinApplyEntry.TeamID != 0 || CoinApplyEntry.Coin < 0)
+		return false;
+
+	if (CoinApplyEntry.Coin < LyraPlayerState->Coin)
+		return false;
+
+	if (BettingCoins.Contains(LyraPlayerState))
+		return false;
+
+	LyraPlayerState->Coin -= CoinApplyEntry.Coin;
+	LyraPlayerState->SetGenericTeamId(CoinApplyEntry.TeamID);
+	
+	BettingCoins.Add(LyraPlayerState, CoinApplyEntry);
+	
+	return true;
+}
+
+bool ALyraGameState::TryCancelBettingCoins(APlayerState* PlayerState)
+{
+	ALyraPlayerState* LyraPlayerState = Cast<ALyraPlayerState>(PlayerState);
+	if (LyraPlayerState == nullptr)
+		return false;
+
+	ULyraGamePhaseSubsystem* GamePhaseSubsystem = UWorld::GetSubsystem<ULyraGamePhaseSubsystem>();
+	if (GamePhaseSubsystem->IsPhaseActive(D1GameplayTags::GamePhase_Betting) == false)
+		return false;
+
+	if (BettingCoins.Contains(LyraPlayerState) == false)
+		return false;
+
+	FCoinApplyEntry* CoinApplyEntry = BettingCoins.Find(LyraPlayerState);
+	if (CoinApplyEntry == nullptr)
+		return false;
+	
+	LyraPlayerState->Coin += CoinApplyEntry->Coin;
+	LyraPlayerState->SetGenericTeamId(0);
+
+	BettingCoins.Remove(LyraPlayerState);
+	
+	return true;
+}
+
+bool ALyraGameState::IsAppiedBettingCoins(APlayerState* PlayerState)
+{
+	return BettingCoins.Contains(PlayerState);
+}
+
+FCoinApplyEntry ALyraGameState::GetAppiedBettingCoins(APlayerState* PlayerState)
+{
+	if (FCoinApplyEntry* CoinApplyEntry = BettingCoins.Find(PlayerState))
+	{
+		return *CoinApplyEntry;	
+	}
+	else
+	{
+		return FCoinApplyEntry();
+	}
 }
 
 void ALyraGameState::OnRep_NextBattlePlayers()

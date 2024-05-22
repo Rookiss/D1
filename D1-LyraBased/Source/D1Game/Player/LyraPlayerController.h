@@ -148,6 +148,12 @@ public:
 
 	UFUNCTION(Server, Reliable, BlueprintCallable, BlueprintAuthorityOnly)
 	void Server_RequestCancelBattle();
+
+	UFUNCTION(Server, Reliable, BlueprintCallable, BlueprintAuthorityOnly)
+	void Server_RequestApplyBetting(FCoinApplyEntry CoinApplyEntry);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable, BlueprintAuthorityOnly)
+	void Server_RequestCancelBetting();
 };
 
 // A player controller used for replay capture and playback

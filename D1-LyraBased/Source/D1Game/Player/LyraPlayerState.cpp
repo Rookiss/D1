@@ -140,7 +140,9 @@ void ALyraPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	SharedParams.Condition = ELifetimeCondition::COND_SkipOwner;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, ReplicatedViewRotation, SharedParams);
 
-	DOREPLIFETIME(ThisClass, StatTags);	
+	DOREPLIFETIME(ThisClass, StatTags);
+	
+	DOREPLIFETIME(ThisClass, Coin);	
 }
 
 FRotator ALyraPlayerState::GetReplicatedViewRotation() const
