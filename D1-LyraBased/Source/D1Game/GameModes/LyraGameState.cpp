@@ -160,17 +160,17 @@ void ALyraGameState::OnRep_RecorderPlayerState()
 
 void ALyraGameState::PollBattlePlayers()
 {
-	if (AppliedBattlePlayers.Num() > 0 && NextBattlePlayers[0] == nullptr)
+	if (QueuedBattlePlayers.Num() > 0 && NextBattlePlayers[0] == nullptr)
 	{
-		NextBattlePlayers[0] = AppliedBattlePlayers[0];
-		AppliedBattlePlayers.RemoveAtSwap(0);
+		NextBattlePlayers[0] = QueuedBattlePlayers[0];
+		QueuedBattlePlayers.RemoveAtSwap(0);
 	}
 
-	if (AppliedBattlePlayers.Num() > 0 && NextBattlePlayers[1] == nullptr)
+	if (QueuedBattlePlayers.Num() > 0 && NextBattlePlayers[1] == nullptr)
 	{
-		int32 RandIndex = FMath::RandRange(0, AppliedBattlePlayers.Num() - 1);
-		NextBattlePlayers[1] = AppliedBattlePlayers[RandIndex];
-		AppliedBattlePlayers.RemoveAtSwap(RandIndex);
+		int32 RandIndex = FMath::RandRange(0, QueuedBattlePlayers.Num() - 1);
+		NextBattlePlayers[1] = QueuedBattlePlayers[RandIndex];
+		QueuedBattlePlayers.RemoveAtSwap(RandIndex);
 	}
 }
 
@@ -188,7 +188,7 @@ bool ALyraGameState::TryApplyBattlePlayer(APlayerState* PlayerState)
 		return true;
 	}
 	
-	AppliedBattlePlayers.Add(PlayerState);
+	QueuedBattlePlayers.Add(PlayerState);
 	return true;
 }
 
@@ -206,15 +206,37 @@ bool ALyraGameState::TryCancelBattlePlayer(APlayerState* PlayerState)
 		return true;
 	}
 
-	return AppliedBattlePlayers.Remove(PlayerState) > 0;
+	return QueuedBattlePlayers.Remove(PlayerState) > 0;
 }
 
-bool ALyraGameState::HasAppliedBattlePlayer(APlayerState* PlayerState)
+bool ALyraGameState::IsAppliedBattlePlayer(APlayerState* PlayerState)
 {
 	if (PlayerState == nullptr)
 		return false;
 	
-	if (NextBattlePlayers.Contains(PlayerState) || AppliedBattlePlayers.Contains(PlayerState))
+	if (NextBattlePlayers.Contains(PlayerState) || QueuedBattlePlayers.Contains(PlayerState))
+		return true;
+	
+	return false;
+}
+
+bool ALyraGameState::IsNextBattlePlayer(APlayerState* PlayerState)
+{
+	if (PlayerState == nullptr)
+		return false;
+
+	if (NextBattlePlayers.Contains(PlayerState))
+		return true;
+
+	return false;
+}
+
+bool ALyraGameState::IsQueuedBattlePlayer(APlayerState* PlayerState)
+{
+	if (PlayerState == nullptr)
+		return false;
+	
+	if (QueuedBattlePlayers.Contains(PlayerState))
 		return true;
 	
 	return false;
