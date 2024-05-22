@@ -113,7 +113,13 @@ public:
 	bool TryCancelBattlePlayer(APlayerState* PlayerState);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool HasAppliedBattlePlayer(APlayerState* PlayerState);
+	bool IsAppliedBattlePlayer(APlayerState* PlayerState);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsNextBattlePlayer(APlayerState* PlayerState);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsQueuedBattlePlayer(APlayerState* PlayerState);
 	
 	UFUNCTION()
 	void OnRep_NextBattlePlayers();
@@ -126,5 +132,5 @@ public:
 	TArray<TObjectPtr<APlayerState>> NextBattlePlayers;
 	
 	UPROPERTY()
-	TArray<TObjectPtr<APlayerState>> AppliedBattlePlayers;
+	TArray<TObjectPtr<APlayerState>> QueuedBattlePlayers;
 };
