@@ -288,7 +288,7 @@ bool ALyraGameState::TryCancelBettingCoins(APlayerState* PlayerState)
 	if (LyraPlayerState == nullptr)
 		return false;
 
-	ULyraGamePhaseSubsystem* GamePhaseSubsystem = UWorld::GetSubsystem<ULyraGamePhaseSubsystem>();
+	ULyraGamePhaseSubsystem* GamePhaseSubsystem = GetWorld()->GetSubsystem<ULyraGamePhaseSubsystem>();
 	if (GamePhaseSubsystem->IsPhaseActive(D1GameplayTags::GamePhase_Betting) == false)
 		return false;
 
