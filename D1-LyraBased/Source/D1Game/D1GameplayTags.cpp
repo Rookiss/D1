@@ -86,11 +86,16 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_WeaponEquipStateChanged,	        "Message.Item.WeaponEquipStateChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_EquipmentEntryChanged,		        "Message.Item.EquipmentEntryChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_InventoryEntryChanged,		        "Message.Item.InventoryEntryChanged");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Game_NotificationMessage,		        "Message.Game.NotificationMessage");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Game_ResponseApplyBattle,				"Message.Game.ResponseApplyBattle");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Game_ResponseCancelBattle,				"Message.Game.ResponseCancelBattle");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Game_NextBattlePlayersChanged,			"Message.Game.NextBattlePlayersChanged");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Game_CoinChanged,						"Message.Game.CoinChanged");
+
+	UE_DEFINE_GAMEPLAY_TAG(Message_Notification,							"Message.Notification");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Response_ApplyBattle,					"Message.Response.ApplyBattle");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Response_CancelBattle,					"Message.Response.CancelBattle");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Response_ApplyBetting,					"Message.Response.ApplyBetting");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Response_CancelBetting,					"Message.Response.CancelBetting");
+	UE_DEFINE_GAMEPLAY_TAG(Message_NextBattlePlayersChanged,				"Message.NextBattlePlayersChanged");
+	UE_DEFINE_GAMEPLAY_TAG(Message_CoinChanged,								"Message.CoinChanged");
+	UE_DEFINE_GAMEPLAY_TAG(Message_TimerMessage_Increase,					"Message.TimerMessage.Increase");
+	UE_DEFINE_GAMEPLAY_TAG(Message_TimerMessage_Decrease,					"Message.TimerMessage.Decrease");
 
 	// Attribute
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				        "Attribute.Primary.Health");

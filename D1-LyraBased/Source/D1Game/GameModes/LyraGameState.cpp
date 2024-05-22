@@ -72,12 +72,10 @@ void ALyraGameState::AddPlayerState(APlayerState* PlayerState)
 
 void ALyraGameState::RemovePlayerState(APlayerState* PlayerState)
 {
-	//@TODO: This isn't getting called right now (only the 'rich' AGameMode uses it, not AGameModeBase)
-	// Need to at least comment the engine code, and possibly move things around
-	Super::RemovePlayerState(PlayerState);
-
 	TryCancelBattlePlayer(PlayerState);
 	
+	Super::RemovePlayerState(PlayerState);
+
 	if (OnPlayerStatesChanged.IsBound())
 	{
 		OnPlayerStatesChanged.Broadcast();
@@ -162,16 +160,16 @@ void ALyraGameState::OnRep_RecorderPlayerState()
 
 void ALyraGameState::PollBattlePlayers()
 {
-	if (AppliedBattlePlayers.Num() <= 0)
-		return;
-	
-	for (int32 i = 0; i < NextBattlePlayers.Num(); i++)
+	if (AppliedBattlePlayers.Num() > 0 && NextBattlePlayers[0] == nullptr)
 	{
-		if (NextBattlePlayers[i])
-			continue;
+		NextBattlePlayers[0] = AppliedBattlePlayers[0];
+		AppliedBattlePlayers.RemoveAtSwap(0);
+	}
 
+	if (AppliedBattlePlayers.Num() > 0 && NextBattlePlayers[1] == nullptr)
+	{
 		int32 RandIndex = FMath::RandRange(0, AppliedBattlePlayers.Num() - 1);
-		NextBattlePlayers[i] = AppliedBattlePlayers[RandIndex];
+		NextBattlePlayers[1] = AppliedBattlePlayers[RandIndex];
 		AppliedBattlePlayers.RemoveAtSwap(RandIndex);
 	}
 }
@@ -225,7 +223,7 @@ bool ALyraGameState::HasAppliedBattlePlayer(APlayerState* PlayerState)
 void ALyraGameState::OnRep_NextBattlePlayers()
 {
 	FLyraVerbMessage VerbMessage;
-	VerbMessage.Verb = D1GameplayTags::Message_Game_NextBattlePlayersChanged;
+	VerbMessage.Verb = D1GameplayTags::Message_NextBattlePlayersChanged;
 	
 	UGameplayMessageSubsystem::Get(this).BroadcastMessage(VerbMessage.Verb, VerbMessage);
 }

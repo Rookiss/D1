@@ -312,7 +312,7 @@ void ALyraPlayerState::Client_SendNotificationMessage_Implementation(const FLyra
 void ALyraPlayerState::OnRep_Coin()
 {
 	FLyraVerbMessage VerbMessage;
-	VerbMessage.Verb = D1GameplayTags::Message_Game_CoinChanged;
+	VerbMessage.Verb = D1GameplayTags::Message_CoinChanged;
 	
 	UGameplayMessageSubsystem::Get(this).BroadcastMessage(VerbMessage.Verb, VerbMessage);
 }

@@ -543,11 +543,12 @@ void ALyraPlayerController::Server_RequestApplyBattle_Implementation()
 	bool bSucceeded = LyraGameState->TryApplyBattlePlayer(LyraPlayerState);
 
 	FLyraVerbMessage VerbMessage;
-	VerbMessage.Verb = D1GameplayTags::Message_Game_ResponseApplyBattle;
+	VerbMessage.Verb = D1GameplayTags::Message_Response_ApplyBattle;
 		
 	FLyraNotificationMessage NotificationMessage;
-	NotificationMessage.TargetChannel = D1GameplayTags::Message_Game_NotificationMessage;
-		
+	NotificationMessage.TargetChannel = D1GameplayTags::Message_Notification;
+	NotificationMessage.Magnitude = 2.f;
+	
 	if (bSucceeded)
 	{
 		VerbMessage.ContextTags.AddTag(D1GameplayTags::Status_Succeeded);
@@ -574,10 +575,11 @@ void ALyraPlayerController::Server_RequestCancelBattle_Implementation()
 	bool bSucceeded = LyraGameState->TryCancelBattlePlayer(LyraPlayerState);
 
 	FLyraVerbMessage VerbMessage;
-	VerbMessage.Verb = D1GameplayTags::Message_Game_ResponseCancelBattle;
+	VerbMessage.Verb = D1GameplayTags::Message_Response_CancelBattle;
 		
 	FLyraNotificationMessage NotificationMessage;
-	NotificationMessage.TargetChannel = D1GameplayTags::Message_Game_NotificationMessage;
+	NotificationMessage.TargetChannel = D1GameplayTags::Message_Notification;
+	NotificationMessage.Magnitude = 2.f;
 		
 	if (bSucceeded)
 	{
