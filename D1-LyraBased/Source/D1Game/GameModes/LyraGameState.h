@@ -3,6 +3,7 @@
 #pragma once
 
 #include "AbilitySystemInterface.h"
+#include "GenericTeamAgentInterface.h"
 #include "ModularGameState.h"
 
 #include "LyraGameState.generated.h"
@@ -24,6 +25,19 @@ struct FFrame;
  */
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerStatesChanged);
+
+USTRUCT(BlueprintType)
+struct FCoinApplyEntry
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TeamID = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int64 Coin = 0;
+};
 
 UCLASS(Config = Game)
 class D1GAME_API ALyraGameState : public AModularGameStateBase, public IAbilitySystemInterface
@@ -111,9 +125,31 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	bool TryCancelBattlePlayer(APlayerState* PlayerState);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsAppliedBattlePlayer(APlayerState* PlayerState);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool HasAppliedBattlePlayer(APlayerState* PlayerState);
+	bool IsNextBattlePlayer(APlayerState* PlayerState);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsQueuedBattlePlayer(APlayerState* PlayerState);
+
+private:
+	bool CancelBattlePlayer_Internal(APlayerState* PlayerState);
+	
+public:
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	bool TryApplyBettingCoins(FCoinApplyEntry CoinApplyEntry, APlayerState* PlayerState);
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	bool TryCancelBettingCoins(APlayerState* PlayerState);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsAppiedBettingCoins(APlayerState* PlayerState);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FCoinApplyEntry GetAppiedBettingCoins(APlayerState* PlayerState);
 	
 	UFUNCTION()
 	void OnRep_NextBattlePlayers();
@@ -126,5 +162,8 @@ public:
 	TArray<TObjectPtr<APlayerState>> NextBattlePlayers;
 	
 	UPROPERTY()
-	TArray<TObjectPtr<APlayerState>> AppliedBattlePlayers;
+	TArray<TObjectPtr<APlayerState>> QueuedBattlePlayers;
+
+	UPROPERTY(BlueprintReadOnly)
+	TMap<TObjectPtr<APlayerState>, FCoinApplyEntry> BettingCoins;
 };

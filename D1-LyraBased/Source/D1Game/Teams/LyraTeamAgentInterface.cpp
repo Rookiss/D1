@@ -2,7 +2,10 @@
 
 #include "Teams/LyraTeamAgentInterface.h"
 
+#include "D1GameplayTags.h"
 #include "D1LogChannels.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
+#include "Messages/LyraVerbMessage.h"
 #include "UObject/ScriptInterface.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraTeamAgentInterface)
@@ -25,4 +28,3 @@ void ILyraTeamAgentInterface::ConditionalBroadcastTeamChanged(TScriptInterface<I
 		This.GetInterface()->GetTeamChangedDelegateChecked().Broadcast(ThisObj, OldTeamIndex, NewTeamIndex);
 	}
 }
-

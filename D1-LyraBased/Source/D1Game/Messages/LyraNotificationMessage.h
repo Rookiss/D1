@@ -37,4 +37,7 @@ struct D1GAME_API FLyraNotificationMessage
 	// Extra payload specific to the target channel (e.g., a style or definition asset)
 	UPROPERTY(BlueprintReadWrite, Category=Notification)
 	TObjectPtr<UObject> PayloadObject = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, Category=Notification)
+	float Magnitude = 0.f;
 };

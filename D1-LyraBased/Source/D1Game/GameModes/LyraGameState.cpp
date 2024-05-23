@@ -10,6 +10,7 @@
 #include "Messages/LyraVerbMessage.h"
 #include "Player/LyraPlayerState.h"
 #include "D1LogChannels.h"
+#include "AbilitySystem/Phases/LyraGamePhaseSubsystem.h"
 #include "Messages/LyraNotificationMessage.h"
 #include "Net/UnrealNetwork.h"
 
@@ -72,12 +73,10 @@ void ALyraGameState::AddPlayerState(APlayerState* PlayerState)
 
 void ALyraGameState::RemovePlayerState(APlayerState* PlayerState)
 {
-	//@TODO: This isn't getting called right now (only the 'rich' AGameMode uses it, not AGameModeBase)
-	// Need to at least comment the engine code, and possibly move things around
+	CancelBattlePlayer_Internal(PlayerState);
+	
 	Super::RemovePlayerState(PlayerState);
 
-	TryCancelBattlePlayer(PlayerState);
-	
 	if (OnPlayerStatesChanged.IsBound())
 	{
 		OnPlayerStatesChanged.Broadcast();
@@ -162,23 +161,29 @@ void ALyraGameState::OnRep_RecorderPlayerState()
 
 void ALyraGameState::PollBattlePlayers()
 {
-	if (AppliedBattlePlayers.Num() <= 0)
+	if (HasAuthority() == false)
 		return;
 	
-	for (int32 i = 0; i < NextBattlePlayers.Num(); i++)
+	if (QueuedBattlePlayers.Num() > 0 && NextBattlePlayers[0] == nullptr)
 	{
-		if (NextBattlePlayers[i])
-			continue;
+		NextBattlePlayers[0] = QueuedBattlePlayers[0];
+		QueuedBattlePlayers.RemoveAtSwap(0);
+	}
 
-		int32 RandIndex = FMath::RandRange(0, AppliedBattlePlayers.Num() - 1);
-		NextBattlePlayers[i] = AppliedBattlePlayers[RandIndex];
-		AppliedBattlePlayers.RemoveAtSwap(RandIndex);
+	if (QueuedBattlePlayers.Num() > 0 && NextBattlePlayers[1] == nullptr)
+	{
+		int32 RandIndex = FMath::RandRange(0, QueuedBattlePlayers.Num() - 1);
+		NextBattlePlayers[1] = QueuedBattlePlayers[RandIndex];
+		QueuedBattlePlayers.RemoveAtSwap(RandIndex);
 	}
 }
 
 bool ALyraGameState::TryApplyBattlePlayer(APlayerState* PlayerState)
 {
 	if (HasAuthority() == false)
+		return false;
+
+	if (IsAppliedBattlePlayer(PlayerState))
 		return false;
 
 	for (int32 i = 0; i < NextBattlePlayers.Num(); i++)
@@ -190,7 +195,7 @@ bool ALyraGameState::TryApplyBattlePlayer(APlayerState* PlayerState)
 		return true;
 	}
 	
-	AppliedBattlePlayers.Add(PlayerState);
+	QueuedBattlePlayers.Add(PlayerState);
 	return true;
 }
 
@@ -199,6 +204,51 @@ bool ALyraGameState::TryCancelBattlePlayer(APlayerState* PlayerState)
 	if (HasAuthority() == false)
 		return false;
 
+	ULyraGamePhaseSubsystem* GamePhaseSubsystem = GetWorld()->GetSubsystem<ULyraGamePhaseSubsystem>();
+	if (GamePhaseSubsystem->IsPhaseActive(D1GameplayTags::GamePhase_WaitForPlayers) == false && NextBattlePlayers.Contains(PlayerState))
+		return false;
+	
+	return CancelBattlePlayer_Internal(PlayerState);
+}
+
+bool ALyraGameState::IsAppliedBattlePlayer(APlayerState* PlayerState)
+{
+	if (PlayerState == nullptr)
+		return false;
+	
+	if (NextBattlePlayers.Contains(PlayerState) || QueuedBattlePlayers.Contains(PlayerState))
+		return true;
+	
+	return false;
+}
+
+bool ALyraGameState::IsNextBattlePlayer(APlayerState* PlayerState)
+{
+	if (PlayerState == nullptr)
+		return false;
+
+	if (NextBattlePlayers.Contains(PlayerState))
+		return true;
+
+	return false;
+}
+
+bool ALyraGameState::IsQueuedBattlePlayer(APlayerState* PlayerState)
+{
+	if (PlayerState == nullptr)
+		return false;
+	
+	if (QueuedBattlePlayers.Contains(PlayerState))
+		return true;
+	
+	return false;
+}
+
+bool ALyraGameState::CancelBattlePlayer_Internal(APlayerState* PlayerState)
+{
+	if (HasAuthority() == false)
+		return false;
+	
 	for (int32 i = 0; i < NextBattlePlayers.Num(); i++)
 	{
 		if (NextBattlePlayers[i] != PlayerState)
@@ -208,24 +258,88 @@ bool ALyraGameState::TryCancelBattlePlayer(APlayerState* PlayerState)
 		return true;
 	}
 
-	return AppliedBattlePlayers.Remove(PlayerState) > 0;
+	return QueuedBattlePlayers.Remove(PlayerState) > 0;
 }
 
-bool ALyraGameState::HasAppliedBattlePlayer(APlayerState* PlayerState)
+bool ALyraGameState::TryApplyBettingCoins(FCoinApplyEntry CoinApplyEntry, APlayerState* PlayerState)
 {
-	if (PlayerState == nullptr)
+	if (HasAuthority() == false)
 		return false;
 	
-	if (NextBattlePlayers.Contains(PlayerState) || AppliedBattlePlayers.Contains(PlayerState))
-		return true;
+	ALyraPlayerState* LyraPlayerState = Cast<ALyraPlayerState>(PlayerState);
+	if (LyraPlayerState == nullptr)
+		return false;
+
+	ULyraGamePhaseSubsystem* GamePhaseSubsystem = GetWorld()->GetSubsystem<ULyraGamePhaseSubsystem>();
+	if (GamePhaseSubsystem->IsPhaseActive(D1GameplayTags::GamePhase_Betting) == false)
+		return false;
 	
-	return false;
+	if (CoinApplyEntry.TeamID == 0 || CoinApplyEntry.Coin <= 0)
+		return false;
+
+	if (CoinApplyEntry.Coin > LyraPlayerState->Coin)
+		return false;
+
+	if (BettingCoins.Contains(LyraPlayerState))
+		return false;
+
+	LyraPlayerState->Coin -= CoinApplyEntry.Coin;
+	LyraPlayerState->SetGenericTeamId(CoinApplyEntry.TeamID);
+	
+	BettingCoins.Add(LyraPlayerState, CoinApplyEntry);
+	
+	return true;
+}
+
+bool ALyraGameState::TryCancelBettingCoins(APlayerState* PlayerState)
+{
+	if (HasAuthority() == false)
+		return false;
+	
+	ALyraPlayerState* LyraPlayerState = Cast<ALyraPlayerState>(PlayerState);
+	if (LyraPlayerState == nullptr)
+		return false;
+
+	ULyraGamePhaseSubsystem* GamePhaseSubsystem = GetWorld()->GetSubsystem<ULyraGamePhaseSubsystem>();
+	if (GamePhaseSubsystem->IsPhaseActive(D1GameplayTags::GamePhase_Betting) == false)
+		return false;
+
+	if (BettingCoins.Contains(LyraPlayerState) == false)
+		return false;
+
+	FCoinApplyEntry* CoinApplyEntry = BettingCoins.Find(LyraPlayerState);
+	if (CoinApplyEntry == nullptr)
+		return false;
+	
+	LyraPlayerState->Coin += CoinApplyEntry->Coin;
+	LyraPlayerState->SetGenericTeamId(0);
+
+	BettingCoins.Remove(LyraPlayerState);
+	
+	return true;
+}
+
+bool ALyraGameState::IsAppiedBettingCoins(APlayerState* PlayerState)
+{
+	return BettingCoins.Contains(PlayerState);
+}
+
+FCoinApplyEntry ALyraGameState::GetAppiedBettingCoins(APlayerState* PlayerState)
+{
+	if (FCoinApplyEntry* CoinApplyEntry = BettingCoins.Find(PlayerState))
+	{
+		return *CoinApplyEntry;	
+	}
+	else
+	{
+		return FCoinApplyEntry();
+	}
 }
 
 void ALyraGameState::OnRep_NextBattlePlayers()
 {
 	FLyraVerbMessage VerbMessage;
-	VerbMessage.Verb = D1GameplayTags::Message_Game_NextBattlePlayersChanged;
+	VerbMessage.Verb = D1GameplayTags::Message_NextBattlePlayersChanged;
 	
 	UGameplayMessageSubsystem::Get(this).BroadcastMessage(VerbMessage.Verb, VerbMessage);
 }

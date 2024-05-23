@@ -341,16 +341,28 @@ void UD1EquipmentManagerComponent::AddDefaultEquipments()
 	}
 
 	{
-		// Bow
+		// Long Sword
 		FD1EquipmentEntry& Entry = Entries[(int32)EEquipmentSlotType::Secondary_TwoHand];
 		UD1ItemInstance* Instance = Entry.GetItemInstance();
 		if (Instance == nullptr)
 		{
 			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(Item::BowID, EItemRarity::Junk);
+			ItemInstance->Init(Item::LongSwordID, EItemRarity::Junk);
 			EquipmentList.AddEntry(EEquipmentSlotType::Secondary_TwoHand, ItemInstance);
 		}
 	}
+
+	// {
+	// 	// Bow
+	// 	FD1EquipmentEntry& Entry = Entries[(int32)EEquipmentSlotType::Secondary_TwoHand];
+	// 	UD1ItemInstance* Instance = Entry.GetItemInstance();
+	// 	if (Instance == nullptr)
+	// 	{
+	// 		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+	// 		ItemInstance->Init(Item::BowID, EItemRarity::Junk);
+	// 		EquipmentList.AddEntry(EEquipmentSlotType::Secondary_TwoHand, ItemInstance);
+	// 	}
+	// }
 
 	ALyraCharacter* Character = GetCharacter();
 	check(Character);

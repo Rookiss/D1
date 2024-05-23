@@ -140,7 +140,9 @@ void ALyraPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	SharedParams.Condition = ELifetimeCondition::COND_SkipOwner;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, ReplicatedViewRotation, SharedParams);
 
-	DOREPLIFETIME(ThisClass, StatTags);	
+	DOREPLIFETIME(ThisClass, StatTags);
+	
+	DOREPLIFETIME(ThisClass, Coin);	
 }
 
 FRotator ALyraPlayerState::GetReplicatedViewRotation() const
@@ -312,7 +314,7 @@ void ALyraPlayerState::Client_SendNotificationMessage_Implementation(const FLyra
 void ALyraPlayerState::OnRep_Coin()
 {
 	FLyraVerbMessage VerbMessage;
-	VerbMessage.Verb = D1GameplayTags::Message_Game_CoinChanged;
+	VerbMessage.Verb = D1GameplayTags::Message_CoinChanged;
 	
 	UGameplayMessageSubsystem::Get(this).BroadcastMessage(VerbMessage.Verb, VerbMessage);
 }
