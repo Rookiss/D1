@@ -43,43 +43,43 @@ void FD1EquipEntry::Equip()
 
 	if (EquipManager->GetOwner()->HasAuthority())
 	{
-		ULyraAbilitySystemComponent* ASC = Cast<ULyraAbilitySystemComponent>(EquipManager->GetAbilitySystemComponent());
-		check(ASC);
+		if (ULyraAbilitySystemComponent* ASC = Cast<ULyraAbilitySystemComponent>(EquipManager->GetAbilitySystemComponent()))
+		{
+			// Remove Previous Ability
+			BaseAbilitySetHandles.TakeFromAbilitySystem(ASC);
+	
+			// Add Current Ability
+			if (const ULyraAbilitySet* BaseAbilitySet = EquippableFragment->BaseAbilitySet)
+			{
+				BaseAbilitySet->GiveToAbilitySystem(ASC, &BaseAbilitySetHandles, ItemInstance);
+			}
+
+			// Remove Previous Stat
+			ASC->RemoveActiveGameplayEffect(BaseStatHandle);
+			BaseStatHandle.Invalidate();
+	
+			// Add Current Stat
+			const TSubclassOf<UGameplayEffect> AttributeModifierGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().AttributeModifierGameplayEffect);
+			check(AttributeModifierGE);
 		
-		// Remove Previous Ability
-		BaseAbilitySetHandles.TakeFromAbilitySystem(ASC);
+			const FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
+			const FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(AttributeModifierGE, 1.f, ContextHandle);
+
+			TArray<FGameplayAttribute> OutAttributes;
+			ASC->GetAllAttributes(OutAttributes);
+
+			for (const FGameplayAttribute& Attribute : OutAttributes)
+			{
+				SpecHandle.Data->SetSetByCallerMagnitude(FName(*Attribute.GetName()), 0);
+			}
+
+			for (const FGameplayTagStack& Stack : ItemInstance->GetStatContainer().GetStacks())
+			{
+				SpecHandle.Data->SetSetByCallerMagnitude(Stack.GetStackTag(), Stack.GetStackCount());
+			}
 	
-		// Add Current Ability
-		if (const ULyraAbilitySet* BaseAbilitySet = EquippableFragment->BaseAbilitySet)
-		{
-			BaseAbilitySet->GiveToAbilitySystem(ASC, &BaseAbilitySetHandles, ItemInstance);
+			BaseStatHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 		}
-
-		// Remove Previous Stat
-		ASC->RemoveActiveGameplayEffect(BaseStatHandle);
-		BaseStatHandle.Invalidate();
-	
-		// Add Current Stat
-		const TSubclassOf<UGameplayEffect> AttributeModifierGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().AttributeModifierGameplayEffect);
-		check(AttributeModifierGE);
-		
-		const FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
-		const FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(AttributeModifierGE, 1.f, ContextHandle);
-
-		TArray<FGameplayAttribute> OutAttributes;
-		ASC->GetAllAttributes(OutAttributes);
-
-		for (const FGameplayAttribute& Attribute : OutAttributes)
-		{
-			SpecHandle.Data->SetSetByCallerMagnitude(FName(*Attribute.GetName()), 0);
-		}
-
-		for (const FGameplayTagStack& Stack : ItemInstance->GetStatContainer().GetStacks())
-		{
-			SpecHandle.Data->SetSetByCallerMagnitude(Stack.GetStackTag(), Stack.GetStackCount());
-		}
-	
-		BaseStatHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 		
 		// Weapon
 		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
@@ -125,15 +125,15 @@ void FD1EquipEntry::Unequip()
 {
 	if (EquipManager->GetOwner()->HasAuthority())
 	{
-		ULyraAbilitySystemComponent* ASC = Cast<ULyraAbilitySystemComponent>(EquipManager->GetAbilitySystemComponent());
-		check(ASC);
-	
-		// Remove Ability
-		BaseAbilitySetHandles.TakeFromAbilitySystem(ASC);
+		if (ULyraAbilitySystemComponent* ASC = Cast<ULyraAbilitySystemComponent>(EquipManager->GetAbilitySystemComponent()))
+		{
+			// Remove Ability
+			BaseAbilitySetHandles.TakeFromAbilitySystem(ASC);
 
-		// Remove Stat
-		ASC->RemoveActiveGameplayEffect(BaseStatHandle);
-		BaseStatHandle.Invalidate();
+			// Remove Stat
+			ASC->RemoveActiveGameplayEffect(BaseStatHandle);
+			BaseStatHandle.Invalidate();
+		}
 		
 		// Despawn Weapon
 		if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType))

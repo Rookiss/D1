@@ -591,8 +591,8 @@ void ALyraPlayerController::Server_RequestCancelBattle_Implementation()
 		NotificationMessage.PayloadMessage = FText(LOCTEXT("RequestApplyBattle_Failed", "전투 신청 취소에 실패했습니다"));
 	}
 
-	LyraPlayerState->Client_SendVerbMessage(VerbMessage);
 	LyraPlayerState->Client_SendNotificationMessage(NotificationMessage);
+	LyraPlayerState->Client_SendVerbMessage(VerbMessage);
 }
 
 void ALyraPlayerController::Server_RequestApplyBetting_Implementation(FCoinApplyRequest CoinApplyRequest)

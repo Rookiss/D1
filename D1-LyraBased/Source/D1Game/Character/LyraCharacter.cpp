@@ -16,6 +16,7 @@
 #include "Player/LyraPlayerState.h"
 #include "System/LyraSignificanceManager.h"
 #include "TimerManager.h"
+#include "GameFramework/SpectatorPawn.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraCharacter)
 
@@ -372,6 +373,8 @@ void ALyraCharacter::DisableMovementAndCollision()
 	ULyraCharacterMovementComponent* LyraMoveComp = CastChecked<ULyraCharacterMovementComponent>(GetCharacterMovement());
 	LyraMoveComp->StopMovementImmediately();
 	LyraMoveComp->DisableMovement();
+
+	bUseControllerRotationYaw = false;
 }
 
 void ALyraCharacter::DestroyDueToDeath()
@@ -384,12 +387,6 @@ void ALyraCharacter::DestroyDueToDeath()
 
 void ALyraCharacter::UninitAndDestroy()
 {
-	if (GetLocalRole() == ROLE_Authority)
-	{
-		DetachFromControllerPendingDestroy();
-		SetLifeSpan(0.1f);
-	}
-
 	// Uninitialize the ASC if we're still the avatar actor (otherwise another pawn already did it when they became the avatar actor)
 	if (ULyraAbilitySystemComponent* LyraASC = GetLyraAbilitySystemComponent())
 	{
@@ -397,6 +394,17 @@ void ALyraCharacter::UninitAndDestroy()
 		{
 			PawnExtComponent->UninitializeAbilitySystem();
 		}
+	}
+	
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		if (Controller)
+		{
+			ASpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(GetActorLocation(), GetActorRotation());
+			Controller->Possess(SpectatorPawn);
+		}
+		
+		SetLifeSpan(0.1f);
 	}
 
 	SetActorHiddenInGame(true);

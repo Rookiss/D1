@@ -174,6 +174,8 @@ protected:
 
 	void DisableMovementAndCollision();
 	void DestroyDueToDeath();
+
+	UFUNCTION(BlueprintCallable)
 	void UninitAndDestroy();
 
 	// Called when the death sequence for the character has completed
