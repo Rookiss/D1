@@ -102,6 +102,7 @@ void ALyraGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(ThisClass, ServerFPS);
 	DOREPLIFETIME(ThisClass, NextBattlePlayers);
+	DOREPLIFETIME(ThisClass, BettingCoins);
 	DOREPLIFETIME_CONDITION(ThisClass, RecorderPlayerState, COND_ReplayOnly);
 }
 
@@ -261,7 +262,7 @@ bool ALyraGameState::CancelBattlePlayer_Internal(APlayerState* PlayerState)
 	return QueuedBattlePlayers.Remove(PlayerState) > 0;
 }
 
-bool ALyraGameState::TryApplyBettingCoins(FCoinApplyEntry CoinApplyEntry, APlayerState* PlayerState)
+bool ALyraGameState::TryApplyBettingCoins(FCoinApplyRequest CoinApplyRequest, APlayerState* PlayerState)
 {
 	if (HasAuthority() == false)
 		return false;
@@ -274,19 +275,19 @@ bool ALyraGameState::TryApplyBettingCoins(FCoinApplyEntry CoinApplyEntry, APlaye
 	if (GamePhaseSubsystem->IsPhaseActive(D1GameplayTags::GamePhase_Betting) == false)
 		return false;
 	
-	if (CoinApplyEntry.TeamID == 0 || CoinApplyEntry.Coin <= 0)
+	if (CoinApplyRequest.TeamID == 0 || CoinApplyRequest.Coin <= 0)
 		return false;
 
-	if (CoinApplyEntry.Coin > LyraPlayerState->Coin)
+	if (CoinApplyRequest.Coin > LyraPlayerState->Coin)
 		return false;
 
-	if (BettingCoins.Contains(LyraPlayerState))
+	if (IsAppiedBettingCoins(PlayerState))
 		return false;
 
-	LyraPlayerState->Coin -= CoinApplyEntry.Coin;
-	LyraPlayerState->SetGenericTeamId(CoinApplyEntry.TeamID);
+	LyraPlayerState->Coin -= CoinApplyRequest.Coin;
+	LyraPlayerState->SetGenericTeamId(CoinApplyRequest.TeamID);
 	
-	BettingCoins.Add(LyraPlayerState, CoinApplyEntry);
+	BettingCoins.Add(FCoinApplyEntry{ LyraPlayerState, CoinApplyRequest.Coin });
 	
 	return true;
 }
@@ -304,42 +305,59 @@ bool ALyraGameState::TryCancelBettingCoins(APlayerState* PlayerState)
 	if (GamePhaseSubsystem->IsPhaseActive(D1GameplayTags::GamePhase_Betting) == false)
 		return false;
 
-	if (BettingCoins.Contains(LyraPlayerState) == false)
-		return false;
+	int32 Index = INDEX_NONE;
+	
+	for (int32 i = 0; i < BettingCoins.Num(); i++)
+	{
+		if (BettingCoins[i].PlayerState == PlayerState)
+		{
+			Index = i;
+			break;
+		}
+	}
 
-	FCoinApplyEntry* CoinApplyEntry = BettingCoins.Find(LyraPlayerState);
-	if (CoinApplyEntry == nullptr)
+	if (Index == INDEX_NONE)
 		return false;
 	
-	LyraPlayerState->Coin += CoinApplyEntry->Coin;
+	LyraPlayerState->Coin += BettingCoins[Index].Coin;
 	LyraPlayerState->SetGenericTeamId(0);
 
-	BettingCoins.Remove(LyraPlayerState);
-	
+	BettingCoins.RemoveAtSwap(Index);
 	return true;
 }
 
 bool ALyraGameState::IsAppiedBettingCoins(APlayerState* PlayerState)
 {
-	return BettingCoins.Contains(PlayerState);
+	for (FCoinApplyEntry& BettingCoin : BettingCoins)
+	{
+		if (BettingCoin.PlayerState == PlayerState)
+			return true;
+	}
+	return false;
 }
 
 FCoinApplyEntry ALyraGameState::GetAppiedBettingCoins(APlayerState* PlayerState)
 {
-	if (FCoinApplyEntry* CoinApplyEntry = BettingCoins.Find(PlayerState))
+	for (FCoinApplyEntry& BettingCoin : BettingCoins)
 	{
-		return *CoinApplyEntry;	
+		if (BettingCoin.PlayerState == PlayerState)
+			return BettingCoin;
 	}
-	else
-	{
-		return FCoinApplyEntry();
-	}
+	return FCoinApplyEntry();
 }
 
 void ALyraGameState::OnRep_NextBattlePlayers()
 {
 	FLyraVerbMessage VerbMessage;
 	VerbMessage.Verb = D1GameplayTags::Message_NextBattlePlayersChanged;
+	
+	UGameplayMessageSubsystem::Get(this).BroadcastMessage(VerbMessage.Verb, VerbMessage);
+}
+
+void ALyraGameState::OnRep_BettingCoins()
+{
+	FLyraVerbMessage VerbMessage;
+	VerbMessage.Verb = D1GameplayTags::Message_BettingCoinsChanged;
 	
 	UGameplayMessageSubsystem::Get(this).BroadcastMessage(VerbMessage.Verb, VerbMessage);
 }

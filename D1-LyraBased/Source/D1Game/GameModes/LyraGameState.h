@@ -8,6 +8,7 @@
 
 #include "LyraGameState.generated.h"
 
+class ALyraPlayerState;
 struct FLyraNotificationMessage;
 struct FLyraVerbMessage;
 
@@ -27,13 +28,26 @@ struct FFrame;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerStatesChanged);
 
 USTRUCT(BlueprintType)
-struct FCoinApplyEntry
+struct FCoinApplyRequest
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TeamID = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int64 Coin = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FCoinApplyEntry
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<ALyraPlayerState> PlayerState = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int64 Coin = 0;
@@ -140,7 +154,7 @@ private:
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool TryApplyBettingCoins(FCoinApplyEntry CoinApplyEntry, APlayerState* PlayerState);
+	bool TryApplyBettingCoins(FCoinApplyRequest CoinApplyRequest, APlayerState* PlayerState);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	bool TryCancelBettingCoins(APlayerState* PlayerState);
@@ -153,6 +167,9 @@ public:
 	
 	UFUNCTION()
 	void OnRep_NextBattlePlayers();
+
+	UFUNCTION()
+	void OnRep_BettingCoins();
 	
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -164,6 +181,6 @@ public:
 	UPROPERTY()
 	TArray<TObjectPtr<APlayerState>> QueuedBattlePlayers;
 
-	UPROPERTY(BlueprintReadOnly)
-	TMap<TObjectPtr<APlayerState>, FCoinApplyEntry> BettingCoins;
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_BettingCoins)
+	TArray<FCoinApplyEntry> BettingCoins;
 };

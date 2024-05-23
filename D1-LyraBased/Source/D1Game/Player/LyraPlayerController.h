@@ -150,7 +150,7 @@ public:
 	void Server_RequestCancelBattle();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable, BlueprintAuthorityOnly)
-	void Server_RequestApplyBetting(FCoinApplyEntry CoinApplyEntry);
+	void Server_RequestApplyBetting(FCoinApplyRequest CoinApplyRequest);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable, BlueprintAuthorityOnly)
 	void Server_RequestCancelBetting();

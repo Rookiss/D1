@@ -276,6 +276,34 @@ bool UD1EquipmentManagerComponent::CanAddEntry(UD1ItemInstance* FromItemInstance
 				return (LeftHandEntry.ItemInstance == nullptr && RightHandEntry.ItemInstance == nullptr);
 			}
 		}
+		else if (IsTertiaryWeaponSlot(ToEquipmentSlotType))
+		{
+			if (FromWeaponHandType == EWeaponHandType::LeftHand || FromWeaponHandType == EWeaponHandType::RightHand)
+			{
+				const FD1EquipmentEntry& TwoHandEntry = Entries[(int32)EEquipmentSlotType::Tertiary_TwoHand];
+				return (TwoHandEntry.ItemInstance == nullptr);
+			}
+			else if (FromWeaponHandType == EWeaponHandType::TwoHand)
+			{
+				const FD1EquipmentEntry& LeftHandEntry = Entries[(int32)EEquipmentSlotType::Tertiary_LeftHand];
+				const FD1EquipmentEntry& RightHandEntry = Entries[(int32)EEquipmentSlotType::Tertiary_RightHand];
+				return (LeftHandEntry.ItemInstance == nullptr && RightHandEntry.ItemInstance == nullptr);
+			}
+		}
+		else if (IsQuaternaryWeaponSlot(ToEquipmentSlotType))
+		{
+			if (FromWeaponHandType == EWeaponHandType::LeftHand || FromWeaponHandType == EWeaponHandType::RightHand)
+			{
+				const FD1EquipmentEntry& TwoHandEntry = Entries[(int32)EEquipmentSlotType::Quaternary_TwoHand];
+				return (TwoHandEntry.ItemInstance == nullptr);
+			}
+			else if (FromWeaponHandType == EWeaponHandType::TwoHand)
+			{
+				const FD1EquipmentEntry& LeftHandEntry = Entries[(int32)EEquipmentSlotType::Quaternary_LeftHand];
+				const FD1EquipmentEntry& RightHandEntry = Entries[(int32)EEquipmentSlotType::Quaternary_RightHand];
+				return (LeftHandEntry.ItemInstance == nullptr && RightHandEntry.ItemInstance == nullptr);
+			}
+		}
 	}
 	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
 	{
@@ -294,75 +322,93 @@ void UD1EquipmentManagerComponent::AddDefaultEquipments()
 
 	{
 		// Unarmed Left Hand
-		FD1EquipmentEntry& Entry = Entries[(int32)EEquipmentSlotType::Unarmed_LeftHand];
+		const int32 ItemID = Item::UnarmedLeftID;
+		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Unarmed_LeftHand;
+		
+		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 		UD1ItemInstance* Instance = Entry.GetItemInstance();
 		if (Instance == nullptr)
 		{
 			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(Item::UnarmedLeftID, EItemRarity::Junk);
-			EquipmentList.AddEntry(EEquipmentSlotType::Unarmed_LeftHand, ItemInstance);
+			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
 		}
 	}
 	
 	{
 		// Unarmed Right Hand
-		FD1EquipmentEntry& Entry = Entries[(int32)EEquipmentSlotType::Unarmed_RightHand];
+		const int32 ItemID = Item::UnarmedRightID;
+		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Unarmed_RightHand;
+		
+		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 		UD1ItemInstance* Instance = Entry.GetItemInstance();
 		if (Instance == nullptr)
 		{
 			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(Item::UnarmedRightID, EItemRarity::Junk);
-			EquipmentList.AddEntry(EEquipmentSlotType::Unarmed_RightHand, ItemInstance);
+			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
 		}
 	}
 
 	{
 		// Shield
-		FD1EquipmentEntry& Entry = Entries[(int32)EEquipmentSlotType::Primary_LeftHand];
+		const int32 ItemID = Item::ShieldID;
+		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Primary_LeftHand;
+		
+		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 		UD1ItemInstance* Instance = Entry.GetItemInstance();
 		if (Instance == nullptr)
 		{
 			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(Item::ShieldID, EItemRarity::Junk);
-			EquipmentList.AddEntry(EEquipmentSlotType::Primary_LeftHand, ItemInstance);
+			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
 		}
 	}
 
 	{
 		// Short Sword
-		FD1EquipmentEntry& Entry = Entries[(int32)EEquipmentSlotType::Primary_RightHand];
+		const int32 ItemID = Item::ShortSwordID;
+		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Primary_RightHand;
+		
+		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 		UD1ItemInstance* Instance = Entry.GetItemInstance();
 		if (Instance == nullptr)
 		{
 			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(Item::ShortSwordID, EItemRarity::Junk);
-			EquipmentList.AddEntry(EEquipmentSlotType::Primary_RightHand, ItemInstance);
+			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
 		}
 	}
 
 	{
 		// Long Sword
-		FD1EquipmentEntry& Entry = Entries[(int32)EEquipmentSlotType::Secondary_TwoHand];
+		const int32 ItemID = Item::LongSwordID;
+		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Secondary_TwoHand;
+		
+		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 		UD1ItemInstance* Instance = Entry.GetItemInstance();
 		if (Instance == nullptr)
 		{
 			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(Item::LongSwordID, EItemRarity::Junk);
-			EquipmentList.AddEntry(EEquipmentSlotType::Secondary_TwoHand, ItemInstance);
+			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
 		}
 	}
 
-	// {
-	// 	// Bow
-	// 	FD1EquipmentEntry& Entry = Entries[(int32)EEquipmentSlotType::Secondary_TwoHand];
-	// 	UD1ItemInstance* Instance = Entry.GetItemInstance();
-	// 	if (Instance == nullptr)
-	// 	{
-	// 		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-	// 		ItemInstance->Init(Item::BowID, EItemRarity::Junk);
-	// 		EquipmentList.AddEntry(EEquipmentSlotType::Secondary_TwoHand, ItemInstance);
-	// 	}
-	// }
+	{
+		// Bow
+		const int32 ItemID = Item::BowID;
+		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Tertiary_TwoHand;
+		
+		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+		UD1ItemInstance* Instance = Entry.GetItemInstance();
+		if (Instance == nullptr)
+		{
+			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
+		}
+	}
 
 	ALyraCharacter* Character = GetCharacter();
 	check(Character);
@@ -375,31 +421,32 @@ void UD1EquipmentManagerComponent::AddDefaultEquipments()
 
 bool UD1EquipmentManagerComponent::IsWeaponSlot(EEquipmentSlotType EquipmentSlotType)
 {
-	return (EquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand   ||
-			EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand  ||
-			EquipmentSlotType == EEquipmentSlotType::Primary_RightHand || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand ||
-			EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand   || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand);
+	return (EquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand	 || EquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand	  ||
+			EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand	 || EquipmentSlotType == EEquipmentSlotType::Primary_RightHand	  || EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand   ||
+			EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand  || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand ||
+			EquipmentSlotType == EEquipmentSlotType::Tertiary_LeftHand	 || EquipmentSlotType == EEquipmentSlotType::Tertiary_RightHand   || EquipmentSlotType == EEquipmentSlotType::Tertiary_TwoHand  ||
+			EquipmentSlotType == EEquipmentSlotType::Quaternary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Quaternary_RightHand || EquipmentSlotType == EEquipmentSlotType::Quaternary_TwoHand);
 }
 
 bool UD1EquipmentManagerComponent::IsArmorSlot(EEquipmentSlotType EquipmentSlotType)
 {
-	return (EquipmentSlotType == EEquipmentSlotType::Helmet || EquipmentSlotType == EEquipmentSlotType::Chest ||
-			EquipmentSlotType == EEquipmentSlotType::Legs   || EquipmentSlotType == EEquipmentSlotType::Hands ||
-			EquipmentSlotType == EEquipmentSlotType::Foot);
+	return (EquipmentSlotType == EEquipmentSlotType::Helmet || EquipmentSlotType == EEquipmentSlotType::Chest || EquipmentSlotType == EEquipmentSlotType::Legs   || EquipmentSlotType == EEquipmentSlotType::Hands || EquipmentSlotType == EEquipmentSlotType::Foot);
 }
 
 bool UD1EquipmentManagerComponent::IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState)
 {
-	return ((EquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand   || EquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand) && WeaponEquipState == EWeaponEquipState::Unarmed ||
-			(EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand   || EquipmentSlotType == EEquipmentSlotType::Primary_RightHand   || EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand)   && WeaponEquipState == EWeaponEquipState::Primary ||
-		    (EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand) && WeaponEquipState == EWeaponEquipState::Secondary);
+	return ((EquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand    || EquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand) && WeaponEquipState == EWeaponEquipState::Unarmed   ||
+			(EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand    || EquipmentSlotType == EEquipmentSlotType::Primary_RightHand    || EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand)    && WeaponEquipState == EWeaponEquipState::Primary   ||
+		    (EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand  || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand)  && WeaponEquipState == EWeaponEquipState::Secondary ||
+		    (EquipmentSlotType == EEquipmentSlotType::Tertiary_LeftHand	  || EquipmentSlotType == EEquipmentSlotType::Tertiary_RightHand   || EquipmentSlotType == EEquipmentSlotType::Tertiary_TwoHand)   && WeaponEquipState == EWeaponEquipState::Tertiary  ||
+		    (EquipmentSlotType == EEquipmentSlotType::Quaternary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Quaternary_RightHand || EquipmentSlotType == EEquipmentSlotType::Quaternary_TwoHand) && WeaponEquipState == EWeaponEquipState::Quaternary);
 }
 
 bool UD1EquipmentManagerComponent::IsSameWeaponHandType(EEquipmentSlotType EquipmentSlotType, EWeaponHandType WeaponHandType)
 {
-	return ((EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand)  && WeaponHandType == EWeaponHandType::LeftHand  ||
-			(EquipmentSlotType == EEquipmentSlotType::Primary_RightHand || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand) && WeaponHandType == EWeaponHandType::RightHand ||
-			(EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand   || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand)   && WeaponHandType == EWeaponHandType::TwoHand);
+	return ((EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Tertiary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Quaternary_LeftHand)  && WeaponHandType == EWeaponHandType::LeftHand  ||
+			(EquipmentSlotType == EEquipmentSlotType::Primary_RightHand || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand || EquipmentSlotType == EEquipmentSlotType::Tertiary_RightHand || EquipmentSlotType == EEquipmentSlotType::Quaternary_RightHand) && WeaponHandType == EWeaponHandType::RightHand ||
+			(EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand   || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand   || EquipmentSlotType == EEquipmentSlotType::Tertiary_TwoHand   || EquipmentSlotType == EEquipmentSlotType::Quaternary_TwoHand)   && WeaponHandType == EWeaponHandType::TwoHand);
 }
 
 bool UD1EquipmentManagerComponent::IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType)
@@ -417,6 +464,16 @@ bool UD1EquipmentManagerComponent::IsPrimaryWeaponSlot(EEquipmentSlotType Equipm
 bool UD1EquipmentManagerComponent::IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType)
 {
 	return (EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand);
+}
+
+bool UD1EquipmentManagerComponent::IsTertiaryWeaponSlot(EEquipmentSlotType EquipmentSlotType)
+{
+	return (EquipmentSlotType == EEquipmentSlotType::Tertiary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Tertiary_RightHand || EquipmentSlotType == EEquipmentSlotType::Tertiary_TwoHand);
+}
+
+bool UD1EquipmentManagerComponent::IsQuaternaryWeaponSlot(EEquipmentSlotType EquipmentSlotType)
+{
+	return (EquipmentSlotType == EEquipmentSlotType::Quaternary_LeftHand || EquipmentSlotType == EEquipmentSlotType::Quaternary_RightHand || EquipmentSlotType == EEquipmentSlotType::Quaternary_TwoHand);
 }
 
 bool UD1EquipmentManagerComponent::IsAllEmpty(EWeaponEquipState WeaponEquipState) const

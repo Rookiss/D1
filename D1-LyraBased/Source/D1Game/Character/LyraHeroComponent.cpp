@@ -294,6 +294,8 @@ void ULyraHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputCompo
 
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Primary, /*bLogIfNotFound=*/ false);
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Secondary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Secondary, /*bLogIfNotFound=*/ false);
+					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Tertiary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Tertiary, /*bLogIfNotFound=*/ false);
+					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Quaternary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Quaternary, /*bLogIfNotFound=*/ false);
 				}
 			}
 		}
@@ -486,6 +488,20 @@ void ULyraHeroComponent::Input_ChangeEquip_Secondary()
 {
 	FGameplayEventData Payload;
 	Payload.EventMagnitude = (int32)EWeaponEquipState::Secondary;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), D1GameplayTags::GameplayEvent_ChangeEquip, Payload);
+}
+
+void ULyraHeroComponent::Input_ChangeEquip_Tertiary()
+{
+	FGameplayEventData Payload;
+	Payload.EventMagnitude = (int32)EWeaponEquipState::Tertiary;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), D1GameplayTags::GameplayEvent_ChangeEquip, Payload);
+}
+
+void ULyraHeroComponent::Input_ChangeEquip_Quaternary()
+{
+	FGameplayEventData Payload;
+	Payload.EventMagnitude = (int32)EWeaponEquipState::Quaternary;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), D1GameplayTags::GameplayEvent_ChangeEquip, Payload);
 }
 

@@ -87,6 +87,8 @@ protected:
 
 	void Input_ChangeEquip_Primary();
 	void Input_ChangeEquip_Secondary();
+	void Input_ChangeEquip_Tertiary();
+	void Input_ChangeEquip_Quaternary();
 
 	TSubclassOf<ULyraCameraMode> DetermineCameraMode() const;
 

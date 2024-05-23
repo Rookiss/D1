@@ -7,7 +7,9 @@
 UD1AnimNotify_SendGameplayEvent::UD1AnimNotify_SendGameplayEvent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+#if WITH_EDITORONLY_DATA
 	bShouldFireInEditor = false;
+#endif
 	bIsNativeBranchingPoint = true;
 }
 

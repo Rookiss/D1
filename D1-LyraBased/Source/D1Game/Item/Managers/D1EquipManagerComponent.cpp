@@ -425,6 +425,24 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Secondary_TwoHand;   break;
 		}
 	}
+	else if (CurrentWeaponEquipState == EWeaponEquipState::Tertiary)
+	{
+		switch (WeaponHandType)
+		{
+		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Tertiary_LeftHand;  break;
+		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Tertiary_RightHand; break;
+		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Tertiary_TwoHand;   break;
+		}
+	}
+	else if (CurrentWeaponEquipState == EWeaponEquipState::Quaternary)
+	{
+		switch (WeaponHandType)
+		{
+		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Quaternary_LeftHand;  break;
+		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Quaternary_RightHand; break;
+		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Quaternary_TwoHand;   break;
+		}
+	}
 	
 	return EquipmentSlotType;
 }

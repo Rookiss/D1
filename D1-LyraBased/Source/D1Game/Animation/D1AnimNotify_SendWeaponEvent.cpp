@@ -10,7 +10,9 @@
 UD1AnimNotify_SendWeaponEvent::UD1AnimNotify_SendWeaponEvent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+#if WITH_EDITORONLY_DATA
 	bShouldFireInEditor = false;
+#endif
 	bIsNativeBranchingPoint = true;
 }
 

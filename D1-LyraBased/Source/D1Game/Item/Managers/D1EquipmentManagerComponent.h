@@ -136,6 +136,8 @@ public:
 	
 	static bool IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);
 	static bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);
+	static bool IsTertiaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);
+	static bool IsQuaternaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);
 	
 	bool IsAllEmpty(EWeaponEquipState WeaponEquipState) const;
 

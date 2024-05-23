@@ -595,7 +595,7 @@ void ALyraPlayerController::Server_RequestCancelBattle_Implementation()
 	LyraPlayerState->Client_SendNotificationMessage(NotificationMessage);
 }
 
-void ALyraPlayerController::Server_RequestApplyBetting_Implementation(FCoinApplyEntry CoinApplyEntry)
+void ALyraPlayerController::Server_RequestApplyBetting_Implementation(FCoinApplyRequest CoinApplyRequest)
 {
 	ALyraPlayerState* LyraPlayerState = GetLyraPlayerState();
 	check(LyraPlayerState);
@@ -603,10 +603,11 @@ void ALyraPlayerController::Server_RequestApplyBetting_Implementation(FCoinApply
 	ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this));
 	check(LyraGameState);
 	
-	bool bSucceeded = LyraGameState->TryApplyBettingCoins(CoinApplyEntry, LyraPlayerState);
+	bool bSucceeded = LyraGameState->TryApplyBettingCoins(CoinApplyRequest, LyraPlayerState);
 
 	FLyraVerbMessage VerbMessage;
 	VerbMessage.Verb = D1GameplayTags::Message_Response_ApplyBetting;
+	VerbMessage.Magnitude = CoinApplyRequest.TeamID;
 		
 	FLyraNotificationMessage NotificationMessage;
 	NotificationMessage.TargetChannel = D1GameplayTags::Message_Notification;
@@ -634,12 +635,12 @@ void ALyraPlayerController::Server_RequestCancelBetting_Implementation()
 
 	ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this));
 	check(LyraGameState);
-
+	
 	bool bSucceeded = LyraGameState->TryCancelBettingCoins(LyraPlayerState);
 
 	FLyraVerbMessage VerbMessage;
 	VerbMessage.Verb = D1GameplayTags::Message_Response_CancelBetting;
-		
+	
 	FLyraNotificationMessage NotificationMessage;
 	NotificationMessage.TargetChannel = D1GameplayTags::Message_Notification;
 	NotificationMessage.Magnitude = 2.f;

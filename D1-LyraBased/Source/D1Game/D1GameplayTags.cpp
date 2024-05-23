@@ -21,6 +21,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_OffHand,							"InputTag.Attack.OffHand");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Primary,					"InputTag.ChangeEquip.Primary");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Secondary,					"InputTag.ChangeEquip.Secondary");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Tertiary,					"InputTag.ChangeEquip.Tertiary");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Quaternary,					"InputTag.ChangeEquip.Quaternary");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Widget_OpenGameStatus,					"InputTag.Widget.OpenGameStatus");
 	
 	// Ability
@@ -93,6 +95,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Response_ApplyBetting,					"Message.Response.ApplyBetting");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Response_CancelBetting,					"Message.Response.CancelBetting");
 	UE_DEFINE_GAMEPLAY_TAG(Message_NextBattlePlayersChanged,				"Message.NextBattlePlayersChanged");
+	UE_DEFINE_GAMEPLAY_TAG(Message_BettingCoinsChanged,						"Message.BettingCoinsChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_TeamChanged,								"Message.TeamChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_CoinChanged,								"Message.CoinChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_TimerMessage_Increase,					"Message.TimerMessage.Increase");

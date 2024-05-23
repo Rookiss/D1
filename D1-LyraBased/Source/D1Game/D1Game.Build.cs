@@ -34,7 +34,10 @@ public class D1Game : ModuleRules
 			"Niagara",
 			"AsyncMixin",
 			"ControlFlows",
-			"PropertyPath"
+			"PropertyPath",
+			"OnlineSubsystem",
+			"OnlineSubsystemEOS",
+			"OnlineSubsystemUtils",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] 

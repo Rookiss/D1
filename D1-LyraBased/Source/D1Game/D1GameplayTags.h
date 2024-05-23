@@ -19,6 +19,8 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Attack_OffHand);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ChangeEquip_Primary);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ChangeEquip_Secondary);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ChangeEquip_Tertiary);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ChangeEquip_Quaternary);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Widget_OpenGameStatus);
 	
 	// Ability
@@ -91,6 +93,7 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Response_ApplyBetting);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Response_CancelBetting);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_NextBattlePlayersChanged);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_BettingCoinsChanged);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_TeamChanged);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_CoinChanged);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_TimerMessage_Increase);
