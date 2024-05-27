@@ -21,11 +21,6 @@ void UD1GameplayAbility_Weapon_MeleeCombo::ActivateAbility(const FGameplayAbilit
 	HitActors.Reset();
 	bInputReleased = false;
 	bBlocked = false;
-
-	UAbilitySystemComponent* AbilitySystemComponent = CurrentActorInfo->AbilitySystemComponent.Get();
-	check(AbilitySystemComponent);
-
-	OnTargetDataReadyCallbackDelegateHandle = AbilitySystemComponent->AbilityTargetDataSetDelegate(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey()).AddUObject(this, &ThisClass::OnTargetDataReadyCallback);
 	
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
@@ -39,40 +34,24 @@ void UD1GameplayAbility_Weapon_MeleeCombo::EndAbility(const FGameplayAbilitySpec
 			WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::EndAbility, Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled));
 			return;
 		}
-
-		UAbilitySystemComponent* AbilitySystemComponent = CurrentActorInfo->AbilitySystemComponent.Get();
-		check(AbilitySystemComponent);
 		
-		AbilitySystemComponent->AbilityTargetDataSetDelegate(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey()).Remove(OnTargetDataReadyCallbackDelegateHandle);
-		AbilitySystemComponent->ConsumeClientReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey());
-
 		Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	}
 }
 
-void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReadyCallback(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, FGameplayTag ApplicationTag)
+void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InTargetDataHandle)
 {
 	if (bBlocked)
 		return;
-
-	// TODO: https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking
-	// TODO: https://ftp.cs.wpi.edu/pub/techreports/pdf/21-06.pdf
-	// Incoming Delay + Time Warp
-
+	
 	ULyraAbilitySystemComponent* AbilitySystemComponent = GetLyraAbilitySystemComponentFromActorInfo();
 	check(AbilitySystemComponent);
 
 	if (AbilitySystemComponent->FindAbilitySpecFromHandle(CurrentSpecHandle))
 	{
-		FScopedPredictionWindow	ScopedPrediction(AbilitySystemComponent);
+		FScopedPredictionWindow	ScopedPrediction(AbilitySystemComponent, GetCurrentActivationInfo().GetActivationPredictionKey());
 
 		FGameplayAbilityTargetDataHandle LocalTargetDataHandle(MoveTemp(const_cast<FGameplayAbilityTargetDataHandle&>(InTargetDataHandle)));
-	
-		const bool bShouldNotifyServer = CurrentActorInfo->IsLocallyControlled() && CurrentActorInfo->IsNetAuthority() == false;
-		if (bShouldNotifyServer)
-		{
-			AbilitySystemComponent->CallServerSetReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey(), LocalTargetDataHandle, ApplicationTag, AbilitySystemComponent->ScopedPredictionKey);
-		}
 
 		TArray<int32> AttackHitIndexes;
 		int32 BlockHitIndex = INDEX_NONE;
@@ -167,8 +146,6 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReadyCallback(const FGame
 			}
 		}
 	}
-
-	AbilitySystemComponent->ConsumeClientReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey());
 }
 
 void UD1GameplayAbility_Weapon_MeleeCombo::TryContinueToNextStage()

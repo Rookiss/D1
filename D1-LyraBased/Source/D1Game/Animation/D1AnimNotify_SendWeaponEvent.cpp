@@ -24,9 +24,7 @@ void UD1AnimNotify_SendWeaponEvent::Notify(USkeletalMeshComponent* MeshComponent
 	{
 		if (UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>())
 		{
-			const TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-			AD1WeaponBase* WeaponActor = Entries[(int32)EquipManager->ConvertToEquipmentSlotType(WeaponHandType)].SpawnedWeaponActor;
-
+			AD1WeaponBase* WeaponActor = EquipManager->GetEquippedWeapon(WeaponHandType);
 			if (WeaponActor && EventData.EventTag.IsValid())
 			{
 				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(WeaponActor, EventData.EventTag, EventData);

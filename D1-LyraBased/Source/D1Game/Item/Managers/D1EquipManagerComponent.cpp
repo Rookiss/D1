@@ -348,6 +348,16 @@ bool UD1EquipManagerComponent::CanChangeWeaponEquipState(EWeaponEquipState NewWe
 	return (EquipmentManager->IsAllEmpty(NewWeaponEquipState) == false);
 }
 
+AD1WeaponBase* UD1EquipManagerComponent::GetEquippedWeapon(EWeaponHandType WeaponHandType) const
+{
+	if (WeaponHandType == EWeaponHandType::Count)
+		return nullptr;
+
+	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType);
+	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].SpawnedWeaponActor : nullptr;
+}
+
 void UD1EquipManagerComponent::OnRep_CurrentWeaponEquipState()
 {
 	BroadcastChangedMessgae(CurrentWeaponEquipState);

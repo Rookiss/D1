@@ -17,7 +17,7 @@ protected:
 	
 protected:
 	UFUNCTION(BlueprintCallable)
-	void OnTargetDataReadyCallback(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, FGameplayTag ApplicationTag);
+	void OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InTargetDataHandle);
 	
 	UFUNCTION(BlueprintCallable)
 	void TryContinueToNextStage();
@@ -48,5 +48,4 @@ private:
 	
 	bool bBlocked = false;
 	FTimerHandle BlockMontageTimerHandle;
-	FDelegateHandle OnTargetDataReadyCallbackDelegateHandle;
 };

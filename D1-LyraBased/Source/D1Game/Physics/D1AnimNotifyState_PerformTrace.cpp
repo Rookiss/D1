@@ -29,8 +29,7 @@ void UD1AnimNotifyState_PerformTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 	{
 		if (UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>())
 		{
-			const TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-			WeaponActor = Entries[(int32)EquipManager->ConvertToEquipmentSlotType(WeaponHandType)].SpawnedWeaponActor;
+			WeaponActor = EquipManager->GetEquippedWeapon(WeaponHandType);
 			if (WeaponActor.IsValid() == false)
 				return;
 			
@@ -124,8 +123,8 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 			const FTransform& AverageDebugTransform = UKismetMathLibrary::TLerp(StartDebugTransform, EndDebugTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
 			
 			DrawDebugSweptBox(MeshComponent->GetWorld(), StartDebugTransform.GetLocation(), EndDebugTransform.GetLocation(), AverageDebugTransform.GetRotation().Rotator(), WeaponActor->TraceDebugCollision->GetScaledBoxExtent(), Color, false, 2.f);
-#endif
 		}
+#endif
 	}
 	
 	PreviousTraceTransform = CurrentTraceTransform;
