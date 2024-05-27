@@ -5,13 +5,6 @@
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "D1AnimNotifyState_PerformTrace.generated.h"
 
-UENUM(BlueprintType)
-enum class ETraceType : uint8
-{
-	Distance,
-	Frame
-};
-
 USTRUCT(BlueprintType)
 struct FTraceParams
 {
@@ -19,16 +12,10 @@ struct FTraceParams
 
 public:
 	UPROPERTY(EditAnywhere)
-	ETraceType TraceType = ETraceType::Distance;
-
-	UPROPERTY(EditAnywhere, meta=(EditCondition="TraceType==ETraceType::Distance", EditConditionHides))
 	float TargetDistance = 20.f;
 
-	UPROPERTY(EditAnywhere, meta=(EditCondition="TraceType==ETraceType::Distance", EditConditionHides))
+	UPROPERTY(EditAnywhere)
 	FName TraceSocketName = "TraceSocket";
-	
-	UPROPERTY(EditAnywhere, meta=(EditCondition="TraceType==ETraceType::Frame", EditConditionHides))
-	int32 TargetFPS = 60;
 };
 
 USTRUCT(BlueprintType)
@@ -63,7 +50,7 @@ protected:
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 	
 private:
-	void PerformTrace(USkeletalMeshComponent* MeshComponent, float DeltaTime);
+	void PerformTrace(USkeletalMeshComponent* MeshComponent);
 	
 public:
 	UPROPERTY(EditAnywhere)
@@ -87,9 +74,8 @@ private:
 
 	UPROPERTY()
 	TSet<TWeakObjectPtr<AActor>> HitActors;
-	
-	double LastTickTime = 0;
-	float TargetDeltaTime = 0.f;
+
+private:
 	FTransform PreviousTraceTransform;
 	FTransform PreviousDebugTransform;
 	FTransform PreviousSocketTransform;
