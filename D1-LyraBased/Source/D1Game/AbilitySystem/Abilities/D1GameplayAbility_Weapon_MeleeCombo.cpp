@@ -2,6 +2,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
 #include "D1GameplayTags.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Actors/D1WeaponBase.h"
@@ -44,12 +45,12 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 	if (bBlocked)
 		return;
 	
-	ULyraAbilitySystemComponent* AbilitySystemComponent = GetLyraAbilitySystemComponentFromActorInfo();
-	check(AbilitySystemComponent);
+	ULyraAbilitySystemComponent* SourceASC = GetLyraAbilitySystemComponentFromActorInfo();
+	check(SourceASC);
 
-	if (AbilitySystemComponent->FindAbilitySpecFromHandle(CurrentSpecHandle))
+	if (SourceASC->FindAbilitySpecFromHandle(CurrentSpecHandle))
 	{
-		FScopedPredictionWindow	ScopedPrediction(AbilitySystemComponent, GetCurrentActivationInfo().GetActivationPredictionKey());
+		FScopedPredictionWindow	ScopedPrediction(SourceASC, GetCurrentActivationInfo().GetActivationPredictionKey());
 
 		FGameplayAbilityTargetDataHandle LocalTargetDataHandle(MoveTemp(const_cast<FGameplayAbilityTargetDataHandle&>(InTargetDataHandle)));
 
@@ -89,13 +90,13 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 							BlockHitIndex = i;
 						}
 
-#if ENABLE_DRAW_DEBUG
-						if (bHitSomething && bShowDebug)
+#if UE_EDITOR
+						if (FORCE_DISABLE_DRAW_DEBUG == false && bHitSomething && bShowDebug)
 						{
 							FColor Color = (HasAuthority(&CurrentActivationInfo)) ? FColor::Red : FColor::Green;
 							DrawDebugSphere(GetWorld(), HitResult->ImpactPoint, 4, 32, Color, false, 5);
 						}
-#endif // ENABLE_DRAW_DEBUG
+#endif
 					}
 				}
 			}
@@ -105,13 +106,13 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 		{
 			const FHitResult& HitResult = *(LocalTargetDataHandle.Data[BlockHitIndex]->GetHitResult());
 			
-			FGameplayCueParameters CueParameters;
-			CueParameters.Location = HitResult.ImpactPoint;
-			CueParameters.Normal = HitResult.ImpactNormal;
-			CueParameters.PhysicalMaterial = HitResult.PhysMaterial;
-			AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, CueParameters);
+			FGameplayCueParameters SourceCueParams;
+			SourceCueParams.Location = HitResult.ImpactPoint;
+			SourceCueParams.Normal = HitResult.ImpactNormal;
+			SourceCueParams.PhysicalMaterial = HitResult.PhysMaterial;
+			SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, SourceCueParams);
 
-			AbilitySystemComponent->BlockAnimMontageForSeconds(BackwardMontage);
+			SourceASC->BlockAnimMontageForSeconds(BackwardMontage);
 			
 			if (HasAuthority(&CurrentActivationInfo))
 			{
@@ -119,7 +120,7 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 				{
 					EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 				});
-				UAnimInstance* AnimInstance = AbilitySystemComponent->AbilityActorInfo->GetAnimInstance();
+				UAnimInstance* AnimInstance = SourceASC->AbilityActorInfo->GetAnimInstance();
 				AnimInstance->Montage_SetEndDelegate(MontageEnded, BackwardMontage);
 			}
 			
@@ -131,11 +132,17 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 			{
 				const FHitResult& HitResult = *LocalTargetDataHandle.Data[AttackHitIndex]->GetHitResult();
 				
-				FGameplayCueParameters CueParameters;
-				CueParameters.Location = HitResult.ImpactPoint;
-				CueParameters.Normal = HitResult.ImpactNormal;
-				CueParameters.PhysicalMaterial = HitResult.PhysMaterial;
-				AbilitySystemComponent->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, CueParameters);
+				FGameplayCueParameters SourceCueParams;
+				SourceCueParams.Location = HitResult.ImpactPoint;
+				SourceCueParams.Normal = HitResult.ImpactNormal;
+				SourceCueParams.PhysicalMaterial = HitResult.PhysMaterial;
+				SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, SourceCueParams);
+
+				if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(HitResult.GetActor()))
+				{
+					FGameplayCueParameters TargetCueParams;
+					TargetASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_HitReact, TargetCueParams);
+				}
 				
 				if (HasAuthority(&CurrentActivationInfo))
 				{

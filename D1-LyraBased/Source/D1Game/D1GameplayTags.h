@@ -111,6 +111,7 @@ namespace D1GameplayTags
 
 	// GameplayCue
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Impact_Weapon);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_HitReact);
 
 	// Cooldown
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Bow_Fire);

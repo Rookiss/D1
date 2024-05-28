@@ -358,6 +358,24 @@ AD1WeaponBase* UD1EquipManagerComponent::GetEquippedWeapon(EWeaponHandType Weapo
 	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].SpawnedWeaponActor : nullptr;
 }
 
+AD1WeaponBase* UD1EquipManagerComponent::GetFirstEquippedWeapon() const
+{
+	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	
+	AD1WeaponBase* WeaponActor = nullptr;
+	for (int i = 0; i < (int32)EWeaponHandType::Count; i++)
+	{
+		int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i);
+		if (Entries.IsValidIndex(EntryIndex) == false)
+			continue;
+
+		WeaponActor = Entries[EntryIndex].SpawnedWeaponActor;
+		if (WeaponActor)
+			break;
+	}
+	return WeaponActor;
+}
+
 void UD1EquipManagerComponent::OnRep_CurrentWeaponEquipState()
 {
 	BroadcastChangedMessgae(CurrentWeaponEquipState);
@@ -403,6 +421,37 @@ UD1EquipmentManagerComponent* UD1EquipManagerComponent::GetEquipmentManagerCompo
 		return PlayerController->FindComponentByClass<UD1EquipmentManagerComponent>();
 	}
 	return nullptr;
+}
+
+EWeaponHandType UD1EquipManagerComponent::ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType) const
+{
+	EWeaponHandType WeaponHandType = EWeaponHandType::Count;
+	
+	switch (EquipmentSlotType)
+	{
+	case EEquipmentSlotType::Unarmed_LeftHand:
+	case EEquipmentSlotType::Primary_LeftHand:
+	case EEquipmentSlotType::Secondary_LeftHand:
+	case EEquipmentSlotType::Tertiary_LeftHand:
+	case EEquipmentSlotType::Quaternary_LeftHand:
+		WeaponHandType = EWeaponHandType::LeftHand;
+		break;
+	case EEquipmentSlotType::Unarmed_RightHand:
+	case EEquipmentSlotType::Primary_RightHand:
+	case EEquipmentSlotType::Secondary_RightHand:
+	case EEquipmentSlotType::Tertiary_RightHand:
+	case EEquipmentSlotType::Quaternary_RightHand:
+		WeaponHandType = EWeaponHandType::RightHand;
+		break;
+	case EEquipmentSlotType::Primary_TwoHand:
+	case EEquipmentSlotType::Secondary_TwoHand:
+	case EEquipmentSlotType::Tertiary_TwoHand:
+	case EEquipmentSlotType::Quaternary_TwoHand:
+		WeaponHandType = EWeaponHandType::TwoHand;
+		break;
+	}
+
+	return WeaponHandType;
 }
 
 EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const

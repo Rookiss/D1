@@ -131,9 +131,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool CanChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState) const;
-	
-	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }
-	AD1WeaponBase* GetEquippedWeapon(EWeaponHandType WeaponHandType) const;
 
 private:
 	UFUNCTION()
@@ -149,8 +146,18 @@ public:
 	UAbilitySystemComponent* GetAbilitySystemComponent() const;
 	UD1EquipmentManagerComponent* GetEquipmentManagerComponent() const;
 
+	EWeaponHandType ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType) const;
 	EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const;
 	EArmorType ConvertToArmorType(EEquipmentSlotType EquipmentSlotType) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	AD1WeaponBase* GetEquippedWeapon(EWeaponHandType WeaponHandType) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	AD1WeaponBase* GetFirstEquippedWeapon() const;
 	
 private:
 	UPROPERTY(Replicated)

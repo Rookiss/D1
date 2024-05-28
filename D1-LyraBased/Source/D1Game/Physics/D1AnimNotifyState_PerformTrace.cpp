@@ -114,7 +114,7 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 		}
 
 #if UE_EDITOR
-		if (TraceDebugParams.bDrawDebugShape)
+		if (FORCE_DISABLE_DRAW_DEBUG == false && TraceDebugParams.bDrawDebugShape)
 		{
 			FColor Color = (HitResults.Num() > 0) ? TraceDebugParams.HitColor : TraceDebugParams.TraceColor;
 			

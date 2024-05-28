@@ -45,6 +45,9 @@ public:
 	TSoftObjectPtr<UAnimMontage> EquipMontage;
 
 	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UAnimMontage> HitMontage;
+
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UAnimInstance> AnimInstanceClass;
 	
 	UPROPERTY(EditDefaultsOnly)

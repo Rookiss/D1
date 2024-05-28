@@ -113,6 +113,7 @@ namespace D1GameplayTags
 
 	// GameplayCue
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Impact_Weapon,						"GameplayCue.Impact.Weapon");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_HitReact,							"GameplayCue.HitReact");
 
 	// Cooldown
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Bow_Fire,								"Cooldown.Bow.Fire");

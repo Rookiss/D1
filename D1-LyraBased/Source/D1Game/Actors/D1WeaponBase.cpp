@@ -123,29 +123,29 @@ void AD1WeaponBase::OnRep_CanBlock()
 void AD1WeaponBase::OnRep_TemplateID()
 {
 	const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-	const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
-	check(WeaponFragment);
-	
-	if (ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner()))
+	if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 	{
-		if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
+		if (ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner()))
 		{
-			if (WeaponFragment->AnimInstanceClass)
+			if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
 			{
-				MeshComponent->LinkAnimClassLayers(WeaponFragment->AnimInstanceClass);
-			}
-
-			UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->EquipMontage);
-			if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
-			{
-				if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
+				if (WeaponFragment->AnimInstanceClass)
 				{
-					Character->PlayAnimMontage(EquipMontage);
+					MeshComponent->LinkAnimClassLayers(WeaponFragment->AnimInstanceClass);
+				}
+
+				UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->EquipMontage);
+				if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
+				{
+					if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
+					{
+						Character->PlayAnimMontage(EquipMontage);
+					}
 				}
 			}
-		}
 		
-		WeaponMeshComponent->SetHiddenInGame(false);
+			WeaponMeshComponent->SetHiddenInGame(false);
+		}
 	}
 }
 
@@ -164,4 +164,17 @@ void AD1WeaponBase::OnRep_EquipmentSlotType()
 UAbilitySystemComponent* AD1WeaponBase::GetAbilitySystemComponent() const
 {
 	return Cast<ALyraCharacter>(GetOwner())->GetAbilitySystemComponent();
+}
+
+UAnimMontage* AD1WeaponBase::GetHitMontage()
+{
+	if (CachedHitMontage == nullptr && TemplateID > 0)
+	{
+		const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
+		if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
+		{
+			CachedHitMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->HitMontage);
+		}
+	}
+	return CachedHitMontage;
 }

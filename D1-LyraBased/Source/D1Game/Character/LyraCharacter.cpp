@@ -16,7 +16,9 @@
 #include "Player/LyraPlayerState.h"
 #include "System/LyraSignificanceManager.h"
 #include "TimerManager.h"
+#include "Data/D1AssetData.h"
 #include "GameFramework/SpectatorPawn.h"
+#include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraCharacter)
 
@@ -400,11 +402,12 @@ void ALyraCharacter::UninitAndDestroy()
 	{
 		if (Controller)
 		{
-			ASpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(GetActorLocation(), GetActorRotation());
+			TSubclassOf<ASpectatorPawn> SpectatorPawnClass = ULyraAssetManager::GetSubclassByName<ASpectatorPawn>("SpectatorPawnClass");
+			ASpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(SpectatorPawnClass, GetActorLocation(), GetActorRotation());
 			Controller->Possess(SpectatorPawn);
 		}
 		
-		SetLifeSpan(0.1f);
+		SetLifeSpan(1.f);
 	}
 
 	SetActorHiddenInGame(true);

@@ -162,7 +162,8 @@ AssetType* ULyraAssetManager::GetAssetByName(const FName& AssetName, bool bKeepI
 {
 	const UD1AssetData& AssetData = Get().GetAssetData();
 	const FSoftObjectPath& AssetPath = AssetData.GetAssetPathByName(AssetName);
-	return GetAssetByPath<AssetType>(AssetPath, bKeepInMemory);
+	TSoftObjectPtr<AssetType> AssetPtr(AssetPath);
+	return GetAssetByPath<AssetType>(AssetPtr, bKeepInMemory);
 }
 
 template<typename AssetType>
@@ -199,7 +200,8 @@ TSubclassOf<AssetType> ULyraAssetManager::GetSubclassByName(const FName& AssetNa
 	
 	FString AssetPathString = AssetPath.GetAssetPathString();
 	AssetPathString.Append(TEXT("_C"));
-	FSoftClassPath ClassPath = FSoftClassPath(AssetPathString);
-	
-	return GetSubclassByPath<AssetType>(ClassPath, bKeepInMemory);
+
+	FSoftClassPath ClassPath(AssetPathString);
+	TSoftClassPtr<AssetType> ClassPtr(ClassPath);
+	return GetSubclassByPath<AssetType>(ClassPtr, bKeepInMemory);
 }

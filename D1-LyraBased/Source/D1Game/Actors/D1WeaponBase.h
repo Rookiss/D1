@@ -45,6 +45,9 @@ private:
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UAnimMontage* GetHitMontage();
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UArrowComponent> ArrowComponent;
@@ -68,4 +71,7 @@ public:
 
 private:
 	FLyraAbilitySet_GrantedHandles SkillAbilitySetHandles;
+
+	UPROPERTY(Transient)
+	UAnimMontage* CachedHitMontage;
 };
