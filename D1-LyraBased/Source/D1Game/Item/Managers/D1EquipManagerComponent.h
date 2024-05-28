@@ -133,6 +133,7 @@ public:
 	bool CanChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState) const;
 	
 	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }
+	AD1WeaponBase* GetEquippedWeapon(EWeaponHandType WeaponHandType) const;
 
 private:
 	UFUNCTION()

@@ -29,12 +29,9 @@ void UD1AnimNotifyState_PerformTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 	{
 		if (UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>())
 		{
-			const TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-			WeaponActor = Entries[(int32)EquipManager->ConvertToEquipmentSlotType(WeaponHandType)].SpawnedWeaponActor;
+			WeaponActor = EquipManager->GetEquippedWeapon(WeaponHandType);
 			if (WeaponActor.IsValid() == false)
 				return;
-			
-			TargetDeltaTime = 1.f / TraceParams.TargetFPS;
 			
 			PreviousTraceTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
 			PreviousDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
@@ -58,9 +55,8 @@ void UD1AnimNotifyState_PerformTrace::NotifyTick(USkeletalMeshComponent* MeshCom
 	
 	if (WeaponActor.IsValid() == false)
 		return;
-
-	LastTickTime = MeshComponent->GetWorld()->GetTimeSeconds();
-	PerformTrace(MeshComponent, FrameDeltaTime);
+	
+	PerformTrace(MeshComponent);
 }
 
 void UD1AnimNotifyState_PerformTrace::NotifyEnd(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
@@ -73,38 +69,26 @@ void UD1AnimNotifyState_PerformTrace::NotifyEnd(USkeletalMeshComponent* MeshComp
 	if (WeaponActor.IsValid() == false)
 		return;
 
-	PerformTrace(MeshComponent, MeshComponent->GetWorld()->GetTimeSeconds() - LastTickTime);
+	PerformTrace(MeshComponent);
 }
 
-void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshComponent, float DeltaTime)
+void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshComponent)
 {
-	int SubSteps = 1;
-
-	if (TraceParams.TraceType == ETraceType::Distance)
-	{
-		const FTransform& CurrentSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceParams.TraceSocketName);
-		float Distance = (PreviousSocketTransform.GetLocation() - CurrentSocketTransform.GetLocation()).Length();
+	const FTransform& CurrentSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceParams.TraceSocketName);
+	float Distance = (PreviousSocketTransform.GetLocation() - CurrentSocketTransform.GetLocation()).Length();
 		
-		SubSteps = FMath::CeilToInt(Distance / TraceParams.TargetDistance);
-		if (SubSteps <= 0)
-			return;
-		
-		PreviousSocketTransform = CurrentSocketTransform;
-	}
-	else if (TraceParams.TraceType == ETraceType::Frame)
-	{
-		SubSteps = FMath::CeilToInt(DeltaTime / TargetDeltaTime);
-		SubSteps = FMath::Clamp(SubSteps, 1, 10);
-	}
+	int SubStepCount = FMath::CeilToInt(Distance / TraceParams.TargetDistance);
+	if (SubStepCount <= 0)
+		return;
 	
-	const float SubstepRatio = 1.f / SubSteps;
+	const float SubstepRatio = 1.f / SubStepCount;
 
 	const FTransform& CurrentTraceTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
 	const FTransform& CurrentDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
 
 	TArray<FHitResult> FinalHitResults;
 	
-	for (int32 i = 0; i < SubSteps; i++)
+	for (int32 i = 0; i < SubStepCount; i++)
 	{
 		const FTransform& StartTraceTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
 		const FTransform& EndTraceTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
@@ -112,6 +96,7 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 
 		FComponentQueryParams Params = FComponentQueryParams::DefaultComponentQueryParams;
 		Params.bReturnPhysicalMaterial = true;
+		
 		TArray<AActor*> IgnoredActors = { WeaponActor.Get(), WeaponActor->GetOwner() };
 		Params.AddIgnoredActors(IgnoredActors);
 
@@ -127,7 +112,8 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 				FinalHitResults.Add(HitResult);
 			}
 		}
-		
+
+#if UE_EDITOR
 		if (TraceDebugParams.bDrawDebugShape)
 		{
 			FColor Color = (HitResults.Num() > 0) ? TraceDebugParams.HitColor : TraceDebugParams.TraceColor;
@@ -135,15 +121,15 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 			const FTransform& StartDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
 			const FTransform& EndDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
 			const FTransform& AverageDebugTransform = UKismetMathLibrary::TLerp(StartDebugTransform, EndDebugTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
-
-#if UE_EDITOR
+			
 			DrawDebugSweptBox(MeshComponent->GetWorld(), StartDebugTransform.GetLocation(), EndDebugTransform.GetLocation(), AverageDebugTransform.GetRotation().Rotator(), WeaponActor->TraceDebugCollision->GetScaledBoxExtent(), Color, false, 2.f);
-#endif
 		}
+#endif
 	}
 	
 	PreviousTraceTransform = CurrentTraceTransform;
 	PreviousDebugTransform = CurrentDebugTransform;
+	PreviousSocketTransform = CurrentSocketTransform;
 	
 	if (FinalHitResults.Num() > 0)
 	{

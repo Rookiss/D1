@@ -1,6 +1,5 @@
 ﻿#include "D1GameplayAbility_Weapon.h"
 
-#include "D1Define.h"
 #include "Character/LyraCharacter.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 
@@ -21,9 +20,7 @@ void UD1GameplayAbility_Weapon::ActivateAbility(const FGameplayAbilitySpecHandle
 	{
 		if (UD1EquipManagerComponent* EquipManager = PlayerCharacter->FindComponentByClass<UD1EquipManagerComponent>())
 		{
-			EEquipmentSlotType EquipmentSlotType = EquipManager->ConvertToEquipmentSlotType(WeaponHandType);
-			const TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-			WeaponActor = Entries[(int32)EquipmentSlotType].SpawnedWeaponActor;
+			WeaponActor = EquipManager->GetEquippedWeapon(WeaponHandType);
 		}
 	}
 	

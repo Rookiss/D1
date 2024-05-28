@@ -410,18 +410,13 @@ void UD1EquipmentManagerComponent::AddDefaultEquipments()
 		}
 	}
 
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, [this]()
-	{
-		ALyraCharacter* Character = GetCharacter();
-		check(Character);
-		
-		UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>();
-		check(EquipManager);
-		
-		EquipManager->ChangeWeaponEquipState(EWeaponEquipState::Unarmed);
-	}, 1.f, false);
-	
+	// ALyraCharacter* Character = GetCharacter();
+	// check(Character);
+	// 	
+	// UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>();
+	// check(EquipManager);
+	// 	
+	// EquipManager->ChangeWeaponEquipState(EWeaponEquipState::Unarmed);
 }
 
 bool UD1EquipmentManagerComponent::IsWeaponSlot(EEquipmentSlotType EquipmentSlotType)
