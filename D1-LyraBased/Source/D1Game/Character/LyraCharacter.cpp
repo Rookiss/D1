@@ -359,7 +359,6 @@ void ALyraCharacter::OnDeathFinished(AActor*)
 	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::DestroyDueToDeath);
 }
 
-
 void ALyraCharacter::DisableMovementAndCollision()
 {
 	if (Controller)
@@ -386,10 +385,8 @@ void ALyraCharacter::DestroyDueToDeath()
 	UninitAndDestroy();
 }
 
-
 void ALyraCharacter::UninitAndDestroy()
 {
-	// Uninitialize the ASC if we're still the avatar actor (otherwise another pawn already did it when they became the avatar actor)
 	if (ULyraAbilitySystemComponent* LyraASC = GetLyraAbilitySystemComponent())
 	{
 		if (LyraASC->GetAvatarActor() == this)
@@ -403,13 +400,17 @@ void ALyraCharacter::UninitAndDestroy()
 		if (Controller)
 		{
 			TSubclassOf<ASpectatorPawn> SpectatorPawnClass = ULyraAssetManager::GetSubclassByName<ASpectatorPawn>("SpectatorPawnClass");
-			ASpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(SpectatorPawnClass, GetActorLocation(), GetActorRotation());
+	
+			FActorSpawnParameters SpawnParameters;
+			SpawnParameters.Owner = Controller;
+			
+			ASpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(SpectatorPawnClass, GetActorLocation(), GetActorRotation(), SpawnParameters);
 			Controller->Possess(SpectatorPawn);
 		}
 		
-		SetLifeSpan(1.f);
+		SetLifeSpan(0.1f);
 	}
-
+	
 	SetActorHiddenInGame(true);
 }
 
