@@ -115,6 +115,7 @@ protected:
 	virtual void InitializeComponent() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
+	virtual void ReadyForReplication() override;
 	
 public:
 	// TODO: With Validation - Check Valid Contract
@@ -131,9 +132,9 @@ public:
 	bool CanMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const;
 
 public:
-	bool TryAddItem(int32 TemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities);
-	bool TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity ItemRarity);
-	bool TryRemoveItem(int32 TemplateID, int32 ItemCount);
+	void TryAddItem(int32 TemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities);
+	void TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity ItemRarity);
+	void TryRemoveItem(int32 TemplateID, int32 ItemCount);
 	
 public:
 	void MarkSlotChecks(TArray<TArray<bool>>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);

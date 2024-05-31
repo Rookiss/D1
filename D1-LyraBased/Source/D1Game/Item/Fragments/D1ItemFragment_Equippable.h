@@ -2,7 +2,7 @@
 
 #include "D1Define.h"
 #include "GameplayTags.h"
-#include "D1ItemFragment.h"
+#include "Item/D1ItemDefinition.h"
 #include "D1ItemFragment_Equippable.generated.h"
 
 class ULyraAbilitySet;
