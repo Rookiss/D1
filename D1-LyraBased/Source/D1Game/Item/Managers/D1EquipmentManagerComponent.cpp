@@ -34,7 +34,7 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* NewItemInstance)
 	
 	if (ItemInstance)
 	{
-		LastValidTemplateID = ItemInstance->GetTemplateID();
+		// LastValidTemplateID = ItemInstance->GetTemplateID();
 
 		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
 		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
@@ -330,7 +330,7 @@ void UD1EquipmentManagerComponent::AddDefaultEquipments()
 		if (Instance == nullptr)
 		{
 			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			// ItemInstance->Init(ItemID, EItemRarity::Junk);
 			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
 		}
 	}
@@ -345,7 +345,7 @@ void UD1EquipmentManagerComponent::AddDefaultEquipments()
 		if (Instance == nullptr)
 		{
 			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			// ItemInstance->Init(ItemID, EItemRarity::Junk);
 			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
 		}
 	}
@@ -360,7 +360,7 @@ void UD1EquipmentManagerComponent::AddDefaultEquipments()
 		if (Instance == nullptr)
 		{
 			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			// ItemInstance->Init(ItemID, EItemRarity::Junk);
 			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
 		}
 	}
@@ -375,7 +375,7 @@ void UD1EquipmentManagerComponent::AddDefaultEquipments()
 		if (Instance == nullptr)
 		{
 			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			// ItemInstance->Init(ItemID, EItemRarity::Junk);
 			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
 		}
 	}
@@ -390,7 +390,7 @@ void UD1EquipmentManagerComponent::AddDefaultEquipments()
 		if (Instance == nullptr)
 		{
 			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			// ItemInstance->Init(ItemID, EItemRarity::Junk);
 			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
 		}
 	}
@@ -405,7 +405,7 @@ void UD1EquipmentManagerComponent::AddDefaultEquipments()
 		if (Instance == nullptr)
 		{
 			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			// ItemInstance->Init(ItemID, EItemRarity::Junk);
 			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
 		}
 	}

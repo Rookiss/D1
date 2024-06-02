@@ -4,6 +4,9 @@
 #include "System/GameplayTagStack.h"
 #include "D1ItemInstance.generated.h"
 
+struct FD1ItemRarityProbability;
+class UD1ItemDefinition;
+
 UCLASS(BlueprintType)
 class UD1ItemInstance : public UObject
 {
@@ -28,7 +31,7 @@ public:
 	void RemoveStatTagStack(FGameplayTag StatTag, int32 StackCount);
 
 private:
-	EItemRarity DetermineItemRarity(const TArray<FD1ItemRarityProbability>& ItemProbabilities);
+	static EItemRarity DetermineItemRarity(const TArray<FD1ItemRarityProbability>& ItemProbabilities);
 	
 public:
 	TSubclassOf<UD1ItemDefinition> GetItemDefinition() const { return ItemDefinition; }

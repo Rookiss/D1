@@ -1,8 +1,6 @@
 ﻿#pragma once
 
-#include "D1Define.h"
 #include "Item/D1ItemDefinition.h"
-#include "Item/Fragments/D1ItemFragment.h"
 #include "D1ItemData.generated.h"
 
 USTRUCT()

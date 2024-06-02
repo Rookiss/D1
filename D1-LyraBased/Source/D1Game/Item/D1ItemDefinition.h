@@ -8,7 +8,7 @@
 *unarmed 착용 시점 문제
 Anim Sync L/R 맞추기
 인벤토리 Contract 구현
-ItemInstance의 주소값을 복제하지 않고 값을 복제(deep copy)하는 방향으로 제작
+ItemInstance의 주소값을 복제하지 않고 값을 복제(deep copy)하는 방향으로 제작(Iris 적용)
 Equipment와 Inventory는 ItemInstance 공유 / Equip은 EquipInstance로 따로 분리
 
 
@@ -16,6 +16,8 @@ GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Ch
  *
  *
  */
+
+class UD1ItemInstance;
 
 USTRUCT()
 struct FD1ItemRarityProbability
