@@ -377,6 +377,23 @@ bool UD1InventoryManagerComponent::ReplicateSubobjects(UActorChannel* Channel, F
 	return bWroteSomething;
 }
 
+void UD1InventoryManagerComponent::ReadyForReplication()
+{
+	Super::ReadyForReplication();
+	
+	if (IsUsingRegisteredSubObjectList())
+	{
+		for (const FD1InventoryEntry& Entry : InventoryList.Entries)
+		{
+			UD1ItemInstance* Instance = Entry.GetItemInstance();
+			if (IsValid(Instance))
+			{
+				AddReplicatedSubObject(Instance);
+			}
+		}
+	}
+}
+
 void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromInternalInventory_Implementation(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos)
 {
 	check(GetOwner()->HasAuthority());
@@ -562,25 +579,55 @@ bool UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalEquipment(UD1E
 	return IsEmpty(ToItemSlotPos, FromItemSlotCount);
 }
 
-bool UD1InventoryManagerComponent::TryAddItem(int32 TemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities)
+void UD1InventoryManagerComponent::TryAddItem(int32 TemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities)
 {
 	check(GetOwner()->HasAuthority());
 
-	return InventoryList.TryAddItem(TemplateID, ItemCount, ItemProbabilities);
+	TArray<UD1ItemInstance*> AddedItemInstances = InventoryList.TryAddItem(TemplateID, ItemCount, ItemProbabilities);
+	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication())
+	{
+		for (UD1ItemInstance* AddedItemInstance : AddedItemInstances)
+		{
+			if (AddedItemInstance)
+			{
+				AddReplicatedSubObject(AddedItemInstance);
+			}
+		}
+	}
 }
 
-bool UD1InventoryManagerComponent::TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity ItemRarity)
+void UD1InventoryManagerComponent::TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity ItemRarity)
 {
 	check(GetOwner()->HasAuthority());
 	
-	return InventoryList.TryAddItem(TemplateID, ItemCount, ItemRarity);
+	TArray<UD1ItemInstance*> AddedItemInstances = InventoryList.TryAddItem(TemplateID, ItemCount, ItemRarity);
+	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication())
+	{
+		for (UD1ItemInstance* AddedItemInstance : AddedItemInstances)
+		{
+			if (AddedItemInstance)
+			{
+				AddReplicatedSubObject(AddedItemInstance);
+			}
+		}
+	}
 }
 
 bool UD1InventoryManagerComponent::TryRemoveItem(int32 TemplateID, int32 ItemCount)
 {
 	check(GetOwner()->HasAuthority());
 	
-	return InventoryList.TryRemoveItem(TemplateID, ItemCount);
+	TArray<UD1ItemInstance*> RemovedItemInstances = InventoryList.TryRemoveItem(TemplateID, ItemCount);
+	if (IsUsingRegisteredSubObjectList())
+	{
+		for (UD1ItemInstance* RemovedItemInstance : RemovedItemInstances)
+		{
+			if (RemovedItemInstance)
+			{
+				RemoveReplicatedSubObject(RemovedItemInstance);
+			}
+		}
+	}
 }
 
 const TArray<FD1InventoryEntry>& UD1InventoryManagerComponent::GetAllEntries() const

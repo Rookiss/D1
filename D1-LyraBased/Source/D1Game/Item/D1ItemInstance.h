@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "D1Define.h"
-#include "Data/D1ItemData.h"
 #include "System/GameplayTagStack.h"
 #include "D1ItemInstance.generated.h"
 
@@ -17,34 +16,51 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool IsSupportedForNetworking() const override { return true; }
 
-#if UE_WITH_IRIS
-	virtual void RegisterReplicationFragments(UE::Net::FFragmentRegistrationContext& Context, UE::Net::EFragmentRegistrationFlags RegistrationFlags) override;
-#endif // #if UE_WITH_IRIS
+private:
+	void SetItemDefinition(TSubclassOf<UD1ItemDefinition> InItemDefinition, EItemRarity InItemRarity);
+	void SetItemDefinition(TSubclassOf<UD1ItemDefinition> InItemDefinition, const TArray<FD1ItemRarityProbability>& InItemProbabilities);
 	
 public:
-	void Init(int32 InTemplateID, EItemRarity InItemRarity);
-	void Init(int32 InTemplateID, const TArray<FD1ItemRarityProbability>& InItemProbabilities);
-	
-	void AddStatTagStack(const FGameplayTag& StatTag, int32 StackCount);
-	void RemoveStatTagStack(const FGameplayTag& StatTag, int32 StackCount);
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void AddStatTagStack(FGameplayTag StatTag, int32 StackCount);
 
-public:
-	static EItemRarity DetermineItemRarity(const TArray<FD1ItemRarityProbability>& ItemProbabilities);
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void RemoveStatTagStack(FGameplayTag StatTag, int32 StackCount);
+
+private:
+	EItemRarity DetermineItemRarity(const TArray<FD1ItemRarityProbability>& ItemProbabilities);
 	
 public:
-	int32 GetTemplateID() const { return TemplateID; }
+	TSubclassOf<UD1ItemDefinition> GetItemDefinition() const { return ItemDefinition; }
 	EItemRarity GetItemRarity() const { return ItemRarity; }
 
+	UFUNCTION(BlueprintCallable)
+	bool HasStatTag(FGameplayTag StatTag) const;
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetStatCountByTag(FGameplayTag StatTag) const;
+	
 	const FGameplayTagStackContainer& GetStatContainer() const { return StatContainer; }
-	int32 GetStatCountByTag(const FGameplayTag& StatTag) const;
-	bool HasStatTag(const FGameplayTag& StatTag) const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure="false", meta=(DeterminesOutputType="FragmentClass"))
+	const UD1ItemFragment* FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const;
 
 	template <typename FragmentClass>
-	const FragmentClass* FindFragmentByClass() const;
+		const FragmentClass* FindFragmentByClass() const
+	{
+		return (FragmentClass*)FindFragmentByClass(FragmentClass::StaticClass());
+	}
+	
+private:
+#if UE_WITH_IRIS
+	virtual void RegisterReplicationFragments(UE::Net::FFragmentRegistrationContext& Context, UE::Net::EFragmentRegistrationFlags RegistrationFlags) override;
+#endif // UE_WITH_IRIS
+	
+	friend struct FD1InventoryList;
 	
 private:
 	UPROPERTY(Replicated)
-	int32 TemplateID = 0;
+	TSubclassOf<UD1ItemDefinition> ItemDefinition;
 
 	UPROPERTY(Replicated)
 	EItemRarity ItemRarity = EItemRarity::Junk;
@@ -52,10 +68,3 @@ private:
 	UPROPERTY(Replicated)
 	FGameplayTagStackContainer StatContainer;
 };
-
-template <typename FragmentClass>
-const FragmentClass* UD1ItemInstance::FindFragmentByClass() const
-{
-	const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-	return ItemTemplate.FindFragmentByClass<FragmentClass>();
-}
