@@ -1,6 +1,7 @@
 ﻿#include "D1ItemData.h"
 
 #include "Item/Fragments/D1ItemFragment_Consumable.h"
+#include "Item/Fragments/D1ItemFragment_Stackable.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "UObject/ObjectSaveContext.h"
@@ -52,7 +53,7 @@ EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) 
 		const UD1ItemFragment_Equippable* Equippable = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable>();
 		const UD1ItemFragment_Equippable_Armor* Armor = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
 		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
-		// const UD1ItemFragment_Stackable* Stackable = ItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>();
+		const UD1ItemFragment_Stackable* Stackable = ItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>();
 		
 		if (ItemID <= 0)
 		{
@@ -75,7 +76,7 @@ EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) 
 				Result = EDataValidationResult::Invalid;
 			}
 			
-			// if (Stackable)
+			if (Stackable)
 			{
 				Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Stackable] <-> [Equippable]"), ItemID)));
 				Result = EDataValidationResult::Invalid;

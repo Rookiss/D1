@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Item/D1ItemDefinition.h"
+#include "D1ItemFragment.h"
 #include "D1ItemFragment_Consumable.generated.h"
 
 class UGameplayEffect;
@@ -19,7 +19,4 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UGameplayEffect> Effect;
-	
-	UPROPERTY(EditDefaultsOnly)
-	int32 MaxStackCount = 1;
 };

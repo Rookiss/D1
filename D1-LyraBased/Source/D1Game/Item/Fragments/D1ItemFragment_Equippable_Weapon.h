@@ -5,6 +5,7 @@
 #include "D1ItemFragment_Equippable_Weapon.generated.h"
 
 class AD1WeaponBase;
+class UGameplayEffect;
 
 USTRUCT()
 struct FD1WeaponAttachInfo

@@ -4,8 +4,9 @@
 #include "Iris/ReplicationSystem/ReplicationFragmentUtil.h"
 #endif // UE_WITH_IRIS
 
-#include "D1ItemDefinition.h"
+#include "Fragments/D1ItemFragment_Stackable.h"
 #include "Net/UnrealNetwork.h"
+#include "Data/D1ItemData.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemInstance)
 
@@ -19,31 +20,9 @@ void UD1ItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, ItemDefinition);
+	DOREPLIFETIME(ThisClass, TemplateID);
 	DOREPLIFETIME(ThisClass, ItemRarity);
 	DOREPLIFETIME(ThisClass, StatContainer);
-}
-
-void UD1ItemInstance::SetItemDefinition(TSubclassOf<UD1ItemDefinition> InItemDefinition, EItemRarity InItemRarity)
-{
-	if (InItemDefinition == nullptr || InItemRarity == EItemRarity::Count)
-		return;
-
-	ItemDefinition = InItemDefinition;
-	ItemRarity = InItemRarity;
-	
-	for (const UD1ItemFragment* Fragment : GetDefault<UD1ItemDefinition>(ItemDefinition)->Fragments)
-	{
-		if (Fragment)
-		{
-			Fragment->OnInstanceCreated(this);
-		}
-	}
-}
-
-void UD1ItemInstance::SetItemDefinition(TSubclassOf<UD1ItemDefinition> InItemDefinition, const TArray<FD1ItemRarityProbability>& InItemProbabilities)
-{
-	SetItemDefinition(InItemDefinition, DetermineItemRarity(InItemProbabilities));
 }
 
 #if UE_WITH_IRIS
@@ -54,52 +33,63 @@ void UD1ItemInstance::RegisterReplicationFragments(UE::Net::FFragmentRegistratio
 }
 #endif // UE_WITH_IRIS
 
-void UD1ItemInstance::AddStatTagStack(FGameplayTag StatTag, int32 StackCount)
+void UD1ItemInstance::Init(int32 InTemplateID, EItemRarity InItemRarity)
+{
+	check(InTemplateID > 0 && InItemRarity != EItemRarity::Count);
+
+	TemplateID = InTemplateID;
+	ItemRarity = InItemRarity;
+	
+	const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
+	for (const UD1ItemFragment* Fragment : ItemTemplate.Fragments)
+	{
+		if (Fragment)
+		{
+			Fragment->OnInstanceCreated(this);
+		}
+	}
+}
+
+void UD1ItemInstance::Init(int32 InTemplateID, const TArray<FD1ItemRarityProbability>& InItemProbabilities)
+{
+	Init(InTemplateID, DetermineItemRarity(InItemProbabilities));
+}
+
+void UD1ItemInstance::AddStatTagStack(const FGameplayTag& StatTag, int32 StackCount)
 {
 	StatContainer.AddStack(StatTag, StackCount);
 }
 
-void UD1ItemInstance::RemoveStatTagStack(FGameplayTag StatTag, int32 StackCount)
+void UD1ItemInstance::RemoveStatTagStack(const FGameplayTag& StatTag, int32 StackCount)
 {
 	StatContainer.RemoveStack(StatTag, StackCount);
+}
+
+int32 UD1ItemInstance::GetStatCountByTag(const FGameplayTag& StatTag) const
+{
+	return StatContainer.GetStackCount(StatTag);
+}
+
+bool UD1ItemInstance::HasStatTag(const FGameplayTag& StatTag) const
+{
+	return StatContainer.ContainsTag(StatTag);
 }
 
 EItemRarity UD1ItemInstance::DetermineItemRarity(const TArray<FD1ItemRarityProbability>& ItemProbabilities)
 {
 	EItemRarity ItemRarity = EItemRarity::Junk;
-
+	
 	float TotalPercent = 0.f;
 	float RandValue = FMath::RandRange(0.f, 100.f);
-
-	for (const FD1ItemRarityProbability& ItemProbability : ItemProbabilities)
+		
+	for (int32 i = 0; i < ItemProbabilities.Num(); i++)
 	{
-		TotalPercent += ItemProbability.Probability;
+		TotalPercent += ItemProbabilities[i].Probability;
 		if (RandValue <= TotalPercent)
 		{
-			ItemRarity = ItemProbability.Rarity;
+			ItemRarity = ItemProbabilities[i].Rarity;
 			break;
 		}
 	}
-
-	check(FMath::IsNearlyEqual(TotalPercent, 100.f));
 	return ItemRarity;
-}
-
-bool UD1ItemInstance::HasStatTag(FGameplayTag StatTag) const
-{
-	return StatContainer.ContainsTag(StatTag);
-}
-
-int32 UD1ItemInstance::GetStatCountByTag(FGameplayTag StatTag) const
-{
-	return StatContainer.GetStackCount(StatTag);
-}
-
-const UD1ItemFragment* UD1ItemInstance::FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const
-{
-	if (ItemDefinition && FragmentClass)
-	{
-		return GetDefault<UD1ItemDefinition>(ItemDefinition)->FindFragmentByClass(FragmentClass);
-	}
-	return nullptr;
 }

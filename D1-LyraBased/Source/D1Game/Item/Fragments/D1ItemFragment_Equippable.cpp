@@ -23,16 +23,13 @@ void UD1ItemFragment_Equippable::OnInstanceCreated(UD1ItemInstance* ItemInstance
 {
 	Super::OnInstanceCreated(ItemInstance);
 
-	if (ItemInstance)
+	for (const auto& Pair : BaseStats)
 	{
-		for (const auto& Pair : BaseStats)
-		{
-			const FGameplayTag& StatTag = Pair.Key;
-			const FRarityStatRangeSet& StatRangeSet = Pair.Value;
+		const FGameplayTag& StatTag = Pair.Key;
+		const FRarityStatRangeSet& StatRangeSet = Pair.Value;
 		
-			const FRarityStatRange& StatRange = StatRangeSet.RarityStatRanges[(int32)ItemInstance->GetItemRarity()];
-			const int32 StatValue = FMath::RandRange(StatRange.MinValue, StatRange.MaxValue);
-			ItemInstance->AddStatTagStack(StatTag, StatValue);
-		}
+		const FRarityStatRange& StatRange = StatRangeSet.RarityStatRanges[(int32)ItemInstance->GetItemRarity()];
+		const int32 StatValue = FMath::RandRange(StatRange.MinValue, StatRange.MaxValue);
+		ItemInstance->AddStatTagStack(StatTag, StatValue);
 	}
 }

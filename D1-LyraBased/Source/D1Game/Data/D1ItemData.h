@@ -1,7 +1,21 @@
 ﻿#pragma once
 
-#include "Item/D1ItemDefinition.h"
+#include "D1Define.h"
+#include "Item/Fragments/D1ItemFragment.h"
 #include "D1ItemData.generated.h"
+
+USTRUCT()
+struct FD1ItemRarityProbability
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleDefaultsOnly)
+	EItemRarity Rarity = EItemRarity::Junk;
+
+	UPROPERTY(EditDefaultsOnly)
+	float Probability = 0;
+};
 
 USTRUCT()
 struct FD1ItemTemplate
