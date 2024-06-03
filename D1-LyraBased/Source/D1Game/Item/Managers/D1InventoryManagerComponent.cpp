@@ -6,29 +6,20 @@
 #include "Engine/ActorChannel.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Stackable.h"
+#include "Item/Fragments/D1ItemFragment_Consumable.h"
 #include "Net/UnrealNetwork.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1InventoryManagerComponent)
 
-void FD1InventoryEntry::Init(int32 InTemplateID, int32 InItemCount, EItemRarity InItemRarity)
+UD1ItemInstance* FD1InventoryEntry::Init(int32 InItemTemplateID, int32 InItemCount, EItemRarity InItemRarity)
 {
-	check(InTemplateID > 0 && InItemCount > 0 && InItemRarity != EItemRarity::Count);
+	check(InItemTemplateID > 0 && InItemCount > 0 && InItemRarity != EItemRarity::Count);
 
 	UD1ItemInstance* NewItemInstance = NewObject<UD1ItemInstance>();
-	NewItemInstance->Init(InTemplateID, InItemRarity);
-
+	NewItemInstance->Init(InItemTemplateID, InItemRarity);
 	Init(NewItemInstance, InItemCount);
-}
-
-void FD1InventoryEntry::Init(int32 InTemplateID, int32 InItemCount, const TArray<FD1ItemRarityProbability>& InItemProbabilities)
-{
-	check(InTemplateID > 0 && InItemCount > 0);
-
-	UD1ItemInstance* NewItemInstance = NewObject<UD1ItemInstance>();
-	NewItemInstance->Init(InTemplateID, InItemProbabilities);
-
-	Init(NewItemInstance, InItemCount);
+	
+	return NewItemInstance;
 }
 
 void FD1InventoryEntry::Init(UD1ItemInstance* InItemInstance, int32 InItemCount)
@@ -37,16 +28,20 @@ void FD1InventoryEntry::Init(UD1ItemInstance* InItemInstance, int32 InItemCount)
 	
 	ItemInstance = InItemInstance;
 	
-	const UD1ItemFragment_Stackable* Stackable = ItemInstance->FindFragmentByClass<UD1ItemFragment_Stackable>();
-	ItemCount = Stackable ? FMath::Clamp(InItemCount, 1, Stackable->MaxStackCount) : 1;
+	const UD1ItemFragment_Consumable* Consumable = ItemInstance->FindFragmentByClass<UD1ItemFragment_Consumable>();
+	ItemCount = Consumable ? FMath::Clamp(InItemCount, 1, Consumable->MaxStackCount) : 1;
 	
-	LastValidTemplateID = ItemInstance->GetTemplateID();
+	LastValidTemplateID = ItemInstance->GetItemTemplateID();
 }
 
-void FD1InventoryEntry::Reset()
+UD1ItemInstance* FD1InventoryEntry::Reset()
 {
+	UD1ItemInstance* RemovedItemInstance = ItemInstance;
+	
 	ItemInstance = nullptr;
 	ItemCount = 0;
+
+	return RemovedItemInstance;
 }
 
 bool FD1InventoryList::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
@@ -58,14 +53,15 @@ void FD1InventoryList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, i
 {
 	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
 
-	for (int32 Index : AddedIndices)
+	for (int32 AddedIndex : AddedIndices)
 	{
-		FD1InventoryEntry& Entry = Entries[Index];
+		FD1InventoryEntry& Entry = Entries[AddedIndex];
 		if (Entry.ItemInstance == nullptr)
 			continue;
 
-		const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(Entry.ItemInstance->GetTemplateID());
-		const FIntPoint ItemSlotPos = FIntPoint(Index % InventorySlotCount.X, Index / InventorySlotCount.X);
+		const int32 ItemTemplateID = Entry.ItemInstance->GetItemTemplateID();
+		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
+		const FIntPoint ItemSlotPos = FIntPoint(AddedIndex % InventorySlotCount.X, AddedIndex / InventorySlotCount.X);
 		const FIntPoint& ItemSlotCount = ItemTemplate.SlotCount;
 
 		InventoryManager->MarkSlotChecks(true, ItemSlotPos, ItemSlotCount);
@@ -80,32 +76,34 @@ void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 	TArray<int32> AddedIndices;
 	AddedIndices.Reserve(FinalSize);
 
-	for (int32 Index : ChangedIndices)
+	for (int32 ChangedIndex : ChangedIndices)
 	{
-		FD1InventoryEntry& Entry = Entries[Index];
+		FD1InventoryEntry& Entry = Entries[ChangedIndex];
 		if (Entry.ItemInstance)
 		{
-			AddedIndices.Add(Index);
-			continue;
+			AddedIndices.Add(ChangedIndex);
 		}
-
-		if (Entry.LastValidTemplateID > 0)
+		else
 		{
-			const FD1ItemTemplate& ItemTemplate =  UD1ItemData::Get().FindItemTemplateByID(Entry.LastValidTemplateID);
-			const FIntPoint ItemSlotPos = FIntPoint(Index % InventorySlotCount.X, Index / InventorySlotCount.X);
-			const FIntPoint& ItemSlotCount = ItemTemplate.SlotCount;
+			if (Entry.LastValidTemplateID > 0)
+			{
+				const UD1ItemTemplate& ItemTemplate =  UD1ItemData::Get().FindItemTemplateByID(Entry.LastValidTemplateID);
+				const FIntPoint ItemSlotPos = FIntPoint(ChangedIndex % InventorySlotCount.X, ChangedIndex / InventorySlotCount.X);
+				const FIntPoint& ItemSlotCount = ItemTemplate.SlotCount;
 
-			InventoryManager->MarkSlotChecks(false, ItemSlotPos, ItemSlotCount);
-			BroadcastChangedMessage(ItemSlotPos, Entry.ItemInstance, Entry.ItemCount);
+				InventoryManager->MarkSlotChecks(false, ItemSlotPos, ItemSlotCount);
+				BroadcastChangedMessage(ItemSlotPos, Entry.ItemInstance, Entry.ItemCount);
+			}
 		}
 	}
 
-	for (int32 Index : AddedIndices)
+	for (int32 AddedIndex : AddedIndices)
 	{
-		FD1InventoryEntry& Entry = Entries[Index];
-		
-		const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID((Entry.ItemInstance->GetTemplateID()));
-		const FIntPoint ItemSlotPos = FIntPoint(Index % InventorySlotCount.X, Index / InventorySlotCount.X);
+		FD1InventoryEntry& Entry = Entries[AddedIndex];
+
+		const int32 ItemTemplateID = Entry.ItemInstance->GetItemTemplateID();
+		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
+		const FIntPoint ItemSlotPos = FIntPoint(AddedIndex % InventorySlotCount.X, AddedIndex / InventorySlotCount.X);
 		const FIntPoint& ItemSlotCount = ItemTemplate.SlotCount;
 
 		InventoryManager->MarkSlotChecks(true, ItemSlotPos, ItemSlotCount);
@@ -113,57 +111,20 @@ void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 	}
 }
 
-void FD1InventoryList::AddItem_Unsafe(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount)
+TArray<UD1ItemInstance*> FD1InventoryList::TryAddItem(int32 ItemTemplateID, int32 ItemCount, EItemRarity ItemRarity)
 {
-	const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetTemplateID());
-	
-	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
-	const int32 Index = ItemSlotPos.Y * InventorySlotCount.X + ItemSlotPos.X;
-	FD1InventoryEntry& Entry = Entries[Index];
-	
-	if (Entry.ItemInstance)
-	{
-		Entry.ItemCount += ItemCount;
-		MarkItemDirty(Entry);
-	}
-	else
-	{
-		InventoryManager->MarkSlotChecks(true, ItemSlotPos, ItemTemplate.SlotCount);
-		Entry.Init(ItemInstance, ItemCount);
-		MarkItemDirty(Entry);
-	}
-}
-
-UD1ItemInstance* FD1InventoryList::RemoveItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemCount)
-{
-	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
-	const int32 Index = ItemSlotPos.Y * InventorySlotCount.X + ItemSlotPos.X;
-	FD1InventoryEntry& Entry = Entries[Index];
-	UD1ItemInstance* ItemInstance = Entry.ItemInstance;
-	
-	Entry.ItemCount -= ItemCount;
-	if (Entry.ItemCount <= 0)
-	{
-		const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetTemplateID());
-		InventoryManager->MarkSlotChecks(false, ItemSlotPos, ItemTemplate.SlotCount);
-		Entry.Reset();
-	}
-	MarkItemDirty(Entry);
-	return ItemInstance;
-}
-
-bool FD1InventoryList::TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity ItemRarity)
-{
-	if (TemplateID <= 0 || ItemCount <= 0 || ItemRarity == EItemRarity::Count)
-		return false;
+	TArray<UD1ItemInstance*> AddedItemInstances;
+	 
+	if (ItemTemplateID <= 0 || ItemCount <= 0 || ItemRarity == EItemRarity::Count)
+		return AddedItemInstances;
 	
 	TArray<TPair<int32/*EntryIndex*/, int32/*AddCount*/>> AddQueue;
 	TArray<TPair<int32/*EntryIndex*/, int32/*NewCount*/>> NewQueue;
 	
-	const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-	const UD1ItemFragment_Stackable* StackableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Stackable>();
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
+	const UD1ItemFragment_Consumable* ConsumableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Consumable>();
 	
-	if (StackableFragment)
+	if (ConsumableFragment)
 	{
 		for (int32 i = 0; i < Entries.Num(); i++)
 		{
@@ -172,13 +133,13 @@ bool FD1InventoryList::TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity
 			if (Entry.ItemInstance == nullptr)
 				continue;
 
-			if (Entry.ItemInstance->GetTemplateID() != TemplateID)
+			if (Entry.ItemInstance->GetItemTemplateID() != ItemTemplateID)
 				continue;
 
 			if (Entry.ItemInstance->GetItemRarity() != ItemRarity)
 				continue;
 			
-			if (int32 AddCount = FMath::Min(Entry.GetItemCount() + ItemCount, StackableFragment->MaxStackCount) - Entry.GetItemCount())
+			if (int32 AddCount = FMath::Min(Entry.GetItemCount() + ItemCount, ConsumableFragment->MaxStackCount) - Entry.GetItemCount())
 			{
 				AddQueue.Emplace(i, AddCount);
 				ItemCount -= AddCount;
@@ -191,7 +152,7 @@ bool FD1InventoryList::TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity
 						ToEntry.ItemCount += Pair.Value;
 						MarkItemDirty(ToEntry);
 					}
-					return true;
+					return AddedItemInstances;
 				}
 			}
 		}
@@ -201,8 +162,8 @@ bool FD1InventoryList::TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity
 	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
 	TArray<TArray<bool>> TempSlotChecks = InventoryManager->GetSlotChecks();
 	
-	FIntPoint StartSlotPos = FIntPoint::ZeroValue;
-	FIntPoint EndSlotPos = InventorySlotCount - ItemSlotCount;
+	const FIntPoint StartSlotPos = FIntPoint::ZeroValue;
+	const FIntPoint EndSlotPos = InventorySlotCount - ItemSlotCount;
 	
 	for (int32 y = StartSlotPos.Y; y <= EndSlotPos.Y; y++)
 	{
@@ -216,7 +177,7 @@ bool FD1InventoryList::TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity
 			{
 				InventoryManager->MarkSlotChecks(TempSlotChecks, true, ItemSlotPos, ItemSlotCount);
 				
-				int32 AddCount = StackableFragment ? FMath::Min(ItemCount, StackableFragment->MaxStackCount) : 1;
+				int32 AddCount = ConsumableFragment ? FMath::Min(ItemCount, ConsumableFragment->MaxStackCount) : 1;
 				NewQueue.Emplace(y * InventorySlotCount.X + x, AddCount);
 				ItemCount -= AddCount;
 				
@@ -235,32 +196,29 @@ bool FD1InventoryList::TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity
 						InventoryManager->MarkSlotChecks(true, ToSlotPos, ItemSlotCount);
 						
 						FD1InventoryEntry& Entry = Entries[Pair.Key];
-						Entry.Init(TemplateID, Pair.Value, ItemRarity);
-
+						AddedItemInstances.Add(Entry.Init(ItemTemplateID, Pair.Value, ItemRarity));
+						
 						MarkItemDirty(Entry);
 					}
-					return true;
+					return AddedItemInstances;
 				}
 			}
 		}
 	}
-	return false;
+	return AddedItemInstances;
 }
 
-bool FD1InventoryList::TryAddItem(int32 TemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities)
+TArray<UD1ItemInstance*> FD1InventoryList::TryRemoveItem(int32 ItemTemplateID, int32 ItemCount)
 {
-	return TryAddItem(TemplateID, ItemCount, UD1ItemInstance::DetermineItemRarity(ItemProbabilities));
-}
-
-bool FD1InventoryList::TryRemoveItem(int32 TemplateID, int32 ItemCount)
-{
-	if (TemplateID <= 0 || ItemCount <= 0)
-		return false;
-
-	if (GetTotalCountByID(TemplateID) < ItemCount)
-		return false;
+	TArray<UD1ItemInstance*> RemovedItemInstances;
 	
-	const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
+	if (ItemTemplateID <= 0 || ItemCount <= 0)
+		return RemovedItemInstances;
+
+	if (GetTotalCountByID(ItemTemplateID) < ItemCount)
+		return RemovedItemInstances;
+	
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
 
 	TArray<TPair<int32/*EntryIndex*/, int32/*RemoveCount*/>> RemoveQueue;
 	
@@ -270,7 +228,7 @@ bool FD1InventoryList::TryRemoveItem(int32 TemplateID, int32 ItemCount)
 		if (Entry.ItemInstance == nullptr)
 			continue;
 
-		if (Entry.ItemInstance->GetTemplateID() != TemplateID)
+		if (Entry.ItemInstance->GetItemTemplateID() != ItemTemplateID)
 			continue;
 			
 		if (Entry.ItemCount < ItemCount)
@@ -292,14 +250,14 @@ bool FD1InventoryList::TryRemoveItem(int32 TemplateID, int32 ItemCount)
 				{
 					FIntPoint ItemSlotPos = FIntPoint(Pair.Key % InventorySlotCount.X, Pair.Key / InventorySlotCount.X);
 					InventoryManager->MarkSlotChecks(false, ItemSlotPos, ItemTemplate.SlotCount);
-					ToEntry.Reset();
+					RemovedItemInstances.Add(ToEntry.Reset());
 				}
 				MarkItemDirty(ToEntry);
 			}
-			return true;
+			return RemovedItemInstances;
 		}
 	}
-	return false;
+	return RemovedItemInstances;
 }
 
 void FD1InventoryList::BroadcastChangedMessage(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount)
@@ -313,12 +271,12 @@ void FD1InventoryList::BroadcastChangedMessage(const FIntPoint& ItemSlotPos, UD1
 	MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Item_InventoryEntryChanged, Message);
 }
 
-int32 FD1InventoryList::GetTotalCountByID(int32 TemplateID) const
+int32 FD1InventoryList::GetTotalCountByID(int32 ItemTemplateID) const
 {
 	int32 Count = 0;
 	for (const FD1InventoryEntry& Entry : Entries)
 	{
-		if (Entry.ItemInstance && Entry.ItemInstance->GetTemplateID() == TemplateID)
+		if (Entry.ItemInstance && Entry.ItemInstance->GetItemTemplateID() == ItemTemplateID)
 		{
 			Count += Entry.ItemCount;
 		}
@@ -401,8 +359,44 @@ void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromInternalInv
 	int32 MovableItemCount = CanMoveOrMergeItem_FromInternalInventory(FromItemSlotPos, ToItemSlotPos);
 	if (MovableItemCount > 0)
 	{
-		UD1ItemInstance* RemovedItemInstance = InventoryList.RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
-		InventoryList.AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, MovableItemCount);
+		TArray<FD1InventoryEntry>& Entries = InventoryList.Entries;
+		const int32 FromEntryIndex = FromItemSlotPos.Y * InventorySlotCount.X + FromItemSlotPos.X;
+		FD1InventoryEntry& FromEntry = Entries[FromEntryIndex];
+		UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
+
+		FromEntry.ItemCount -= MovableItemCount;
+		if (FromEntry.GetItemCount() <= 0)
+		{
+			UD1ItemInstance* RemovedItemInstance = FromEntry.Reset();
+			if (IsUsingRegisteredSubObjectList())
+			{
+				if (RemovedItemInstance)
+				{
+					RemoveReplicatedSubObject(RemovedItemInstance);
+				}
+			}
+		}
+		
+		const int32 ToEntryIndex = ToItemSlotPos.Y * InventorySlotCount.X + ToItemSlotPos.X;
+		FD1InventoryEntry& ToEntry = Entries[ToEntryIndex];
+
+		UD1ItemInstance* ToItemInstance = NewObject<UD1ItemInstance>();
+		ToItemInstance->ItemTemplateID = FromItemInstance->GetItemTemplateID();
+		ToItemInstance->ItemRarity = FromItemInstance->GetItemRarity();
+		ToItemInstance->StatContainer = FromItemInstance->GetStatContainer();
+
+		ToEntry.Init(ToItemInstance, MovableItemCount);
+		
+		// UD1ItemInstance* RemovedItemInstance = InventoryList.RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
+		// InventoryList.AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, MovableItemCount);
+
+		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication())
+		{
+			if (ToItemInstance)
+			{
+				AddReplicatedSubObject(ToItemInstance);
+			}
+		}
 	}
 }
 
@@ -432,20 +426,20 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_FromInternalInventory(con
 	const UD1ItemInstance* ToItemInstance = ToEntry.ItemInstance;
 	const int32 ToItemCount = ToEntry.ItemCount;
 	
-	const int32 FromTemplateID = FromItemInstance->GetTemplateID();
-	const FD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromTemplateID);
+	const int32 FromTemplateID = FromItemInstance->GetItemTemplateID();
+	const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromTemplateID);
 	
 	if (ToItemInstance)
 	{
-		const int32 ToTemplateID = ToItemInstance->GetTemplateID();
+		const int32 ToTemplateID = ToItemInstance->GetItemTemplateID();
 		if (FromTemplateID != ToTemplateID)
 			return 0;
 
-		const UD1ItemFragment_Stackable* Stackable = FromItemTemplate.FindFragmentByClass<UD1ItemFragment_Stackable>();
-		if (Stackable == nullptr)
+		const UD1ItemFragment_Consumable* ConsumableFragment = FromItemTemplate.FindFragmentByClass<UD1ItemFragment_Consumable>();
+		if (ConsumableFragment == nullptr)
 			return 0;
 
-		return FMath::Min(FromItemCount + ToItemCount, Stackable->MaxStackCount) - ToItemCount;
+		return FMath::Min(FromItemCount + ToItemCount, ConsumableFragment->MaxStackCount) - ToItemCount;
 	}
 	else
 	{
@@ -510,20 +504,20 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalInventory(UD1
 	const UD1ItemInstance* ToItemInstance = ToEntry.ItemInstance;
 	const int32 ToItemCount = ToEntry.ItemCount;
 	
-	const int32 FromTemplateID = FromItemInstance->GetTemplateID();
-	const FD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromTemplateID);
+	const int32 FromTemplateID = FromItemInstance->GetItemTemplateID();
+	const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromTemplateID);
 	
 	if (ToItemInstance)
 	{
-		const int32 ToTemplateID = ToItemInstance->GetTemplateID();
+		const int32 ToTemplateID = ToItemInstance->GetItemTemplateID();
 		if (FromTemplateID != ToTemplateID)
 			return 0;
 
-		const UD1ItemFragment_Stackable* Stackable = FromItemTemplate.FindFragmentByClass<UD1ItemFragment_Stackable>();
-		if (Stackable == nullptr)
+		const UD1ItemFragment_Consumable* ConsumableFragment = FromItemTemplate.FindFragmentByClass<UD1ItemFragment_Consumable>();
+		if (ConsumableFragment == nullptr)
 			return 0;
 
-		return FMath::Min(FromItemCount + ToItemCount, Stackable->MaxStackCount) - ToItemCount;
+		return FMath::Min(FromItemCount + ToItemCount, ConsumableFragment->MaxStackCount) - ToItemCount;
 	}
 	else
 	{
@@ -572,18 +566,18 @@ bool UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalEquipment(UD1E
 	if (ToItemInstance)
 		return false;
 
-	const int32 FromTemplateID = FromItemInstance->GetTemplateID();
-	const FD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromTemplateID);
+	const int32 FromTemplateID = FromItemInstance->GetItemTemplateID();
+	const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromTemplateID);
 
 	const FIntPoint& FromItemSlotCount = FromItemTemplate.SlotCount;
 	return IsEmpty(ToItemSlotPos, FromItemSlotCount);
 }
 
-void UD1InventoryManagerComponent::TryAddItem(int32 TemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities)
+void UD1InventoryManagerComponent::TryAddItem(int32 ItemTemplateID, int32 ItemCount, EItemRarity ItemRarity)
 {
 	check(GetOwner()->HasAuthority());
-
-	TArray<UD1ItemInstance*> AddedItemInstances = InventoryList.TryAddItem(TemplateID, ItemCount, ItemProbabilities);
+	
+	TArray<UD1ItemInstance*> AddedItemInstances = InventoryList.TryAddItem(ItemTemplateID, ItemCount, ItemRarity);
 	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication())
 	{
 		for (UD1ItemInstance* AddedItemInstance : AddedItemInstances)
@@ -596,28 +590,18 @@ void UD1InventoryManagerComponent::TryAddItem(int32 TemplateID, int32 ItemCount,
 	}
 }
 
-void UD1InventoryManagerComponent::TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity ItemRarity)
+void UD1InventoryManagerComponent::TryAddItem(int32 ItemTemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities)
 {
 	check(GetOwner()->HasAuthority());
-	
-	TArray<UD1ItemInstance*> AddedItemInstances = InventoryList.TryAddItem(TemplateID, ItemCount, ItemRarity);
-	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication())
-	{
-		for (UD1ItemInstance* AddedItemInstance : AddedItemInstances)
-		{
-			if (AddedItemInstance)
-			{
-				AddReplicatedSubObject(AddedItemInstance);
-			}
-		}
-	}
+
+	TryAddItem(ItemTemplateID, ItemCount, UD1ItemInstance::DetermineItemRarity(ItemProbabilities));
 }
 
-bool UD1InventoryManagerComponent::TryRemoveItem(int32 TemplateID, int32 ItemCount)
+void UD1InventoryManagerComponent::TryRemoveItem(int32 ItemTemplateID, int32 ItemCount)
 {
 	check(GetOwner()->HasAuthority());
 	
-	TArray<UD1ItemInstance*> RemovedItemInstances = InventoryList.TryRemoveItem(TemplateID, ItemCount);
+	TArray<UD1ItemInstance*> RemovedItemInstances = InventoryList.TryRemoveItem(ItemTemplateID, ItemCount);
 	if (IsUsingRegisteredSubObjectList())
 	{
 		for (UD1ItemInstance* RemovedItemInstance : RemovedItemInstances)
@@ -635,9 +619,9 @@ const TArray<FD1InventoryEntry>& UD1InventoryManagerComponent::GetAllEntries() c
 	return InventoryList.GetAllEntries();
 }
 
-int32 UD1InventoryManagerComponent::GetTotalCountByID(int32 TemplateID) const
+int32 UD1InventoryManagerComponent::GetTotalCountByID(int32 ItemTemplateID) const
 {
-	return InventoryList.GetTotalCountByID(TemplateID);
+	return InventoryList.GetTotalCountByID(ItemTemplateID);
 }
 
 bool UD1InventoryManagerComponent::IsEmpty(const TArray<TArray<bool>>& InSlotChecks, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const

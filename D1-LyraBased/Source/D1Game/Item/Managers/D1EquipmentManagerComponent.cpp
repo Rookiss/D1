@@ -34,7 +34,7 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* NewItemInstance)
 	
 	if (ItemInstance)
 	{
-		LastValidTemplateID = ItemInstance->GetTemplateID();
+		LastValidTemplateID = ItemInstance->GetItemTemplateID();
 
 		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
 		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();

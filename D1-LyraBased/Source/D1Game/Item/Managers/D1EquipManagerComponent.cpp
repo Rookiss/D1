@@ -97,7 +97,7 @@ void FD1EquipEntry::Equip()
 			{
 				UWorld* World = EquipManager->GetWorld();
 				AD1WeaponBase* NewWeaponActor = World->SpawnActorDeferred<AD1WeaponBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
-				NewWeaponActor->Init(ItemInstance->GetTemplateID(), EquipmentSlotType);
+				NewWeaponActor->Init(ItemInstance->GetItemTemplateID(), EquipmentSlotType);
 				NewWeaponActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 				NewWeaponActor->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
 				NewWeaponActor->FinishSpawning(FTransform::Identity, true);

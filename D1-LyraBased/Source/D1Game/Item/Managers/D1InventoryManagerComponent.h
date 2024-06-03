@@ -4,8 +4,9 @@
 #include "Net/Serialization/FastArraySerializer.h"
 #include "D1InventoryManagerComponent.generated.h"
 
-struct FD1ItemRarityProbability;
+class UD1ItemTemplate;
 class UD1ItemInstance;
+struct FD1ItemRarityProbability;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
@@ -31,10 +32,9 @@ struct FD1InventoryEntry : public FFastArraySerializerItem
 	GENERATED_BODY()
 
 private:
-	void Init(int32 InTemplateID, int32 InItemCount, EItemRarity InItemRarity);
-	void Init(int32 InTemplateID, int32 InItemCount, const TArray<FD1ItemRarityProbability>& InItemProbabilities);
+	UD1ItemInstance* Init(int32 InItemTemplateID, int32 InItemCount, EItemRarity InItemRarity);
 	void Init(UD1ItemInstance* InItemInstance, int32 InItemCount);
-	void Reset();
+	UD1ItemInstance* Reset();
 	
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
@@ -69,19 +69,15 @@ public:
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
 	
 private:
-	void AddItem_Unsafe(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount);
-	UD1ItemInstance* RemoveItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemCount); /* Return Removed ItemInstance */
-	
-	bool TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity ItemRarity);
-	bool TryAddItem(int32 TemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities);
-	bool TryRemoveItem(int32 TemplateID, int32 ItemCount);
+	TArray<UD1ItemInstance*> TryAddItem(int32 ItemTemplateID, int32 ItemCount, EItemRarity ItemRarity);
+	TArray<UD1ItemInstance*> TryRemoveItem(int32 ItemTemplateID, int32 ItemCount);
 
 private:
 	void BroadcastChangedMessage(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount);
 	
 public:
 	const TArray<FD1InventoryEntry>& GetAllEntries() const { return Entries; }
-	int32 GetTotalCountByID(int32 TemplateID) const;
+	int32 GetTotalCountByID(int32 ItemTemplateID) const;
 	
 private:
 	friend class UD1InventoryManagerComponent;
@@ -132,9 +128,9 @@ public:
 	bool CanMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const;
 
 public:
-	void TryAddItem(int32 TemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities);
-	void TryAddItem(int32 TemplateID, int32 ItemCount, EItemRarity ItemRarity);
-	void TryRemoveItem(int32 TemplateID, int32 ItemCount);
+	void TryAddItem(int32 ItemTemplateID, int32 ItemCount, EItemRarity ItemRarity);
+	void TryAddItem(int32 ItemTemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities);
+	void TryRemoveItem(int32 ItemTemplateID, int32 ItemCount);
 	
 public:
 	void MarkSlotChecks(TArray<TArray<bool>>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);
@@ -148,7 +144,7 @@ public:
 	const TArray<FD1InventoryEntry>& GetAllEntries() const;
 	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
 	TArray<TArray<bool>>& GetSlotChecks() { return SlotChecks; }
-	int32 GetTotalCountByID(int32 TemplateID) const;
+	int32 GetTotalCountByID(int32 ItemTemplateID) const;
 	
 private:
 	friend class UD1EquipmentManagerComponent;
