@@ -33,7 +33,6 @@ struct FD1InventoryEntry : public FFastArraySerializerItem
 
 private:
 	UD1ItemInstance* Init(int32 InItemTemplateID, int32 InItemCount, EItemRarity InItemRarity);
-	void Init(UD1ItemInstance* InItemInstance, int32 InItemCount);
 	UD1ItemInstance* Reset();
 	
 public:
@@ -117,11 +116,11 @@ public:
 	// TODO: With Validation - Check Valid Contract
 	UFUNCTION(Server, Reliable)
 	void Server_RequestMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos);
-	int32 CanMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const; /* Return Movable Item Count */
+	int32 CanMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const;
 
 	UFUNCTION(Server, Reliable)
 	void Server_RequestMoveOrMergeItem_FromExternalInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos);
-	int32 CanMoveOrMergeItem_FromExternalInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const; /* Return Movable Item Count */
+	int32 CanMoveOrMergeItem_FromExternalInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const;
 
 	UFUNCTION(Server, Reliable)
 	void Server_RequestMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos);
@@ -131,6 +130,10 @@ public:
 	void TryAddItem(int32 ItemTemplateID, int32 ItemCount, EItemRarity ItemRarity);
 	void TryAddItem(int32 ItemTemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities);
 	void TryRemoveItem(int32 ItemTemplateID, int32 ItemCount);
+
+private:
+	void AddItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemTemplateID, int32 ItemCount, EItemRarity ItemRarity);
+	UD1ItemInstance* RemoveItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemCount);
 	
 public:
 	void MarkSlotChecks(TArray<TArray<bool>>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);

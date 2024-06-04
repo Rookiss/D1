@@ -15,23 +15,16 @@ UD1ItemInstance* FD1InventoryEntry::Init(int32 InItemTemplateID, int32 InItemCou
 {
 	check(InItemTemplateID > 0 && InItemCount > 0 && InItemRarity != EItemRarity::Count);
 
-	UD1ItemInstance* NewItemInstance = NewObject<UD1ItemInstance>();
-	NewItemInstance->Init(InItemTemplateID, InItemRarity);
-	Init(NewItemInstance, InItemCount);
-	
-	return NewItemInstance;
-}
-
-void FD1InventoryEntry::Init(UD1ItemInstance* InItemInstance, int32 InItemCount)
-{
-	check(InItemInstance && InItemCount > 0);
-	
-	ItemInstance = InItemInstance;
+	UD1ItemInstance* AddedItemInstance = NewObject<UD1ItemInstance>();
+	AddedItemInstance->Init(InItemTemplateID, InItemRarity);
+	ItemInstance = AddedItemInstance;
 	
 	const UD1ItemFragment_Consumable* Consumable = ItemInstance->FindFragmentByClass<UD1ItemFragment_Consumable>();
 	ItemCount = Consumable ? FMath::Clamp(InItemCount, 1, Consumable->MaxStackCount) : 1;
 	
 	LastValidTemplateID = ItemInstance->GetItemTemplateID();
+	
+	return AddedItemInstance;
 }
 
 UD1ItemInstance* FD1InventoryEntry::Reset()
@@ -359,44 +352,8 @@ void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromInternalInv
 	int32 MovableItemCount = CanMoveOrMergeItem_FromInternalInventory(FromItemSlotPos, ToItemSlotPos);
 	if (MovableItemCount > 0)
 	{
-		TArray<FD1InventoryEntry>& Entries = InventoryList.Entries;
-		const int32 FromEntryIndex = FromItemSlotPos.Y * InventorySlotCount.X + FromItemSlotPos.X;
-		FD1InventoryEntry& FromEntry = Entries[FromEntryIndex];
-		UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
-
-		FromEntry.ItemCount -= MovableItemCount;
-		if (FromEntry.GetItemCount() <= 0)
-		{
-			UD1ItemInstance* RemovedItemInstance = FromEntry.Reset();
-			if (IsUsingRegisteredSubObjectList())
-			{
-				if (RemovedItemInstance)
-				{
-					RemoveReplicatedSubObject(RemovedItemInstance);
-				}
-			}
-		}
-		
-		const int32 ToEntryIndex = ToItemSlotPos.Y * InventorySlotCount.X + ToItemSlotPos.X;
-		FD1InventoryEntry& ToEntry = Entries[ToEntryIndex];
-
-		UD1ItemInstance* ToItemInstance = NewObject<UD1ItemInstance>();
-		ToItemInstance->ItemTemplateID = FromItemInstance->GetItemTemplateID();
-		ToItemInstance->ItemRarity = FromItemInstance->GetItemRarity();
-		ToItemInstance->StatContainer = FromItemInstance->GetStatContainer();
-
-		ToEntry.Init(ToItemInstance, MovableItemCount);
-		
-		// UD1ItemInstance* RemovedItemInstance = InventoryList.RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
-		// InventoryList.AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, MovableItemCount);
-
-		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication())
-		{
-			if (ToItemInstance)
-			{
-				AddReplicatedSubObject(ToItemInstance);
-			}
-		}
+		UD1ItemInstance* RemovedItemInstance = RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
+		AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance->GetItemTemplateID(), MovableItemCount, RemovedItemInstance->GetItemRarity());
 	}
 }
 
@@ -470,8 +427,8 @@ void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromExternalInv
 	int32 MovableItemCount = CanMoveOrMergeItem_FromExternalInventory(OtherComponent, FromItemSlotPos, ToItemSlotPos);
 	if (MovableItemCount > 0)
 	{
-		UD1ItemInstance* RemovedItemInstance = OtherComponent->InventoryList.RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
-		InventoryList.AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, MovableItemCount);
+		UD1ItemInstance* RemovedItemInstance = OtherComponent->RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
+		AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance->GetItemTemplateID(), MovableItemCount, RemovedItemInstance->GetItemRarity());
 	}
 }
 
@@ -535,8 +492,8 @@ void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromExternalEqu
 	
 	if (CanMoveOrMergeItem_FromExternalEquipment(OtherComponent, FromEquipmentSlotType, ToItemSlotPos))
 	{
-		UD1ItemInstance* RemovedItemInstance = OtherComponent->EquipmentList.RemoveEntry(FromEquipmentSlotType);
-		InventoryList.AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, 1);
+		UD1ItemInstance* RemovedItemInstance = OtherComponent->EquipmentList.RemoveEquipment(FromEquipmentSlotType);
+		AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance->GetItemTemplateID(), 1, RemovedItemInstance->GetItemRarity());
 	}
 }
 
@@ -612,6 +569,61 @@ void UD1InventoryManagerComponent::TryRemoveItem(int32 ItemTemplateID, int32 Ite
 			}
 		}
 	}
+}
+
+void UD1InventoryManagerComponent::AddItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemTemplateID, int32 ItemCount, EItemRarity ItemRarity)
+{
+	check(GetOwner()->HasAuthority());
+	
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
+	const int32 EntryIndex = ItemSlotPos.Y * InventorySlotCount.X + ItemSlotPos.X;
+	FD1InventoryEntry& Entry = InventoryList.Entries[EntryIndex];
+	
+	if (UD1ItemInstance* ItemInstance = Entry.ItemInstance)
+	{
+		if (ItemInstance->GetItemTemplateID() == ItemTemplateID && ItemInstance->GetItemRarity() == ItemRarity)
+		{
+			Entry.ItemCount += ItemCount;
+			InventoryList.MarkItemDirty(Entry);
+		}
+	}
+	else
+	{
+		MarkSlotChecks(true, ItemSlotPos, ItemTemplate.SlotCount);
+		
+		UD1ItemInstance* AddedItemInstance = Entry.Init(ItemTemplateID, ItemCount, ItemRarity);
+		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && AddedItemInstance)
+		{
+			AddReplicatedSubObject(AddedItemInstance);
+		}
+		
+		InventoryList.MarkItemDirty(Entry);
+	}
+}
+
+UD1ItemInstance* UD1InventoryManagerComponent::RemoveItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemCount)
+{
+	check(GetOwner()->HasAuthority());
+	
+	const int32 EntryIndex = ItemSlotPos.Y * InventorySlotCount.X + ItemSlotPos.X;
+	FD1InventoryEntry& Entry = InventoryList.Entries[EntryIndex];
+	UD1ItemInstance* ItemInstance = Entry.ItemInstance;
+	
+	Entry.ItemCount -= ItemCount;
+	if (Entry.ItemCount <= 0)
+	{
+		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
+		MarkSlotChecks(false, ItemSlotPos, ItemTemplate.SlotCount);
+		
+		UD1ItemInstance* RemovedItemInstance = Entry.Reset();
+		if (IsUsingRegisteredSubObjectList() && RemovedItemInstance)
+		{
+			RemoveReplicatedSubObject(RemovedItemInstance);
+		}
+	}
+	
+	InventoryList.MarkItemDirty(Entry);
+	return ItemInstance;
 }
 
 const TArray<FD1InventoryEntry>& UD1InventoryManagerComponent::GetAllEntries() const

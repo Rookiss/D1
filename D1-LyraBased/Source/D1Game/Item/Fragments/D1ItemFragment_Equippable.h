@@ -9,7 +9,7 @@ class ULyraAbilitySet;
 class UD1ItemInstance;
 
 USTRUCT()
-struct FRarityStatRange
+struct FRarityStat
 {
 	GENERATED_BODY()
 
@@ -18,23 +18,20 @@ public:
 	EItemRarity Rarity = EItemRarity::Junk;
 	
 	UPROPERTY(EditDefaultsOnly)
-	int32 MinValue = 0;
-
-	UPROPERTY(EditDefaultsOnly)
-	int32 MaxValue = 0;
+	int32 Value = 0;
 };
 
 USTRUCT()
-struct FRarityStatRangeSet
+struct FRarityStatSet
 {
 	GENERATED_BODY()
 
 public:
-	FRarityStatRangeSet();
+	FRarityStatSet();
 	
 public:
 	UPROPERTY(EditDefaultsOnly, EditFixedSize)
-	TArray<FRarityStatRange> RarityStatRanges;
+	TArray<FRarityStat> RarityStats;
 };
 
 UCLASS(Abstract, Const)
@@ -55,5 +52,5 @@ public:
 	TObjectPtr<const ULyraAbilitySet> BaseAbilitySet;
 	
 	UPROPERTY(EditDefaultsOnly, meta=(ForceInlineRow))
-	TMap<FGameplayTag, FRarityStatRangeSet> BaseStats;
+	TMap<FGameplayTag, FRarityStatSet> BaseStats;
 };

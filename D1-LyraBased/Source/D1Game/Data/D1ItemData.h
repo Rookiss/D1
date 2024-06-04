@@ -2,6 +2,8 @@
 
 #include "D1ItemData.generated.h"
 
+class UD1ItemTemplate;
+
 UCLASS(BlueprintType, Const, meta=(DisplayName="D1 Item Data"))
 class UD1ItemData : public UPrimaryDataAsset
 {

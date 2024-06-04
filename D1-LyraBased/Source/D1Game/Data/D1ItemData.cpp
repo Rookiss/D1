@@ -2,11 +2,9 @@
 
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
-#endif
+#endif // WITH_EDITOR
 
-#include "Item/Fragments/D1ItemFragment_Consumable.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
+#include "Item/D1ItemTemplate.h"
 #include "System/LyraAssetManager.h"
 #include "UObject/ObjectSaveContext.h"
 
@@ -78,51 +76,6 @@ EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) 
 		}
 		
 		ItemTemplateClassSet.Add(ItemTemplateClass);
-
-		// Fragment Check
-		if (const UD1ItemTemplate* ItemTemplate = ItemTemplateClass.GetDefaultObject())
-		{
-			const UD1ItemFragment_Consumable* Consumable = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Consumable>();
-			const UD1ItemFragment_Equippable* Equippable = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equippable>();
-			const UD1ItemFragment_Equippable_Armor* Armor = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
-			const UD1ItemFragment_Equippable_Weapon* Weapon = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
-		
-			if (Equippable)
-			{
-				if (Armor && Weapon)
-				{
-					Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Armor] <-> [Weapon]"), ItemTemplateID)));
-					Result = EDataValidationResult::Invalid;
-				}
-
-				if (Consumable)
-				{
-					Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Consumable] <-> [Equippable]"), ItemTemplateID)));
-					Result = EDataValidationResult::Invalid;
-				}
-
-				if (Armor && Armor->ArmorType == EArmorType::Count)
-				{
-					Context.AddError(FText::FromString(FString::Printf(TEXT("Armor Type is Invalid : [ID : %d] : [EArmorType::Count]"), ItemTemplateID)));
-					Result = EDataValidationResult::Invalid;
-				}
-
-				if (Weapon)
-				{
-					if (Weapon->WeaponType == EWeaponType::Count)
-					{
-						Context.AddError(FText::FromString(FString::Printf(TEXT("Weapon Type is Invalid : [ID : %d] : [EWeaponType::Count]"), ItemTemplateID)));
-						Result = EDataValidationResult::Invalid;
-					}
-				
-					if (Weapon->WeaponHandType == EWeaponHandType::Count)
-					{
-						Context.AddError(FText::FromString(FString::Printf(TEXT("Weapon Hand Type is Invalid : [ID : %d] : [EWeaponHandType::Count]"), ItemTemplateID)));
-						Result = EDataValidationResult::Invalid;
-					}
-				}
-			}
-		}
 	}
 	return Result;
 }

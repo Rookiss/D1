@@ -4,12 +4,12 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemFragment_Equippable)
 
-FRarityStatRangeSet::FRarityStatRangeSet()
+FRarityStatSet::FRarityStatSet()
 {
-	RarityStatRanges.SetNum((int32)EItemRarity::Count);
-	for (int32 i = 0; i < RarityStatRanges.Num(); i++)
+	RarityStats.SetNum((int32)EItemRarity::Count);
+	for (int32 i = 0; i < RarityStats.Num(); i++)
 	{
-		RarityStatRanges[i].Rarity = (EItemRarity)i;
+		RarityStats[i].Rarity = (EItemRarity)i;
 	}
 }
 
@@ -28,11 +28,10 @@ void UD1ItemFragment_Equippable::OnInstanceCreated(UD1ItemInstance* ItemInstance
 		for (const auto& Pair : BaseStats)
 		{
 			const FGameplayTag& StatTag = Pair.Key;
-			const FRarityStatRangeSet& StatRangeSet = Pair.Value;
+			const FRarityStatSet& RarityStatSet = Pair.Value;
 		
-			const FRarityStatRange& StatRange = StatRangeSet.RarityStatRanges[(int32)ItemInstance->GetItemRarity()];
-			const int32 StatValue = FMath::RandRange(StatRange.MinValue, StatRange.MaxValue);
-			ItemInstance->AddStatTagStack(StatTag, StatValue);
+			const FRarityStat& RarityStat = RarityStatSet.RarityStats[(int32)ItemInstance->GetItemRarity()];
+			ItemInstance->AddStatTagStack(StatTag, RarityStat.Value);
 		}
 	}
 }
