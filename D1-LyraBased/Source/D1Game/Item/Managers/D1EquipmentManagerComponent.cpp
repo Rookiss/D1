@@ -4,6 +4,7 @@
 #include "D1InventoryManagerComponent.h"
 #include "D1GameplayTags.h"
 #include "Character/LyraCharacter.h"
+#include "Data/D1ItemData.h"
 #include "Engine/ActorChannel.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Item/D1ItemInstance.h"
@@ -155,6 +156,23 @@ bool UD1EquipmentManagerComponent::ReplicateSubobjects(UActorChannel* Channel, F
 	}
 	
 	return bWroteSomething;
+}
+
+void UD1EquipmentManagerComponent::ReadyForReplication()
+{
+	Super::ReadyForReplication();
+
+	if (IsUsingRegisteredSubObjectList())
+	{
+		for (const FD1EquipmentEntry& Entry : EquipmentList.Entries)
+		{
+			UD1ItemInstance* ItemInstance = Entry.ItemInstance;
+			if (IsValid(ItemInstance))
+			{
+				AddReplicatedSubObject(ItemInstance);
+			}
+		}
+	}
 }
 
 void UD1EquipmentManagerComponent::Server_AddEquipment_FromInventory_Implementation(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType)
@@ -313,34 +331,89 @@ bool UD1EquipmentManagerComponent::CanAddEquipment(UD1ItemInstance* FromItemInst
 	return false;
 }
 
-void UD1EquipmentManagerComponent::AddDefaultEquipments(const TArray<TSubclassOf<UD1ItemTemplate>>& ItemTemplateClasses)
+void UD1EquipmentManagerComponent::TryAddEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass, EItemRarity ItemRarity)
 {
 	check(HasAuthority());
 
-	
-	
+	if (EquipmentSlotType == EEquipmentSlotType::Count || ItemTemplateClass == nullptr || ItemRarity == EItemRarity::Count)
+		return;
+
 	TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
+	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 
-	for (TSubclassOf<UD1ItemTemplate> ItemTemplateClass : ItemTemplateClasses)
+	if (Entry.ItemInstance == nullptr)
 	{
-		ItemTemplateClass
-	}
+		UD1ItemInstance* AddedItemInstance = NewObject<UD1ItemInstance>();
+		int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
+		AddedItemInstance->Init(ItemTemplateID, ItemRarity);
+		EquipmentList.AddEquipment(EquipmentSlotType, AddedItemInstance);
 
-
-	{
-		// Unarmed Left Hand
-		const int32 ItemID = Item::UnarmedLeftID;
-		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Unarmed_LeftHand;
-		
-		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
-		UD1ItemInstance* Instance = Entry.GetItemInstance();
-		if (Instance == nullptr)
+		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && AddedItemInstance)
 		{
-			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
-			EquipmentList.AddEquipment(EquipmentSlotType, ItemInstance);
+			AddReplicatedSubObject(AddedItemInstance);
 		}
 	}
+}
+
+void UD1EquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
+{
+	check(HasAuthority());
+
+	if (EquipmentSlotType == EEquipmentSlotType::Count || ItemInstance == nullptr)
+		return;
+
+	TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
+	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+	
+	Entry.Init(ItemInstance);
+	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && ItemInstance)
+	{
+		AddReplicatedSubObject(ItemInstance);
+	}
+}
+
+UD1ItemInstance* UD1EquipmentManagerComponent::RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType)
+{
+	check(HasAuthority());
+
+	UD1ItemInstance* RemovedItemInstance = nullptr;
+	
+	if (EquipmentSlotType == EEquipmentSlotType::Count)
+		return RemovedItemInstance;
+
+	TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
+	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+
+	if (Entry.ItemInstance)
+	{
+		RemovedItemInstance = EquipmentList.RemoveEquipment(EquipmentSlotType);
+		if (IsUsingRegisteredSubObjectList() && RemovedItemInstance)
+		{
+			RemoveReplicatedSubObject(RemovedItemInstance);
+		}
+	}
+	return RemovedItemInstance;
+}
+
+void UD1EquipmentManagerComponent::AddDefaultEquipments()
+{
+	check(HasAuthority());
+	
+	// TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
+	// {
+	// 	// Unarmed Left Hand
+	// 	const int32 ItemID = Item::UnarmedLeftID;
+	// 	const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Unarmed_LeftHand;
+	// 	
+	// 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+	// 	UD1ItemInstance* Instance = Entry.GetItemInstance();
+	// 	if (Instance == nullptr)
+	// 	{
+	// 		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+	// 		ItemInstance->Init(ItemID, EItemRarity::Junk);
+	// 		EquipmentList.AddEquipment(EquipmentSlotType, ItemInstance);
+	// 	}
+	// }
 	//
 	// {
 	// 	// Unarmed Right Hand
@@ -417,13 +490,13 @@ void UD1EquipmentManagerComponent::AddDefaultEquipments(const TArray<TSubclassOf
 	// 	}
 	// }
 
-	ALyraCharacter* Character = GetCharacter();
-	check(Character);
-		
-	UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>();
-	check(EquipManager);
-		
-	EquipManager->ChangeWeaponEquipState(EWeaponEquipState::Unarmed);
+	// ALyraCharacter* Character = GetCharacter();
+	// check(Character);
+	// 	
+	// UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>();
+	// check(EquipManager);
+	// 	
+	// EquipManager->ChangeWeaponEquipState(EWeaponEquipState::Unarmed);
 }
 
 bool UD1EquipmentManagerComponent::IsWeaponSlot(EEquipmentSlotType EquipmentSlotType)

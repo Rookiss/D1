@@ -8,6 +8,7 @@
 class ALyraCharacter;
 class ALyraPlayerController;
 class UD1ItemInstance;
+class UD1ItemTemplate;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
@@ -109,7 +110,8 @@ protected:
 	virtual void InitializeComponent() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
-
+	virtual void ReadyForReplication() override;
+	
 public:
 	UFUNCTION(Server, Reliable)
 	void Server_AddEquipment_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType);
@@ -122,8 +124,13 @@ public:
 	bool CanAddEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
 	
 public:
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void AddEquipment(EEquipmentSlotType EquipmentSlotType, int32 ItemTemplateID, EItemRarity ItemRarity);
+	void TryAddEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass, EItemRarity ItemRarity);
+
+private:
+	void AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+	UD1ItemInstance* RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType);
+	
+	void AddDefaultEquipments();
 	
 public:
 	static bool IsWeaponSlot(EEquipmentSlotType EquipmentSlotType);

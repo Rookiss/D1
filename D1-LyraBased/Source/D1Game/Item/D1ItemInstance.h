@@ -71,6 +71,7 @@ private:
 #endif // UE_WITH_IRIS
 	
 	friend struct FD1InventoryEntry;
+	friend class UD1EquipmentManagerComponent;
 	friend class UD1InventoryManagerComponent;
 	
 private:

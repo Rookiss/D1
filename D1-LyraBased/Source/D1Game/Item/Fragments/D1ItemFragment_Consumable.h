@@ -19,7 +19,4 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UGameplayEffect> GameplayEffectClass;
-	
-	UPROPERTY(EditDefaultsOnly)
-	int32 MaxStackCount = 1;
 };

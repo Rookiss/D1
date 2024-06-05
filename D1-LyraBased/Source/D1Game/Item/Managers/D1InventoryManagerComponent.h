@@ -33,6 +33,7 @@ struct FD1InventoryEntry : public FFastArraySerializerItem
 
 private:
 	UD1ItemInstance* Init(int32 InItemTemplateID, int32 InItemCount, EItemRarity InItemRarity);
+	void Init(UD1ItemInstance* InItemInstance, int32 InItemCount);
 	UD1ItemInstance* Reset();
 	
 public:
@@ -132,7 +133,7 @@ public:
 	void TryRemoveItem(int32 ItemTemplateID, int32 ItemCount);
 
 private:
-	void AddItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemTemplateID, int32 ItemCount, EItemRarity ItemRarity);
+	void AddItem_Unsafe(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount);
 	UD1ItemInstance* RemoveItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemCount);
 	
 public:
