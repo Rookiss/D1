@@ -399,37 +399,37 @@ void UD1EquipmentManagerComponent::AddDefaultEquipments()
 {
 	check(HasAuthority());
 	
-	// TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
-	// {
-	// 	// Unarmed Left Hand
-	// 	const int32 ItemID = Item::UnarmedLeftID;
-	// 	const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Unarmed_LeftHand;
-	// 	
-	// 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
-	// 	UD1ItemInstance* Instance = Entry.GetItemInstance();
-	// 	if (Instance == nullptr)
-	// 	{
-	// 		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-	// 		ItemInstance->Init(ItemID, EItemRarity::Junk);
-	// 		EquipmentList.AddEquipment(EquipmentSlotType, ItemInstance);
-	// 	}
-	// }
-	//
-	// {
-	// 	// Unarmed Right Hand
-	// 	const int32 ItemID = Item::UnarmedRightID;
-	// 	const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Unarmed_RightHand;
-	// 	
-	// 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
-	// 	UD1ItemInstance* Instance = Entry.GetItemInstance();
-	// 	if (Instance == nullptr)
-	// 	{
-	// 		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-	// 		ItemInstance->Init(ItemID, EItemRarity::Junk);
-	// 		EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
-	// 	}
-	// }
-	//
+	TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
+	{
+		// Unarmed Left Hand
+		const int32 ItemID = Item::UnarmedLeftID;
+		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Unarmed_LeftHand;
+		
+		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+		UD1ItemInstance* Instance = Entry.GetItemInstance();
+		if (Instance == nullptr)
+		{
+			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			EquipmentList.AddEquipment(EquipmentSlotType, ItemInstance);
+		}
+	}
+	
+	{
+		// Unarmed Right Hand
+		const int32 ItemID = Item::UnarmedRightID;
+		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Unarmed_RightHand;
+		
+		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+		UD1ItemInstance* Instance = Entry.GetItemInstance();
+		if (Instance == nullptr)
+		{
+			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+			ItemInstance->Init(ItemID, EItemRarity::Junk);
+			EquipmentList.AddEquipment(EquipmentSlotType, ItemInstance);
+		}
+	}
+	
 	// {
 	// 	// Shield
 	// 	const int32 ItemID = Item::ShieldID;

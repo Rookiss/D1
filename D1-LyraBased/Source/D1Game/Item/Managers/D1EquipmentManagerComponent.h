@@ -129,7 +129,8 @@ public:
 private:
 	void AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
 	UD1ItemInstance* RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType);
-	
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void AddDefaultEquipments();
 	
 public:
