@@ -1,60 +1,8 @@
 ﻿#pragma once
 
-#include "D1Define.h"
-#include "Item/Fragments/D1ItemFragment.h"
 #include "D1ItemData.generated.h"
 
-USTRUCT()
-struct FD1ItemRarityProbability
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(VisibleDefaultsOnly)
-	EItemRarity Rarity = EItemRarity::Junk;
-
-	UPROPERTY(EditDefaultsOnly)
-	float Probability = 0;
-};
-
-USTRUCT()
-struct FD1ItemTemplate
-{
-	GENERATED_BODY()
-
-public:
-	template <typename FragmentClass>
-	const FragmentClass* FindFragmentByClass() const;
-	
-public:
-	UPROPERTY(EditDefaultsOnly)
-	int32 TemplateID = 0;
-
-	UPROPERTY(EditDefaultsOnly)
-	FIntPoint SlotCount = FIntPoint::ZeroValue;
-	
-	UPROPERTY(EditDefaultsOnly)
-	FText DisplayName;
-
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UTexture2D> IconTexture;
-	
-	UPROPERTY(EditDefaultsOnly, Instanced)
-	TArray<TObjectPtr<UD1ItemFragment>> Fragments;
-};
-
-template <typename FragmentClass>
-const FragmentClass* FD1ItemTemplate::FindFragmentByClass() const
-{
-	for (UD1ItemFragment* Fragment : Fragments)
-	{
-		if (Fragment && Fragment->IsA(FragmentClass::StaticClass()))
-		{
-			return Cast<FragmentClass>(Fragment);
-		}
-	}
-	return nullptr;
-}
+class UD1ItemTemplate;
 
 UCLASS(BlueprintType, Const, meta=(DisplayName="D1 Item Data"))
 class UD1ItemData : public UPrimaryDataAsset
@@ -63,21 +11,24 @@ class UD1ItemData : public UPrimaryDataAsset
 
 public:
 	static const UD1ItemData& Get();
-	
-public:
-	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
 
+public:
+#if WITH_EDITORONLY_DATA
+	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
+#endif // WITH_EDITORONLY_DATA
+	
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
-#endif
+#endif // WITH_EDITOR
 	
 public:
-	const FD1ItemTemplate& FindItemTemplateByID(int32 TemplateID) const;
+	const UD1ItemTemplate& FindItemTemplateByID(int32 ItemTemplateID) const;
+	int32 FindItemTemplateIDByClass(TSubclassOf<UD1ItemTemplate> ItemTemplateClass) const;
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	TMap<FString, FD1ItemTemplate> ItemNameToTemplate;
+	TMap<int32, TSubclassOf<UD1ItemTemplate>> ItemTemplateIDToClass;
 
 	UPROPERTY()
-	TMap<int32, FD1ItemTemplate> ItemIDToTemplate;
+	TMap<TSubclassOf<UD1ItemTemplate>, int32> ItemTemplateClassToID;
 };

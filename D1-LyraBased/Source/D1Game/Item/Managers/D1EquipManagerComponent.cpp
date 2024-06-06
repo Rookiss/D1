@@ -97,7 +97,7 @@ void FD1EquipEntry::Equip()
 			{
 				UWorld* World = EquipManager->GetWorld();
 				AD1WeaponBase* NewWeaponActor = World->SpawnActorDeferred<AD1WeaponBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
-				NewWeaponActor->Init(ItemInstance->GetTemplateID(), EquipmentSlotType);
+				NewWeaponActor->Init(ItemInstance->GetItemTemplateID(), EquipmentSlotType);
 				NewWeaponActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 				NewWeaponActor->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
 				NewWeaponActor->FinishSpawning(FTransform::Identity, true);
@@ -267,6 +267,23 @@ bool UD1EquipManagerComponent::ReplicateSubobjects(UActorChannel* Channel, FOutB
 	return bWroteSomething;
 }
 
+void UD1EquipManagerComponent::ReadyForReplication()
+{
+	Super::ReadyForReplication();
+
+	if (IsUsingRegisteredSubObjectList())
+	{
+		for (const FD1EquipEntry& Entry : EquipList.Entries)
+		{
+			UD1ItemInstance* ItemInstance = Entry.ItemInstance;
+			if (IsValid(ItemInstance))
+			{
+				AddReplicatedSubObject(ItemInstance);
+			}
+		}
+	}
+}
+
 void UD1EquipManagerComponent::Equip(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
 {
 	check(GetOwner()->HasAuthority());
@@ -275,6 +292,10 @@ void UD1EquipManagerComponent::Equip(EEquipmentSlotType EquipmentSlotType, UD1It
 		return;
 	
 	EquipList.Equip(EquipmentSlotType, ItemInstance);
+	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && ItemInstance)
+	{
+		AddReplicatedSubObject(ItemInstance);
+	}
 }
 
 void UD1EquipManagerComponent::Unequip(EEquipmentSlotType EquipmentSlotType)
@@ -283,8 +304,16 @@ void UD1EquipManagerComponent::Unequip(EEquipmentSlotType EquipmentSlotType)
 
 	if (EquipmentSlotType == EEquipmentSlotType::Count)
 		return;
-
+	
+	TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	FD1EquipEntry& Entry = Entries[(int32)EquipmentSlotType];
+	UD1ItemInstance* RemovedItemInstance = Entry.GetItemInstance();
+	
 	EquipList.Unequip(EquipmentSlotType);
+	if (IsUsingRegisteredSubObjectList() && RemovedItemInstance)
+	{
+		RemoveReplicatedSubObject(RemovedItemInstance);
+	}
 }
 
 void UD1EquipManagerComponent::EquipWeaponInSlot()

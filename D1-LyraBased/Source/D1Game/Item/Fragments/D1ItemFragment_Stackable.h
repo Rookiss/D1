@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "D1ItemFragment.h"
+#include "Item/D1ItemTemplate.h"
 #include "D1ItemFragment_Stackable.generated.h"
 
 UCLASS(Const)

@@ -4,6 +4,7 @@
 #include "D1InventoryManagerComponent.h"
 #include "D1GameplayTags.h"
 #include "Character/LyraCharacter.h"
+#include "Data/D1ItemData.h"
 #include "Engine/ActorChannel.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Item/D1ItemInstance.h"
@@ -34,7 +35,7 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* NewItemInstance)
 	
 	if (ItemInstance)
 	{
-		LastValidTemplateID = ItemInstance->GetTemplateID();
+		LastValidTemplateID = ItemInstance->GetItemTemplateID();
 
 		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
 		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
@@ -81,14 +82,14 @@ void FD1EquipmentList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 	}
 }
 
-void FD1EquipmentList::AddEntry(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
+void FD1EquipmentList::AddEquipment(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
 {
 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 	Entry.Init(ItemInstance);
 	MarkItemDirty(Entry);
 }
 
-UD1ItemInstance* FD1EquipmentList::RemoveEntry(EEquipmentSlotType EquipmentSlotType)
+UD1ItemInstance* FD1EquipmentList::RemoveEquipment(EEquipmentSlotType EquipmentSlotType)
 {
 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 	UD1ItemInstance* ItemInstance = Entry.ItemInstance;
@@ -157,18 +158,35 @@ bool UD1EquipmentManagerComponent::ReplicateSubobjects(UActorChannel* Channel, F
 	return bWroteSomething;
 }
 
-void UD1EquipmentManagerComponent::Server_AddEntry_FromInventory_Implementation(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType)
+void UD1EquipmentManagerComponent::ReadyForReplication()
 {
-	check(GetOwner()->HasAuthority());
-	
-	if (CanAddEntry_FromInventory(OtherComponent, FromItemSlotPos, ToEquipmentSlotType))
+	Super::ReadyForReplication();
+
+	if (IsUsingRegisteredSubObjectList())
 	{
-		UD1ItemInstance* RemovedItemInstance = OtherComponent->InventoryList.RemoveItem_Unsafe(FromItemSlotPos, 1);
-		EquipmentList.AddEntry(ToEquipmentSlotType, RemovedItemInstance);
+		for (const FD1EquipmentEntry& Entry : EquipmentList.Entries)
+		{
+			UD1ItemInstance* ItemInstance = Entry.ItemInstance;
+			if (IsValid(ItemInstance))
+			{
+				AddReplicatedSubObject(ItemInstance);
+			}
+		}
 	}
 }
 
-bool UD1EquipmentManagerComponent::CanAddEntry_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const
+void UD1EquipmentManagerComponent::Server_AddEquipment_FromInventory_Implementation(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType)
+{
+	check(GetOwner()->HasAuthority());
+	
+	if (CanAddEquipment_FromInventory(OtherComponent, FromItemSlotPos, ToEquipmentSlotType))
+	{
+		UD1ItemInstance* RemovedItemInstance = OtherComponent->RemoveItem_Unsafe(FromItemSlotPos, 1);
+		EquipmentList.AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
+	}
+}
+
+bool UD1EquipmentManagerComponent::CanAddEquipment_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const
 {
 	if (OtherComponent == nullptr)
 		return false;
@@ -182,24 +200,24 @@ bool UD1EquipmentManagerComponent::CanAddEntry_FromInventory(UD1InventoryManager
 	const FD1InventoryEntry& FromEntry = FromEntries[FromIndex];
 	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
 
-	return CanAddEntry(FromItemInstance, ToEquipmentSlotType);
+	return CanAddEquipment(FromItemInstance, ToEquipmentSlotType);
 }
 
-void UD1EquipmentManagerComponent::Server_AddEntry_FromEquipment_Implementation(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType)
+void UD1EquipmentManagerComponent::Server_AddEquipment_FromEquipment_Implementation(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType)
 {
 	check(GetOwner()->HasAuthority());
 
 	if (this == OtherComponent && FromEquipmentSlotType == ToEquipmentSlotType)
 		return;
 	
-	if (CanAddEntry_FromEquipment(OtherComponent, FromEquipmentSlotType, ToEquipmentSlotType))
+	if (CanAddEquipment_FromEquipment(OtherComponent, FromEquipmentSlotType, ToEquipmentSlotType))
 	{
-		UD1ItemInstance* RemovedItemInstance = OtherComponent->EquipmentList.RemoveEntry(FromEquipmentSlotType);
-		EquipmentList.AddEntry(ToEquipmentSlotType, RemovedItemInstance);
+		UD1ItemInstance* RemovedItemInstance = OtherComponent->EquipmentList.RemoveEquipment(FromEquipmentSlotType);
+		EquipmentList.AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
 	}
 }
 
-bool UD1EquipmentManagerComponent::CanAddEntry_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanAddEquipment_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const
 {
 	if (OtherComponent == nullptr)
 		return false;
@@ -217,10 +235,10 @@ bool UD1EquipmentManagerComponent::CanAddEntry_FromEquipment(UD1EquipmentManager
 	const FD1EquipmentEntry& FromEntry = FromEntries[(int32)FromEquipmentSlotType];
 	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
 
-	return CanAddEntry(FromItemInstance, ToEquipmentSlotType);
+	return CanAddEquipment(FromItemInstance, ToEquipmentSlotType);
 }
 
-bool UD1EquipmentManagerComponent::CanAddEntry(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanAddEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const
 {
 	if (FromItemInstance == nullptr)
 		return false;
@@ -313,110 +331,172 @@ bool UD1EquipmentManagerComponent::CanAddEntry(UD1ItemInstance* FromItemInstance
 	return false;
 }
 
+void UD1EquipmentManagerComponent::TryAddEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass, EItemRarity ItemRarity)
+{
+	check(HasAuthority());
+
+	if (EquipmentSlotType == EEquipmentSlotType::Count || ItemTemplateClass == nullptr || ItemRarity == EItemRarity::Count)
+		return;
+
+	TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
+	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+
+	if (Entry.ItemInstance == nullptr)
+	{
+		UD1ItemInstance* AddedItemInstance = NewObject<UD1ItemInstance>();
+		int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
+		AddedItemInstance->Init(ItemTemplateID, ItemRarity);
+		EquipmentList.AddEquipment(EquipmentSlotType, AddedItemInstance);
+
+		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && AddedItemInstance)
+		{
+			AddReplicatedSubObject(AddedItemInstance);
+		}
+	}
+}
+
+void UD1EquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
+{
+	check(HasAuthority());
+
+	if (EquipmentSlotType == EEquipmentSlotType::Count || ItemInstance == nullptr)
+		return;
+
+	TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
+	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+	
+	Entry.Init(ItemInstance);
+	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && ItemInstance)
+	{
+		AddReplicatedSubObject(ItemInstance);
+	}
+}
+
+UD1ItemInstance* UD1EquipmentManagerComponent::RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType)
+{
+	check(HasAuthority());
+
+	UD1ItemInstance* RemovedItemInstance = nullptr;
+	
+	if (EquipmentSlotType == EEquipmentSlotType::Count)
+		return RemovedItemInstance;
+
+	TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
+	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+
+	if (Entry.ItemInstance)
+	{
+		RemovedItemInstance = EquipmentList.RemoveEquipment(EquipmentSlotType);
+		if (IsUsingRegisteredSubObjectList() && RemovedItemInstance)
+		{
+			RemoveReplicatedSubObject(RemovedItemInstance);
+		}
+	}
+	return RemovedItemInstance;
+}
+
 void UD1EquipmentManagerComponent::AddDefaultEquipments()
 {
-	if (HasAuthority() == false)
-		return;
+	check(HasAuthority());
 	
-	TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
+	// TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
+	// {
+	// 	// Unarmed Left Hand
+	// 	const int32 ItemID = Item::UnarmedLeftID;
+	// 	const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Unarmed_LeftHand;
+	// 	
+	// 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+	// 	UD1ItemInstance* Instance = Entry.GetItemInstance();
+	// 	if (Instance == nullptr)
+	// 	{
+	// 		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+	// 		ItemInstance->Init(ItemID, EItemRarity::Junk);
+	// 		EquipmentList.AddEquipment(EquipmentSlotType, ItemInstance);
+	// 	}
+	// }
+	//
+	// {
+	// 	// Unarmed Right Hand
+	// 	const int32 ItemID = Item::UnarmedRightID;
+	// 	const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Unarmed_RightHand;
+	// 	
+	// 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+	// 	UD1ItemInstance* Instance = Entry.GetItemInstance();
+	// 	if (Instance == nullptr)
+	// 	{
+	// 		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+	// 		ItemInstance->Init(ItemID, EItemRarity::Junk);
+	// 		EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
+	// 	}
+	// }
+	//
+	// {
+	// 	// Shield
+	// 	const int32 ItemID = Item::ShieldID;
+	// 	const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Primary_LeftHand;
+	// 	
+	// 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+	// 	UD1ItemInstance* Instance = Entry.GetItemInstance();
+	// 	if (Instance == nullptr)
+	// 	{
+	// 		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+	// 		ItemInstance->Init(ItemID, EItemRarity::Junk);
+	// 		EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
+	// 	}
+	// }
+	//
+	// {
+	// 	// Short Sword
+	// 	const int32 ItemID = Item::ShortSwordID;
+	// 	const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Primary_RightHand;
+	// 	
+	// 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+	// 	UD1ItemInstance* Instance = Entry.GetItemInstance();
+	// 	if (Instance == nullptr)
+	// 	{
+	// 		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+	// 		ItemInstance->Init(ItemID, EItemRarity::Junk);
+	// 		EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
+	// 	}
+	// }
+	//
+	// {
+	// 	// Long Sword
+	// 	const int32 ItemID = Item::LongSwordID;
+	// 	const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Secondary_TwoHand;
+	// 	
+	// 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+	// 	UD1ItemInstance* Instance = Entry.GetItemInstance();
+	// 	if (Instance == nullptr)
+	// 	{
+	// 		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+	// 		ItemInstance->Init(ItemID, EItemRarity::Junk);
+	// 		EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
+	// 	}
+	// }
+	//
+	// {
+	// 	// Bow
+	// 	const int32 ItemID = Item::BowID;
+	// 	const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Tertiary_TwoHand;
+	// 	
+	// 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+	// 	UD1ItemInstance* Instance = Entry.GetItemInstance();
+	// 	if (Instance == nullptr)
+	// 	{
+	// 		UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+	// 		ItemInstance->Init(ItemID, EItemRarity::Junk);
+	// 		EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
+	// 	}
+	// }
 
-	{
-		// Unarmed Left Hand
-		const int32 ItemID = Item::UnarmedLeftID;
-		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Unarmed_LeftHand;
-		
-		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
-		UD1ItemInstance* Instance = Entry.GetItemInstance();
-		if (Instance == nullptr)
-		{
-			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
-			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
-		}
-	}
-	
-	{
-		// Unarmed Right Hand
-		const int32 ItemID = Item::UnarmedRightID;
-		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Unarmed_RightHand;
-		
-		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
-		UD1ItemInstance* Instance = Entry.GetItemInstance();
-		if (Instance == nullptr)
-		{
-			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
-			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
-		}
-	}
-
-	{
-		// Shield
-		const int32 ItemID = Item::ShieldID;
-		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Primary_LeftHand;
-		
-		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
-		UD1ItemInstance* Instance = Entry.GetItemInstance();
-		if (Instance == nullptr)
-		{
-			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
-			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
-		}
-	}
-
-	{
-		// Short Sword
-		const int32 ItemID = Item::ShortSwordID;
-		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Primary_RightHand;
-		
-		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
-		UD1ItemInstance* Instance = Entry.GetItemInstance();
-		if (Instance == nullptr)
-		{
-			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
-			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
-		}
-	}
-
-	{
-		// Long Sword
-		const int32 ItemID = Item::LongSwordID;
-		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Secondary_TwoHand;
-		
-		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
-		UD1ItemInstance* Instance = Entry.GetItemInstance();
-		if (Instance == nullptr)
-		{
-			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
-			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
-		}
-	}
-
-	{
-		// Bow
-		const int32 ItemID = Item::BowID;
-		const EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Tertiary_TwoHand;
-		
-		FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
-		UD1ItemInstance* Instance = Entry.GetItemInstance();
-		if (Instance == nullptr)
-		{
-			UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-			ItemInstance->Init(ItemID, EItemRarity::Junk);
-			EquipmentList.AddEntry(EquipmentSlotType, ItemInstance);
-		}
-	}
-
-	ALyraCharacter* Character = GetCharacter();
-	check(Character);
-		
-	UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>();
-	check(EquipManager);
-		
-	EquipManager->ChangeWeaponEquipState(EWeaponEquipState::Unarmed);
+	// ALyraCharacter* Character = GetCharacter();
+	// check(Character);
+	// 	
+	// UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>();
+	// check(EquipManager);
+	// 	
+	// EquipManager->ChangeWeaponEquipState(EWeaponEquipState::Unarmed);
 }
 
 bool UD1EquipmentManagerComponent::IsWeaponSlot(EEquipmentSlotType EquipmentSlotType)

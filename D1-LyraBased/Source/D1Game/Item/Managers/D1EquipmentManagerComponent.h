@@ -8,6 +8,7 @@
 class ALyraCharacter;
 class ALyraPlayerController;
 class UD1ItemInstance;
+class UD1ItemTemplate;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
@@ -68,8 +69,8 @@ public:
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
 
 private:
-	void AddEntry(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
-	UD1ItemInstance* RemoveEntry(EEquipmentSlotType EquipmentSlotType); /* Return Previous ItemInstance */
+	void AddEquipment(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+	UD1ItemInstance* RemoveEquipment(EEquipmentSlotType EquipmentSlotType);
 
 private:
 	void BroadcastChangedMessage(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
@@ -109,21 +110,26 @@ protected:
 	virtual void InitializeComponent() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
-
-public:
-	// TODO: With Validation (Check Valid Contract)
-	UFUNCTION(Server, Reliable)
-	void Server_AddEntry_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType);
-	bool CanAddEntry_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const;
-
-	UFUNCTION(Server, Reliable)
-	void Server_AddEntry_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType);
-	bool CanAddEntry_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
+	virtual void ReadyForReplication() override;
 	
-	bool CanAddEntry(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
+public:
+	UFUNCTION(Server, Reliable)
+	void Server_AddEquipment_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType);
+	bool CanAddEquipment_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const;
 
-protected:
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	UFUNCTION(Server, Reliable)
+	void Server_AddEquipment_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType);
+	bool CanAddEquipment_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
+
+	bool CanAddEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
+	
+public:
+	void TryAddEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass, EItemRarity ItemRarity);
+
+private:
+	void AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+	UD1ItemInstance* RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType);
+	
 	void AddDefaultEquipments();
 	
 public:

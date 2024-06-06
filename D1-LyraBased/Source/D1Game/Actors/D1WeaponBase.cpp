@@ -96,7 +96,7 @@ void AD1WeaponBase::ChangeSkill(int32 AbilitySetIndex)
 
 	SkillAbilitySetHandles.TakeFromAbilitySystem(ASC);
 
-	const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
 	if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 	{
 		if (WeaponFragment->SkillAbilitySets.IsValidIndex(AbilitySetIndex))
@@ -122,7 +122,7 @@ void AD1WeaponBase::OnRep_CanBlock()
 
 void AD1WeaponBase::OnRep_TemplateID()
 {
-	const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
 	if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 	{
 		if (ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner()))
@@ -170,7 +170,7 @@ UAnimMontage* AD1WeaponBase::GetHitMontage()
 {
 	if (CachedHitMontage == nullptr && TemplateID > 0)
 	{
-		const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
+		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
 		if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 		{
 			CachedHitMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->HitMontage);
