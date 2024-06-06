@@ -108,12 +108,9 @@ namespace D1GameplayTags
 
 	// GamePhase
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_WaitForPlayers);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_Betting);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GamePhase_Battle);
 
 	// HUD
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(HUD_Slot_MyInventory);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(HUD_Slot_OtherInventory);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(HUD_Slot_Reticle);
 	
 	D1GAME_API	extern const TMap<uint8, FGameplayTag> MovementModeTagMap;
 	D1GAME_API	extern const TMap<uint8, FGameplayTag> CustomMovementModeTagMap;

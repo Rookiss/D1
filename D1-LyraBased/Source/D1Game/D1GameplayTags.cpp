@@ -88,18 +88,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_WeaponEquipStateChanged,	        "Message.Item.WeaponEquipStateChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_EquipmentEntryChanged,		        "Message.Item.EquipmentEntryChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_InventoryEntryChanged,		        "Message.Item.InventoryEntryChanged");
-
 	UE_DEFINE_GAMEPLAY_TAG(Message_Notification,							"Message.Notification");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Response_ApplyBattle,					"Message.Response.ApplyBattle");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Response_CancelBattle,					"Message.Response.CancelBattle");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Response_ApplyBetting,					"Message.Response.ApplyBetting");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Response_CancelBetting,					"Message.Response.CancelBetting");
-	UE_DEFINE_GAMEPLAY_TAG(Message_NextBattlePlayersChanged,				"Message.NextBattlePlayersChanged");
-	UE_DEFINE_GAMEPLAY_TAG(Message_BettingCoinsChanged,						"Message.BettingCoinsChanged");
-	UE_DEFINE_GAMEPLAY_TAG(Message_TeamChanged,								"Message.TeamChanged");
-	UE_DEFINE_GAMEPLAY_TAG(Message_CoinChanged,								"Message.CoinChanged");
-	UE_DEFINE_GAMEPLAY_TAG(Message_TimerMessage_Increase,					"Message.TimerMessage.Increase");
-	UE_DEFINE_GAMEPLAY_TAG(Message_TimerMessage_Decrease,					"Message.TimerMessage.Decrease");
 
 	// Attribute
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				        "Attribute.Primary.Health");
@@ -121,12 +110,9 @@ namespace D1GameplayTags
 
 	// GamePhase
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_WaitForPlayers,					    "GamePhase.WaitForPlayers");
-	UE_DEFINE_GAMEPLAY_TAG(GamePhase_Betting,							    "GamePhase.Betting");
-	UE_DEFINE_GAMEPLAY_TAG(GamePhase_Battle,							    "GamePhase.Battle");
 
 	// HUD
-	UE_DEFINE_GAMEPLAY_TAG(HUD_Slot_MyInventory,							"HUD.Slot.MyInventory");
-	UE_DEFINE_GAMEPLAY_TAG(HUD_Slot_OtherInventory,							"HUD.Slot.OtherInventory");
+	UE_DEFINE_GAMEPLAY_TAG(HUD_Slot_Reticle,								"HUD.Slot.Reticle");
 	
 	const TMap<uint8, FGameplayTag> MovementModeTagMap =
 	{

@@ -119,6 +119,27 @@ void FD1EquipEntry::Equip()
 			CharacterCosmetics->SetArmorMesh(ArmorFragment->ArmorType, ArmorFragment->ArmorMesh);
 		}
 	}
+
+	if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
+	{
+		const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+		if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
+		{
+			if (WeaponFragment->AnimInstanceClass)
+			{
+				MeshComponent->LinkAnimClassLayers(WeaponFragment->AnimInstanceClass);
+			}
+
+			UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->EquipMontage);
+			if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
+			{
+				if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
+				{
+					Character->PlayAnimMontage(EquipMontage);
+				}
+			}
+		}
+	}
 }
 
 void FD1EquipEntry::Unequip()
