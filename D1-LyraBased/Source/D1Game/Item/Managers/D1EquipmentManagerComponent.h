@@ -124,13 +124,13 @@ public:
 	bool CanAddEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
 	
 public:
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void TryAddEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass, EItemRarity ItemRarity);
 
 private:
 	void AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
 	UD1ItemInstance* RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType);
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	
 	void AddDefaultEquipments();
 	
 public:

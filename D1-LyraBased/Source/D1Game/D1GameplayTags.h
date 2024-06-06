@@ -21,7 +21,7 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ChangeEquip_Secondary);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ChangeEquip_Tertiary);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ChangeEquip_Quaternary);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Widget_OpenGameStatus);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Widget_OpenInventory);
 	
 	// Ability
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_ActivateFail_IsDead);
@@ -86,18 +86,7 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Item_WeaponEquipStateChanged);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Item_EquipmentEntryChanged);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Item_InventoryEntryChanged);
-	
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Notification);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Response_ApplyBattle);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Response_CancelBattle);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Response_ApplyBetting);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Response_CancelBetting);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_NextBattlePlayersChanged);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_BettingCoinsChanged);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_TeamChanged);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_CoinChanged);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_TimerMessage_Increase);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_TimerMessage_Decrease);
 
 	// Attribute
 	D1GAME_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Primary_Health);

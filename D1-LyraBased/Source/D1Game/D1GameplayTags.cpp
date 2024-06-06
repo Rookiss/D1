@@ -23,7 +23,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Secondary,					"InputTag.ChangeEquip.Secondary");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Tertiary,					"InputTag.ChangeEquip.Tertiary");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Quaternary,					"InputTag.ChangeEquip.Quaternary");
-	UE_DEFINE_GAMEPLAY_TAG(InputTag_Widget_OpenGameStatus,					"InputTag.Widget.OpenGameStatus");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Widget_OpenInventory,					"InputTag.Widget.OpenInventory");
 	
 	// Ability
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ActivateFail_IsDead,						"Ability.ActivateFail.IsDead");

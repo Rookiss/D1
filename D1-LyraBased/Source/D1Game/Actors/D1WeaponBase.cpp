@@ -125,7 +125,10 @@ void AD1WeaponBase::OnRep_TemplateID()
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
 	if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 	{
-		if (ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner()))
+		ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner());
+		check(Character);
+		
+		// if ()
 		{
 			if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
 			{

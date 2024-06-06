@@ -139,21 +139,6 @@ protected:
 	void K2_OnEndAutoRun();
 
 	bool bHideViewTargetPawnNextFrame = false;
-
-	////////////////////////////////////////////////////////////////////////
-	
-public:
-	UFUNCTION(Server, Reliable, BlueprintCallable, BlueprintAuthorityOnly)
-	void Server_RequestApplyBattle();
-
-	UFUNCTION(Server, Reliable, BlueprintCallable, BlueprintAuthorityOnly)
-	void Server_RequestCancelBattle();
-
-	UFUNCTION(Server, Reliable, BlueprintCallable, BlueprintAuthorityOnly)
-	void Server_RequestApplyBetting(FCoinApplyRequest CoinApplyRequest);
-
-	UFUNCTION(Server, Reliable, BlueprintCallable, BlueprintAuthorityOnly)
-	void Server_RequestCancelBetting();
 };
 
 // A player controller used for replay capture and playback

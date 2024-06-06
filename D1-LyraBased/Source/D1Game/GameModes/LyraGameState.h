@@ -3,14 +3,8 @@
 #pragma once
 
 #include "AbilitySystemInterface.h"
-#include "GenericTeamAgentInterface.h"
 #include "ModularGameState.h"
-
 #include "LyraGameState.generated.h"
-
-class ALyraPlayerState;
-struct FLyraNotificationMessage;
-struct FLyraVerbMessage;
 
 class APlayerState;
 class UAbilitySystemComponent;
@@ -24,34 +18,6 @@ struct FFrame;
  *
  *	The base game state class used by this project.
  */
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerStatesChanged);
-
-USTRUCT(BlueprintType)
-struct FCoinApplyRequest
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 TeamID = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int64 Coin = 0;
-};
-
-USTRUCT(BlueprintType)
-struct FCoinApplyEntry
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<ALyraPlayerState> PlayerState = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int64 Coin = 0;
-};
 
 UCLASS(Config = Game)
 class D1GAME_API ALyraGameState : public AModularGameStateBase, public IAbilitySystemInterface
@@ -71,8 +37,6 @@ public:
 	//~End of AActor interface
 
 	//~AGameStateBase interface
-	virtual void AddPlayerState(APlayerState* PlayerState) override;
-	virtual void RemovePlayerState(APlayerState* PlayerState) override;
 	virtual void SeamlessTravelTransitionCheckpoint(bool bToTransitionMap) override;
 	//~End of AGameStateBase interface
 
@@ -127,60 +91,4 @@ protected:
 
 	UFUNCTION()
 	void OnRep_RecorderPlayerState();
-
-	////////////////////////////////////////////////////////////////////////
-	
-public:
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void PollBattlePlayers();
-	
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool TryApplyBattlePlayer(APlayerState* PlayerState);
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool TryCancelBattlePlayer(APlayerState* PlayerState);
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsAppliedBattlePlayer(APlayerState* PlayerState);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsNextBattlePlayer(APlayerState* PlayerState);
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsQueuedBattlePlayer(APlayerState* PlayerState);
-
-private:
-	bool CancelBattlePlayer_Internal(APlayerState* PlayerState);
-	
-public:
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool TryApplyBettingCoins(FCoinApplyRequest CoinApplyRequest, APlayerState* PlayerState);
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool TryCancelBettingCoins(APlayerState* PlayerState);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsAppiedBettingCoins(APlayerState* PlayerState);
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FCoinApplyEntry GetAppiedBettingCoins(APlayerState* PlayerState);
-	
-	UFUNCTION()
-	void OnRep_NextBattlePlayers();
-
-	UFUNCTION()
-	void OnRep_BettingCoins();
-	
-public:
-	UPROPERTY(BlueprintAssignable)
-	FOnPlayerStatesChanged OnPlayerStatesChanged;
-
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_NextBattlePlayers);
-	TArray<TObjectPtr<APlayerState>> NextBattlePlayers;
-	
-	UPROPERTY()
-	TArray<TObjectPtr<APlayerState>> QueuedBattlePlayers;
-
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_BettingCoins)
-	TArray<FCoinApplyEntry> BettingCoins;
 };
