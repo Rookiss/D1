@@ -125,7 +125,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_Battle,							    "GamePhase.Battle");
 
 	// HUD
-	UE_DEFINE_GAMEPLAY_TAG(HUD_Slot_Timer,									"HUD.Slot.Timer");
+	UE_DEFINE_GAMEPLAY_TAG(HUD_Slot_MyInventory,							"HUD.Slot.MyInventory");
+	UE_DEFINE_GAMEPLAY_TAG(HUD_Slot_OtherInventory,							"HUD.Slot.OtherInventory");
 	
 	const TMap<uint8, FGameplayTag> MovementModeTagMap =
 	{
