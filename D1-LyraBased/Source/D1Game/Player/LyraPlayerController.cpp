@@ -529,6 +529,33 @@ void ALyraPlayerController::OnUnPossess()
 	Super::OnUnPossess();
 }
 
+EKeyboardLayout ALyraPlayerController::GetCurrentKeyboardLayout()
+{
+	// HKL KeyboardLayout = GetKeyboardLayout(0);
+	// if (LOWORD(KeyboardLayout) == LID_KOREAN)
+	// {
+	// 	
+	// }
+	//
+	// WCHAR LayoutName[KL_NAMELENGTH];
+	// GetKeyboardLayoutNameW(LayoutName);
+	// GetKeyboardLayoutId()
+	// FString LayoutString(LayoutName);
+
+	EKeyboardLayout KeyboardLayout = EKeyboardLayout::Undefined;
+		
+	// if (LayoutString.Equals(TEXT("00000409")))
+	// {
+	// 	KeyboardLayout = EKeyboardLayout::English;
+	// }
+	// else if (LayoutString.Equals(TEXT("00000412")) || LayoutString.Equals(TEXT("00000411")))
+	// {
+	// 	KeyboardLayout = EKeyboardLayout::Korean;
+	// }
+
+	return KeyboardLayout;
+}
+
 void ALyraReplayPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);

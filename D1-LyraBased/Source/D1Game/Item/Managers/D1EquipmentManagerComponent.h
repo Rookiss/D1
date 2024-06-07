@@ -131,8 +131,6 @@ private:
 	void AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
 	UD1ItemInstance* RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType);
 	
-	void AddDefaultEquipments();
-	
 public:
 	static bool IsWeaponSlot(EEquipmentSlotType EquipmentSlotType);
 	static bool IsArmorSlot(EEquipmentSlotType EquipmentSlotType);
