@@ -23,6 +23,14 @@ class UObject;
 class UPlayer;
 struct FFrame;
 
+UENUM(BlueprintType)
+enum class EKeyboardLayout : uint8
+{
+	Undefined,
+	English,
+	Korean,
+};
+
 /**
  * ALyraPlayerController
  *
@@ -122,11 +130,6 @@ private:
 	void BroadcastOnPlayerStateChanged();
 
 protected:
-
-	//~APlayerController interface
-
-	//~End of APlayerController interface
-
 	void OnSettingsChanged(ULyraSettingsShared* Settings);
 	
 	void OnStartAutoRun();
@@ -139,6 +142,8 @@ protected:
 	void K2_OnEndAutoRun();
 
 	bool bHideViewTargetPawnNextFrame = false;
+
+	EKeyboardLayout GetCurrentKeyboardLayout();
 };
 
 // A player controller used for replay capture and playback
