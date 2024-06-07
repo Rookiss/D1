@@ -115,6 +115,8 @@ protected:
 	
 public:
 	// TODO: With Validation - Check Valid Contract
+	// My(Other) -> Chest (???)
+	// Chest(Other) -> My
 	UFUNCTION(Server, Reliable)
 	void Server_RequestMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos);
 	int32 CanMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const;
@@ -122,7 +124,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_RequestMoveOrMergeItem_FromExternalInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos);
 	int32 CanMoveOrMergeItem_FromExternalInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const;
-
+	
 	UFUNCTION(Server, Reliable)
 	void Server_RequestMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos);
 	bool CanMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const;

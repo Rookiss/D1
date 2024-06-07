@@ -441,7 +441,7 @@ void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromExternalInv
 
 int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const
 {
-	if (OtherComponent == nullptr)
+	if (OtherComponent == nullptr || OtherComponent->GetOwner() == GetOwner())
 		return 0;
 
 	const FIntPoint& FromInventorySlotCount = OtherComponent->GetInventorySlotCount();
@@ -506,7 +506,7 @@ void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromExternalEqu
 
 bool UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const
 {
-	if (OtherComponent == nullptr)
+	if (OtherComponent == nullptr || OtherComponent->GetOwner() == GetOwner())
 		return false;
 
 	if (FromEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || FromEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || FromEquipmentSlotType == EEquipmentSlotType::Count)

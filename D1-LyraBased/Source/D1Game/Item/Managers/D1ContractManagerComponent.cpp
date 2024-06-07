@@ -7,3 +7,18 @@ UD1ContractManagerComponent::UD1ContractManagerComponent(const FObjectInitialize
 {
     
 }
+
+void UD1ContractManagerComponent::AddAllowedActor(AActor* Actor)
+{
+	AllowedActors.Add(Actor);
+}
+
+void UD1ContractManagerComponent::RemoveAllowedActor(AActor* Actor)
+{
+	AllowedActors.Remove(Actor);
+}
+
+bool UD1ContractManagerComponent::IsAllowedActor(AActor* Actor) const
+{
+	return AllowedActors.Contains(TWeakObjectPtr<AActor>(Actor));
+}

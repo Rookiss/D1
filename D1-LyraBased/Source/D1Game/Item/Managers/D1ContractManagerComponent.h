@@ -10,4 +10,19 @@ class UD1ContractManagerComponent : public UPlayerStateComponent
 	
 public:
 	UD1ContractManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void AddAllowedActor(AActor* Actor);
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void RemoveAllowedActor(AActor* Actor);
+
+public:
+	UFUNCTION(BlueprintCallable)
+	bool IsAllowedActor(AActor* Actor) const;
+	
+private:
+	UPROPERTY()
+	TSet<TWeakObjectPtr<AActor>> AllowedActors;
 };
