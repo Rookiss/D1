@@ -141,8 +141,6 @@ void ALyraPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, ReplicatedViewRotation, SharedParams);
 
 	DOREPLIFETIME(ThisClass, StatTags);
-	
-	DOREPLIFETIME(ThisClass, Coin);	
 }
 
 FRotator ALyraPlayerState::GetReplicatedViewRotation() const
@@ -293,37 +291,4 @@ int32 ALyraPlayerState::GetStatTagStackCount(FGameplayTag Tag) const
 bool ALyraPlayerState::HasStatTag(FGameplayTag Tag) const
 {
 	return StatTags.ContainsTag(Tag);
-}
-
-void ALyraPlayerState::Client_SendVerbMessage_Implementation(const FLyraVerbMessage Message)
-{
-	if (GetNetMode() == NM_Client)
-	{
-		UGameplayMessageSubsystem::Get(this).BroadcastMessage(Message.Verb, Message);
-	}
-}
-
-void ALyraPlayerState::Client_SendNotificationMessage_Implementation(const FLyraNotificationMessage Message)
-{
-	if (GetNetMode() == NM_Client)
-	{
-		UGameplayMessageSubsystem::Get(this).BroadcastMessage(Message.TargetChannel, Message);
-	}
-}
-
-void ALyraPlayerState::OnRep_Coin()
-{
-	FLyraVerbMessage VerbMessage;
-	VerbMessage.Verb = D1GameplayTags::Message_CoinChanged;
-	
-	UGameplayMessageSubsystem::Get(this).BroadcastMessage(VerbMessage.Verb, VerbMessage);
-}
-
-FString ALyraPlayerState::GetPlayerNameCustom() const
-{
-	FString PlayerName = Super::GetPlayerNameCustom();
-
-	FString Left, Right;
-	PlayerName.Split(TEXT("-"), &Left, &Right);
-	return Left;
 }

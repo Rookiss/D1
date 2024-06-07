@@ -1,16 +1,12 @@
 ﻿#include "D1ItemData.h"
 
-#include "Item/Fragments/D1ItemFragment_Consumable.h"
-#include "Item/Fragments/D1ItemFragment_Stackable.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
-#include "UObject/ObjectSaveContext.h"
-
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
-#endif
+#endif // WITH_EDITOR
 
+#include "Item/D1ItemTemplate.h"
 #include "System/LyraAssetManager.h"
+#include "UObject/ObjectSaveContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemData)
 
@@ -19,104 +15,82 @@ const UD1ItemData& UD1ItemData::Get()
 	return ULyraAssetManager::Get().GetItemData();
 }
 
+#if WITH_EDITORONLY_DATA
 void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);
-	
-	ItemIDToTemplate.Empty();
-	ItemNameToTemplate.ValueSort([](const FD1ItemTemplate& A, const FD1ItemTemplate& B)
+
+	ItemTemplateIDToClass.KeySort([](const int32 A, const int32 B)
 	{
-		return A.TemplateID < B.TemplateID;
+		return A < B;
 	});
-	
-	for (const auto& Pair : ItemNameToTemplate)
+
+	ItemTemplateClassToID.Empty();
+	for (const auto& Pair : ItemTemplateIDToClass)
 	{
-		const FD1ItemTemplate& ItemDef = Pair.Value;
-		ItemIDToTemplate.Emplace(ItemDef.TemplateID, ItemDef);
+		ItemTemplateClassToID.Emplace(Pair.Value, Pair.Key);
 	}
 }
+#endif // WITH_EDITORONLY_DATA
 
 #if WITH_EDITOR
 EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) const
 {
 	EDataValidationResult Result = Super::IsDataValid(Context);
 	
-	TSet<int32> ItemIDSet;
-	
-	for (const auto& Pair : ItemNameToTemplate)
+	TSet<int32> ItemTemplateIDSet;
+	TSet<TSubclassOf<UD1ItemTemplate>> ItemTemplateClassSet;
+
+	for (const auto& Pair : ItemTemplateIDToClass)
 	{
-		const FString& Name = Pair.Key;
-		const FD1ItemTemplate& ItemDef = Pair.Value;
-		const int32 ItemID = ItemDef.TemplateID;
-
-		const UD1ItemFragment_Consumable* Consumable = ItemDef.FindFragmentByClass<UD1ItemFragment_Consumable>();
-		const UD1ItemFragment_Equippable* Equippable = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable>();
-		const UD1ItemFragment_Equippable_Armor* Armor = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
-		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemDef.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
-		const UD1ItemFragment_Stackable* Stackable = ItemDef.FindFragmentByClass<UD1ItemFragment_Stackable>();
+		// ID Check
+		const int32 ItemTemplateID = Pair.Key;
 		
-		if (ItemID <= 0)
+		if (ItemTemplateID <= 0)
 		{
-			Context.AddError(FText::FromString(FString::Printf(TEXT("Invalid ID : [ID : %d] - [Name : %s]\n"), ItemID, *Name)));
+			Context.AddError(FText::FromString(FString::Printf(TEXT("Invalid ID : [ID : %d]\n"), ItemTemplateID)));
 			Result = EDataValidationResult::Invalid;
 		}
 		
-		if (ItemIDSet.Contains(ItemID))
+		if (ItemTemplateIDSet.Contains(ItemTemplateID))
 		{
-			Context.AddError(FText::FromString(FString::Printf(TEXT("Duplicated ID : [ID : %d] - [Name : %s]\n"), ItemID, *Name)));
+			Context.AddError(FText::FromString(FString::Printf(TEXT("Duplicated ID : [ID : %d]\n"), ItemTemplateID)));
 			Result = EDataValidationResult::Invalid;
 		}
-		ItemIDSet.Add(ItemID);
+		
+		ItemTemplateIDSet.Add(ItemTemplateID);
 
-		if (Equippable)
+		// Class Check
+		const TSubclassOf<UD1ItemTemplate> ItemTemplateClass = Pair.Value;
+		
+		if (ItemTemplateClass == nullptr)
 		{
-			if (Armor && Weapon)
-			{
-				Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Armor] <-> [Weapon]"), ItemID)));
-				Result = EDataValidationResult::Invalid;
-			}
-			
-			if (Stackable)
-			{
-				Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Stackable] <-> [Equippable]"), ItemID)));
-				Result = EDataValidationResult::Invalid;
-			}
-
-			if (Consumable)
-			{
-				Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [ID : %d] : [Consumable] <-> [Equippable]"), ItemID)));
-				Result = EDataValidationResult::Invalid;
-			}
-
-			if (Armor && Armor->ArmorType == EArmorType::Count)
-			{
-				Context.AddError(FText::FromString(FString::Printf(TEXT("Armor Type is Invalid : [ID : %d] : [EArmorType::Count]"), ItemID)));
-				Result = EDataValidationResult::Invalid;
-			}
-
-			if (Weapon)
-			{
-				if (Weapon->WeaponType == EWeaponType::Count)
-				{
-					Context.AddError(FText::FromString(FString::Printf(TEXT("Weapon Type is Invalid : [ID : %d] : [EWeaponType::Count]"), ItemID)));
-					Result = EDataValidationResult::Invalid;
-				}
-				
-				if (Weapon->WeaponHandType == EWeaponHandType::Count)
-				{
-					Context.AddError(FText::FromString(FString::Printf(TEXT("Weapon Hand Type is Invalid : [ID : %d] : [EWeaponHandType::Count]"), ItemID)));
-					Result = EDataValidationResult::Invalid;
-				}
-			}
+			Context.AddError(FText::FromString(FString::Printf(TEXT("Invalid Class : [ID : %d]\n"), ItemTemplateID)));
+			Result = EDataValidationResult::Invalid;
 		}
+
+		if (ItemTemplateClassSet.Contains(ItemTemplateClass))
+		{
+			Context.AddError(FText::FromString(FString::Printf(TEXT("Duplicated Class : [ID : %d]\n"), ItemTemplateID)));
+			Result = EDataValidationResult::Invalid;
+		}
+		
+		ItemTemplateClassSet.Add(ItemTemplateClass);
 	}
 	return Result;
 }
-#endif // #if WITH_EDITOR
+#endif // WITH_EDITOR
 
-const FD1ItemTemplate& UD1ItemData::FindItemTemplateByID(int32 TemplateID) const
+const UD1ItemTemplate& UD1ItemData::FindItemTemplateByID(int32 ItemTemplateID) const
 {
-	const FD1ItemTemplate* ItemTemplate = ItemIDToTemplate.Find(TemplateID);
-	ensureAlwaysMsgf(ItemTemplate, TEXT("Can't find ItemTemplate from ID [%d]."), TemplateID);
-	return *ItemTemplate;
+	const TSubclassOf<UD1ItemTemplate>* ItemTemplateClass = ItemTemplateIDToClass.Find(ItemTemplateID);
+	ensureAlwaysMsgf(ItemTemplateClass, TEXT("Can't find ItemTemplateClass from ID [%d]"), ItemTemplateID);
+	return *(ItemTemplateClass->GetDefaultObject());
+}
+
+int32 UD1ItemData::FindItemTemplateIDByClass(TSubclassOf<UD1ItemTemplate> ItemTemplateClass) const
+{
+	const int32* ItemTemplateID = ItemTemplateClassToID.Find(ItemTemplateClass);
+	ensureAlwaysMsgf(ItemTemplateID, TEXT("Can't find ItemTemplateID from Class"));
+	return *ItemTemplateID;
 }

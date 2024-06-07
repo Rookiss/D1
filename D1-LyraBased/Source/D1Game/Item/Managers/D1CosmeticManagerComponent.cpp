@@ -24,7 +24,7 @@ UD1CosmeticManagerComponent::UD1CosmeticManagerComponent(const FObjectInitialize
 void UD1CosmeticManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	check(CosmeticSlotClass);
 	
 	ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner());
@@ -47,8 +47,7 @@ void UD1CosmeticManagerComponent::BeginPlay()
 				{
 					SpawnedRootComponent->AddTickPrerequisiteComponent(ComponentToAttachTo);
 				}
-
-				// TODO: Sync with EqiupmentManagerComponent
+				
 				USkeletalMesh* CosmeticMesh = DefaultMeshes[i].DefaultMesh; 
 				SpawnedActor->SetArmorMesh(CosmeticMesh);
 			}

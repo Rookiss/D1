@@ -96,7 +96,7 @@ void AD1WeaponBase::ChangeSkill(int32 AbilitySetIndex)
 
 	SkillAbilitySetHandles.TakeFromAbilitySystem(ASC);
 
-	const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
 	if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 	{
 		if (WeaponFragment->SkillAbilitySets.IsValidIndex(AbilitySetIndex))
@@ -112,7 +112,7 @@ void AD1WeaponBase::ChangeSkill(int32 AbilitySetIndex)
 void AD1WeaponBase::ChangeBlockState(bool bShouldBlock)
 {
 	bCanBlock = bShouldBlock;
-	WeaponMeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Projectile, bShouldBlock ? ECR_Block : ECR_Ignore);
+	OnRep_CanBlock();
 }
 
 void AD1WeaponBase::OnRep_CanBlock()
@@ -122,42 +122,25 @@ void AD1WeaponBase::OnRep_CanBlock()
 
 void AD1WeaponBase::OnRep_TemplateID()
 {
-	const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-	if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
-	{
-		if (ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner()))
-		{
-			if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
-			{
-				if (WeaponFragment->AnimInstanceClass)
-				{
-					MeshComponent->LinkAnimClassLayers(WeaponFragment->AnimInstanceClass);
-				}
-
-				UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->EquipMontage);
-				if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
-				{
-					if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
-					{
-						Character->PlayAnimMontage(EquipMontage);
-					}
-				}
-			}
-		
-			WeaponMeshComponent->SetHiddenInGame(false);
-		}
-	}
+	WeaponMeshComponent->SetHiddenInGame(false);
 }
 
 void AD1WeaponBase::OnRep_EquipmentSlotType()
 {
-	if (ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner()))
+	if (GetOwner() && GetOwner()->FindComponentByClass<UD1EquipManagerComponent>())
 	{
-		if (UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>())
+		if (ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner()))
 		{
-			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-			Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = this;
+			if (UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>())
+			{
+				TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
+				Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = this;
+			}
 		}
+	}
+	else
+	{
+		GetWorldTimerManager().SetTimerForNextTick(this, &ThisClass::OnRep_EquipmentSlotType);
 	}
 }
 
@@ -170,7 +153,7 @@ UAnimMontage* AD1WeaponBase::GetHitMontage()
 {
 	if (CachedHitMontage == nullptr && TemplateID > 0)
 	{
-		const FD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
+		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
 		if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 		{
 			CachedHitMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->HitMontage);

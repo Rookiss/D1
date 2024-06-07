@@ -23,7 +23,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Secondary,					"InputTag.ChangeEquip.Secondary");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Tertiary,					"InputTag.ChangeEquip.Tertiary");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Quaternary,					"InputTag.ChangeEquip.Quaternary");
-	UE_DEFINE_GAMEPLAY_TAG(InputTag_Widget_OpenGameStatus,					"InputTag.Widget.OpenGameStatus");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Widget_OpenInventory,					"InputTag.Widget.OpenInventory");
 	
 	// Ability
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ActivateFail_IsDead,						"Ability.ActivateFail.IsDead");
@@ -88,18 +88,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_WeaponEquipStateChanged,	        "Message.Item.WeaponEquipStateChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_EquipmentEntryChanged,		        "Message.Item.EquipmentEntryChanged");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Item_InventoryEntryChanged,		        "Message.Item.InventoryEntryChanged");
-
 	UE_DEFINE_GAMEPLAY_TAG(Message_Notification,							"Message.Notification");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Response_ApplyBattle,					"Message.Response.ApplyBattle");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Response_CancelBattle,					"Message.Response.CancelBattle");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Response_ApplyBetting,					"Message.Response.ApplyBetting");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Response_CancelBetting,					"Message.Response.CancelBetting");
-	UE_DEFINE_GAMEPLAY_TAG(Message_NextBattlePlayersChanged,				"Message.NextBattlePlayersChanged");
-	UE_DEFINE_GAMEPLAY_TAG(Message_BettingCoinsChanged,						"Message.BettingCoinsChanged");
-	UE_DEFINE_GAMEPLAY_TAG(Message_TeamChanged,								"Message.TeamChanged");
-	UE_DEFINE_GAMEPLAY_TAG(Message_CoinChanged,								"Message.CoinChanged");
-	UE_DEFINE_GAMEPLAY_TAG(Message_TimerMessage_Increase,					"Message.TimerMessage.Increase");
-	UE_DEFINE_GAMEPLAY_TAG(Message_TimerMessage_Decrease,					"Message.TimerMessage.Decrease");
 
 	// Attribute
 	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				        "Attribute.Primary.Health");
@@ -121,11 +110,9 @@ namespace D1GameplayTags
 
 	// GamePhase
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_WaitForPlayers,					    "GamePhase.WaitForPlayers");
-	UE_DEFINE_GAMEPLAY_TAG(GamePhase_Betting,							    "GamePhase.Betting");
-	UE_DEFINE_GAMEPLAY_TAG(GamePhase_Battle,							    "GamePhase.Battle");
 
 	// HUD
-	UE_DEFINE_GAMEPLAY_TAG(HUD_Slot_Timer,									"HUD.Slot.Timer");
+	UE_DEFINE_GAMEPLAY_TAG(HUD_Slot_Reticle,								"HUD.Slot.Reticle");
 	
 	const TMap<uint8, FGameplayTag> MovementModeTagMap =
 	{

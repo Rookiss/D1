@@ -121,7 +121,6 @@ enum class ESpellType : uint8
 
 namespace Item
 {
-	const int32 CoinID = 9999, UnarmedLeftID = 1001, UnarmedRightID = 1002, ShortSwordID = 1003, ShieldID = 1004, BowID = 1005, LongSwordID = 1006;
 	const FIntPoint UnitInventorySlotSize = FIntPoint(50.f, 50.f);
 
 	const TArray<TArray<EEquipmentSlotType>> EquipmentSlotsByWeaponState = {

@@ -117,6 +117,7 @@ protected:
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
+	virtual void ReadyForReplication() override;
 	
 public:
 	void Equip(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
