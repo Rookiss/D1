@@ -1,0 +1,57 @@
+﻿#include "D1EquipmentEntryWidget.h"
+
+#include "D1EquipmentSlotsWidget.h"
+#include "Data/D1ItemData.h"
+#include "Item/D1ItemInstance.h"
+#include "Item/D1ItemTemplate.h"
+#include "UI/Item/D1ItemDragDrop.h"
+#include "UI/Item/D1ItemDragWidget.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentEntryWidget)
+
+UD1EquipmentEntryWidget::UD1EquipmentEntryWidget(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+    
+}
+
+void UD1EquipmentEntryWidget::Init(UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType)
+{
+	if (InEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || InEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || InEquipmentSlotType == EEquipmentSlotType::Count)
+		return;
+	
+	SetItemInstance(InItemInstance);
+	EquipmentSlotType = InEquipmentSlotType;
+}
+
+void UD1EquipmentEntryWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	APlayerController* PlayerController = GetOwningPlayer();
+	check(PlayerController);
+	
+	EquipmentManagerComponent = PlayerController->GetComponentByClass<UD1EquipmentManagerComponent>();
+	check(EquipmentManagerComponent);
+}
+
+void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+{
+	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
+	
+	UD1ItemDragWidget* DragWidget = CreateWidget<UD1ItemDragWidget>(GetOwningPlayer(), DragWidgetClass);
+	FVector2D DragWidgetSize = FVector2D(ItemTemplate.SlotCount * Item::UnitInventorySlotSize);
+	DragWidget->Init(DragWidgetSize, ItemTemplate.IconTexture, 1);
+	
+	UD1ItemDragDrop* DragDrop = NewObject<UD1ItemDragDrop>();
+	DragDrop->DefaultDragVisual = DragWidget;
+	DragDrop->Pivot = EDragPivot::CenterCenter;
+	DragDrop->FromEntryWidget = this;
+	DragDrop->FromEquipmentManager = EquipmentManagerComponent;
+	DragDrop->FromEquipmentSlotType = EquipmentSlotType;
+	DragDrop->FromItemInstance = ItemInstance;
+	DragDrop->DeltaWidgetPos = (DragWidgetSize / 2.f) - (Item::UnitInventorySlotSize / 2.f);
+	OutOperation = DragDrop;
+}

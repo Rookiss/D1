@@ -147,8 +147,9 @@ public:
 	UAbilitySystemComponent* GetAbilitySystemComponent() const;
 	UD1EquipmentManagerComponent* GetEquipmentManagerComponent() const;
 
-	EWeaponHandType ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType) const;
 	EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const;
+	EEquipmentSlotType ConvertToEquipmentSlotType(EArmorType ArmorType) const;
+	EWeaponHandType ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType) const;
 	EArmorType ConvertToArmorType(EEquipmentSlotType EquipmentSlotType) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)

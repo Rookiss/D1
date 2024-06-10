@@ -473,37 +473,6 @@ UD1EquipmentManagerComponent* UD1EquipManagerComponent::GetEquipmentManagerCompo
 	return nullptr;
 }
 
-EWeaponHandType UD1EquipManagerComponent::ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType) const
-{
-	EWeaponHandType WeaponHandType = EWeaponHandType::Count;
-	
-	switch (EquipmentSlotType)
-	{
-	case EEquipmentSlotType::Unarmed_LeftHand:
-	case EEquipmentSlotType::Primary_LeftHand:
-	case EEquipmentSlotType::Secondary_LeftHand:
-	case EEquipmentSlotType::Tertiary_LeftHand:
-	case EEquipmentSlotType::Quaternary_LeftHand:
-		WeaponHandType = EWeaponHandType::LeftHand;
-		break;
-	case EEquipmentSlotType::Unarmed_RightHand:
-	case EEquipmentSlotType::Primary_RightHand:
-	case EEquipmentSlotType::Secondary_RightHand:
-	case EEquipmentSlotType::Tertiary_RightHand:
-	case EEquipmentSlotType::Quaternary_RightHand:
-		WeaponHandType = EWeaponHandType::RightHand;
-		break;
-	case EEquipmentSlotType::Primary_TwoHand:
-	case EEquipmentSlotType::Secondary_TwoHand:
-	case EEquipmentSlotType::Tertiary_TwoHand:
-	case EEquipmentSlotType::Quaternary_TwoHand:
-		WeaponHandType = EWeaponHandType::TwoHand;
-		break;
-	}
-
-	return WeaponHandType;
-}
-
 EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const
 {
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
@@ -554,6 +523,53 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 	}
 	
 	return EquipmentSlotType;
+}
+
+EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EArmorType ArmorType) const
+{
+	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
+
+	switch (ArmorType)
+	{
+	case EArmorType::Helmet: EquipmentSlotType = EEquipmentSlotType::Helmet; break;
+	case EArmorType::Chest:  EquipmentSlotType = EEquipmentSlotType::Chest;  break;
+	case EArmorType::Legs:   EquipmentSlotType = EEquipmentSlotType::Legs;   break;
+	case EArmorType::Hands:  EquipmentSlotType = EEquipmentSlotType::Hands;  break;
+	case EArmorType::Foot:   EquipmentSlotType = EEquipmentSlotType::Foot;   break;
+	}
+
+	return EquipmentSlotType;
+}
+
+EWeaponHandType UD1EquipManagerComponent::ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType) const
+{
+	EWeaponHandType WeaponHandType = EWeaponHandType::Count;
+	
+	switch (EquipmentSlotType)
+	{
+	case EEquipmentSlotType::Unarmed_LeftHand:
+	case EEquipmentSlotType::Primary_LeftHand:
+	case EEquipmentSlotType::Secondary_LeftHand:
+	case EEquipmentSlotType::Tertiary_LeftHand:
+	case EEquipmentSlotType::Quaternary_LeftHand:
+		WeaponHandType = EWeaponHandType::LeftHand;
+		break;
+	case EEquipmentSlotType::Unarmed_RightHand:
+	case EEquipmentSlotType::Primary_RightHand:
+	case EEquipmentSlotType::Secondary_RightHand:
+	case EEquipmentSlotType::Tertiary_RightHand:
+	case EEquipmentSlotType::Quaternary_RightHand:
+		WeaponHandType = EWeaponHandType::RightHand;
+		break;
+	case EEquipmentSlotType::Primary_TwoHand:
+	case EEquipmentSlotType::Secondary_TwoHand:
+	case EEquipmentSlotType::Tertiary_TwoHand:
+	case EEquipmentSlotType::Quaternary_TwoHand:
+		WeaponHandType = EWeaponHandType::TwoHand;
+		break;
+	}
+
+	return WeaponHandType;
 }
 
 EArmorType UD1EquipManagerComponent::ConvertToArmorType(EEquipmentSlotType EquipmentSlotType) const

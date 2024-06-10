@@ -92,7 +92,7 @@ void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 				const FIntPoint& ItemSlotCount = ItemTemplate.SlotCount;
 
 				InventoryManager->MarkSlotChecks(false, ItemSlotPos, ItemSlotCount);
-				BroadcastChangedMessage(ItemSlotPos, Entry.ItemInstance, Entry.ItemCount);
+				BroadcastChangedMessage(ItemSlotPos, nullptr, 0);
 			}
 		}
 	}
