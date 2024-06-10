@@ -525,7 +525,7 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 	return EquipmentSlotType;
 }
 
-EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EArmorType ArmorType) const
+EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EArmorType ArmorType)
 {
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 
@@ -541,7 +541,7 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EArmorTy
 	return EquipmentSlotType;
 }
 
-EWeaponHandType UD1EquipManagerComponent::ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType) const
+EWeaponHandType UD1EquipManagerComponent::ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType)
 {
 	EWeaponHandType WeaponHandType = EWeaponHandType::Count;
 	
@@ -572,7 +572,7 @@ EWeaponHandType UD1EquipManagerComponent::ConvertToWeaponHandType(EEquipmentSlot
 	return WeaponHandType;
 }
 
-EArmorType UD1EquipManagerComponent::ConvertToArmorType(EEquipmentSlotType EquipmentSlotType) const
+EArmorType UD1EquipManagerComponent::ConvertToArmorType(EEquipmentSlotType EquipmentSlotType)
 {
 	EArmorType ArmorType = EArmorType::Count;
 	

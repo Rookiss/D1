@@ -148,9 +148,9 @@ public:
 	UD1EquipmentManagerComponent* GetEquipmentManagerComponent() const;
 
 	EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const;
-	EEquipmentSlotType ConvertToEquipmentSlotType(EArmorType ArmorType) const;
-	EWeaponHandType ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType) const;
-	EArmorType ConvertToArmorType(EEquipmentSlotType EquipmentSlotType) const;
+	static EEquipmentSlotType ConvertToEquipmentSlotType(EArmorType ArmorType);
+	static EWeaponHandType ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType);
+	static EArmorType ConvertToArmorType(EEquipmentSlotType EquipmentSlotType);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }
