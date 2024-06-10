@@ -437,7 +437,7 @@ void UD1EquipManagerComponent::BroadcastChangedMessgae(EWeaponEquipState NewWeap
 	Message.WeaponEquipState = NewWeaponEquipState;
 
 	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
-	MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Item_WeaponEquipStateChanged, Message);
+	// MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Item_WeaponEquipStateChanged, Message);
 }
 
 ALyraCharacter* UD1EquipManagerComponent::GetCharacter() const

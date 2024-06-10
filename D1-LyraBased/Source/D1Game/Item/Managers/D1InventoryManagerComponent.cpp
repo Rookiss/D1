@@ -262,13 +262,10 @@ TArray<UD1ItemInstance*> FD1InventoryList::TryRemoveItem(int32 ItemTemplateID, i
 
 void FD1InventoryList::BroadcastChangedMessage(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount)
 {
-	FD1InventoryEntryChangedMessage Message;
-	Message.ItemSlotPos = ItemSlotPos;
-	Message.ItemInstance = ItemInstance;
-	Message.ItemCount = ItemCount;
-
-	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(InventoryManager->GetWorld());
-	MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Item_InventoryEntryChanged, Message);
+	if (InventoryManager->OnInventoryEntryChanged.IsBound())
+	{
+		InventoryManager->OnInventoryEntryChanged.Broadcast(ItemSlotPos, ItemInstance, ItemCount);
+	}
 }
 
 int32 FD1InventoryList::GetTotalCountByID(int32 ItemTemplateID) const

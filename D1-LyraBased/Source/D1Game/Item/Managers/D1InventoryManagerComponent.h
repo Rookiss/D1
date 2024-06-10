@@ -10,21 +10,7 @@ struct FD1ItemRarityProbability;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
-USTRUCT(BlueprintType)
-struct FD1InventoryEntryChangedMessage
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadOnly)
-	FIntPoint ItemSlotPos = FIntPoint::ZeroValue;
-
-	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UD1ItemInstance> ItemInstance = nullptr;
-
-	UPROPERTY(BlueprintReadOnly)
-	int32 ItemCount = 0;
-};
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnInventoryEntryChanged, const FIntPoint&/*ItemSlotPos*/, UD1ItemInstance*/*ItemInstance*/, int32/*ItemCount*/);
 
 USTRUCT(BlueprintType)
 struct FD1InventoryEntry : public FFastArraySerializerItem
@@ -115,8 +101,6 @@ protected:
 	
 public:
 	// TODO: With Validation - Check Valid Contract
-	// My(Other) -> Chest (???)
-	// Chest(Other) -> My
 	UFUNCTION(Server, Reliable)
 	void Server_RequestMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos);
 	int32 CanMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const;
@@ -151,6 +135,9 @@ public:
 	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
 	TArray<TArray<bool>>& GetSlotChecks() { return SlotChecks; }
 	int32 GetTotalCountByID(int32 ItemTemplateID) const;
+
+public:
+	FOnInventoryEntryChanged OnInventoryEntryChanged;
 	
 private:
 	friend class UD1EquipmentManagerComponent;

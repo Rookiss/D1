@@ -83,9 +83,7 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Movement_Mode_Custom);
 
 	// Message
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Item_WeaponEquipStateChanged);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Item_EquipmentEntryChanged);
-	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Item_InventoryEntryChanged);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Item_HoverWidgetVisibility);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Notification);
 
 	// Attribute

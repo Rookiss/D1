@@ -85,9 +85,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Movement_Mode_Custom,							"Movement.Mode.Custom");
 
 	// Message
-	UE_DEFINE_GAMEPLAY_TAG(Message_Item_WeaponEquipStateChanged,	        "Message.Item.WeaponEquipStateChanged");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Item_EquipmentEntryChanged,		        "Message.Item.EquipmentEntryChanged");
-	UE_DEFINE_GAMEPLAY_TAG(Message_Item_InventoryEntryChanged,		        "Message.Item.InventoryEntryChanged");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Item_HoverWidgetVisibility,		        "Message.Item.HoverWidgetVisibility");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Notification,							"Message.Notification");
 
 	// Attribute

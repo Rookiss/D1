@@ -100,12 +100,10 @@ UD1ItemInstance* FD1EquipmentList::RemoveEquipment(EEquipmentSlotType EquipmentS
 
 void FD1EquipmentList::BroadcastChangedMessage(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
 {
-	FD1EquipmentEntryChangedMessage Message;
-	Message.EquipmentSlotType = EquipmentSlotType;
-	Message.ItemInstance = ItemInstance;
-
-	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(EquipmentManager->GetWorld());
-	MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Item_EquipmentEntryChanged, Message);
+	if (EquipmentManager->OnEquipmentEntryChanged.IsBound())
+	{
+		EquipmentManager->OnEquipmentEntryChanged.Broadcast(EquipmentSlotType, ItemInstance);
+	}
 }
 
 UD1EquipmentManagerComponent::UD1EquipmentManagerComponent(const FObjectInitializer& ObjectInitializer)

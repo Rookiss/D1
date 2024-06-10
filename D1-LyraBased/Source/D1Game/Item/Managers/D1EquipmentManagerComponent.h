@@ -12,18 +12,7 @@ class UD1ItemTemplate;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
-USTRUCT(BlueprintType)
-struct FD1EquipmentEntryChangedMessage
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadOnly)
-	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
-
-	UPROPERTY(BlueprintReadOnly)
-	UD1ItemInstance* ItemInstance = nullptr;
-};
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEquipmentEntryChanged, EEquipmentSlotType, UD1ItemInstance*)
 
 USTRUCT(BlueprintType)
 struct FD1EquipmentEntry : public FFastArraySerializerItem
@@ -150,6 +139,9 @@ public:
 	ALyraPlayerController* GetPlayerController() const;
 	
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const;
+
+public:
+	FOnEquipmentEntryChanged OnEquipmentEntryChanged;
 	
 private:
 	friend class UD1InventoryManagerComponent;
