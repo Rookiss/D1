@@ -18,9 +18,11 @@ public:
 
 public:
 	void Init(UD1InventorySlotsWidget* InSlotsWidget, UD1ItemInstance* InItemInstance, int32 InItemCount);
-	
+	void RefreshItemCount(int32 NewItemCount);
+
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
+	
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 

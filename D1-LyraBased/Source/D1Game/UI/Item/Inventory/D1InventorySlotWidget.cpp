@@ -11,10 +11,10 @@ UD1InventorySlotWidget::UD1InventorySlotWidget(const FObjectInitializer& ObjectI
     
 }
 
-void UD1InventorySlotWidget::NativeConstruct()
+void UD1InventorySlotWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
-
+	Super::NativeOnInitialized();
+	
 	SizeBox_Root->SetWidthOverride(Item::UnitInventorySlotSize.X);
 	SizeBox_Root->SetHeightOverride(Item::UnitInventorySlotSize.Y);
 }

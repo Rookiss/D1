@@ -6,6 +6,7 @@
 #include "Item/D1ItemTemplate.h"
 #include "UI/Item/D1ItemDragDrop.h"
 #include "UI/Item/D1ItemDragWidget.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentEntryWidget)
 
@@ -24,9 +25,9 @@ void UD1EquipmentEntryWidget::Init(UD1ItemInstance* InItemInstance, EEquipmentSl
 	EquipmentSlotType = InEquipmentSlotType;
 }
 
-void UD1EquipmentEntryWidget::NativeConstruct()
+void UD1EquipmentEntryWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	APlayerController* PlayerController = GetOwningPlayer();
 	check(PlayerController);

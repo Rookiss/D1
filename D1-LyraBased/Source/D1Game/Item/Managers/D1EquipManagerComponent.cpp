@@ -404,7 +404,7 @@ AD1WeaponBase* UD1EquipManagerComponent::GetEquippedWeapon(EWeaponHandType Weapo
 		return nullptr;
 
 	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
-	int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType);
+	int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType, CurrentWeaponEquipState);
 	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].SpawnedWeaponActor : nullptr;
 }
 
@@ -415,7 +415,7 @@ AD1WeaponBase* UD1EquipManagerComponent::GetFirstEquippedWeapon() const
 	AD1WeaponBase* WeaponActor = nullptr;
 	for (int i = 0; i < (int32)EWeaponHandType::Count; i++)
 	{
-		int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i);
+		int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentWeaponEquipState);
 		if (Entries.IsValidIndex(EntryIndex) == false)
 			continue;
 
@@ -473,11 +473,11 @@ UD1EquipmentManagerComponent* UD1EquipManagerComponent::GetEquipmentManagerCompo
 	return nullptr;
 }
 
-EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const
+EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EWeaponEquipState WeaponEquipState)
 {
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 
-	if (CurrentWeaponEquipState == EWeaponEquipState::Unarmed)
+	if (WeaponEquipState == EWeaponEquipState::Unarmed)
 	{
 		switch (WeaponHandType)
 		{
@@ -485,7 +485,7 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Unarmed_RightHand; break;
 		}
 	}
-	else if (CurrentWeaponEquipState == EWeaponEquipState::Primary)
+	else if (WeaponEquipState == EWeaponEquipState::Primary)
 	{
 		switch (WeaponHandType)
 		{
@@ -494,7 +494,7 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Primary_TwoHand;   break;
 		}
 	}
-	else if (CurrentWeaponEquipState == EWeaponEquipState::Secondary)
+	else if (WeaponEquipState == EWeaponEquipState::Secondary)
 	{
 		switch (WeaponHandType)
 		{
@@ -503,7 +503,7 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Secondary_TwoHand;   break;
 		}
 	}
-	else if (CurrentWeaponEquipState == EWeaponEquipState::Tertiary)
+	else if (WeaponEquipState == EWeaponEquipState::Tertiary)
 	{
 		switch (WeaponHandType)
 		{
@@ -512,7 +512,51 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Tertiary_TwoHand;   break;
 		}
 	}
-	else if (CurrentWeaponEquipState == EWeaponEquipState::Quaternary)
+	else if (WeaponEquipState == EWeaponEquipState::Quaternary)
+	{
+		switch (WeaponHandType)
+		{
+		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Quaternary_LeftHand;  break;
+		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Quaternary_RightHand; break;
+		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Quaternary_TwoHand;   break;
+		}
+	}
+	
+	return EquipmentSlotType;
+}
+
+EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EWeaponSlotType WeaponSlotType)
+{
+	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
+
+	if (WeaponSlotType == EWeaponSlotType::Primary)
+	{
+		switch (WeaponHandType)
+		{
+		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Primary_LeftHand;  break;
+		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Primary_RightHand; break;
+		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Primary_TwoHand;   break;
+		}
+	}
+	else if (WeaponSlotType == EWeaponSlotType::Secondary)
+	{
+		switch (WeaponHandType)
+		{
+		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Secondary_LeftHand;  break;
+		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Secondary_RightHand; break;
+		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Secondary_TwoHand;   break;
+		}
+	}
+	else if (WeaponSlotType == EWeaponSlotType::Tertiary)
+	{
+		switch (WeaponHandType)
+		{
+		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Tertiary_LeftHand;  break;
+		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Tertiary_RightHand; break;
+		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Tertiary_TwoHand;   break;
+		}
+	}
+	else if (WeaponSlotType == EWeaponSlotType::Quaternary)
 	{
 		switch (WeaponHandType)
 		{

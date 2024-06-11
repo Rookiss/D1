@@ -19,7 +19,7 @@ public:
 	UD1InventorySlotsWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 	
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
@@ -61,5 +61,6 @@ private:
 	TObjectPtr<UCanvasPanel> CanvasPanel_Entries;
 	
 private:
+	FDelegateHandle DelegateHandle;
 	FIntPoint PrevDragOverSlotPos = FIntPoint(-1, -1);
 };

@@ -147,7 +147,8 @@ public:
 	UAbilitySystemComponent* GetAbilitySystemComponent() const;
 	UD1EquipmentManagerComponent* GetEquipmentManagerComponent() const;
 
-	EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const;
+	static EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EWeaponEquipState WeaponEquipState);
+	static EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EWeaponSlotType WeaponSlotType);
 	static EEquipmentSlotType ConvertToEquipmentSlotType(EArmorType ArmorType);
 	static EWeaponHandType ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType);
 	static EArmorType ConvertToArmorType(EEquipmentSlotType EquipmentSlotType);

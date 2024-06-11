@@ -17,10 +17,10 @@ UD1ItemEntryWidget::UD1ItemEntryWidget(const FObjectInitializer& ObjectInitializ
     
 }
 
-void UD1ItemEntryWidget::NativeConstruct()
+void UD1ItemEntryWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
-	
+	Super::NativeOnInitialized();
+
 	Image_Hover->SetRenderOpacity(0.f);
 	DragWidgetClass = ULyraAssetManager::GetSubclassByName<UD1ItemDragWidget>("DragWidgetClass");
 }
