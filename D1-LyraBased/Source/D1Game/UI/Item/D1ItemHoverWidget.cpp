@@ -1,8 +1,10 @@
 ﻿#include "D1ItemHoverWidget.h"
 
+#include "D1ItemEntryWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Components/TextBlock.h"
 #include "Data/D1ItemData.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Consumable.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
@@ -36,20 +38,20 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 	
 	if (const UD1ItemFragment_Equippable* EquippableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable>())
 	{
-		FString AttributeModifierString;
+		FString AttributeString;
 		
 		const FGameplayTagStackContainer& StackContainer = ItemInstance->GetStatContainer();
 		for (const FGameplayTagStack& Stack : StackContainer.GetStacks())
 		{
 			FString Left, Right;
 			Stack.GetStackTag().ToString().Split(TEXT("."), &Left, &Right, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
-			AttributeModifierString.Append(FString::Printf(TEXT("%s %d\n"), *Right, Stack.GetStackCount()));
+			AttributeString.Append(FString::Printf(TEXT("%s %d\n"), *Right, Stack.GetStackCount()));
 		}
-		AttributeModifierString.RemoveFromEnd(TEXT("\n"));
+		AttributeString.RemoveFromEnd(TEXT("\n"));
 		
-		if (AttributeModifierString.IsEmpty() == false)
+		if (AttributeString.IsEmpty() == false)
 		{
-			Text_AttributeModifiers->SetText(FText::FromString(AttributeModifierString));
+			Text_AttributeModifiers->SetText(FText::FromString(AttributeString));
 			Text_AttributeModifiers->SetVisibility(ESlateVisibility::Visible);
 		}
 		

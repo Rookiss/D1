@@ -1,13 +1,12 @@
 ﻿#include "D1ItemEntryWidget.h"
 
-#include "D1GameplayTags.h"
 #include "Components/Image.h"
 #include "Data/D1ItemData.h"
-#include "GameFramework/GameplayMessageSubsystem.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/D1ItemTemplate.h"
 #include "System/LyraAssetManager.h"
 #include "D1ItemDragWidget.h"
+#include "D1ItemHoverWidget.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemEntryWidget)
 
@@ -22,7 +21,9 @@ void UD1ItemEntryWidget::NativeOnInitialized()
 	Super::NativeOnInitialized();
 
 	Image_Hover->SetRenderOpacity(0.f);
+
 	DragWidgetClass = ULyraAssetManager::GetSubclassByName<UD1ItemDragWidget>("DragWidgetClass");
+	HoverWidgetClass = ULyraAssetManager::GetSubclassByName<UD1ItemHoverWidget>("HoverWidgetClass");
 }
 
 void UD1ItemEntryWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -31,18 +32,11 @@ void UD1ItemEntryWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const F
 
 	Image_Hover->SetRenderOpacity(1.f);
 
-	FItemHoverWidgetVisibilityMessage Message;
-	Message.bVisible = true;
-	Message.ItemInstance = ItemInstance;
-	
-	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
-	MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Item_HoverWidgetVisibility, Message);
-
-	// TODO:
-	// if (AD1HUD* HUD = Cast<AD1HUD>(GetOwningPlayer()->GetHUD()))
-	// {
-	// 	HUD->ShowItemHoverWidget(ItemInstance);
-	// }
+	if (HoverWidget == nullptr)
+	{
+		HoverWidget = CreateWidget<UD1ItemHoverWidget>(GetOwningPlayer(), HoverWidgetClass);
+	}
+	HoverWidget->RefreshUI(ItemInstance);
 }
 
 void UD1ItemEntryWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
@@ -51,18 +45,11 @@ void UD1ItemEntryWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 
 	Image_Hover->SetRenderOpacity(0.f);
 
-	FItemHoverWidgetVisibilityMessage Message;
-	Message.bVisible = false;
-	Message.ItemInstance = nullptr;
-	
-	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
-	MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Item_HoverWidgetVisibility, Message);
-
-	// TODO:
-	// if (AD1HUD* HUD = Cast<AD1HUD>(GetOwningPlayer()->GetHUD()))
-	// {
-	// 	HUD->HideItemHoverWidget();
-	// }
+	if (HoverWidget)
+	{
+		HoverWidget->RemoveFromParent();
+		HoverWidget = nullptr;
+	}
 }
 
 FReply UD1ItemEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)

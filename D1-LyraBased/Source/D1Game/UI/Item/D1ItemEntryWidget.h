@@ -3,6 +3,7 @@
 #include "Blueprint/UserWidget.h"
 #include "D1ItemEntryWidget.generated.h"
 
+class UD1ItemHoverWidget;
 class UImage;
 class UD1ItemInstance;
 class UD1ItemDragWidget;
@@ -48,9 +49,13 @@ public:
 protected:
 	UPROPERTY()
 	TObjectPtr<UD1ItemInstance> ItemInstance;
-	
+
+protected:
 	UPROPERTY()
 	TSubclassOf<UD1ItemDragWidget> DragWidgetClass;
+
+	UPROPERTY()
+	TSubclassOf<UD1ItemHoverWidget> HoverWidgetClass;
 
 protected:
 	UPROPERTY(meta=(BindWidget))
@@ -58,4 +63,8 @@ protected:
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Hover;
+
+private:
+	UPROPERTY()
+	TObjectPtr<UD1ItemHoverWidget> HoverWidget;
 };
