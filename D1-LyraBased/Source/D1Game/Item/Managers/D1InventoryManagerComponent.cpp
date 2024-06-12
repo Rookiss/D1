@@ -420,7 +420,7 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_FromInternalInventory(con
 				TempSlotChecks[y][x] = false;
 			}
 		}
-		return IsEmpty(ToItemSlotPos, FromItemSlotCount) ? FromItemCount : 0;
+		return IsEmpty(TempSlotChecks, ToItemSlotPos, FromItemSlotCount) ? FromItemCount : 0;
 	}
 }
 
@@ -503,7 +503,7 @@ void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromExternalEqu
 
 bool UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const
 {
-	if (OtherComponent == nullptr || OtherComponent->GetOwner() == GetOwner())
+	if (OtherComponent == nullptr)
 		return false;
 
 	if (FromEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || FromEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || FromEquipmentSlotType == EEquipmentSlotType::Count)

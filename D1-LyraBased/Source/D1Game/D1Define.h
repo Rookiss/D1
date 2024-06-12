@@ -75,6 +75,17 @@ enum class EWeaponEquipState : uint8
 };
 
 UENUM(BlueprintType)
+enum class EWeaponSlotType : uint8
+{
+	Primary,
+	Secondary,
+	Tertiary,
+	Quaternary,
+
+	Count	UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
 enum class EArmorType : uint8
 {
 	Helmet,
@@ -121,6 +132,7 @@ enum class ESpellType : uint8
 
 namespace Item
 {
+	const int32 GoldID = 9999;
 	const FIntPoint UnitInventorySlotSize = FIntPoint(50.f, 50.f);
 
 	const TArray<TArray<EEquipmentSlotType>> EquipmentSlotsByWeaponState = {

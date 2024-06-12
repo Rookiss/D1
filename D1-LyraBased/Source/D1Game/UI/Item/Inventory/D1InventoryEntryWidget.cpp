@@ -31,14 +31,19 @@ void UD1InventoryEntryWidget::Init(UD1InventorySlotsWidget* InSlotsWidget, UD1It
 	
 	if (ItemTemplate.FindFragmentByClass<UD1ItemFragment_Stackable>())
 	{
-		ItemCount = InItemCount;
-		Text_Count->SetText((ItemCount >= 2) ? FText::AsNumber(ItemCount) : FText::GetEmpty());
+		RefreshItemCount(InItemCount);
 	}
 }
 
-void UD1InventoryEntryWidget::NativeConstruct()
+void UD1InventoryEntryWidget::RefreshItemCount(int32 NewItemCount)
 {
-	Super::NativeConstruct();
+	ItemCount = NewItemCount;
+	Text_Count->SetText((ItemCount >= 2) ? FText::AsNumber(ItemCount) : FText::GetEmpty());
+}
+
+void UD1InventoryEntryWidget::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
 	
 	Text_Count->SetText(FText::GetEmpty());
 }
