@@ -19,10 +19,10 @@ public:
 	UD1EquipmentSlotWeaponWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	// void Init(EWeaponSlotType InWeaponSlotType);
+	void Init(EWeaponSlotType InWeaponSlotType);
 	
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 	
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
@@ -30,7 +30,6 @@ protected:
 
 private:
 	void FinishDrag();
-	EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType) const;
 
 public:
 	void OnEquipmentEntryChanged(EWeaponHandType InWeaponHandType, UD1ItemInstance* NewItemInstance);
@@ -73,5 +72,5 @@ private:
 
 private:
 	bool bAlreadyHovered = false;
-	// EWeaponSlotType WeaponSlotType = EWeaponSlotType::Count;
+	EWeaponSlotType WeaponSlotType = EWeaponSlotType::Count;
 };

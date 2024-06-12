@@ -19,7 +19,8 @@ public:
 	void Init(UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType);
 	
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
+	
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 
 protected:

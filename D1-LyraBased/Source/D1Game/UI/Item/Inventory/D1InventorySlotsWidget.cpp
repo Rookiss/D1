@@ -21,9 +21,9 @@ UD1InventorySlotsWidget::UD1InventorySlotsWidget(const FObjectInitializer& Objec
 	
 }
 
-void UD1InventorySlotsWidget::NativeConstruct()
+void UD1InventorySlotsWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 	
 	SlotWidgetClass = ULyraAssetManager::GetSubclassByName<UD1InventorySlotWidget>("InventorySlotWidgetClass");
 	EntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1InventoryEntryWidget>("InventoryEntryWidgetClass");
@@ -33,11 +33,11 @@ void UD1InventorySlotsWidget::NativeConstruct()
 
 	InventoryManagerComponent = PlayerController->GetComponentByClass<UD1InventoryManagerComponent>();
 	check(InventoryManagerComponent);
-	
+
 	const FIntPoint& InventorySlotCount = InventoryManagerComponent->GetInventorySlotCount();
 	SlotWidgets.SetNum(InventorySlotCount.X * InventorySlotCount.Y);
 	EntryWidgets.SetNum(InventorySlotCount.X * InventorySlotCount.Y);
-			
+
 	for (int32 y = 0; y < InventorySlotCount.Y; y++)
 	{
 		for (int32 x = 0; x < InventorySlotCount.X; x++)
@@ -47,7 +47,7 @@ void UD1InventorySlotsWidget::NativeConstruct()
 			GridPanel_Slots->AddChildToUniformGrid(SlotWidget, y, x);
 		}
 	}
-
+	
 	const TArray<FD1InventoryEntry>& Entries = InventoryManagerComponent->GetAllEntries();
 	for (int32 i = 0; i < Entries.Num(); i++)
 	{
@@ -58,7 +58,7 @@ void UD1InventorySlotsWidget::NativeConstruct()
 			OnInventoryEntryChanged(ItemSlotPos, ItemInstance, Entry.GetItemCount());
 		}
 	}
-	InventoryManagerComponent->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
+	DelegateHandle = InventoryManagerComponent->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
 }
 
 bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -193,23 +193,31 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlo
 	{
 		if (UD1ItemInstance* ItemInstance = EntryWidget->GetItemInstance())
 		{
-			const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
-
-			const FIntPoint StartSlotPos = InItemSlotPos;
-			const FIntPoint EndSlotPos = InItemSlotPos + ItemTemplate.SlotCount;
-				
-			for (int y = StartSlotPos.Y; y < EndSlotPos.Y; y++)
+			if (ItemInstance == InItemInstance)
 			{
-				for (int x = StartSlotPos.X; x < EndSlotPos.X; x++)
+				EntryWidget->RefreshItemCount(NewItemCount);
+				return;
+			}
+			else
+			{
+				const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
+
+				const FIntPoint StartSlotPos = InItemSlotPos;
+				const FIntPoint EndSlotPos = InItemSlotPos + ItemTemplate.SlotCount;
+				
+				for (int y = StartSlotPos.Y; y < EndSlotPos.Y; y++)
 				{
-					if (UD1InventorySlotWidget* SlotWidget = SlotWidgets[y * InventorySlotCount.X + x])
+					for (int x = StartSlotPos.X; x < EndSlotPos.X; x++)
 					{
-						SlotWidget->ChangeSlotState(SlotWidget->Image_Slot, ESlotState::Default);
+						if (UD1InventorySlotWidget* SlotWidget = SlotWidgets[y * InventorySlotCount.X + x])
+						{
+							SlotWidget->ChangeSlotState(SlotWidget->Image_Slot, ESlotState::Default);
+						}
 					}
 				}
 			}
 		}
-			
+		
 		CanvasPanel_Entries->RemoveChild(EntryWidget);
 		EntryWidgets[SlotIndex] = nullptr;
 	}

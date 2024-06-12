@@ -30,9 +30,9 @@ void UD1EquipmentSlotArmorWidget::Init(EArmorType InArmorType)
 	}
 }
 
-void UD1EquipmentSlotArmorWidget::NativeConstruct()
+void UD1EquipmentSlotArmorWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	APlayerController* PlayerController = GetOwningPlayer();
 	check(PlayerController);
@@ -120,27 +120,22 @@ void UD1EquipmentSlotArmorWidget::CleanUpDrag()
 	bAlreadyHovered = false;
 }
 
-void UD1EquipmentSlotArmorWidget::OnEquipmentEntryChanged(UD1ItemInstance* InItemInstance)
+void UD1EquipmentSlotArmorWidget::OnEquipmentEntryChanged(UD1ItemInstance* NewItemInstance)
 {
-	if (InItemInstance)
+	if (EntryWidget)
 	{
-		if (EntryWidget)
-		{
-			Overlay_Root->RemoveChild(EntryWidget);
-			EntryWidget = nullptr;
-		}
-		
+		Overlay_Root->RemoveChild(EntryWidget);
+		EntryWidget = nullptr;
+	}
+	
+	if (NewItemInstance)
+	{
 		EntryWidget = CreateWidget<UD1EquipmentEntryWidget>(GetOwningPlayer(), EntryWidgetClass);
 		
 		UOverlaySlot* OverlaySlot = Overlay_Root->AddChildToOverlay(EntryWidget);
 		OverlaySlot->SetHorizontalAlignment(HAlign_Fill);
 		OverlaySlot->SetVerticalAlignment(VAlign_Fill);
 		
-		EntryWidget->Init(InItemInstance, UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType));
-	}
-	else
-	{
-		Overlay_Root->RemoveChild(EntryWidget);
-		EntryWidget = nullptr;
+		EntryWidget->Init(NewItemInstance, UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType));
 	}
 }
