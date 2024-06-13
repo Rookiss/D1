@@ -63,32 +63,7 @@ FReply UD1ItemEntryWidget::NativeOnMouseMove(const FGeometry& InGeometry, const 
 
 	if (HoverWidget)
 	{
-		FVector2D Margin = FVector2D(5.f, 5.f);
-		FVector2D AbsoluteMousePos = InMouseEvent.GetScreenSpacePosition();
-		FVector2D HoverWidgetSize = HoverWidget->GetCachedGeometry().GetAbsoluteSize();
-		FVector2D HoverWidgetStartPos = AbsoluteMousePos + Margin;
-		FVector2D HoverWidgetEndPos = HoverWidgetStartPos + HoverWidgetSize;
-
-		FVector2D ViewportSize;
-		if (GEngine && GEngine->GameViewport)
-		{
-			GEngine->GameViewport->GetViewportSize(ViewportSize);
-		}
-		
-		if (HoverWidgetEndPos.X > ViewportSize.X)
-		{
-			HoverWidgetStartPos.X = AbsoluteMousePos.X - (Margin.X + HoverWidgetSize.X);
-		}
-
-		if (HoverWidgetEndPos.Y > ViewportSize.Y)
-		{
-			HoverWidgetStartPos.Y = AbsoluteMousePos.Y - (Margin.Y + HoverWidgetSize.Y);
-		}
-		
-		FVector2D PixelPos, ViewportPos;
-		USlateBlueprintLibrary::AbsoluteToViewport(this, HoverWidgetStartPos, PixelPos, ViewportPos);
-		HoverWidget->SetPositionInViewport({HoverWidgetSize.X, HoverWidgetSize.Y});
-		
+		HoverWidget->SetPosition(InMouseEvent.GetScreenSpacePosition());
 		return FReply::Handled();
 	}
 	

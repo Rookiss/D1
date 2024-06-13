@@ -1,7 +1,10 @@
 ﻿#include "D1ItemHoverWidget.h"
 
 #include "D1ItemEntryWidget.h"
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
 #include "Components/HorizontalBox.h"
+#include "Components/Overlay.h"
 #include "Components/TextBlock.h"
 #include "Data/D1ItemData.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
@@ -110,5 +113,34 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 	{
 		Text_MaxStackCount->SetText(FText::AsNumber(StackableFragment ? StackableFragment->MaxStackCount : 1));
 		HorizontalBox_MaxStackCount->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void UD1ItemHoverWidget::SetPosition(const FVector2D& AbsolutePosition)
+{
+	FVector2D HoverWidgetSize = Overlay_Root->GetCachedGeometry().GetLocalSize();
+	if (HoverWidgetSize.IsZero())
+		return;
+	
+	FVector2D Margin = FVector2D(5.f, 5.f);
+	FVector2D MouseWidgetPos = CanvasPanel_Root->GetCachedGeometry().AbsoluteToLocal(AbsolutePosition);
+	FVector2D CanvasWidgetSize = CanvasPanel_Root->GetCachedGeometry().GetLocalSize();
+
+	FVector2D HoverWidgetStartPos = MouseWidgetPos + Margin;
+	FVector2D HoverWidgetEndPos = HoverWidgetStartPos + HoverWidgetSize;
+
+	if (HoverWidgetEndPos.X > CanvasWidgetSize.X)
+	{
+		HoverWidgetStartPos.X = MouseWidgetPos.X - (Margin.X + HoverWidgetSize.X);
+	}
+
+	if (HoverWidgetEndPos.Y > CanvasWidgetSize.Y)
+	{
+		HoverWidgetStartPos.Y = MouseWidgetPos.Y - (Margin.Y + HoverWidgetSize.Y);
+	}
+		
+	if (UCanvasPanelSlot* CanvasPanelSlot = Cast<UCanvasPanelSlot>(Overlay_Root->Slot))
+	{
+		CanvasPanelSlot->SetPosition(HoverWidgetStartPos);
 	}
 }
