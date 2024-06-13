@@ -7,6 +7,7 @@
 #include "System/LyraAssetManager.h"
 #include "D1ItemDragWidget.h"
 #include "D1ItemHoverWidget.h"
+#include "Blueprint/SlateBlueprintLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemEntryWidget)
 
@@ -31,6 +32,17 @@ void UD1ItemEntryWidget::NativeConstruct()
 	Image_Hover->SetRenderOpacity(0.f);
 }
 
+void UD1ItemEntryWidget::NativeDestruct()
+{
+	if (HoverWidget)
+	{
+		HoverWidget->RemoveFromParent();
+		HoverWidget = nullptr;
+	}
+	
+	Super::NativeDestruct();
+}
+
 void UD1ItemEntryWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
@@ -42,6 +54,45 @@ void UD1ItemEntryWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const F
 		HoverWidget = CreateWidget<UD1ItemHoverWidget>(GetOwningPlayer(), HoverWidgetClass);
 	}
 	HoverWidget->RefreshUI(ItemInstance);
+	HoverWidget->AddToViewport();
+}
+
+FReply UD1ItemEntryWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	FReply Reply = Super::NativeOnMouseMove(InGeometry, InMouseEvent);
+
+	if (HoverWidget)
+	{
+		FVector2D Margin = FVector2D(5.f, 5.f);
+		FVector2D AbsoluteMousePos = InMouseEvent.GetScreenSpacePosition();
+		FVector2D HoverWidgetSize = HoverWidget->GetCachedGeometry().GetAbsoluteSize();
+		FVector2D HoverWidgetStartPos = AbsoluteMousePos + Margin;
+		FVector2D HoverWidgetEndPos = HoverWidgetStartPos + HoverWidgetSize;
+
+		FVector2D ViewportSize;
+		if (GEngine && GEngine->GameViewport)
+		{
+			GEngine->GameViewport->GetViewportSize(ViewportSize);
+		}
+		
+		if (HoverWidgetEndPos.X > ViewportSize.X)
+		{
+			HoverWidgetStartPos.X = AbsoluteMousePos.X - (Margin.X + HoverWidgetSize.X);
+		}
+
+		if (HoverWidgetEndPos.Y > ViewportSize.Y)
+		{
+			HoverWidgetStartPos.Y = AbsoluteMousePos.Y - (Margin.Y + HoverWidgetSize.Y);
+		}
+		
+		FVector2D PixelPos, ViewportPos;
+		USlateBlueprintLibrary::AbsoluteToViewport(this, HoverWidgetStartPos, PixelPos, ViewportPos);
+		HoverWidget->SetPositionInViewport({HoverWidgetSize.X, HoverWidgetSize.Y});
+		
+		return FReply::Handled();
+	}
+	
+	return Reply;
 }
 
 void UD1ItemEntryWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
