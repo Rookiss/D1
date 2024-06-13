@@ -66,7 +66,8 @@ public class D1Game : ModuleRules
 			"ClientPilot",
 			"AudioModulation",
 			"EngineSettings",
-			"DTLSHandlerComponent",
+			"DTLSHandlerComponent", 
+			"PocketWorlds",
 		});
 		
 		PublicDefinitions.Add("SHIPPING_DRAW_DEBUG_ERROR=1");

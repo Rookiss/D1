@@ -11,6 +11,8 @@
 #include "LyraCharacterMovementComponent.h"
 #include "D1GameplayTags.h"
 #include "D1LogChannels.h"
+#include "PocketLevel.h"
+#include "PocketLevelSystem.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/LyraPlayerController.h"
 #include "Player/LyraPlayerState.h"
@@ -19,6 +21,7 @@
 #include "Data/D1AssetData.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "System/LyraAssetManager.h"
+#include "UI/Subsystem/D1UIPocketWorldSubsystem.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraCharacter)
 
@@ -92,14 +95,14 @@ void ALyraCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UWorld* World = GetWorld();
-
-	const bool bRegisterWithSignificanceManager = !IsNetMode(NM_DedicatedServer);
-	if (bRegisterWithSignificanceManager)
+	if (IsLocallyControlled())
 	{
-		if (ULyraSignificanceManager* SignificanceManager = USignificanceManager::Get<ULyraSignificanceManager>(World))
+		if (ALyraPlayerController* LyraPlayerController = GetLyraPlayerController())
 		{
-//@TODO: SignificanceManager->RegisterObject(this, (EFortSignificanceType)SignificanceType);
+			if (UD1UIPocketWorldSubsystem* UIPocketWorldSubsystem = UGameInstance::GetSubsystem<UD1UIPocketWorldSubsystem>(GetGameInstance()))
+			{
+				UIPocketWorldSubsystem->SpawnPocketLevel(LyraPlayerController->GetLocalPlayer());
+			}
 		}
 	}
 }

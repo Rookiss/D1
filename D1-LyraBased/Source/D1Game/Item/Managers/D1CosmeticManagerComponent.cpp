@@ -27,7 +27,7 @@ void UD1CosmeticManagerComponent::BeginPlay()
 	
 	check(CosmeticSlotClass);
 	
-	ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner());
+	ACharacter* Character = Cast<ACharacter>(GetOwner());
 	check(Character);
 	
 	if (Character->IsNetMode(NM_DedicatedServer) == false)
