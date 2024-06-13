@@ -13,8 +13,8 @@ class UD1ItemHoverWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	UD1ItemHoverWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
+	UD1ItemHoverWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());\
+	
 public:
 	void RefreshUI(UD1ItemInstance* ItemInstance);
 
