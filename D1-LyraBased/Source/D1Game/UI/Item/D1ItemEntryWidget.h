@@ -3,23 +3,10 @@
 #include "Blueprint/UserWidget.h"
 #include "D1ItemEntryWidget.generated.h"
 
-class UD1ItemHoverWidget;
 class UImage;
 class UD1ItemInstance;
 class UD1ItemDragWidget;
-
-USTRUCT(BlueprintType)
-struct FItemHoverWidgetVisibilityMessage
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadOnly)
-	bool bVisible = false;
-
-	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UD1ItemInstance> ItemInstance;
-};
+class UD1ItemHoverWidget;
 
 UCLASS()
 class UD1ItemEntryWidget : public UUserWidget
@@ -32,8 +19,10 @@ public:
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	
