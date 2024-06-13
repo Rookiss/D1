@@ -20,10 +20,15 @@ void UD1ItemEntryWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	Image_Hover->SetRenderOpacity(0.f);
-
 	DragWidgetClass = ULyraAssetManager::GetSubclassByName<UD1ItemDragWidget>("DragWidgetClass");
 	HoverWidgetClass = ULyraAssetManager::GetSubclassByName<UD1ItemHoverWidget>("HoverWidgetClass");
+}
+
+void UD1ItemEntryWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	Image_Hover->SetRenderOpacity(0.f);
 }
 
 void UD1ItemEntryWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
