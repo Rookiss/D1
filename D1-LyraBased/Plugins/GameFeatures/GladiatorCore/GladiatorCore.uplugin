@@ -23,5 +23,11 @@
 		}
 	],
 	"ExplicitlyLoaded": true,
-	"BuiltInInitialFeatureState": "Registered"
+	"BuiltInInitialFeatureState": "Registered",
+	"Plugins": [
+		{
+			"Name": "PocketWorlds",
+			"Enabled": true
+		}
+	]
 }

@@ -282,7 +282,7 @@ void UPocketCapture::CaptureDiffuse()
 		TArray<AActor*> CaptureActors;
 		if (AActor* CaptureTarget = CaptureTargetPtr.Get())
 		{
-			CaptureTarget->GetAttachedActors(CaptureActors);
+			CaptureTarget->GetAttachedActors(CaptureActors, true, true);
 			CaptureActors.Add(CaptureTarget);
 		}
 
