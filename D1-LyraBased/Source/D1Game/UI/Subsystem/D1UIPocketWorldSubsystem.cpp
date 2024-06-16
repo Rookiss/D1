@@ -6,12 +6,12 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1UIPocketWorldSubsystem)
 
-void UD1UIPocketWorldSubsystem::SpawnPocketLevel(ULocalPlayer* LocalPlayer)
+UPocketLevelInstance* UD1UIPocketWorldSubsystem::GetOrCreatePocketLevelFor(ULocalPlayer* LocalPlayer)
 {
 	UPocketLevelSubsystem* PocketLevelSubsystem = GetWorld()->GetSubsystem<UPocketLevelSubsystem>();
 	
 	UPocketLevel* PocketLevel = ULyraAssetManager::GetAssetByName<UPocketLevel>("PocketLevelData");
-	FVector PocketLevelLocation = FVector(0, 0, -10000);
+	FVector PocketLevelLocation = FVector(0, 0, -10000.f);
 
-	PocketLevelSubsystem->GetOrCreatePocketLevelFor(LocalPlayer, PocketLevel, PocketLevelLocation);
+	return PocketLevelSubsystem->GetOrCreatePocketLevelFor(LocalPlayer, PocketLevel, PocketLevelLocation);
 }

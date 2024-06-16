@@ -2,6 +2,7 @@
 
 #include "D1UIPocketWorldSubsystem.generated.h"
 
+class UPocketLevelInstance;
 class UPocketCapture;
 class AD1PocketWorldStage;
 
@@ -12,7 +13,7 @@ class UD1UIPocketWorldSubsystem : public UGameInstanceSubsystem
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void SpawnPocketLevel(ULocalPlayer* LocalPlayer);
+	UPocketLevelInstance* GetOrCreatePocketLevelFor(ULocalPlayer* LocalPlayer);
 	
 public:
 	UPROPERTY(BlueprintReadWrite)

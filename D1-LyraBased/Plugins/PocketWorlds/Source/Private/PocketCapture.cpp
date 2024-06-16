@@ -219,7 +219,7 @@ bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const 
 
 				CaptureComponent->ShowFlags.SetLensFlares(false);
 				CaptureComponent->ShowFlags.SetOnScreenDebug(false);
-				//CaptureComponent->ShowFlags.SetEyeAdaptation(false);
+				CaptureComponent->ShowFlags.SetEyeAdaptation(false);
 				CaptureComponent->ShowFlags.SetColorGrading(false);
 				CaptureComponent->ShowFlags.SetCameraImperfections(false);
 				CaptureComponent->ShowFlags.SetVignette(false);
@@ -237,6 +237,7 @@ bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const 
 				CaptureComponent->ShowFlags.SetHighResScreenshotMask(false);
 				CaptureComponent->ShowFlags.SetHMDDistortion(false);
 				CaptureComponent->ShowFlags.SetStereoRendering(false);
+				CaptureComponent->ShowFlags.SetFog(false);
 				CaptureComponent->ShowFlags.SetVolumetricFog(false);
 				CaptureComponent->ShowFlags.SetVolumetricLightmap(false);
 				CaptureComponent->ShowFlags.SetSkyLighting(false);

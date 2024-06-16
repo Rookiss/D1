@@ -73,25 +73,19 @@ void UD1CosmeticManagerComponent::SetArmorMesh(EArmorType ArmorType, TSoftObject
 	if (ArmorType == EArmorType::Count)
 		return;
 
+	UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)ArmorType];
+	check(CosmeticSlot);
+
+	AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor());
+	check(CosmeticActor);
+	
 	if (ArmorMeshPtr.IsNull())
 	{
-		UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)ArmorType];
-		check(CosmeticSlot);
-
-		AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor());
-		check(CosmeticActor);
-
 		const FD1CosmeticDefaultMeshEntry& DefaultMeshEntry = DefaultMeshes[(int32)ArmorType];
 		CosmeticActor->SetArmorMesh(DefaultMeshEntry.DefaultMesh);
 	}
 	else
 	{
-		UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)ArmorType];
-		check(CosmeticSlot);
-
-		AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor());
-		check(CosmeticActor);
-
 		USkeletalMesh* ArmorMesh = ULyraAssetManager::GetAssetByPath<USkeletalMesh>(ArmorMeshPtr);
 		CosmeticActor->SetArmorMesh(ArmorMesh);
 	}

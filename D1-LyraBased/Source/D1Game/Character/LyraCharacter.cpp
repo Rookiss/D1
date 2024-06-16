@@ -101,7 +101,7 @@ void ALyraCharacter::BeginPlay()
 		{
 			if (UD1UIPocketWorldSubsystem* UIPocketWorldSubsystem = UGameInstance::GetSubsystem<UD1UIPocketWorldSubsystem>(GetGameInstance()))
 			{
-				UIPocketWorldSubsystem->SpawnPocketLevel(LyraPlayerController->GetLocalPlayer());
+				UIPocketWorldSubsystem->GetOrCreatePocketLevelFor(LyraPlayerController->GetLocalPlayer());
 			}
 		}
 	}

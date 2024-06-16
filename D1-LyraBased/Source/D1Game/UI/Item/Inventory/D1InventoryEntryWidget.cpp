@@ -69,12 +69,13 @@ void UD1InventoryEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
 	
 	UD1ItemDragWidget* DragWidget = CreateWidget<UD1ItemDragWidget>(GetOwningPlayer(), DragWidgetClass);
-	FVector2D EntityWidgetSize = FVector2D(ItemTemplate.SlotCount.X * Item::UnitInventorySlotSize.X, ItemTemplate.SlotCount.Y * Item::UnitInventorySlotSize.Y);
-	DragWidget->Init(EntityWidgetSize, ItemTemplate.IconTexture, ItemCount);
+	FVector2D DragWidgetSize = FVector2D(ItemTemplate.SlotCount.X * Item::UnitInventorySlotSize.X, ItemTemplate.SlotCount.Y * Item::UnitInventorySlotSize.Y);
+	DragWidget->Init(DragWidgetSize, ItemTemplate.IconTexture, ItemCount);
 	
 	UD1ItemDragDrop* DragDrop = NewObject<UD1ItemDragDrop>();
 	DragDrop->DefaultDragVisual = DragWidget;
-	DragDrop->Pivot = EDragPivot::MouseDown;
+	DragDrop->Pivot = EDragPivot::TopLeft;
+	DragDrop->Offset = -((CachedDeltaWidgetPos + Item::UnitInventorySlotSize / 2.f) / DragWidgetSize);
 	DragDrop->FromEntryWidget = this;
 	DragDrop->FromInventoryManager = SlotsWidget->GetInventoryManagerComponent();
 	DragDrop->FromItemSlotPos = CachedFromSlotPos;
