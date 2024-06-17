@@ -4,7 +4,6 @@
 #include "AbilitySystemGlobals.h"
 #include "D1CosmeticManagerComponent.h"
 #include "D1EquipmentManagerComponent.h"
-#include "D1GameplayTags.h"
 #include "Engine/ActorChannel.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
@@ -117,6 +116,12 @@ void FD1EquipEntry::Equip()
 			check(CharacterCosmetics);
 		
 			CharacterCosmetics->SetArmorMesh(ArmorFragment->ArmorType, ArmorFragment->ArmorMesh);
+
+			// Refresh Armor Mesh
+			// if (UD1PocketWorldSubsystem* UIPocketWorldSubsystem = UGameInstance::GetSubsystem<UD1PocketWorldSubsystem>())
+			// {
+			// 	UIPocketWorldSubsystem->CachedPocketWorldStage->RefreshArmorMesh(ArmorFragment->ArmorType, ArmorFragment->ArmorMesh);
+			// }
 		}
 	}
 

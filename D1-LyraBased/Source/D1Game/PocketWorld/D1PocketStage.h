@@ -1,0 +1,68 @@
+﻿#pragma once
+
+#include "D1PocketStage.generated.h"
+
+class UCameraComponent;
+class UPocketCapture;
+
+UCLASS()
+class AD1PocketStage : public AActor
+{
+	GENERATED_BODY()
+	
+public:
+	AD1PocketStage(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+protected:
+	virtual void BeginPlay() override;
+	
+public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void PreCaptureDiffuse();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void PostCaptureDiffuse();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void PreCaptureAlphaMask();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void PostCaptureAlphaMask();
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UPocketCapture* GetPocketCapute() const { return CachedPocketCapture; }
+	
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ACharacter> CharacterClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UPocketCapture> PocketCaptureClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UMaterialInstance> OverrideMaterial;
+	
+private:
+	UPROPERTY()
+	TObjectPtr<ACharacter> SpawnedCharacter;
+
+	UPROPERTY()
+	TArray<TObjectPtr<AActor>> AlphaMaskMaterialActors;
+
+	UPROPERTY()
+	TObjectPtr<UPocketCapture> CachedPocketCapture;
+	
+	UPROPERTY()
+	TArray<TObjectPtr<UMaterialInterface>> CachedMaterials;
+
+private:
+	UPROPERTY()
+	TObjectPtr<USceneComponent> RootSceneComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UCameraComponent> CameraComponent;
+
+	UPROPERTY()
+	TObjectPtr<USceneComponent> CharacterSpawnPoint;
+};

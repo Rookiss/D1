@@ -36,7 +36,7 @@ public:
 
 	FDelegateHandle AddReadyCallback(FPocketLevelInstanceEvent::FDelegate Callback);
 	void RemoveReadyCallback(FDelegateHandle CallbackToRemove);
-
+	
 	virtual class UWorld* GetWorld() const override { return World; }
 
 private:
