@@ -368,6 +368,10 @@
 				"Win64",
 				"Android"
 			]
+		},
+		{
+			"Name": "HDRIBackdrop",
+			"Enabled": true
 		}
 	],
 	"EpicSampleNameHash": "451731683"
