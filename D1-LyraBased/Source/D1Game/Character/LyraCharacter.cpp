@@ -94,7 +94,10 @@ void ALyraCharacter::BeginPlay()
 
 	if (UD1PocketWorldSubsystem* PocketWorldSubsystem = GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 	{
-		PocketWorldSubsystem->GetOrCreatePocketLevelFor();
+		if (APlayerController* PlayerController = GetLyraPlayerController())
+		{
+			PocketWorldSubsystem->GetOrCreatePocketLevelFor(PlayerController->GetLocalPlayer());
+		}
 	}
 }
 

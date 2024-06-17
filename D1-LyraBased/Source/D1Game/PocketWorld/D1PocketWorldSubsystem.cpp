@@ -8,9 +8,8 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1PocketWorldSubsystem)
 
-UPocketLevelInstance* UD1PocketWorldSubsystem::GetOrCreatePocketLevelFor()
+UPocketLevelInstance* UD1PocketWorldSubsystem::GetOrCreatePocketLevelFor(ULocalPlayer* LocalPlayer)
 {
-	ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	UPocketLevelSubsystem* PocketLevelSubsystem = GetWorld()->GetSubsystem<UPocketLevelSubsystem>();
 	
 	UPocketLevel* PocketLevel = ULyraAssetManager::GetAssetByName<UPocketLevel>("PocketLevelData");
@@ -19,23 +18,23 @@ UPocketLevelInstance* UD1PocketWorldSubsystem::GetOrCreatePocketLevelFor()
 	return PocketLevelSubsystem->GetOrCreatePocketLevelFor(LocalPlayer, PocketLevel, PocketLevelLocation);
 }
 
-void UD1PocketWorldSubsystem::GetPocketStage(FPocketStageDelegate Delegate)
+void UD1PocketWorldSubsystem::GetPocketStage(ULocalPlayer* LocalPlayer, FGetPocketStageDelegate Delegate)
 {
 	if (Delegate.IsBound() == false)
 		return;
 
 	if (CachedPocketStage.IsValid())
 	{
-		Delegate.Broadcast(CachedPocketStage.Get());
+		Delegate.Execute(CachedPocketStage.Get());
 	}
 	else
 	{
-		if (UPocketLevelInstance* PocketLevelInstance = GetOrCreatePocketLevelFor())
+		if (UPocketLevelInstance* PocketLevelInstance = GetOrCreatePocketLevelFor(LocalPlayer))
 		{
 			PocketLevelInstance->AddReadyCallback(FPocketLevelInstanceEvent::FDelegate::CreateLambda(
 				[Delegate = MoveTemp(Delegate), this](UPocketLevelInstance* Instance)
 				{
-					Delegate.Broadcast(CachedPocketStage.Get());
+					Delegate.Execute(CachedPocketStage.Get());
 				})
 			);
 		}

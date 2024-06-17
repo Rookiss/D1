@@ -8,7 +8,7 @@
 #include "Components/LightComponent.h"
 #include "GameFramework/Character.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1PocketWorldStage)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1PocketStage)
 
 AD1PocketStage::AD1PocketStage(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

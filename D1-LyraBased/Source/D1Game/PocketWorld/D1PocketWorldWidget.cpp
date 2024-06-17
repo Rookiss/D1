@@ -4,6 +4,7 @@
 #include "D1PocketWorldSubsystem.h"
 #include "PocketCapture.h"
 #include "Components/Image.h"
+#include "Engine/TextureRenderTarget2D.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1PocketWorldWidget)
 
@@ -19,10 +20,10 @@ void UD1PocketWorldWidget::NativeConstruct()
 
 	if (UD1PocketWorldSubsystem* PocketWorldSubsystem = GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 	{
-		FPocketStageDelegate Delegate;
-		Delegate.AddDynamic(this, &UD1PocketWorldWidget::OnPocketStageReady);
+		FGetPocketStageDelegate Delegate;
+		Delegate.BindDynamic(this, &UD1PocketWorldWidget::OnPocketStageReady);
 		
-		PocketWorldSubsystem->GetPocketStage(Delegate);
+		PocketWorldSubsystem->GetPocketStage(GetOwningLocalPlayer(), Delegate);
 	}
 }
 
@@ -41,7 +42,7 @@ void UD1PocketWorldWidget::OnPocketStageReady(AD1PocketStage* PocketStage)
 		AlphaRenderTarget = PocketCapture->GetOrCreateAlphaMaskRenderTarget();
 
 		UMaterialInstanceDynamic* MaterialInstanceDynamic = Image_Render->GetDynamicMaterial();
-		MaterialInstanceDynamic->SetTextureParameterValue("Diffuse", DiffuseRenderTarget->GetTexture);
+		MaterialInstanceDynamic->SetTextureParameterValue("Diffuse", DiffuseRenderTarget);
 		MaterialInstanceDynamic->SetTextureParameterValue("AlphaMask", AlphaRenderTarget);
 	}
 }

@@ -5,7 +5,7 @@
 class UCameraComponent;
 class UPocketCapture;
 
-UCLASS()
+UCLASS(BlueprintType)
 class AD1PocketStage : public AActor
 {
 	GENERATED_BODY()
@@ -41,7 +41,7 @@ protected:
 	TSubclassOf<UPocketCapture> PocketCaptureClass;
 
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UMaterialInstance> OverrideMaterial;
+	TObjectPtr<UMaterial> OverrideMaterial;
 	
 private:
 	UPROPERTY()
@@ -57,12 +57,12 @@ private:
 	TArray<TObjectPtr<UMaterialInterface>> CachedMaterials;
 
 private:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> RootSceneComponent;
 	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> CameraComponent;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> CharacterSpawnPoint;
 };
