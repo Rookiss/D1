@@ -31,14 +31,8 @@ void UD1PocketWorldWidget::NativeTick(const FGeometry& MyGeometry, float InDelta
 	if (CachedPocketStage.IsValid())
 	{
 		UPocketCapture* PocketCapture = CachedPocketStage->GetPocketCapute();
-		
-		CachedPocketStage->PreCaptureDiffuse();
 		PocketCapture->CaptureDiffuse();
-		CachedPocketStage->PostCaptureDiffuse();
-
-		CachedPocketStage->PreCaptureAlphaMask();
 		PocketCapture->CaptureAlphaMask();
-		CachedPocketStage->PostCaptureAlphaMask();
 	}
 }
 

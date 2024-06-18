@@ -15,19 +15,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
-public:
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void PreCaptureDiffuse();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void PostCaptureDiffuse();
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void PreCaptureAlphaMask();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void PostCaptureAlphaMask();
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -49,9 +36,6 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<ACharacter> SpawnedCharacter;
-
-	UPROPERTY()
-	TArray<TObjectPtr<AActor>> AlphaMaskMaterialActors;
 
 	UPROPERTY()
 	TObjectPtr<UPocketCapture> CachedPocketCapture;

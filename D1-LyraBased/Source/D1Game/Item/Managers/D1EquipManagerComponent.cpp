@@ -85,13 +85,13 @@ void FD1EquipEntry::Equip()
 		// Weapon
 		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
 		{
-			// Despawn Previous Weapon
+			// Despawn Previous Real Weapon
 			if (IsValid(SpawnedWeaponActor))
 			{
 				SpawnedWeaponActor->Destroy();
 			}
 
-			// Spawn Current Weapon
+			// Spawn Current Real Weapon
 			const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
 			const FD1WeaponAttachInfo& AttachInfo = WeaponFragment->WeaponAttachInfo;
 			if (AttachInfo.SpawnWeaponClass)
@@ -107,8 +107,11 @@ void FD1EquipEntry::Equip()
 	}
 	else
 	{
-		// Armor
-		if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
+		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
+		{
+			
+		}
+		else if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
 		{
 			// Refresh Real Armor Mesh
 			const UD1ItemFragment_Equippable_Armor* ArmorFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();

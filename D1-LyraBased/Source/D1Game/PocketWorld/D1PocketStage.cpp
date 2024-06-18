@@ -3,9 +3,7 @@
 #include "D1PocketWorldSubsystem.h"
 #include "PocketCapture.h"
 #include "PocketCaptureSubsystem.h"
-#include "Actors/D1ArmorBase.h"
 #include "Camera/CameraComponent.h"
-#include "Components/LightComponent.h"
 #include "GameFramework/Character.h"
 #include "Item/Managers/D1CosmeticManagerComponent.h"
 
@@ -52,40 +50,6 @@ void AD1PocketStage::BeginPlay()
 
 		PocketCapture->SetAlphaMaskedActors(AttachedActors);
 		
-		for (AActor* AttachedActor : AttachedActors)
-		{
-			if (AttachedActor)
-			{
-				if (AttachedActor->IsA(AD1ArmorBase::StaticClass()))
-				{
-					AlphaMaskMaterialActors.Add(AttachedActor);
-				}
-				
-				TArray<UPrimitiveComponent*> PrimitiveComponents;
-				AttachedActor->GetComponents<UPrimitiveComponent>(PrimitiveComponents);
-				
-				for (UPrimitiveComponent* PrimitiveComponent : PrimitiveComponents)
-				{
-					if (PrimitiveComponent)
-					{
-						// PrimitiveComponent->SetLightingChannels(false, true, false);
-					}
-				}
-
-				TArray<ULightComponent*> LightComponents;
-				AttachedActor->GetComponents<ULightComponent>(LightComponents);
-
-				for (ULightComponent* LightComponent : LightComponents)
-				{
-					if (LightComponent)
-					{
-						// LightComponent->SetLightingChannels(false, true, false);
-					}
-				}
-			}
-		}
-		AlphaMaskMaterialActors.Add(SpawnedCharacter);
-		
 		if (UD1PocketWorldSubsystem* PocketWorldSubsystem = GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 		{
 			PocketWorldSubsystem->SetPocketStage(this);
@@ -101,70 +65,4 @@ UD1CosmeticManagerComponent* AD1PocketStage::GetCosmeticManager() const
 		Result = SpawnedCharacter->GetComponentByClass<UD1CosmeticManagerComponent>();
 	}
 	return Result;
-}
-
-void AD1PocketStage::PreCaptureDiffuse_Implementation()
-{
-	
-}
-
-void AD1PocketStage::PostCaptureDiffuse_Implementation()
-{
-	
-}
-
-void AD1PocketStage::PreCaptureAlphaMask_Implementation()
-{
-	CachedMaterials.Empty();
-	
-	for (AActor* AlphaMaskMaterialActor : AlphaMaskMaterialActors)
-	{
-		if (AlphaMaskMaterialActor)
-		{
-			TArray<UPrimitiveComponent*> PrimitiveComponents;
-			AlphaMaskMaterialActor->GetComponents<UPrimitiveComponent>(PrimitiveComponents);
-
-			for (UPrimitiveComponent* PrimitiveComponent : PrimitiveComponents)
-			{
-				if (PrimitiveComponent)
-				{
-					for (int32 i = 0; i < PrimitiveComponent->GetNumMaterials(); i++)
-					{
-						CachedMaterials.Add(PrimitiveComponent->GetMaterial(i));
-						PrimitiveComponent->SetMaterial(i, OverrideMaterial);
-					}
-				}
-			}
-		}
-	}
-
-	int32 A = 10;
-}
-
-void AD1PocketStage::PostCaptureAlphaMask_Implementation()
-{
-	int32 CachedMaterialsIndex = 0;
-	
-	for (AActor* AlphaMaskMaterialActor : AlphaMaskMaterialActors)
-	{
-		if (AlphaMaskMaterialActor)
-		{
-			TArray<UPrimitiveComponent*> PrimitiveComponents;
-			AlphaMaskMaterialActor->GetComponents<UPrimitiveComponent>(PrimitiveComponents);
-
-			for (UPrimitiveComponent* PrimitiveComponent : PrimitiveComponents)
-			{
-				if (PrimitiveComponent)
-				{
-					for (int32 i = 0; i < PrimitiveComponent->GetNumMaterials(); i++)
-					{
-						PrimitiveComponent->SetMaterial(i, CachedMaterials[CachedMaterialsIndex]);
-						CachedMaterialsIndex++;
-					}
-				}
-			}
-		}
-	}
-
-	int32 A = 10;
 }
