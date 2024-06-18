@@ -17,9 +17,15 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	void RefreshAlphaMaskActors();
+	
+public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UPocketCapture* GetPocketCapute() const { return CachedPocketCapture; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ACharacter* GetCharacter() const { return SpawnedCharacter; }
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UD1CosmeticManagerComponent* GetCosmeticManager() const;
 	

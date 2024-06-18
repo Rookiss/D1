@@ -6,6 +6,7 @@
 #include "Net/Serialization/FastArraySerializer.h"
 #include "D1EquipManagerComponent.generated.h"
 
+class AD1CosmeticWeapon;
 class ALyraCharacter;
 class ALyraPlayerController;
 class AD1WeaponBase;
@@ -50,6 +51,9 @@ public:
 	
 	UPROPERTY(NotReplicated)
 	TObjectPtr<AD1WeaponBase> SpawnedWeaponActor;
+
+	UPROPERTY(NotReplicated)
+	TObjectPtr<AD1CosmeticWeapon> SpawnedCosmeticWeapon;
 
 private:
 	UPROPERTY(NotReplicated)

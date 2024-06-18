@@ -45,16 +45,21 @@ void AD1PocketStage::BeginPlay()
 		PocketCapture->SetRenderTargetSize(1024, 2048);
 		PocketCapture->SetCaptureTarget(this);
 
-		TArray<AActor*> AttachedActors;
-		GetAttachedActors(AttachedActors, true, true);
-
-		PocketCapture->SetAlphaMaskedActors(AttachedActors);
+		RefreshAlphaMaskActors();
 		
 		if (UD1PocketWorldSubsystem* PocketWorldSubsystem = GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 		{
 			PocketWorldSubsystem->SetPocketStage(this);
 		}
 	}
+}
+
+void AD1PocketStage::RefreshAlphaMaskActors()
+{
+	TArray<AActor*> AttachedActors;
+	GetAttachedActors(AttachedActors, true, true);
+
+	CachedPocketCapture->SetAlphaMaskedActors(AttachedActors);
 }
 
 UD1CosmeticManagerComponent* AD1PocketStage::GetCosmeticManager() const

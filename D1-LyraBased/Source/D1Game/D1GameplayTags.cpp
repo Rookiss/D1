@@ -85,18 +85,21 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Movement_Mode_Custom,							"Movement.Mode.Custom");
 
 	// Message
-	UE_DEFINE_GAMEPLAY_TAG(Message_Item_HoverWidgetVisibility,		        "Message.Item.HoverWidgetVisibility");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Notification,							"Message.Notification");
 
 	// Attribute
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Health,				        "Attribute.Primary.Health");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MaxHealth, 			        "Attribute.Primary.MaxHealth");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_Stamina,						"Attribute.Primary.Stamina");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MaxStamina,				    "Attribute.Primary.MaxStamina");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MoveSpeed,				        "Attribute.Primary.MoveSpeed");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_MoveSpeedPercent,		        "Attribute.Primary.MoveSpeePercent");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_BaseDamage,					"Attribute.Primary.BaseDamage");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Primary_BaseDefense,			        "Attribute.Primary.BaseDefense");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Health,				                "Attribute.Health");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_MaxHealth, 			                "Attribute.MaxHealth");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_MoveSpeed,				                "Attribute.MoveSpeed");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_MoveSpeedPercent,		                "Attribute.MoveSpeePercent");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_BaseDamage,					        "Attribute.BaseDamage");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Strength,					            "Attribute.Strength");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Vigor,						            "Attribute.Vigor");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Agility,					            "Attribute.Agility");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Dexterity,					            "Attribute.Dexterity");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Will,						            "Attribute.Will");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Knowledge,					            "Attribute.Knowledge");
+	UE_DEFINE_GAMEPLAY_TAG(Attribute_Resourcefulness,			            "Attribute.Resourcefulness");
 
 	// GameplayCue
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Impact_Weapon,						"GameplayCue.Impact.Weapon");
