@@ -5,7 +5,7 @@
 class UPocketLevelInstance;
 class AD1PocketStage;
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FGetPocketStageDelegate, AD1PocketStage*, PocketStage);
+DECLARE_DELEGATE_OneParam(FGetPocketStageDelegate, AD1PocketStage*);
 
 UCLASS()
 class UD1PocketWorldSubsystem : public UWorldSubsystem
@@ -17,10 +17,7 @@ public:
 	UPocketLevelInstance* GetOrCreatePocketLevelFor(ULocalPlayer* LocalPlayer);
 	
 public:
-	UFUNCTION(BlueprintCallable)
-	void GetPocketStage(ULocalPlayer* LocalPlayer, FGetPocketStageDelegate Delegate);
-
-	UFUNCTION(BlueprintCallable)
+	void RegisterAndCallForGetPocketStage(ULocalPlayer* LocalPlayer, FGetPocketStageDelegate Delegate);
 	void SetPocketStage(AD1PocketStage* InPocketStage);
 	
 private:

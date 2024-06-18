@@ -54,11 +54,13 @@ public:
 	void CancelActivationGroupAbilities(ELyraAbilityActivationGroup Group, ULyraGameplayAbility* IgnoreLyraAbility, bool bReplicateCancelAbility);
 
 	// Uses a gameplay effect to add the specified dynamic granted tag.
-	void AddDynamicTagGameplayEffect(const FGameplayTag& Tag);
+	UFUNCTION(BlueprintCallable)
+	void AddDynamicTagGameplayEffect(FGameplayTag Tag);
 
 	// Removes all active instances of the gameplay effect that was used to add the specified dynamic granted tag.
-	void RemoveDynamicTagGameplayEffect(const FGameplayTag& Tag);
-
+	UFUNCTION(BlueprintCallable)
+	void RemoveDynamicTagGameplayEffect(FGameplayTag Tag);
+	
 	/** Gets the ability target data associated with the given ability handle and activation info */
 	void GetAbilityTargetData(const FGameplayAbilitySpecHandle AbilityHandle, FGameplayAbilityActivationInfo ActivationInfo, FGameplayAbilityTargetDataHandle& OutTargetDataHandle);
 

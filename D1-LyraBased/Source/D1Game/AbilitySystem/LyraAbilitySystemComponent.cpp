@@ -538,7 +538,7 @@ void ULyraAbilitySystemComponent::CancelActivationGroupAbilities(ELyraAbilityAct
 	CancelAbilitiesByFunc(ShouldCancelFunc, bReplicateCancelAbility);
 }
 
-void ULyraAbilitySystemComponent::AddDynamicTagGameplayEffect(const FGameplayTag& Tag)
+void ULyraAbilitySystemComponent::AddDynamicTagGameplayEffect(FGameplayTag Tag)
 {
 	const TSubclassOf<UGameplayEffect> DynamicTagGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DynamicTagGameplayEffect);
 	if (!DynamicTagGE)
@@ -561,7 +561,7 @@ void ULyraAbilitySystemComponent::AddDynamicTagGameplayEffect(const FGameplayTag
 	ApplyGameplayEffectSpecToSelf(*Spec);
 }
 
-void ULyraAbilitySystemComponent::RemoveDynamicTagGameplayEffect(const FGameplayTag& Tag)
+void ULyraAbilitySystemComponent::RemoveDynamicTagGameplayEffect(FGameplayTag Tag)
 {
 	const TSubclassOf<UGameplayEffect> DynamicTagGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DynamicTagGameplayEffect);
 	if (!DynamicTagGE)
@@ -584,4 +584,3 @@ void ULyraAbilitySystemComponent::GetAbilityTargetData(const FGameplayAbilitySpe
 		OutTargetDataHandle = ReplicatedData->TargetData;
 	}
 }
-

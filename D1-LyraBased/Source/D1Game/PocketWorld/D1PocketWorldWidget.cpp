@@ -20,10 +20,7 @@ void UD1PocketWorldWidget::NativeConstruct()
 
 	if (UD1PocketWorldSubsystem* PocketWorldSubsystem = GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 	{
-		FGetPocketStageDelegate Delegate;
-		Delegate.BindDynamic(this, &UD1PocketWorldWidget::OnPocketStageReady);
-		
-		PocketWorldSubsystem->GetPocketStage(GetOwningLocalPlayer(), Delegate);
+		PocketWorldSubsystem->RegisterAndCallForGetPocketStage(GetOwningLocalPlayer(), FGetPocketStageDelegate::CreateUObject(this, &UD1PocketWorldWidget::OnPocketStageReady));
 	}
 }
 
@@ -31,11 +28,24 @@ void UD1PocketWorldWidget::NativeTick(const FGeometry& MyGeometry, float InDelta
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	
+	if (CachedPocketStage.IsValid())
+	{
+		UPocketCapture* PocketCapture = CachedPocketStage->GetPocketCapute();
+		
+		CachedPocketStage->PreCaptureDiffuse();
+		PocketCapture->CaptureDiffuse();
+		CachedPocketStage->PostCaptureDiffuse();
+
+		CachedPocketStage->PreCaptureAlphaMask();
+		PocketCapture->CaptureAlphaMask();
+		CachedPocketStage->PostCaptureAlphaMask();
+	}
 }
 
 void UD1PocketWorldWidget::OnPocketStageReady(AD1PocketStage* PocketStage)
 {
+	CachedPocketStage = PocketStage;
+	
 	if (UPocketCapture* PocketCapture = PocketStage->GetPocketCapute())
 	{
 		DiffuseRenderTarget = PocketCapture->GetOrCreateDiffuseRenderTarget();

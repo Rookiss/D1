@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/LightComponent.h"
 #include "GameFramework/Character.h"
+#include "Item/Managers/D1CosmeticManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1PocketStage)
 
@@ -67,7 +68,7 @@ void AD1PocketStage::BeginPlay()
 				{
 					if (PrimitiveComponent)
 					{
-						PrimitiveComponent->SetLightingChannels(false, true, false);
+						// PrimitiveComponent->SetLightingChannels(false, true, false);
 					}
 				}
 
@@ -78,7 +79,7 @@ void AD1PocketStage::BeginPlay()
 				{
 					if (LightComponent)
 					{
-						LightComponent->SetLightingChannels(false, true, false);
+						// LightComponent->SetLightingChannels(false, true, false);
 					}
 				}
 			}
@@ -90,6 +91,16 @@ void AD1PocketStage::BeginPlay()
 			PocketWorldSubsystem->SetPocketStage(this);
 		}
 	}
+}
+
+UD1CosmeticManagerComponent* AD1PocketStage::GetCosmeticManager() const
+{
+	UD1CosmeticManagerComponent* Result = nullptr;
+	if (SpawnedCharacter)
+	{
+		Result = SpawnedCharacter->GetComponentByClass<UD1CosmeticManagerComponent>();
+	}
+	return Result;
 }
 
 void AD1PocketStage::PreCaptureDiffuse_Implementation()
@@ -104,7 +115,7 @@ void AD1PocketStage::PostCaptureDiffuse_Implementation()
 
 void AD1PocketStage::PreCaptureAlphaMask_Implementation()
 {
-	CachedMaterials.Reset();
+	CachedMaterials.Empty();
 	
 	for (AActor* AlphaMaskMaterialActor : AlphaMaskMaterialActors)
 	{
@@ -126,6 +137,8 @@ void AD1PocketStage::PreCaptureAlphaMask_Implementation()
 			}
 		}
 	}
+
+	int32 A = 10;
 }
 
 void AD1PocketStage::PostCaptureAlphaMask_Implementation()
@@ -152,4 +165,6 @@ void AD1PocketStage::PostCaptureAlphaMask_Implementation()
 			}
 		}
 	}
+
+	int32 A = 10;
 }

@@ -534,10 +534,11 @@ bool UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalEquipment(UD1E
 	return IsEmpty(ToItemSlotPos, FromItemSlotCount);
 }
 
-void UD1InventoryManagerComponent::TryAddItem(int32 ItemTemplateID, int32 ItemCount, EItemRarity ItemRarity)
+void UD1InventoryManagerComponent::TryAddItemByRarity(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, EItemRarity ItemRarity)
 {
 	check(GetOwner()->HasAuthority());
-	
+
+	int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
 	TArray<UD1ItemInstance*> AddedItemInstances = InventoryList.TryAddItem(ItemTemplateID, ItemCount, ItemRarity);
 	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication())
 	{
@@ -551,11 +552,11 @@ void UD1InventoryManagerComponent::TryAddItem(int32 ItemTemplateID, int32 ItemCo
 	}
 }
 
-void UD1InventoryManagerComponent::TryAddItem(int32 ItemTemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities)
+void UD1InventoryManagerComponent::TryAddItemByProbatility(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities)
 {
 	check(GetOwner()->HasAuthority());
 
-	TryAddItem(ItemTemplateID, ItemCount, UD1ItemInstance::DetermineItemRarity(ItemProbabilities));
+	TryAddItemByRarity(ItemTemplateClass, ItemCount, UD1ItemInstance::DetermineItemRarity(ItemProbabilities));
 }
 
 void UD1InventoryManagerComponent::TryRemoveItem(int32 ItemTemplateID, int32 ItemCount)

@@ -27,8 +27,14 @@ protected:
 
 private:
 	UPROPERTY()
+	TWeakObjectPtr<AD1PocketStage> CachedPocketStage;
+	
+	UPROPERTY()
 	TObjectPtr<UTextureRenderTarget2D> DiffuseRenderTarget;
 
 	UPROPERTY()
 	TObjectPtr<UTextureRenderTarget2D> AlphaRenderTarget;
+
+private:
+	FDelegateHandle DelegateHandle;
 };

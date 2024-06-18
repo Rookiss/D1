@@ -15,6 +15,8 @@
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Character/LyraCharacter.h"
 #include "Player/LyraPlayerController.h"
+#include "PocketWorld/D1PocketStage.h"
+#include "PocketWorld/D1PocketWorldSubsystem.h"
 #include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
 
@@ -108,7 +110,7 @@ void FD1EquipEntry::Equip()
 		// Armor
 		if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
 		{
-			// Refresh Armor Mesh
+			// Refresh Real Armor Mesh
 			const UD1ItemFragment_Equippable_Armor* ArmorFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
 			check(ArmorFragment);
 
@@ -117,11 +119,28 @@ void FD1EquipEntry::Equip()
 		
 			CharacterCosmetics->SetArmorMesh(ArmorFragment->ArmorType, ArmorFragment->ArmorMesh);
 
-			// Refresh Armor Mesh
-			// if (UD1PocketWorldSubsystem* UIPocketWorldSubsystem = UGameInstance::GetSubsystem<UD1PocketWorldSubsystem>())
-			// {
-			// 	UIPocketWorldSubsystem->CachedPocketWorldStage->RefreshArmorMesh(ArmorFragment->ArmorType, ArmorFragment->ArmorMesh);
-			// }
+			// Refresh Pocket Armor Mesh
+			if (Character->IsLocallyControlled())
+			{
+				if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
+				{
+					if (APlayerController* PC = Character->GetLyraPlayerController())
+					{
+						PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
+							FGetPocketStageDelegate::CreateLambda([ArmorFragment](AD1PocketStage* PocketStage)
+							{
+								if (IsValid(PocketStage))
+								{
+									if (UD1CosmeticManagerComponent* CosmeticManager = PocketStage->GetCosmeticManager())
+									{
+										CosmeticManager->SetArmorMesh(ArmorFragment->ArmorType, ArmorFragment->ArmorMesh);
+									}
+								}
+							})
+						);
+					}
+				}
+			}
 		}
 	}
 
@@ -170,20 +189,45 @@ void FD1EquipEntry::Unequip()
 			}
 		}
 	}
-	
-	// Refresh Armor Mesh
-	if (UD1EquipmentManagerComponent::IsArmorSlot(EquipmentSlotType))
- 	{
-		ALyraCharacter* Character = EquipManager->GetCharacter();
-		check(Character);
+	else
+	{
+		if (UD1EquipmentManagerComponent::IsArmorSlot(EquipmentSlotType))
+		{
+			// Refresh Real Armor Mesh
+			ALyraCharacter* Character = EquipManager->GetCharacter();
+			check(Character);
  
- 		EArmorType ArmorType = EquipManager->ConvertToArmorType(EquipmentSlotType);
+			EArmorType ArmorType = EquipManager->ConvertToArmorType(EquipmentSlotType);
+		
+			UD1CosmeticManagerComponent* CharacterCosmetics = Character->FindComponentByClass<UD1CosmeticManagerComponent>();
+			check(CharacterCosmetics);
 
-		UD1CosmeticManagerComponent* CharacterCosmetics = Character->FindComponentByClass<UD1CosmeticManagerComponent>();
-		check(CharacterCosmetics);
+			CharacterCosmetics->SetArmorMesh(ArmorType, nullptr);
 
-		CharacterCosmetics->SetArmorMesh(ArmorType, nullptr);
- 	}
+			// Refresh Pocket Armor Mesh
+			if (Character->IsLocallyControlled())
+			{
+				if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
+				{
+					if (APlayerController* PC = Character->GetLyraPlayerController())
+					{
+						PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
+							FGetPocketStageDelegate::CreateLambda([ArmorType](AD1PocketStage* PocketStage)
+							{
+								if (IsValid(PocketStage))
+								{
+									if (UD1CosmeticManagerComponent* CosmeticManager = PocketStage->GetCosmeticManager())
+									{
+										CosmeticManager->SetArmorMesh(ArmorType, nullptr);
+									}
+								}
+							})
+						);
+					}
+				}
+			}
+		}
+	}
  }
 
 bool FD1EquipList::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)

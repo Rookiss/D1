@@ -114,8 +114,13 @@ public:
 	bool CanMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const;
 
 public:
-	void TryAddItem(int32 ItemTemplateID, int32 ItemCount, EItemRarity ItemRarity);
-	void TryAddItem(int32 ItemTemplateID, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities);
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void TryAddItemByRarity(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, EItemRarity ItemRarity);
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void TryAddItemByProbatility(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities);
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void TryRemoveItem(int32 ItemTemplateID, int32 ItemCount);
 
 private:

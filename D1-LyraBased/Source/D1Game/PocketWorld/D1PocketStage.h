@@ -32,6 +32,9 @@ public:
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UPocketCapture* GetPocketCapute() const { return CachedPocketCapture; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UD1CosmeticManagerComponent* GetCosmeticManager() const;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly)

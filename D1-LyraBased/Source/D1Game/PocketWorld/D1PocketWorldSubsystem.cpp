@@ -18,7 +18,7 @@ UPocketLevelInstance* UD1PocketWorldSubsystem::GetOrCreatePocketLevelFor(ULocalP
 	return PocketLevelSubsystem->GetOrCreatePocketLevelFor(LocalPlayer, PocketLevel, PocketLevelLocation);
 }
 
-void UD1PocketWorldSubsystem::GetPocketStage(ULocalPlayer* LocalPlayer, FGetPocketStageDelegate Delegate)
+void UD1PocketWorldSubsystem::RegisterAndCallForGetPocketStage(ULocalPlayer* LocalPlayer, FGetPocketStageDelegate Delegate)
 {
 	if (Delegate.IsBound() == false)
 		return;

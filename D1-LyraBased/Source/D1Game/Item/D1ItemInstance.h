@@ -4,7 +4,7 @@
 #include "System/GameplayTagStack.h"
 #include "D1ItemInstance.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FD1ItemRarityProbability
 {
 	GENERATED_BODY()
