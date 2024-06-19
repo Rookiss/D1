@@ -56,9 +56,9 @@ void UD1ItemInstance::AddStatTagStack(FGameplayTag StatTag, int32 StackCount)
 	StatContainer.AddStack(StatTag, StackCount);
 }
 
-void UD1ItemInstance::RemoveStatTagStack(FGameplayTag StatTag, int32 StackCount)
+void UD1ItemInstance::RemoveStatTagStack(FGameplayTag StatTag)
 {
-	StatContainer.RemoveStack(StatTag, StackCount);
+	StatContainer.RemoveStack(StatTag);
 }
 
 EItemRarity UD1ItemInstance::DetermineItemRarity(const TArray<FD1ItemRarityProbability>& ItemProbabilities)

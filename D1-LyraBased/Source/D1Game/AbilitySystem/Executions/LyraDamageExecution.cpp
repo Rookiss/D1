@@ -3,7 +3,6 @@
 #include "AbilitySystem/Attributes/LyraHealthSet.h"
 #include "AbilitySystem/Attributes/LyraCombatSet.h"
 #include "AbilitySystem/LyraGameplayEffectContext.h"
-#include "Engine/World.h"
 #include "Teams/LyraTeamSubsystem.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraDamageExecution)
@@ -114,7 +113,7 @@ void ULyraDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	// DistanceAttenuation = FMath::Max(DistanceAttenuation, 0.0f);
 
 	// Clamping is done when damage is converted to -health
-	const float DamageDone = FMath::Max((BaseDamage / 10.f + Strength) * DistanceAttenuation * PhysicalMaterialAttenuation * DamageInteractionAllowedMultiplier, 0.0f);
+	const float DamageDone = FMath::Max((BaseDamage / 2.f + Strength) * DistanceAttenuation * PhysicalMaterialAttenuation * DamageInteractionAllowedMultiplier, 0.0f);
 
 	if (DamageDone > 0.0f)
 	{

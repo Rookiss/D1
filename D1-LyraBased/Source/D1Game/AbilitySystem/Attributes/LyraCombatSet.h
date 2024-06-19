@@ -31,20 +31,13 @@ private:
 	FGameplayAttributeData BaseHeal;
 	
 public:
-	ATTRIBUTE_ACCESSORS(ThisClass, PhysicalWeaponDamage);
 	ATTRIBUTE_ACCESSORS(ThisClass, MoveSpeed);
 
 protected:
 	UFUNCTION()
-	void OnRep_PhysicalWeaponDamage(const FGameplayAttributeData& OldValue);
-	
-	UFUNCTION()
 	void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
 
 private:
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_PhysicalWeaponDamage, meta=(AllowPrivateAccess="true"))
-	FGameplayAttributeData PhysicalWeaponDamage;
-
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MoveSpeed, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MoveSpeed;
 	

@@ -1,6 +1,5 @@
 ﻿#include "D1EquipManagerComponent.h"
 
-#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemGlobals.h"
 #include "D1CosmeticManagerComponent.h"
 #include "D1EquipmentManagerComponent.h"
@@ -20,6 +19,7 @@
 #include "Player/LyraPlayerController.h"
 #include "PocketWorld/D1PocketStage.h"
 #include "PocketWorld/D1PocketWorldSubsystem.h"
+#include "System/D1GameplayTagStack.h"
 #include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
 
@@ -75,7 +75,7 @@ void FD1EquipEntry::Equip()
 				SpecData->SetSetByCallerMagnitude(ModifierInfo.ModifierMagnitude.GetSetByCallerFloat().DataTag, 0);
 			}
 			
-			for (const FGameplayTagStack& Stack : ItemInstance->GetStatContainer().GetStacks())
+			for (const FD1GameplayTagStack& Stack : ItemInstance->GetStatContainer().GetStacks())
 			{
 				SpecData->SetSetByCallerMagnitude(Stack.GetStackTag(), Stack.GetStackCount());
 			}

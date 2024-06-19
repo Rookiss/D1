@@ -43,8 +43,8 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 	{
 		FString AttributeString;
 		
-		const FGameplayTagStackContainer& StackContainer = ItemInstance->GetStatContainer();
-		for (const FGameplayTagStack& Stack : StackContainer.GetStacks())
+		const FD1GameplayTagStackContainer& StackContainer = ItemInstance->GetStatContainer();
+		for (const FD1GameplayTagStack& Stack : StackContainer.GetStacks())
 		{
 			FString Left, Right;
 			Stack.GetStackTag().ToString().Split(TEXT("."), &Left, &Right, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
@@ -61,14 +61,14 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
 		{
 			const UD1ItemFragment_Equippable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(EquippableFragment);
-			Text_ItemType->SetText(FText::FromString(TEXT("Weapon")));
+			Text_ItemType->SetText(FText::FromString(TEXT("무기")));
 			
 			FString WeaponTypeString;
 			switch (WeaponFragment->WeaponType)
 			{
-			case EWeaponType::Sword:		    WeaponTypeString = TEXT("검");		break;
-			case EWeaponType::Shield:		    WeaponTypeString = TEXT("방패");	break;
-			case EWeaponType::Bow:				WeaponTypeString = TEXT("활");	    break;
+			case EWeaponType::Sword:		    WeaponTypeString = TEXT("검");			break;
+			case EWeaponType::Shield:		    WeaponTypeString = TEXT("방패");		break;
+			case EWeaponType::Bow:				WeaponTypeString = TEXT("활");			break;
 			}
 			Text_WeaponType->SetText(FText::FromString(WeaponTypeString));
 			HorizontalBox_WeaponType->SetVisibility(ESlateVisibility::Visible);
@@ -86,16 +86,16 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 		else if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
 		{
 			const UD1ItemFragment_Equippable_Armor* ArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(EquippableFragment);
-			Text_ItemType->SetText(FText::FromString(TEXT("Armor")));
+			Text_ItemType->SetText(FText::FromString(TEXT("방어구")));
 	
 			FString ArmorTypeString;
 			switch (ArmorFragment->ArmorType)
 			{
-			case EArmorType::Helmet:	        ArmorTypeString = TEXT("헬맷");	break;
-			case EArmorType::Chest:		        ArmorTypeString = TEXT("가슴");	break;
-			case EArmorType::Legs:		        ArmorTypeString = TEXT("다리");	break;
-			case EArmorType::Hands:		        ArmorTypeString = TEXT("장갑");	break;
-			case EArmorType::Foot:		        ArmorTypeString = TEXT("신발");	break;
+			case EArmorType::Helmet:	        ArmorTypeString = TEXT("헬맷");	        break;
+			case EArmorType::Chest:		        ArmorTypeString = TEXT("가슴");	        break;
+			case EArmorType::Legs:		        ArmorTypeString = TEXT("다리");	        break;
+			case EArmorType::Hands:		        ArmorTypeString = TEXT("장갑");	        break;
+			case EArmorType::Foot:		        ArmorTypeString = TEXT("신발");	        break;
 			}
 			Text_ArmorType->SetText(FText::FromString(ArmorTypeString));
 			HorizontalBox_ArmorType->SetVisibility(ESlateVisibility::Visible);
@@ -103,7 +103,7 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 	}
 	else if (const UD1ItemFragment_Consumable* ConsumableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Consumable>())
 	{
-		Text_ItemType->SetText(FText::FromString(TEXT("Comsumable")));
+		Text_ItemType->SetText(FText::FromString(TEXT("소모품")));
 		
 		Text_Description->SetText(ConsumableFragment->Description);
 		Text_Description->SetVisibility(ESlateVisibility::Visible);

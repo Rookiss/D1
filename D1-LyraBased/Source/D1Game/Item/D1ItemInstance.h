@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "D1Define.h"
-#include "System/GameplayTagStack.h"
+#include "System/D1GameplayTagStack.h"
 #include "D1ItemInstance.generated.h"
 
 USTRUCT(BlueprintType)
@@ -37,7 +37,7 @@ public:
 	void AddStatTagStack(FGameplayTag StatTag, int32 StackCount);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void RemoveStatTagStack(FGameplayTag StatTag, int32 StackCount);
+	void RemoveStatTagStack(FGameplayTag StatTag);
 
 public:
 	static EItemRarity DetermineItemRarity(const TArray<FD1ItemRarityProbability>& ItemProbabilities);
@@ -53,7 +53,7 @@ public:
 	int32 GetStatCountByTag(FGameplayTag StatTag) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	const FGameplayTagStackContainer& GetStatContainer() const { return StatContainer; }
+	const FD1GameplayTagStackContainer& GetStatContainer() const { return StatContainer; }
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure="false", meta=(DeterminesOutputType="FragmentClass"))
@@ -82,5 +82,5 @@ private:
 	EItemRarity ItemRarity = EItemRarity::Junk;
 	
 	UPROPERTY(Replicated)
-	FGameplayTagStackContainer StatContainer;
+	FD1GameplayTagStackContainer StatContainer;
 };

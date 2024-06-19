@@ -152,7 +152,7 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 					FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
 					const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
 					FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
-					EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_IncomingDamage, GetWeaponStatValue(D1GameplayTags::SetByCaller_IncomingDamage));
+					EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_PhysicalWeaponDamage, GetWeaponStatValue(D1GameplayTags::SetByCaller_PhysicalWeaponDamage));
 					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
 				}
 			}

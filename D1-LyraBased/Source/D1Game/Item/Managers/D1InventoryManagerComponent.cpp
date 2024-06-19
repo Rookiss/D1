@@ -1,10 +1,8 @@
 ﻿#include "D1InventoryManagerComponent.h"
 
 #include "D1EquipmentManagerComponent.h"
-#include "D1GameplayTags.h"
 #include "Data/D1ItemData.h"
 #include "Engine/ActorChannel.h"
-#include "GameFramework/GameplayMessageSubsystem.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Stackable.h"
 #include "Net/UnrealNetwork.h"
