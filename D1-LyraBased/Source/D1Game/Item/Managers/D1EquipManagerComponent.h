@@ -164,6 +164,9 @@ public:
 	AD1WeaponBase* GetEquippedWeapon(EWeaponHandType WeaponHandType) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
+	const UD1ItemInstance* GetEquippedWeaponItemInstance(EWeaponHandType WeaponHandType) const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AD1WeaponBase* GetFirstEquippedWeapon() const;
 	
 private:

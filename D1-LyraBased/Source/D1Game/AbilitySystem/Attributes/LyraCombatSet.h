@@ -2,7 +2,6 @@
 
 #include "AbilitySystemComponent.h"
 #include "LyraAttributeSet.h"
-
 #include "LyraCombatSet.generated.h"
 
 UCLASS(BlueprintType)
@@ -14,22 +13,40 @@ public:
 	ULyraCombatSet();
 
 public:
-	ATTRIBUTE_ACCESSORS(ULyraCombatSet, BaseDamage);
-	ATTRIBUTE_ACCESSORS(ULyraCombatSet, BaseHeal);
-	
+	ATTRIBUTE_ACCESSORS(ThisClass, BaseDamage);
+	ATTRIBUTE_ACCESSORS(ThisClass, BaseHeal);
+
 protected:
 	UFUNCTION()
 	void OnRep_BaseDamage(const FGameplayAttributeData& OldValue);
-
+	
 	UFUNCTION()
 	void OnRep_BaseHeal(const FGameplayAttributeData& OldValue);
 
 private:
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_BaseDamage, Category = "Lyra|Combat", Meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_BaseDamage, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData BaseDamage;
-	
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_BaseHeal, Category = "Lyra|Combat", Meta = (AllowPrivateAccess = true))
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_BaseHeal, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData BaseHeal;
+	
+public:
+	ATTRIBUTE_ACCESSORS(ThisClass, PhysicalWeaponDamage);
+	ATTRIBUTE_ACCESSORS(ThisClass, MoveSpeed);
+
+protected:
+	UFUNCTION()
+	void OnRep_PhysicalWeaponDamage(const FGameplayAttributeData& OldValue);
+	
+	UFUNCTION()
+	void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
+
+private:
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_PhysicalWeaponDamage, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData PhysicalWeaponDamage;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MoveSpeed, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData MoveSpeed;
 	
 public:
 	ATTRIBUTE_ACCESSORS(ThisClass, Strength);

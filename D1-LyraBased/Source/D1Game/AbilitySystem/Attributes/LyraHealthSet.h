@@ -37,8 +37,8 @@ public:
 
 	ATTRIBUTE_ACCESSORS(ULyraHealthSet, Health);
 	ATTRIBUTE_ACCESSORS(ULyraHealthSet, MaxHealth);
-	ATTRIBUTE_ACCESSORS(ULyraHealthSet, Healing);
-	ATTRIBUTE_ACCESSORS(ULyraHealthSet, Damage);
+	ATTRIBUTE_ACCESSORS(ULyraHealthSet, IncomingHeal);
+	ATTRIBUTE_ACCESSORS(ULyraHealthSet, IncomingDamage);
 
 	// Delegate when health changes due to damage/healing, some information may be missing on the client
 	mutable FLyraAttributeEvent OnHealthChanged;
@@ -89,9 +89,9 @@ private:
 
 	// Incoming healing. This is mapped directly to +Health
 	UPROPERTY(BlueprintReadOnly, Category="Lyra|Health", Meta=(AllowPrivateAccess=true))
-	FGameplayAttributeData Healing;
+	FGameplayAttributeData IncomingHeal;
 
 	// Incoming damage. This is mapped directly to -Health
 	UPROPERTY(BlueprintReadOnly, Category="Lyra|Health", Meta=(HideFromModifiers, AllowPrivateAccess=true))
-	FGameplayAttributeData Damage;
+	FGameplayAttributeData IncomingDamage;
 };

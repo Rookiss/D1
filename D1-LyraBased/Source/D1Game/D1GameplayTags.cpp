@@ -68,10 +68,6 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ChangeEquip,						"GameplayEvent.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ArrowVisibility,					"GameplayEvent.ArrowVisibility");
 	
-	// SetByCaller
-	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Damage,								"SetByCaller.Damage");
-	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Heal,								"SetByCaller.Heal");
-
 	// Cheat
 	UE_DEFINE_GAMEPLAY_TAG(Cheat_GodMode,									"Cheat.GodMode");
 	UE_DEFINE_GAMEPLAY_TAG(Cheat_UnlimitedHealth,							"Cheat.UnlimitedHealth");
@@ -87,20 +83,19 @@ namespace D1GameplayTags
 	// Message
 	UE_DEFINE_GAMEPLAY_TAG(Message_Notification,							"Message.Notification");
 
-	// Attribute
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Health,				                "Attribute.Health");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_MaxHealth, 			                "Attribute.MaxHealth");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_MoveSpeed,				                "Attribute.MoveSpeed");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_MoveSpeedPercent,		                "Attribute.MoveSpeePercent");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_BaseDamage,					        "Attribute.BaseDamage");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Strength,					            "Attribute.Strength");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Vigor,						            "Attribute.Vigor");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Agility,					            "Attribute.Agility");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Dexterity,					            "Attribute.Dexterity");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Will,						            "Attribute.Will");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Knowledge,					            "Attribute.Knowledge");
-	UE_DEFINE_GAMEPLAY_TAG(Attribute_Resourcefulness,			            "Attribute.Resourcefulness");
-
+	// SetByCaller
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingHeal,						"SetByCaller.IncomingHeal");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingDamage,						"SetByCaller.IncomingDamage");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_PhysicalWeaponDamage,				"SetByCaller.PhysicalWeaponDamage");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_MoveSpeed,						    "SetByCaller.MoveSpeed");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Strength,						    "SetByCaller.Strength");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Vigor,								"SetByCaller.Vigor");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Agility,								"SetByCaller.Agility");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Dexterity,							"SetByCaller.Dexterity");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Will,								"SetByCaller.Will");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Knowledge,							"SetByCaller.Knowledge");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Resourcefulness,						"SetByCaller.Resourcefulness");
+	
 	// GameplayCue
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Impact_Weapon,						"GameplayCue.Impact.Weapon");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_HitReact,							"GameplayCue.HitReact");

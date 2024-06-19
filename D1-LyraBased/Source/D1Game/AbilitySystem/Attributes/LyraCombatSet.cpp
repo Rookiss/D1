@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "LyraCombatSet.h"
 
 #include "AbilitySystem/Attributes/LyraAttributeSet.h"
@@ -7,12 +5,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraCombatSet)
 
-class FLifetimeProperty;
-
-
 ULyraCombatSet::ULyraCombatSet()
-	: BaseDamage(0.0f)
-	, BaseHeal(0.0f)
 {
 	
 }
@@ -21,59 +14,72 @@ void ULyraCombatSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION_NOTIFY(ULyraCombatSet, BaseDamage, COND_OwnerOnly, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ULyraCombatSet, BaseHeal, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BaseDamage, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BaseHeal, COND_OwnerOnly, REPNOTIFY_Always);
 	
-	DOREPLIFETIME_CONDITION_NOTIFY(ULyraCombatSet, Strength, COND_OwnerOnly, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ULyraCombatSet, Vigor, COND_OwnerOnly, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ULyraCombatSet, Agility, COND_OwnerOnly, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ULyraCombatSet, Dexterity, COND_OwnerOnly, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ULyraCombatSet, Will, COND_OwnerOnly, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ULyraCombatSet, Knowledge, COND_OwnerOnly, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ULyraCombatSet, Resourcefulness, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, PhysicalWeaponDamage, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeed, COND_OwnerOnly, REPNOTIFY_Always);
+	
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Strength, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Vigor, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Agility, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Dexterity, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Will, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Knowledge, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Resourcefulness, COND_OwnerOnly, REPNOTIFY_Always);
 }
 
 void ULyraCombatSet::OnRep_BaseDamage(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ULyraCombatSet, BaseDamage, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseDamage, OldValue);
 }
 
 void ULyraCombatSet::OnRep_BaseHeal(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ULyraCombatSet, BaseHeal, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseHeal, OldValue);
+}
+
+void ULyraCombatSet::OnRep_PhysicalWeaponDamage(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, PhysicalWeaponDamage, OldValue);
+}
+
+void ULyraCombatSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MoveSpeed, OldValue);
 }
 
 void ULyraCombatSet::OnRep_Strength(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ULyraCombatSet, Strength, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Strength, OldValue);
 }
 
 void ULyraCombatSet::OnRep_Vigor(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ULyraCombatSet, Vigor, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Vigor, OldValue);
 }
 
 void ULyraCombatSet::OnRep_Agility(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ULyraCombatSet, Agility, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Agility, OldValue);
 }
 
 void ULyraCombatSet::OnRep_Dexterity(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ULyraCombatSet, Dexterity, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Dexterity, OldValue);
 }
 
 void ULyraCombatSet::OnRep_Will(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ULyraCombatSet, Will, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Will, OldValue);
 }
 
 void ULyraCombatSet::OnRep_Knowledge(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ULyraCombatSet, Knowledge, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Knowledge, OldValue);
 }
 
 void ULyraCombatSet::OnRep_Resourcefulness(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ULyraCombatSet, Resourcefulness, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Resourcefulness, OldValue);
 }

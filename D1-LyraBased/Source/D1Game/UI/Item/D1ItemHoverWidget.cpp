@@ -62,13 +62,13 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 		{
 			const UD1ItemFragment_Equippable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(EquippableFragment);
 			Text_ItemType->SetText(FText::FromString(TEXT("Weapon")));
-	
+			
 			FString WeaponTypeString;
 			switch (WeaponFragment->WeaponType)
 			{
-			case EWeaponType::Sword:		    WeaponTypeString = TEXT("Sword");		    break;
-			case EWeaponType::Shield:		    WeaponTypeString = TEXT("Shield");		    break;
-			case EWeaponType::Bow:				WeaponTypeString = TEXT("Bow");			    break;
+			case EWeaponType::Sword:		    WeaponTypeString = TEXT("검");		break;
+			case EWeaponType::Shield:		    WeaponTypeString = TEXT("방패");	break;
+			case EWeaponType::Bow:				WeaponTypeString = TEXT("활");	    break;
 			}
 			Text_WeaponType->SetText(FText::FromString(WeaponTypeString));
 			HorizontalBox_WeaponType->SetVisibility(ESlateVisibility::Visible);
@@ -76,9 +76,9 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 			FString WeaponHandTypeString;
 			switch (WeaponFragment->WeaponHandType)
 			{
-			case EWeaponHandType::LeftHand:		WeaponHandTypeString = TEXT("Left Hand");	break;
-			case EWeaponHandType::RightHand:	WeaponHandTypeString = TEXT("Right Hand");	break;
-			case EWeaponHandType::TwoHand:		WeaponHandTypeString = TEXT("Two Hand");	break;
+			case EWeaponHandType::LeftHand:		WeaponHandTypeString = TEXT("왼손");	break;
+			case EWeaponHandType::RightHand:	WeaponHandTypeString = TEXT("오른손");	break;
+			case EWeaponHandType::TwoHand:		WeaponHandTypeString = TEXT("양손");	break;
 			}
 			Text_WeaponHandType->SetText(FText::FromString(WeaponHandTypeString));
 			HorizontalBox_WeaponHandType->SetVisibility(ESlateVisibility::Visible);
@@ -91,12 +91,12 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 			FString ArmorTypeString;
 			switch (ArmorFragment->ArmorType)
 			{
-			case EArmorType::Helmet:	        ArmorTypeString = TEXT("Head");				break;
-			case EArmorType::Chest:		        ArmorTypeString = TEXT("Chest");            break;
-			case EArmorType::Legs:		        ArmorTypeString = TEXT("Legs");				break;
-			case EArmorType::Hands:		        ArmorTypeString = TEXT("Hand");	            break;
-			case EArmorType::Foot:		        ArmorTypeString = TEXT("Foot");				break;
-			}       
+			case EArmorType::Helmet:	        ArmorTypeString = TEXT("헬맷");	break;
+			case EArmorType::Chest:		        ArmorTypeString = TEXT("가슴");	break;
+			case EArmorType::Legs:		        ArmorTypeString = TEXT("다리");	break;
+			case EArmorType::Hands:		        ArmorTypeString = TEXT("장갑");	break;
+			case EArmorType::Foot:		        ArmorTypeString = TEXT("신발");	break;
+			}
 			Text_ArmorType->SetText(FText::FromString(ArmorTypeString));
 			HorizontalBox_ArmorType->SetVisibility(ESlateVisibility::Visible);
 		}

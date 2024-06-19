@@ -7,6 +7,9 @@
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
+#include "Item/D1ItemInstance.h"
+#include "Item/Managers/D1EquipManagerComponent.h"
+#include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_MeleeCombo)
@@ -147,7 +150,9 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 				if (HasAuthority(&CurrentActivationInfo))
 				{
 					FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
-					FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGameplayEffectClass);
+					const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
+					FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
+					EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_IncomingDamage, GetWeaponStatValue(D1GameplayTags::SetByCaller_IncomingDamage));
 					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
 				}
 			}

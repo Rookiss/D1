@@ -34,9 +34,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	bool bShowDebug = false;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UGameplayEffect> DamageGameplayEffectClass;
 	
 protected:
 	UPROPERTY(BlueprintReadWrite)

@@ -74,7 +74,7 @@ bool ULyraHealthSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData &Da
 	}
 
 	// Handle modifying incoming normal damage
-	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
 		if (Data.EvaluatedData.Magnitude > 0.0f)
 		{
@@ -126,7 +126,7 @@ void ULyraHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackD
 	AActor* Instigator = EffectContext.GetOriginalInstigator();
 	AActor* Causer = EffectContext.GetEffectCauser();
 
-	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
 		// Send a standardized verb message that other systems can observe
 		if (Data.EvaluatedData.Magnitude > 0.0f)
@@ -146,14 +146,14 @@ void ULyraHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackD
 		}
 
 		// Convert into -Health and then clamp
-		SetHealth(FMath::Clamp(GetHealth() - GetDamage(), MinimumHealth, GetMaxHealth()));
-		SetDamage(0.0f);
+		SetHealth(FMath::Clamp(GetHealth() - GetIncomingDamage(), MinimumHealth, GetMaxHealth()));
+		SetIncomingDamage(0.0f);
 	}
-	else if (Data.EvaluatedData.Attribute == GetHealingAttribute())
+	else if (Data.EvaluatedData.Attribute == GetIncomingHealAttribute())
 	{
 		// Convert into +Health and then clamo
-		SetHealth(FMath::Clamp(GetHealth() + GetHealing(), MinimumHealth, GetMaxHealth()));
-		SetHealing(0.0f);
+		SetHealth(FMath::Clamp(GetHealth() + GetIncomingHeal(), MinimumHealth, GetMaxHealth()));
+		SetIncomingHeal(0.0f);
 	}
 	else if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{

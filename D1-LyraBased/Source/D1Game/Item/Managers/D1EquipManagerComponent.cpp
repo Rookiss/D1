@@ -13,6 +13,7 @@
 #include "Actors/D1WeaponBase.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
+#include "AbilitySystem/Attributes/LyraCombatSet.h"
 #include "Actors/D1CosmeticWeapon.h"
 #include "Character/LyraCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -67,20 +68,18 @@ void FD1EquipEntry::Equip()
 		
 			const FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
 			const FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(AttributeModifierGE, 1.f, ContextHandle);
-
-			TArray<FGameplayAttribute> OutAttributes;
-			ASC->GetAllAttributes(OutAttributes);
-
-			for (const FGameplayAttribute& Attribute : OutAttributes)
+			const TSharedPtr<FGameplayEffectSpec>& SpecData = SpecHandle.Data;
+			
+			for (const FGameplayModifierInfo& ModifierInfo : SpecData->Def->Modifiers)
 			{
-				SpecHandle.Data->SetSetByCallerMagnitude(FName(*Attribute.GetName()), 0);
+				SpecData->SetSetByCallerMagnitude(ModifierInfo.ModifierMagnitude.GetSetByCallerFloat().DataTag, 0);
 			}
-
+			
 			for (const FGameplayTagStack& Stack : ItemInstance->GetStatContainer().GetStacks())
 			{
-				SpecHandle.Data->SetSetByCallerMagnitude(Stack.GetStackTag(), Stack.GetStackCount());
+				SpecData->SetSetByCallerMagnitude(Stack.GetStackTag(), Stack.GetStackCount());
 			}
-	
+			
 			BaseStatHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 		}
 		
@@ -542,6 +541,16 @@ AD1WeaponBase* UD1EquipManagerComponent::GetEquippedWeapon(EWeaponHandType Weapo
 	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
 	int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType, CurrentWeaponEquipState);
 	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].SpawnedWeaponActor : nullptr;
+}
+
+const UD1ItemInstance* UD1EquipManagerComponent::GetEquippedWeaponItemInstance(EWeaponHandType WeaponHandType) const
+{
+	if (WeaponHandType == EWeaponHandType::Count)
+		return nullptr;
+
+	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType, CurrentWeaponEquipState);
+	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].GetItemInstance() : nullptr;
 }
 
 AD1WeaponBase* UD1EquipManagerComponent::GetFirstEquippedWeapon() const

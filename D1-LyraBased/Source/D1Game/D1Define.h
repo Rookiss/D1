@@ -111,12 +111,11 @@ enum class EItemRarity : uint8
 {
 	Junk,
 	Poor,
-	Common,
-	Uncommon,
+	Normal,
+	Special,
 	Rare,
 	Epic,
 	Legendary,
-	Unique,
 
 	Count	UMETA(Hidden)
 };

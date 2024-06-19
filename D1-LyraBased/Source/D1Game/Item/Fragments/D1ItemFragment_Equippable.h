@@ -33,6 +33,9 @@ public:
 	FRarityStatRangeSet();
 	
 public:
+	UPROPERTY(EditDefaultsOnly, meta=(Categories="SetByCaller"))
+	FGameplayTag StatTag;
+	
 	UPROPERTY(EditDefaultsOnly, EditFixedSize)
 	TArray<FRarityStatRange> RarityStatRanges;
 };
@@ -55,5 +58,5 @@ public:
 	TObjectPtr<const ULyraAbilitySet> BaseAbilitySet;
 	
 	UPROPERTY(EditDefaultsOnly, meta=(ForceInlineRow))
-	TMap<FGameplayTag, FRarityStatRangeSet> BaseStats;
+	TArray<FRarityStatRangeSet> RarityStatRangeSets;
 };

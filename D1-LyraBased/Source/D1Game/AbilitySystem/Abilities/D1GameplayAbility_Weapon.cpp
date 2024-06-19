@@ -1,6 +1,8 @@
 ﻿#include "D1GameplayAbility_Weapon.h"
 
+#include "D1GameplayTags.h"
 #include "Character/LyraCharacter.h"
+#include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon)
@@ -30,4 +32,17 @@ void UD1GameplayAbility_Weapon::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
+int32 UD1GameplayAbility_Weapon::GetWeaponStatValue(FGameplayTag StatTag) const
+{
+	int32 StatValue = 0;
+	if (UD1EquipManagerComponent* EquipManager = GetLyraCharacterFromActorInfo()->FindComponentByClass<UD1EquipManagerComponent>())
+	{
+		if (const UD1ItemInstance* ItemInstance = EquipManager->GetEquippedWeaponItemInstance(WeaponHandType))
+		{
+			StatValue = ItemInstance->GetStatCountByTag(StatTag);
+		}
+	}
+	return StatValue;
 }

@@ -1,10 +1,8 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "LyraDamageExecution.h"
+
 #include "AbilitySystem/Attributes/LyraHealthSet.h"
 #include "AbilitySystem/Attributes/LyraCombatSet.h"
 #include "AbilitySystem/LyraGameplayEffectContext.h"
-#include "AbilitySystem/LyraAbilitySourceInterface.h"
 #include "Engine/World.h"
 #include "Teams/LyraTeamSubsystem.h"
 
@@ -12,12 +10,16 @@
 
 struct FDamageStatics
 {
-	FGameplayEffectAttributeCaptureDefinition BaseDamageDef;
-
+public:
 	FDamageStatics()
 	{
 		BaseDamageDef = FGameplayEffectAttributeCaptureDefinition(ULyraCombatSet::GetBaseDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		StrengthDef = FGameplayEffectAttributeCaptureDefinition(ULyraCombatSet::GetStrengthAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 	}
+
+public:
+	FGameplayEffectAttributeCaptureDefinition BaseDamageDef;
+	FGameplayEffectAttributeCaptureDefinition StrengthDef;
 };
 
 static FDamageStatics& DamageStatics()
@@ -29,6 +31,7 @@ static FDamageStatics& DamageStatics()
 ULyraDamageExecution::ULyraDamageExecution()
 {
 	RelevantAttributesToCapture.Add(DamageStatics().BaseDamageDef);
+	RelevantAttributesToCapture.Add(DamageStatics().StrengthDef);
 }
 
 void ULyraDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
@@ -48,6 +51,9 @@ void ULyraDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	float BaseDamage = 0.0f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().BaseDamageDef, EvaluateParameters, BaseDamage);
 
+	float Strength = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().StrengthDef, EvaluateParameters, Strength);
+	
 	const AActor* EffectCauser = TypedContext->GetEffectCauser();
 	const FHitResult* HitActorResult = TypedContext->GetHitResult();
 
@@ -56,10 +62,7 @@ void ULyraDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	FVector ImpactNormal = FVector::ZeroVector;
 	FVector StartTrace = FVector::ZeroVector;
 	FVector EndTrace = FVector::ZeroVector;
-
-	// Calculation of hit actor, surface, zone, and distance all rely on whether the calculation has a hit result or not.
-	// Effects just being added directly w/o having been targeted will always come in without a hit result, which must default
-	// to some fallback information.
+	
 	if (HitActorResult)
 	{
 		const FHitResult& CurHitResult = *HitActorResult;
@@ -96,22 +99,6 @@ void ULyraDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	// 	}
 	// }
 
-	// // Determine distance
-	// double Distance = WORLD_MAX;
-	//
-	// if (TypedContext->HasOrigin())
-	// {
-	// 	Distance = FVector::Dist(TypedContext->GetOrigin(), ImpactLocation);
-	// }
-	// else if (EffectCauser)
-	// {
-	// 	Distance = FVector::Dist(EffectCauser->GetActorLocation(), ImpactLocation);
-	// }
-	// else
-	// {
-	// 	ensureMsgf(false, TEXT("Damage Calculation cannot deduce a source location for damage coming from %s; Falling back to WORLD_MAX dist!"), *GetPathNameSafe(Spec.Def));
-	// }
-
 	// Apply ability source modifiers
 	float PhysicalMaterialAttenuation = 1.0f;
 	float DistanceAttenuation = 1.0f;
@@ -127,13 +114,11 @@ void ULyraDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	// DistanceAttenuation = FMath::Max(DistanceAttenuation, 0.0f);
 
 	// Clamping is done when damage is converted to -health
-	const float DamageDone = FMath::Max(BaseDamage * DistanceAttenuation * PhysicalMaterialAttenuation * DamageInteractionAllowedMultiplier, 0.0f);
+	const float DamageDone = FMath::Max((BaseDamage / 10.f + Strength) * DistanceAttenuation * PhysicalMaterialAttenuation * DamageInteractionAllowedMultiplier, 0.0f);
 
 	if (DamageDone > 0.0f)
 	{
-		// Apply a damage modifier, this gets turned into - health on the target
-		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(ULyraHealthSet::GetDamageAttribute(), EGameplayModOp::Additive, DamageDone));
+		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(ULyraHealthSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, DamageDone));
 	}
 #endif // #if WITH_SERVER_CODE
 }
-
