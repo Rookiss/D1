@@ -1,10 +1,8 @@
 ﻿#include "D1ItemHoverWidget.h"
 
 #include "D1ItemEntryWidget.h"
-#include "Components/CanvasPanel.h"
-#include "Components/CanvasPanelSlot.h"
 #include "Components/HorizontalBox.h"
-#include "Components/Overlay.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Data/D1ItemData.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
@@ -23,13 +21,22 @@ UD1ItemHoverWidget::UD1ItemHoverWidget(const FObjectInitializer& ObjectInitializ
     
 }
 
-void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
+void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 {
+	if (ItemInstance == nullptr)
+	{
+		SetVisibility(ESlateVisibility::Hidden);
+		return;
+	}
+	
+	SetVisibility(ESlateVisibility::HitTestInvisible);
+	
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
 	const EItemRarity ItemRarity = ItemInstance->GetItemRarity();
 	
 	Text_DisplayName->SetText(ItemTemplate.DisplayName);
-	Text_DisplayName->SetColorAndOpacity(FSlateColor(Item::ItemRarityColors[(int32)ItemRarity]));
+	// Text_DisplayName->SetColorAndOpacity(FSlateColor(Item::ItemRarityColors[(int32)ItemRarity]));
+	Image_DIsplayName_Background->SetColorAndOpacity(Item::ItemRarityColors[(int32)ItemRarity]);
 	
 	Text_AttributeModifiers->SetVisibility(ESlateVisibility::Collapsed);
 	Text_Description->SetVisibility(ESlateVisibility::Collapsed);
@@ -61,14 +68,14 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
 		{
 			const UD1ItemFragment_Equippable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(EquippableFragment);
-			Text_ItemType->SetText(FText::FromString(TEXT("무기")));
+			Text_ItemType->SetText(FText::FromString(TEXT("Weapon")));
 			
 			FString WeaponTypeString;
 			switch (WeaponFragment->WeaponType)
 			{
-			case EWeaponType::Sword:		    WeaponTypeString = TEXT("검");			break;
-			case EWeaponType::Shield:		    WeaponTypeString = TEXT("방패");		break;
-			case EWeaponType::Bow:				WeaponTypeString = TEXT("활");			break;
+			case EWeaponType::Sword:		    WeaponTypeString = TEXT("Sword");			break;
+			case EWeaponType::Shield:		    WeaponTypeString = TEXT("Shield");			break;
+			case EWeaponType::Bow:				WeaponTypeString = TEXT("Bow");				break;
 			}
 			Text_WeaponType->SetText(FText::FromString(WeaponTypeString));
 			HorizontalBox_WeaponType->SetVisibility(ESlateVisibility::Visible);
@@ -76,9 +83,9 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 			FString WeaponHandTypeString;
 			switch (WeaponFragment->WeaponHandType)
 			{
-			case EWeaponHandType::LeftHand:		WeaponHandTypeString = TEXT("왼손");	break;
-			case EWeaponHandType::RightHand:	WeaponHandTypeString = TEXT("오른손");	break;
-			case EWeaponHandType::TwoHand:		WeaponHandTypeString = TEXT("양손");	break;
+			case EWeaponHandType::LeftHand:		WeaponHandTypeString = TEXT("Left Hand");	break;
+			case EWeaponHandType::RightHand:	WeaponHandTypeString = TEXT("Right Hand");	break;
+			case EWeaponHandType::TwoHand:		WeaponHandTypeString = TEXT("Two Hand");	break;
 			}
 			Text_WeaponHandType->SetText(FText::FromString(WeaponHandTypeString));
 			HorizontalBox_WeaponHandType->SetVisibility(ESlateVisibility::Visible);
@@ -86,16 +93,16 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 		else if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
 		{
 			const UD1ItemFragment_Equippable_Armor* ArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(EquippableFragment);
-			Text_ItemType->SetText(FText::FromString(TEXT("방어구")));
+			Text_ItemType->SetText(FText::FromString(TEXT("Armor")));
 	
 			FString ArmorTypeString;
 			switch (ArmorFragment->ArmorType)
 			{
-			case EArmorType::Helmet:	        ArmorTypeString = TEXT("헬맷");	        break;
-			case EArmorType::Chest:		        ArmorTypeString = TEXT("가슴");	        break;
-			case EArmorType::Legs:		        ArmorTypeString = TEXT("다리");	        break;
-			case EArmorType::Hands:		        ArmorTypeString = TEXT("장갑");	        break;
-			case EArmorType::Foot:		        ArmorTypeString = TEXT("신발");	        break;
+			case EArmorType::Helmet:	        ArmorTypeString = TEXT("Helmet");	        break;
+			case EArmorType::Chest:		        ArmorTypeString = TEXT("Chest");	        break;
+			case EArmorType::Legs:		        ArmorTypeString = TEXT("Legs");				break;
+			case EArmorType::Hands:		        ArmorTypeString = TEXT("Hands");	        break;
+			case EArmorType::Foot:		        ArmorTypeString = TEXT("Foot");				break;
 			}
 			Text_ArmorType->SetText(FText::FromString(ArmorTypeString));
 			HorizontalBox_ArmorType->SetVisibility(ESlateVisibility::Visible);
@@ -103,7 +110,7 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 	}
 	else if (const UD1ItemFragment_Consumable* ConsumableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Consumable>())
 	{
-		Text_ItemType->SetText(FText::FromString(TEXT("소모품")));
+		Text_ItemType->SetText(FText::FromString(TEXT("Consumable")));
 		
 		Text_Description->SetText(ConsumableFragment->Description);
 		Text_Description->SetVisibility(ESlateVisibility::Visible);
@@ -113,34 +120,5 @@ void UD1ItemHoverWidget::RefreshUI(UD1ItemInstance* ItemInstance)
 	{
 		Text_MaxStackCount->SetText(FText::AsNumber(StackableFragment ? StackableFragment->MaxStackCount : 1));
 		HorizontalBox_MaxStackCount->SetVisibility(ESlateVisibility::Visible);
-	}
-}
-
-void UD1ItemHoverWidget::SetPosition(const FVector2D& AbsolutePosition)
-{
-	FVector2D HoverWidgetSize = Overlay_Root->GetCachedGeometry().GetLocalSize();
-	if (HoverWidgetSize.IsZero())
-		return;
-	
-	FVector2D Margin = FVector2D(5.f, 5.f);
-	FVector2D MouseWidgetPos = CanvasPanel_Root->GetCachedGeometry().AbsoluteToLocal(AbsolutePosition);
-	FVector2D CanvasWidgetSize = CanvasPanel_Root->GetCachedGeometry().GetLocalSize();
-
-	FVector2D HoverWidgetStartPos = MouseWidgetPos + Margin;
-	FVector2D HoverWidgetEndPos = HoverWidgetStartPos + HoverWidgetSize;
-
-	if (HoverWidgetEndPos.X > CanvasWidgetSize.X)
-	{
-		HoverWidgetStartPos.X = MouseWidgetPos.X - (Margin.X + HoverWidgetSize.X);
-	}
-
-	if (HoverWidgetEndPos.Y > CanvasWidgetSize.Y)
-	{
-		HoverWidgetStartPos.Y = MouseWidgetPos.Y - (Margin.Y + HoverWidgetSize.Y);
-	}
-		
-	if (UCanvasPanelSlot* CanvasPanelSlot = Cast<UCanvasPanelSlot>(Overlay_Root->Slot))
-	{
-		CanvasPanelSlot->SetPosition(HoverWidgetStartPos);
 	}
 }

@@ -509,11 +509,8 @@ bool UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalEquipment(UD1E
 	
 	if (ToItemSlotPos.X < 0 || ToItemSlotPos.Y < 0 || ToItemSlotPos.X >= InventorySlotCount.X || ToItemSlotPos.Y >= InventorySlotCount.Y)
 		return false;
-
-	const TArray<FD1EquipmentEntry>& FromEntries = OtherComponent->GetAllEntries();
-	const FD1EquipmentEntry& FromEntry = FromEntries[(int32)FromEquipmentSlotType];
-	const UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
-
+	
+	const UD1ItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromEquipmentSlotType);
 	if (FromItemInstance == nullptr)
 		return false;
 	

@@ -227,10 +227,7 @@ bool UD1EquipmentManagerComponent::CanAddEquipment_FromEquipment(UD1EquipmentMan
 	if (FromEquipmentSlotType == EEquipmentSlotType::Count || ToEquipmentSlotType == EEquipmentSlotType::Count)
 		return false;
 	
-	const TArray<FD1EquipmentEntry>& FromEntries = OtherComponent->GetAllEntries();
-	const FD1EquipmentEntry& FromEntry = FromEntries[(int32)FromEquipmentSlotType];
-	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
-
+	UD1ItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromEquipmentSlotType);
 	return CanAddEquipment(FromItemInstance, ToEquipmentSlotType);
 }
 
@@ -241,13 +238,12 @@ bool UD1EquipmentManagerComponent::CanAddEquipment(UD1ItemInstance* FromItemInst
 	
 	if (ToEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || ToEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || ToEquipmentSlotType == EEquipmentSlotType::Count)
 		return false;
-
-	const TArray<FD1EquipmentEntry>& Entries = GetAllEntries();
-	const FD1EquipmentEntry& ToEntry = Entries[(int32)ToEquipmentSlotType];
-	if (FromItemInstance == ToEntry.ItemInstance)
+	
+	const UD1ItemInstance* ToItemInstance = GetItemInstance(ToEquipmentSlotType);
+	if (FromItemInstance == ToItemInstance)
 		return true;
 
-	if (ToEntry.ItemInstance)
+	if (ToItemInstance)
 		return false;
 	
 	const UD1ItemFragment_Equippable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
@@ -266,56 +262,44 @@ bool UD1EquipmentManagerComponent::CanAddEquipment(UD1ItemInstance* FromItemInst
 		{
 			if (FromWeaponHandType == EWeaponHandType::LeftHand || FromWeaponHandType == EWeaponHandType::RightHand)
 			{
-				const FD1EquipmentEntry& TwoHandEntry = Entries[(int32)EEquipmentSlotType::Primary_TwoHand];
-				return (TwoHandEntry.ItemInstance == nullptr);
+				return GetItemInstance(EEquipmentSlotType::Primary_TwoHand) == nullptr;
 			}
 			else if (FromWeaponHandType == EWeaponHandType::TwoHand)
 			{
-				const FD1EquipmentEntry& LeftHandEntry = Entries[(int32)EEquipmentSlotType::Primary_LeftHand];
-				const FD1EquipmentEntry& RightHandEntry = Entries[(int32)EEquipmentSlotType::Primary_RightHand];
-				return (LeftHandEntry.ItemInstance == nullptr && RightHandEntry.ItemInstance == nullptr);
+				return GetItemInstance(EEquipmentSlotType::Primary_LeftHand) == nullptr && GetItemInstance(EEquipmentSlotType::Primary_RightHand) == nullptr;
 			}
 		}
 		else if (IsSecondaryWeaponSlot(ToEquipmentSlotType))
 		{
 			if (FromWeaponHandType == EWeaponHandType::LeftHand || FromWeaponHandType == EWeaponHandType::RightHand)
 			{
-				const FD1EquipmentEntry& TwoHandEntry = Entries[(int32)EEquipmentSlotType::Secondary_TwoHand];
-				return (TwoHandEntry.ItemInstance == nullptr);
+				return GetItemInstance(EEquipmentSlotType::Secondary_TwoHand) == nullptr;
 			}
 			else if (FromWeaponHandType == EWeaponHandType::TwoHand)
 			{
-				const FD1EquipmentEntry& LeftHandEntry = Entries[(int32)EEquipmentSlotType::Secondary_LeftHand];
-				const FD1EquipmentEntry& RightHandEntry = Entries[(int32)EEquipmentSlotType::Secondary_RightHand];
-				return (LeftHandEntry.ItemInstance == nullptr && RightHandEntry.ItemInstance == nullptr);
+				return GetItemInstance(EEquipmentSlotType::Secondary_LeftHand) == nullptr && GetItemInstance(EEquipmentSlotType::Secondary_RightHand) == nullptr;
 			}
 		}
 		else if (IsTertiaryWeaponSlot(ToEquipmentSlotType))
 		{
 			if (FromWeaponHandType == EWeaponHandType::LeftHand || FromWeaponHandType == EWeaponHandType::RightHand)
 			{
-				const FD1EquipmentEntry& TwoHandEntry = Entries[(int32)EEquipmentSlotType::Tertiary_TwoHand];
-				return (TwoHandEntry.ItemInstance == nullptr);
+				return GetItemInstance(EEquipmentSlotType::Tertiary_TwoHand) == nullptr;
 			}
 			else if (FromWeaponHandType == EWeaponHandType::TwoHand)
 			{
-				const FD1EquipmentEntry& LeftHandEntry = Entries[(int32)EEquipmentSlotType::Tertiary_LeftHand];
-				const FD1EquipmentEntry& RightHandEntry = Entries[(int32)EEquipmentSlotType::Tertiary_RightHand];
-				return (LeftHandEntry.ItemInstance == nullptr && RightHandEntry.ItemInstance == nullptr);
+				return GetItemInstance(EEquipmentSlotType::Tertiary_LeftHand) == nullptr && GetItemInstance(EEquipmentSlotType::Tertiary_RightHand) == nullptr;
 			}
 		}
 		else if (IsQuaternaryWeaponSlot(ToEquipmentSlotType))
 		{
 			if (FromWeaponHandType == EWeaponHandType::LeftHand || FromWeaponHandType == EWeaponHandType::RightHand)
 			{
-				const FD1EquipmentEntry& TwoHandEntry = Entries[(int32)EEquipmentSlotType::Quaternary_TwoHand];
-				return (TwoHandEntry.ItemInstance == nullptr);
+				return GetItemInstance(EEquipmentSlotType::Quaternary_TwoHand) == nullptr;
 			}
 			else if (FromWeaponHandType == EWeaponHandType::TwoHand)
 			{
-				const FD1EquipmentEntry& LeftHandEntry = Entries[(int32)EEquipmentSlotType::Quaternary_LeftHand];
-				const FD1EquipmentEntry& RightHandEntry = Entries[(int32)EEquipmentSlotType::Quaternary_RightHand];
-				return (LeftHandEntry.ItemInstance == nullptr && RightHandEntry.ItemInstance == nullptr);
+				return GetItemInstance(EEquipmentSlotType::Quaternary_LeftHand) == nullptr && GetItemInstance(EEquipmentSlotType::Quaternary_RightHand) == nullptr;
 			}
 		}
 	}
@@ -481,6 +465,20 @@ ALyraCharacter* UD1EquipmentManagerComponent::GetCharacter() const
 ALyraPlayerController* UD1EquipmentManagerComponent::GetPlayerController() const
 {
 	return Cast<ALyraPlayerController>(GetOwner());
+}
+
+UD1ItemInstance* UD1EquipmentManagerComponent::GetItemInstance(EEquipmentSlotType EquipmentSlotType) const
+{
+	UD1ItemInstance* Result = nullptr;
+	const TArray<FD1EquipmentEntry>& Entries = EquipmentList.GetAllEntries();
+	
+	if (Entries.IsValidIndex((int32)EquipmentSlotType))
+	{
+		const FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+		Result = Entry.ItemInstance;
+	}
+	
+	return Result;;
 }
 
 const TArray<FD1EquipmentEntry>& UD1EquipmentManagerComponent::GetAllEntries() const

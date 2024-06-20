@@ -6,7 +6,7 @@
 #include "Item/D1ItemTemplate.h"
 #include "System/LyraAssetManager.h"
 #include "D1ItemDragWidget.h"
-#include "D1ItemHoverWidget.h"
+#include "D1ItemHoversWidget.h"
 #include "Blueprint/SlateBlueprintLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemEntryWidget)
@@ -22,7 +22,7 @@ void UD1ItemEntryWidget::NativeOnInitialized()
 	Super::NativeOnInitialized();
 
 	DragWidgetClass = ULyraAssetManager::GetSubclassByName<UD1ItemDragWidget>("DragWidgetClass");
-	HoverWidgetClass = ULyraAssetManager::GetSubclassByName<UD1ItemHoverWidget>("HoverWidgetClass");
+	HoversWidgetClass = ULyraAssetManager::GetSubclassByName<UD1ItemHoversWidget>("HoversWidgetClass");
 }
 
 void UD1ItemEntryWidget::NativeConstruct()
@@ -34,10 +34,10 @@ void UD1ItemEntryWidget::NativeConstruct()
 
 void UD1ItemEntryWidget::NativeDestruct()
 {
-	if (HoverWidget)
+	if (HoversWidget)
 	{
-		HoverWidget->RemoveFromParent();
-		HoverWidget = nullptr;
+		HoversWidget->RemoveFromParent();
+		HoversWidget = nullptr;
 	}
 	
 	Super::NativeDestruct();
@@ -49,21 +49,21 @@ void UD1ItemEntryWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const F
 
 	Image_Hover->SetRenderOpacity(1.f);
 
-	if (HoverWidget == nullptr)
+	if (HoversWidget == nullptr)
 	{
-		HoverWidget = CreateWidget<UD1ItemHoverWidget>(GetOwningPlayer(), HoverWidgetClass);
+		HoversWidget = CreateWidget<UD1ItemHoversWidget>(GetOwningPlayer(), HoversWidgetClass);
 	}
-	HoverWidget->RefreshUI(ItemInstance);
-	HoverWidget->AddToViewport();
+	HoversWidget->RefreshUI(ItemInstance);
+	HoversWidget->AddToViewport();
 }
 
 FReply UD1ItemEntryWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	FReply Reply = Super::NativeOnMouseMove(InGeometry, InMouseEvent);
 
-	if (HoverWidget)
+	if (HoversWidget)
 	{
-		HoverWidget->SetPosition(InMouseEvent.GetScreenSpacePosition());
+		HoversWidget->SetPosition(InMouseEvent.GetScreenSpacePosition());
 		return FReply::Handled();
 	}
 	
@@ -76,10 +76,10 @@ void UD1ItemEntryWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 
 	Image_Hover->SetRenderOpacity(0.f);
 
-	if (HoverWidget)
+	if (HoversWidget)
 	{
-		HoverWidget->RemoveFromParent();
-		HoverWidget = nullptr;
+		HoversWidget->RemoveFromParent();
+		HoversWidget = nullptr;
 	}
 }
 

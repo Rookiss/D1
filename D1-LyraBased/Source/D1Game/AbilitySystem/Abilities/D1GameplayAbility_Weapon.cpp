@@ -22,7 +22,7 @@ void UD1GameplayAbility_Weapon::ActivateAbility(const FGameplayAbilitySpecHandle
 	{
 		if (UD1EquipManagerComponent* EquipManager = PlayerCharacter->FindComponentByClass<UD1EquipManagerComponent>())
 		{
-			WeaponActor = EquipManager->GetEquippedWeapon(WeaponHandType);
+			WeaponActor = EquipManager->GetEquippedWeaponActor(WeaponHandType);
 		}
 	}
 	

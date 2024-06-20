@@ -470,11 +470,10 @@ void UD1EquipManagerComponent::EquipWeaponInSlot()
 	
 	UD1EquipmentManagerComponent* EquipmentManager = GetEquipmentManagerComponent();
 	check(EquipmentManager);
-
-	const TArray<FD1EquipmentEntry>& Entries = EquipmentManager->GetAllEntries();
+	
 	for (EEquipmentSlotType EquipmentSlotType : Item::EquipmentSlotsByWeaponState[(int32)CurrentWeaponEquipState])
 	{
-		Equip(EquipmentSlotType, Entries[(int32)EquipmentSlotType].GetItemInstance());
+		Equip(EquipmentSlotType, EquipmentManager->GetItemInstance(EquipmentSlotType));
 	}
 }
 
@@ -522,7 +521,7 @@ bool UD1EquipManagerComponent::CanChangeWeaponEquipState(EWeaponEquipState NewWe
 	return (EquipmentManager->IsAllEmpty(NewWeaponEquipState) == false);
 }
 
-AD1WeaponBase* UD1EquipManagerComponent::GetEquippedWeapon(EWeaponHandType WeaponHandType) const
+AD1WeaponBase* UD1EquipManagerComponent::GetEquippedWeaponActor(EWeaponHandType WeaponHandType) const
 {
 	if (WeaponHandType == EWeaponHandType::Count)
 		return nullptr;
@@ -532,7 +531,7 @@ AD1WeaponBase* UD1EquipManagerComponent::GetEquippedWeapon(EWeaponHandType Weapo
 	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].SpawnedWeaponActor : nullptr;
 }
 
-const UD1ItemInstance* UD1EquipManagerComponent::GetEquippedWeaponItemInstance(EWeaponHandType WeaponHandType) const
+UD1ItemInstance* UD1EquipManagerComponent::GetEquippedWeaponItemInstance(EWeaponHandType WeaponHandType) const
 {
 	if (WeaponHandType == EWeaponHandType::Count)
 		return nullptr;
