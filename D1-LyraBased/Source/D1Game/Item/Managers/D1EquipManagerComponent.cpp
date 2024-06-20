@@ -148,19 +148,8 @@ void FD1EquipEntry::Equip()
 									
 									if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
 									{
-										if (WeaponFragment->AnimInstanceClass)
-										{
-											MeshComponent->LinkAnimClassLayers(WeaponFragment->AnimInstanceClass);
-										}
-										
-										UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->EquipMontage);
-										if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
-										{
-											if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
-											{
-												Character->PlayAnimMontage(EquipMontage);
-											}
-										}
+										UAnimSequence* PocketWorldAnim = ULyraAssetManager::GetAssetByPath<UAnimSequence>(WeaponFragment->PocketWorldAnim);
+										MeshComponent->PlayAnimation(PocketWorldAnim, true);
 									}
 								}
 							})
