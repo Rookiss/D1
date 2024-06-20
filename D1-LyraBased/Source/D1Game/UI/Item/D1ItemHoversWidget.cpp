@@ -66,13 +66,13 @@ void UD1ItemHoversWidget::SetPosition(const FVector2D& AbsolutePosition)
 {
 	HorizontalBox_Hovers->ForceLayoutPrepass();
 	FVector2D HoversWidgetSize = HorizontalBox_Hovers->GetDesiredSize();
-	if (HoversWidgetSize.IsZero())
+
+	FVector2D CanvasWidgetSize = CanvasPanel_Root->GetCachedGeometry().GetLocalSize();
+	if (CanvasWidgetSize.IsZero())
 		return;
 	
 	FVector2D Margin = FVector2D(5.f, 5.f);
 	FVector2D MouseWidgetPos = CanvasPanel_Root->GetCachedGeometry().AbsoluteToLocal(AbsolutePosition);
-	FVector2D CanvasWidgetSize = CanvasPanel_Root->GetCachedGeometry().GetLocalSize();
-
 	FVector2D HoverWidgetStartPos = MouseWidgetPos + Margin;
 	FVector2D HoverWidgetEndPos = HoverWidgetStartPos + HoversWidgetSize;
 

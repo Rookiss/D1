@@ -25,7 +25,7 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 {
 	if (ItemInstance == nullptr)
 	{
-		SetVisibility(ESlateVisibility::Hidden);
+		SetVisibility(ESlateVisibility::Collapsed);
 		return;
 	}
 	
