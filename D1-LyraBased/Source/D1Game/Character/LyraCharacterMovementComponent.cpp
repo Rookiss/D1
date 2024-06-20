@@ -5,6 +5,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "D1GameplayTags.h"
+#include "AbilitySystem/Attributes/LyraCombatSet.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
@@ -124,8 +125,36 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 	{
 		if (ASC->HasMatchingGameplayTag(TAG_Gameplay_MovementStopped))
 			return 0;
-	}
 
-	float MaxSpeed = Super::GetMaxSpeed();
-	return MaxSpeed;
+		bool IsADS = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_ADS);
+		
+		const UAttributeSet* AttributeSet = ASC->GetAttributeSet(ULyraCombatSet::StaticClass());
+		if (const ULyraCombatSet* CombatSet = Cast<ULyraCombatSet>(AttributeSet))
+		{
+			float MaxSpeed = FMath::Max(0.f, CombatSet->GetMoveSpeed());
+			switch(MovementMode)
+			{
+			case MOVE_Walking:
+			case MOVE_NavWalking:
+			{
+				float CrouchCheck = IsCrouching() ? MaxSpeed * 0.7f : MaxSpeed;
+				float ADSCheck = IsADS ? CrouchCheck * 0.5f : CrouchCheck;
+				GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red, FString::Printf(TEXT("Final Speed: %f"), ADSCheck));
+				return ADSCheck;
+			}
+			case MOVE_Falling:
+				return MaxSpeed;
+			case MOVE_Swimming:
+				return MaxSwimSpeed;
+			case MOVE_Flying:
+				return MaxFlySpeed;
+			case MOVE_Custom:
+				return MaxCustomMovementSpeed;
+			case MOVE_None:
+			default:
+				return 0.f;
+			}
+		}
+	}
+	return Super::GetMaxSpeed();
 }
