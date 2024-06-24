@@ -20,8 +20,8 @@ public:
 	
 protected:
 	virtual void NativeOnInitialized() override;
-	
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 protected:
 	UPROPERTY()

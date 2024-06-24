@@ -139,8 +139,17 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 			case MOVE_Walking:
 			case MOVE_NavWalking:
 			{
+				float DirectionCheck;
 				float DirectionDot = GetOwner()->GetActorForwardVector().Dot(Velocity.GetSafeNormal());
-				float DirectionCheck = DirectionDot < -0.1f ? MaxSpeed * BackwardMovePercent : MaxSpeed;
+				if (DirectionDot < 0.25f)
+				{
+					DirectionCheck = (DirectionDot > -0.25f) ? MaxSpeed * LeftRightMovePercent : MaxSpeed * BackwardMovePercent;
+				}
+				else
+				{
+					DirectionCheck = MaxSpeed;
+				}
+					
 				float CrouchCheck = IsCrouching() ? DirectionCheck * CrouchMovePercent : DirectionCheck;
 				float ADSCheck = IsADS ? CrouchCheck * ADSMovePercent : CrouchCheck;
 				return ADSCheck;
