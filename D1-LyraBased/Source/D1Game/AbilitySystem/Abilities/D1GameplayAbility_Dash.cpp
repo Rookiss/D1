@@ -45,7 +45,7 @@ void UD1GameplayAbility_Dash::GetDirection(FVector& OutFacing, FVector& OutLastM
 	}
 }
 
-UAnimMontage* UD1GameplayAbility_Dash::SelectDirectionalMontage(const FVector& FacingDirection, const FVector& MovementDirection, bool& bOutForwardMovement) const
+UAnimMontage* UD1GameplayAbility_Dash::SelectDirectionalMontage(const FVector& FacingDirection, const FVector& MovementDirection, bool& bOutForwardMovement, bool& bOutLeftMovement) const
 {
 	const FRotator& FacingRotator = UKismetMathLibrary::Conv_VectorToRotator(FacingDirection);
 	const FRotator& MovementRotator = UKismetMathLibrary::Conv_VectorToRotator(MovementDirection);
@@ -59,21 +59,25 @@ UAnimMontage* UD1GameplayAbility_Dash::SelectDirectionalMontage(const FVector& F
 	{
 		SelectedMontage = nullptr;
 		bOutForwardMovement = true;
+		bOutLeftMovement = false;
 	}
 	else if (YawAbs > 135.f)
 	{
 		SelectedMontage = BackwardMontage;
 		bOutForwardMovement = false;
+		bOutLeftMovement = false;
 	}
 	else if (DeltaRotator.Yaw < 0.f)
 	{
 		SelectedMontage = LeftMontage;
 		bOutForwardMovement = false;
+		bOutLeftMovement = true;
 	}
 	else
 	{
 		SelectedMontage = RightMontage;
 		bOutForwardMovement = false;
+		bOutLeftMovement = false;
 	}
 
 	return SelectedMontage;

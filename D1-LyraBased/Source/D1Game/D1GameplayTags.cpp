@@ -36,16 +36,17 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ActivateFail_ActivationGroup,			"Ability.ActivateFail.ActivationGroup");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Behavior_SurvivesDeath,					"Ability.Behavior.SurvivesDeath");
 	
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,									"Ability.Jump");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Dash_Check,								"Ability.Dash.Check");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Dash_Active,								"Ability.Dash.Active");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_ChangeEquip,								"Ability.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack,									"Ability.Attack");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_1,								"Ability.Attack.1");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_2,								"Ability.Attack.2");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_3,								"Ability.Attack.3");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_Bow,								"Ability.Attack.Bow");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Block,									"Ability.Block");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_ChangeEquip,								"Ability.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS,										"Ability.ADS");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_Dash,									"Ability.Dash");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,									"Ability.Jump");
 
 	// Status
 	UE_DEFINE_GAMEPLAY_TAG(Status_Crouching,								"Status.Crouching");
