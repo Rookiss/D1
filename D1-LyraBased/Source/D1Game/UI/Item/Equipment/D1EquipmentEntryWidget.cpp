@@ -7,6 +7,7 @@
 #include "UI/Item/D1ItemDragDrop.h"
 #include "UI/Item/D1ItemDragWidget.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "Item/Managers/D1InventoryManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentEntryWidget)
 
@@ -55,4 +56,22 @@ void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	DragDrop->FromItemInstance = ItemInstance;
 	DragDrop->DeltaWidgetPos = (DragWidgetSize / 2.f) - (Item::UnitInventorySlotSize / 2.f);
 	OutOperation = DragDrop;
+}
+
+FReply UD1EquipmentEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+
+	if (InMouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
+	{
+		// APlayerController* PlayerController = GetOwningPlayer();
+		// check(PlayerController);
+		//
+		// UD1InventoryManagerComponent* InventoryManager = PlayerController->GetComponentByClass<UD1InventoryManagerComponent>();
+		// check(InventoryManager);
+		//
+		// InventoryManager->Server_RequestMoveOrMergeItem_FromExternalEquipment(EquipmentManagerComponent, EquipmentSlotType, FIntPoint::ZeroValue);
+	}
+
+	return Reply;
 }

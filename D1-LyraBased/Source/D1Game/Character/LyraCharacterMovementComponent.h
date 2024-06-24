@@ -79,6 +79,9 @@ protected:
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
+	float LeftRightMovePercent = 0.7f;
+	
+	UPROPERTY(EditDefaultsOnly)
 	float BackwardMovePercent = 0.7f;
 
 	UPROPERTY(EditDefaultsOnly)
