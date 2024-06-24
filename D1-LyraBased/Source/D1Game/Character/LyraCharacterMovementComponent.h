@@ -71,10 +71,19 @@ protected:
 	virtual void InitializeComponent() override;
 
 protected:
-
 	// Cached ground info for the character.  Do not access this directly!  It's only updated when accessed via GetGroundInfo().
 	FLyraCharacterGroundInfo CachedGroundInfo;
 
 	UPROPERTY(Transient)
 	bool bHasReplicatedAcceleration = false;
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	float BackwardMovePercent = 0.7f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CrouchMovePercent = 0.7f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float ADSMovePercent = 0.7f;
 };

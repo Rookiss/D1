@@ -3,6 +3,15 @@
 #include "LyraGameplayAbility.h"
 #include "D1GameplayAbility_Dash.generated.h"
 
+UENUM()
+enum class EDashDirection
+{
+	Left,
+	Right,
+	Upward,
+	Downward
+};
+
 class UAnimMontage;
 
 UCLASS()
