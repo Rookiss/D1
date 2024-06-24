@@ -5,10 +5,12 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "D1GameplayTags.h"
+#include "LyraCharacter.h"
 #include "AbilitySystem/Attributes/LyraCombatSet.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraCharacterMovementComponent)
 
@@ -137,9 +139,10 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 			case MOVE_Walking:
 			case MOVE_NavWalking:
 			{
-				float CrouchCheck = IsCrouching() ? MaxSpeed * 0.7f : MaxSpeed;
-				float ADSCheck = IsADS ? CrouchCheck * 0.5f : CrouchCheck;
-				GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red, FString::Printf(TEXT("Final Speed: %f"), ADSCheck));
+				float DirectionDot = GetOwner()->GetActorForwardVector().Dot(Velocity.GetSafeNormal());
+				float DirectionCheck = DirectionDot < -0.1f ? MaxSpeed * BackwardMovePercent : MaxSpeed;
+				float CrouchCheck = IsCrouching() ? DirectionCheck * CrouchMovePercent : DirectionCheck;
+				float ADSCheck = IsADS ? CrouchCheck * ADSMovePercent : CrouchCheck;
 				return ADSCheck;
 			}
 			case MOVE_Falling:
