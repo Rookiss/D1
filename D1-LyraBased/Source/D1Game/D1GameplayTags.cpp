@@ -17,6 +17,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Look_Mouse,								"InputTag.Look.Mouse");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Look_Stick,								"InputTag.Look.Stick");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Crouch,									"InputTag.Crouch");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Dash,									"InputTag.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_MainHand,						"InputTag.Attack.MainHand");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_OffHand,							"InputTag.Attack.OffHand");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Primary,					"InputTag.ChangeEquip.Primary");
@@ -43,9 +44,12 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Block,									"Ability.Block");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ChangeEquip,								"Ability.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS,										"Ability.ADS");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Dash,									"Ability.Dash");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,									"Ability.Jump");
 
 	// Status
 	UE_DEFINE_GAMEPLAY_TAG(Status_Crouching,								"Status.Crouching");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Jumping,									"Status.Jumping");
 	UE_DEFINE_GAMEPLAY_TAG(Status_AutoRunning,								"Status.AutoRunning");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Death,									"Status.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Death_Dying,								"Status.Death.Dying");
@@ -54,6 +58,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_Block,									"Status.Block");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ChangeEquip,								"Status.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS,										"Status.ADS");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Dash,										"Status.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Succeeded,								"Status.Succeeded");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Failed,									"Status.Failed");
 	
@@ -103,6 +108,7 @@ namespace D1GameplayTags
 	// Cooldown
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Bow_Fire,								"Cooldown.Bow.Fire");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Jump,									"Cooldown.Jump");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Dash,									"Cooldown.Dash");
 
 	// GamePhase
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_WaitForPlayers,					    "GamePhase.WaitForPlayers");

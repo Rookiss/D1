@@ -3,6 +3,7 @@
 #include "Blueprint/UserWidget.h"
 #include "D1ItemHoverWidget.generated.h"
 
+class UImage;
 class UCanvasPanel;
 class UOverlay;
 class UTextBlock;
@@ -18,8 +19,7 @@ public:
 	UD1ItemHoverWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());\
 	
 public:
-	void RefreshUI(UD1ItemInstance* ItemInstance);
-	void SetPosition(const FVector2D& AbsolutePosition);
+	void RefreshUI(const UD1ItemInstance* ItemInstance);
 
 protected:
 	UPROPERTY(meta=(BindWidget))
@@ -48,6 +48,10 @@ protected:
 
 protected:
 	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_DIsplayName_Background;
+
+protected:
+	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UHorizontalBox> HorizontalBox_WeaponType;
 
 	UPROPERTY(meta=(BindWidget))
@@ -58,11 +62,4 @@ protected:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UHorizontalBox> HorizontalBox_MaxStackCount;
-
-private:
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UCanvasPanel> CanvasPanel_Root;
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UOverlay> Overlay_Root;
 };

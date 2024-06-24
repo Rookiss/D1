@@ -137,7 +137,8 @@ public:
 
 	ALyraCharacter* GetCharacter() const;
 	ALyraPlayerController* GetPlayerController() const;
-	
+
+	UD1ItemInstance* GetItemInstance(EEquipmentSlotType EquipmentSlotType) const;
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const;
 
 public:

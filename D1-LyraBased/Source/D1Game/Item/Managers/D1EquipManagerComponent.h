@@ -161,10 +161,10 @@ public:
 	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	AD1WeaponBase* GetEquippedWeapon(EWeaponHandType WeaponHandType) const;
+	AD1WeaponBase* GetEquippedWeaponActor(EWeaponHandType WeaponHandType) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	const UD1ItemInstance* GetEquippedWeaponItemInstance(EWeaponHandType WeaponHandType) const;
+	UD1ItemInstance* GetEquippedWeaponItemInstance(EWeaponHandType WeaponHandType) const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AD1WeaponBase* GetFirstEquippedWeapon() const;

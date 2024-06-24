@@ -116,6 +116,7 @@ public:
 	virtual bool HasAllMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const override;
 	virtual bool HasAnyMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const override;
 
+	UFUNCTION(BlueprintCallable, Category = "Lyra|Character")
 	void ToggleCrouch();
 
 	//~AActor interface
@@ -188,6 +189,10 @@ protected:
 	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 
+public:
+	UFUNCTION(BlueprintCallable, Category = "Lyra|Character")
+	ULyraCameraComponent* GetCameraComponent() const { return CameraComponent; }
+	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lyra|Character", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<ULyraPawnExtensionComponent> PawnExtComponent;

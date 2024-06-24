@@ -6,7 +6,7 @@
 class UImage;
 class UD1ItemInstance;
 class UD1ItemDragWidget;
-class UD1ItemHoverWidget;
+class UD1ItemHoversWidget;
 
 UCLASS()
 class UD1ItemEntryWidget : public UUserWidget
@@ -45,7 +45,7 @@ protected:
 	TSubclassOf<UD1ItemDragWidget> DragWidgetClass;
 
 	UPROPERTY()
-	TSubclassOf<UD1ItemHoverWidget> HoverWidgetClass;
+	TSubclassOf<UD1ItemHoversWidget> HoversWidgetClass;
 
 protected:
 	UPROPERTY(meta=(BindWidget))
@@ -56,5 +56,5 @@ protected:
 
 private:
 	UPROPERTY()
-	TObjectPtr<UD1ItemHoverWidget> HoverWidget;
+	TObjectPtr<UD1ItemHoversWidget> HoversWidget;
 };
