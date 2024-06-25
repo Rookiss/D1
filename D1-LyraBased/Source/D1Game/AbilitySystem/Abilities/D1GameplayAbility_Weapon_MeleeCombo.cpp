@@ -7,7 +7,6 @@
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
-#include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
@@ -23,6 +22,7 @@ UD1GameplayAbility_Weapon_MeleeCombo::UD1GameplayAbility_Weapon_MeleeCombo(const
 void UD1GameplayAbility_Weapon_MeleeCombo::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	HitActors.Reset();
+	bInputPressed = false;
 	bInputReleased = false;
 	bBlocked = false;
 	
@@ -99,7 +99,7 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 							FColor Color = (HasAuthority(&CurrentActivationInfo)) ? FColor::Red : FColor::Green;
 							DrawDebugSphere(GetWorld(), HitResult->ImpactPoint, 4, 32, Color, false, 5);
 						}
-#endif
+#endif // UE_EDITOR
 					}
 				}
 			}
@@ -162,7 +162,7 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 
 void UD1GameplayAbility_Weapon_MeleeCombo::TryContinueToNextStage()
 {
-	bool bCanContinue = NextAbilityClass && (bInputReleased == false) && (bBlocked == false);
+	bool bCanContinue = NextAbilityClass && (bInputPressed || bInputReleased == false) && (bBlocked == false);
 	if (bCanContinue)
 	{
 		if (UAbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo())

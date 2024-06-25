@@ -37,8 +37,11 @@ protected:
 	
 protected:
 	UPROPERTY(BlueprintReadWrite)
-	bool bInputReleased = false;
+	bool bInputPressed = false;
 
+	UPROPERTY(BlueprintReadWrite)
+	bool bInputReleased = false;
+	
 private:
 	UPROPERTY()
 	TSet<TWeakObjectPtr<AActor>> HitActors;

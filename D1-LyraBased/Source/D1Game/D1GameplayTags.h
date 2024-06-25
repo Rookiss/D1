@@ -23,6 +23,8 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ChangeEquip_Tertiary);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ChangeEquip_Quaternary);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Widget_OpenInventory);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Ability_Confirm);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Ability_Cancel);
 	
 	// Ability
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_ActivateFail_IsDead);

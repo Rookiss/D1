@@ -28,7 +28,6 @@ class D1GAME_API ULyraAbilitySystemComponent : public UAbilitySystemComponent
 	GENERATED_BODY()
 
 public:
-
 	ULyraAbilitySystemComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	//~UActorComponent interface
@@ -42,6 +41,7 @@ public:
 
 	void CancelInputActivatedAbilities(bool bReplicateCancelAbility);
 
+	void AbilityInputTagStarted(const FGameplayTag& InputTag);
 	void AbilityInputTagPressed(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 
@@ -71,9 +71,9 @@ public:
 	void GetAdditionalActivationTagRequirements(const FGameplayTagContainer& AbilityTags, FGameplayTagContainer& OutActivationRequired, FGameplayTagContainer& OutActivationBlocked) const;
 
 protected:
-
 	void TryActivateAbilitiesOnSpawn();
 
+	virtual void AbilitySecInputStarted(FGameplayAbilitySpec& Spec);
 	virtual void AbilitySpecInputPressed(FGameplayAbilitySpec& Spec) override;
 	virtual void AbilitySpecInputReleased(FGameplayAbilitySpec& Spec) override;
 
@@ -88,12 +88,16 @@ protected:
 	void ClientNotifyAbilityFailed(const UGameplayAbility* Ability, const FGameplayTagContainer& FailureReason);
 
 	void HandleAbilityFailed(const UGameplayAbility* Ability, const FGameplayTagContainer& FailureReason);
+	
 protected:
 
 	// If set, this table is used to look up tag relationships for activate and cancel
 	UPROPERTY()
 	TObjectPtr<ULyraAbilityTagRelationshipMapping> TagRelationshipMapping;
 
+	// Handles to abilities that had their input started this frame.
+	TArray<FGameplayAbilitySpecHandle> InputStartedSpecHandles;
+	
 	// Handles to abilities that had their input pressed this frame.
 	TArray<FGameplayAbilitySpecHandle> InputPressedSpecHandles;
 

@@ -143,7 +143,14 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 				float DirectionDot = GetOwner()->GetActorForwardVector().Dot(Velocity.GetSafeNormal());
 				if (DirectionDot < 0.25f)
 				{
-					DirectionCheck = (DirectionDot > -0.25f) ? MaxSpeed * LeftRightMovePercent : MaxSpeed * BackwardMovePercent;
+					if (DirectionDot > -0.25f)
+					{
+						DirectionCheck = MaxSpeed * LeftRightMovePercent;
+					}
+					else
+					{
+						DirectionCheck = MaxSpeed * BackwardMovePercent;
+					}
 				}
 				else
 				{

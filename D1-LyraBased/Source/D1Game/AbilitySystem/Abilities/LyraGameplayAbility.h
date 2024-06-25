@@ -6,6 +6,7 @@
 
 #include "LyraGameplayAbility.generated.h"
 
+class UInputMappingContext;
 struct FGameplayAbilityActivationInfo;
 struct FGameplayAbilitySpec;
 struct FGameplayAbilitySpecHandle;
@@ -212,4 +213,8 @@ protected:
 
 	// Current camera mode set by the ability.
 	TSubclassOf<ULyraCameraMode> ActiveCameraMode;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UInputMappingContext> InputMappingContext;
 };

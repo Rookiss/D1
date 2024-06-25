@@ -11,13 +11,14 @@
 #include "Character/LyraHeroComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemGlobals.h"
+#include "EnhancedInputSubsystems.h"
 #include "LyraAbilitySimpleFailureMessage.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "AbilitySystem/LyraAbilitySourceInterface.h"
 #include "AbilitySystem/LyraGameplayEffectContext.h"
 #include "Physics/PhysicalMaterialWithTags.h"
-#include "GameFramework/PlayerState.h"
 #include "Camera/LyraCameraMode.h"
+#include "Player/LyraLocalPlayer.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraGameplayAbility)
 
@@ -188,12 +189,46 @@ void ULyraGameplayAbility::OnRemoveAbility(const FGameplayAbilityActorInfo* Acto
 
 void ULyraGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+	if (InputMappingContext)
+	{
+		if (const APlayerController* PC = GetLyraPlayerControllerFromActorInfo())
+		{
+			if (const ULyraLocalPlayer* LP = Cast<ULyraLocalPlayer>(PC->GetLocalPlayer()))
+			{
+				if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+				{
+					FModifyContextOptions Options;
+					Options.bForceImmediately = true;
+					Options.bIgnoreAllPressedKeysUntilRelease = true;
+					Subsystem->AddMappingContext(InputMappingContext, 0, Options);
+				}
+			}
+		}
+	}
+	
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void ULyraGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	ClearCameraMode();
+
+	if (InputMappingContext)
+	{
+		if (const APlayerController* PC = GetLyraPlayerControllerFromActorInfo())
+		{
+			if (const ULyraLocalPlayer* LP = Cast<ULyraLocalPlayer>(PC->GetLocalPlayer()))
+			{
+				if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+				{
+					FModifyContextOptions Options;
+					Options.bForceImmediately = true;
+					Options.bIgnoreAllPressedKeysUntilRelease = true;
+					Subsystem->RemoveMappingContext(InputMappingContext, Options);
+				}
+			}
+		}
+	}
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

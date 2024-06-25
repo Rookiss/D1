@@ -32,7 +32,6 @@ class D1GAME_API ULyraHeroComponent : public UPawnComponent, public IGameFramewo
 	GENERATED_BODY()
 
 public:
-
 	ULyraHeroComponent(const FObjectInitializer& ObjectInitializer);
 
 	/** Returns the hero component if one exists on the specified actor. */
@@ -69,13 +68,13 @@ public:
 	//~ End IGameFrameworkInitStateInterface interface
 
 protected:
-
 	virtual void OnRegister() override;
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void InitializePlayerInput(UInputComponent* PlayerInputComponent);
 
+	void Input_AbilityInputTagStarted(FGameplayTag InputTag);
 	void Input_AbilityInputTagPressed(FGameplayTag InputTag);
 	void Input_AbilityInputTagReleased(FGameplayTag InputTag);
 
@@ -90,10 +89,12 @@ protected:
 	void Input_ChangeEquip_Tertiary();
 	void Input_ChangeEquip_Quaternary();
 
+	void Input_LocalInputConfirm();
+	void Input_LocalInputCancel();
+
 	TSubclassOf<ULyraCameraMode> DetermineCameraMode() const;
 
 protected:
-
 	/**
 	 * Input Configs that should be added to this player when initializing the input. These configs
 	 * will NOT be registered with the settings because they are added at runtime. If you want the config

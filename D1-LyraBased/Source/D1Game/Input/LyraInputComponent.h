@@ -32,8 +32,8 @@ public:
 	template<class UserClass, typename FuncType>
 	void BindNativeAction(const ULyraInputConfig* InputConfig, const FGameplayTag& InputTag, ETriggerEvent TriggerEvent, UserClass* Object, FuncType Func, bool bLogIfNotFound);
 
-	template<class UserClass, typename PressedFuncType, typename ReleasedFuncType>
-	void BindAbilityActions(const ULyraInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, TArray<uint32>& BindHandles);
+	template<class UserClass, typename StartedFuncType, typename PressedFuncType, typename ReleasedFuncType>
+	void BindAbilityActions(const ULyraInputConfig* InputConfig, UserClass* Object, StartedFuncType StartedFunc, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, TArray<uint32>& BindHandles);
 
 	void RemoveBinds(TArray<uint32>& BindHandles);
 };
@@ -49,8 +49,8 @@ void ULyraInputComponent::BindNativeAction(const ULyraInputConfig* InputConfig, 
 	}
 }
 
-template<class UserClass, typename PressedFuncType, typename ReleasedFuncType>
-void ULyraInputComponent::BindAbilityActions(const ULyraInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, TArray<uint32>& BindHandles)
+template<class UserClass, typename StartedFuncType, typename PressedFuncType, typename ReleasedFuncType>
+void ULyraInputComponent::BindAbilityActions(const ULyraInputConfig* InputConfig, UserClass* Object, StartedFuncType StartedFunc, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, TArray<uint32>& BindHandles)
 {
 	check(InputConfig);
 
@@ -58,6 +58,11 @@ void ULyraInputComponent::BindAbilityActions(const ULyraInputConfig* InputConfig
 	{
 		if (Action.InputAction && Action.InputTag.IsValid())
 		{
+			if (StartedFunc)
+			{
+				BindHandles.Add(BindAction(Action.InputAction, ETriggerEvent::Started, Object, StartedFunc, Action.InputTag).GetHandle());
+			}
+			
 			if (PressedFunc)
 			{
 				BindHandles.Add(BindAction(Action.InputAction, ETriggerEvent::Triggered, Object, PressedFunc, Action.InputTag).GetHandle());

@@ -2,11 +2,11 @@
 
 #include "LyraHeroComponent.h"
 
+#include "Input/LyraMappableConfigPair.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "D1Define.h"
 #include "Components/GameFrameworkComponentDelegates.h"
 #include "Logging/MessageLog.h"
-#include "Input/LyraMappableConfigPair.h"
 #include "D1LogChannels.h"
 #include "EnhancedInputSubsystems.h"
 #include "Player/LyraPlayerController.h"
@@ -21,7 +21,6 @@
 #include "Camera/LyraCameraComponent.h"
 #include "D1GameplayTags.h"
 #include "Components/GameFrameworkComponentManager.h"
-#include "PlayerMappableInputConfig.h"
 #include "Camera/LyraCameraMode.h"
 #include "UserSettings/EnhancedInputUserSettings.h"
 #include "InputMappingContext.h"
@@ -168,7 +167,7 @@ void ULyraHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* M
 			PawnExtComp->InitializeAbilitySystem(LyraPS->GetLyraAbilitySystemComponent(), LyraPS);
 		}
 
-		if (ALyraPlayerController* LyraPC = GetController<ALyraPlayerController>())
+		if (GetController<ALyraPlayerController>())
 		{
 			if (Pawn->InputComponent != nullptr)
 			{
@@ -284,7 +283,7 @@ void ULyraHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputCompo
 					// This is where we actually bind and input action to a gameplay tag, which means that Gameplay Ability Blueprints will
 					// be triggered directly by these input actions Triggered events. 
 					TArray<uint32> BindHandles;
-					LyraIC->BindAbilityActions(InputConfig, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, /*out*/ BindHandles);
+					LyraIC->BindAbilityActions(InputConfig, this, &ThisClass::Input_AbilityInputTagStarted, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, /*out*/ BindHandles);
 
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move, /*bLogIfNotFound=*/ false);
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Look_Mouse, ETriggerEvent::Triggered, this, &ThisClass::Input_LookMouse, /*bLogIfNotFound=*/ false);
@@ -296,6 +295,9 @@ void ULyraHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputCompo
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Secondary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Secondary, /*bLogIfNotFound=*/ false);
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Tertiary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Tertiary, /*bLogIfNotFound=*/ false);
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Quaternary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Quaternary, /*bLogIfNotFound=*/ false);
+					
+					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Ability_Confirm, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputConfirm, /*bLogIfNotFound=*/ false);
+					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Ability_Cancel, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputCancel, /*bLogIfNotFound=*/ false);
 				}
 			}
 		}
@@ -329,24 +331,38 @@ void ULyraHeroComponent::AddAdditionalInputConfig(const ULyraInputConfig* InputC
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
 	check(Subsystem);
 
-	if (const ULyraPawnExtensionComponent* PawnExtComp = ULyraPawnExtensionComponent::FindPawnExtensionComponent(Pawn))
+	if (ULyraPawnExtensionComponent::FindPawnExtensionComponent(Pawn))
 	{
 		ULyraInputComponent* LyraIC = Pawn->FindComponentByClass<ULyraInputComponent>();
 		if (ensureMsgf(LyraIC, TEXT("Unexpected Input Component class! The Gameplay Abilities will not be bound to their inputs. Change the input component to ULyraInputComponent or a subclass of it.")))
 		{
-			LyraIC->BindAbilityActions(InputConfig, this, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, /*out*/ BindHandles);
+			LyraIC->BindAbilityActions(InputConfig, this, &ThisClass::Input_AbilityInputTagStarted, &ThisClass::Input_AbilityInputTagPressed, &ThisClass::Input_AbilityInputTagReleased, /*out*/ BindHandles);
 		}
 	}
 }
 
 void ULyraHeroComponent::RemoveAdditionalInputConfig(const ULyraInputConfig* InputConfig)
 {
-	//@TODO: Implement me!
+	//@TODO: Implement
 }
 
 bool ULyraHeroComponent::IsReadyToBindInputs() const
 {
 	return bReadyToBindInputs;
+}
+
+void ULyraHeroComponent::Input_AbilityInputTagStarted(FGameplayTag InputTag)
+{
+	if (const APawn* Pawn = GetPawn<APawn>())
+	{
+		if (const ULyraPawnExtensionComponent* PawnExtComp = ULyraPawnExtensionComponent::FindPawnExtensionComponent(Pawn))
+		{
+			if (ULyraAbilitySystemComponent* LyraASC = PawnExtComp->GetLyraAbilitySystemComponent())
+			{
+				LyraASC->AbilityInputTagStarted(InputTag);
+			}
+		}
+	}
 }
 
 void ULyraHeroComponent::Input_AbilityInputTagPressed(FGameplayTag InputTag)
@@ -359,7 +375,7 @@ void ULyraHeroComponent::Input_AbilityInputTagPressed(FGameplayTag InputTag)
 			{
 				LyraASC->AbilityInputTagPressed(InputTag);
 			}
-		}	
+		}
 	}
 }
 
@@ -473,7 +489,7 @@ void ULyraHeroComponent::Input_AutoRun(const FInputActionValue& InputActionValue
 		{
 			// Toggle auto running
 			Controller->SetIsAutoRunning(!Controller->GetIsAutoRunning());
-		}	
+		}
 	}
 }
 
@@ -503,6 +519,34 @@ void ULyraHeroComponent::Input_ChangeEquip_Quaternary()
 	FGameplayEventData Payload;
 	Payload.EventMagnitude = (int32)EWeaponEquipState::Quaternary;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), D1GameplayTags::GameplayEvent_ChangeEquip, Payload);
+}
+
+void ULyraHeroComponent::Input_LocalInputConfirm()
+{
+	if (const APawn* Pawn = GetPawn<APawn>())
+	{
+		if (const ULyraPawnExtensionComponent* PawnExtComp = ULyraPawnExtensionComponent::FindPawnExtensionComponent(Pawn))
+		{
+			if (ULyraAbilitySystemComponent* LyraASC = PawnExtComp->GetLyraAbilitySystemComponent())
+			{
+				LyraASC->LocalInputConfirm();
+			}
+		}
+	}
+}
+
+void ULyraHeroComponent::Input_LocalInputCancel()
+{
+	if (const APawn* Pawn = GetPawn<APawn>())
+	{
+		if (const ULyraPawnExtensionComponent* PawnExtComp = ULyraPawnExtensionComponent::FindPawnExtensionComponent(Pawn))
+		{
+			if (ULyraAbilitySystemComponent* LyraASC = PawnExtComp->GetLyraAbilitySystemComponent())
+			{
+				LyraASC->LocalInputCancel();
+			}
+		}	
+	}
 }
 
 TSubclassOf<ULyraCameraMode> ULyraHeroComponent::DetermineCameraMode() const
