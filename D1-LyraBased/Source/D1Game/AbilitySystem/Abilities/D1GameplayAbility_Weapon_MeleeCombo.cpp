@@ -144,6 +144,7 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 				if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(HitResult.GetActor()))
 				{
 					FGameplayCueParameters TargetCueParams;
+					TargetCueParams.Location = HitResult.ImpactPoint;
 					TargetASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_HitReact, TargetCueParams);
 				}
 				
@@ -169,7 +170,7 @@ void UD1GameplayAbility_Weapon_MeleeCombo::TryContinueToNextStage()
 		{
 			AbilitySystemComponent->TryActivateAbilityByClass(NextAbilityClass);
 		}
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+		// EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 	}
 	else if (bBlocked == false)
 	{

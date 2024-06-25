@@ -223,7 +223,7 @@ void ULyraGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, c
 				{
 					FModifyContextOptions Options;
 					Options.bForceImmediately = true;
-					Options.bIgnoreAllPressedKeysUntilRelease = true;
+					Options.bIgnoreAllPressedKeysUntilRelease = false;
 					Subsystem->RemoveMappingContext(InputMappingContext, Options);
 				}
 			}
