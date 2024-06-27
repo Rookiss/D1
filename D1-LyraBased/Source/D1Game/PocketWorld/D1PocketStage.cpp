@@ -4,6 +4,7 @@
 #include "PocketCapture.h"
 #include "PocketCaptureSubsystem.h"
 #include "Camera/CameraComponent.h"
+#include "Components/LightComponent.h"
 #include "GameFramework/Character.h"
 #include "Item/Managers/D1CosmeticManagerComponent.h"
 
@@ -60,6 +61,34 @@ void AD1PocketStage::RefreshAlphaMaskActors()
 	GetAttachedActors(AttachedActors, true, true);
 
 	CachedPocketCapture->SetAlphaMaskedActors(AttachedActors);
+
+	for (AActor* AttachedActor : AttachedActors)
+	{
+		if (AttachedActor)
+		{
+			TArray<UPrimitiveComponent*> PrimitiveComponents;
+			AttachedActor->GetComponents<UPrimitiveComponent>(PrimitiveComponents);
+				
+			for (UPrimitiveComponent* PrimitiveComponent : PrimitiveComponents)
+			{
+				if (PrimitiveComponent)
+				{
+					PrimitiveComponent->SetLightingChannels(false, true, false);
+				}
+			}
+
+			TArray<ULightComponent*> LightComponents;
+			AttachedActor->GetComponents<ULightComponent>(LightComponents);
+
+			for (ULightComponent* LightComponent : LightComponents)
+			{
+				if (LightComponent)
+				{
+					LightComponent->SetLightingChannels(false, true, false);
+				}
+			}
+		}
+	}
 }
 
 UD1CosmeticManagerComponent* AD1PocketStage::GetCosmeticManager() const

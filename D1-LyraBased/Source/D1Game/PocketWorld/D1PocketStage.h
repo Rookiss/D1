@@ -35,9 +35,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UPocketCapture> PocketCaptureClass;
-
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UMaterial> OverrideMaterial;
 	
 private:
 	UPROPERTY()
