@@ -13,11 +13,14 @@
 #include "AbilitySystemGlobals.h"
 #include "EnhancedInputSubsystems.h"
 #include "LyraAbilitySimpleFailureMessage.h"
+#include "NavigationSystem.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "AbilitySystem/LyraAbilitySourceInterface.h"
 #include "AbilitySystem/LyraGameplayEffectContext.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Physics/PhysicalMaterialWithTags.h"
 #include "Camera/LyraCameraMode.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Player/LyraLocalPlayer.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraGameplayAbility)
@@ -471,6 +474,64 @@ void ULyraGameplayAbility::GetAbilitySource(FGameplayAbilitySpecHandle Handle, c
 	UObject* SourceObject = GetSourceObject(Handle, ActorInfo);
 
 	OutAbilitySource = Cast<ILyraAbilitySourceInterface>(SourceObject);
+}
+
+void ULyraGameplayAbility::GetMovementDirection(ED1Direction& OutDirection, FVector& OutMovementVector) const
+{
+	FVector FacingVector;
+	
+	if (ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo())
+	{
+		FacingVector = LyraCharacter->GetActorForwardVector();
+		
+		if (UAIBlueprintHelperLibrary::GetAIController(LyraCharacter))
+		{
+			if (UNavigationSystemV1* NavigationSystemV1 = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld()))
+			{
+				FNavLocation OutProjectedLocation;
+				const FVector CharacterLocation = LyraCharacter->GetActorLocation();
+				const FVector QueryExtent = FVector(500.f, 500.f, 500.f);
+				NavigationSystemV1->ProjectPointToNavigation(CharacterLocation, OutProjectedLocation, QueryExtent);
+
+				FVector CharacterToProjectedXY = (OutProjectedLocation.Location - CharacterLocation) * FVector(1.f, 1.f, 0.f);
+				OutMovementVector = CharacterToProjectedXY.GetSafeNormal();
+			}
+		}
+		else
+		{
+			OutMovementVector = LyraCharacter->GetLastMovementInputVector();
+		}
+	}
+
+	const FRotator& FacingRotator = UKismetMathLibrary::Conv_VectorToRotator(FacingVector);
+	const FRotator& MovementRotator = UKismetMathLibrary::Conv_VectorToRotator(OutMovementVector);
+
+	const FRotator& DeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(FacingRotator, MovementRotator);
+	float YawAbs = FMath::Abs(DeltaRotator.Yaw);
+
+	if (OutMovementVector.IsNearlyZero())
+	{
+		OutDirection = ED1Direction::None;
+	}
+	else
+	{
+		if (YawAbs < 60.f)
+		{
+			OutDirection = ED1Direction::Forward;
+		}
+		else if (YawAbs > 120.f)
+		{
+			OutDirection = ED1Direction::Backward;
+		}
+		else if (DeltaRotator.Yaw > 0.f)
+		{
+			OutDirection = ED1Direction::Left;
+		}
+		else
+		{
+			OutDirection = ED1Direction::Right;
+		}
+	}
 }
 
 void ULyraGameplayAbility::TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const

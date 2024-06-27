@@ -24,10 +24,7 @@ public:
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	void GetDirection(FVector& OutFacing, FVector& OutLastMovementInput, FVector& OutMovement) const;
-
-	UFUNCTION(BlueprintCallable)
-	UAnimMontage* SelectDirectionalMontage(const FVector& FacingDirection, const FVector& MovementDirection, bool& bOutForwardMovement, bool& bOutLeftMovement) const;
+	UAnimMontage* SelectDirectionalMontage(ED1Direction MovementDirection) const;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly)

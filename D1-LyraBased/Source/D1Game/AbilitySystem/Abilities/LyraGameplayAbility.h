@@ -49,7 +49,6 @@ enum class ELyraAbilityActivationPolicy : uint8
 	OnSpawn
 };
 
-
 /**
  * ELyraAbilityActivationGroup
  *
@@ -70,6 +69,18 @@ enum class ELyraAbilityActivationGroup : uint8
 	MAX	UMETA(Hidden)
 };
 
+UENUM(BlueprintType)
+enum class ED1Direction : uint8
+{
+	None,
+	Forward,
+	Right,	
+	Backward,
+	Left,
+
+	MAX UMETA(Hidden)
+};
+
 /** Failure reason that can be used to play an animation montage when a failure occurs */
 USTRUCT(BlueprintType)
 struct FLyraAbilityMontageFailureMessage
@@ -77,7 +88,6 @@ struct FLyraAbilityMontageFailureMessage
 	GENERATED_BODY()
 
 public:
-	
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<APlayerController> PlayerController = nullptr;
 
@@ -101,7 +111,6 @@ class D1GAME_API ULyraGameplayAbility : public UGameplayAbility
 	friend class ULyraAbilitySystemComponent;
 
 public:
-
 	ULyraGameplayAbility(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	UFUNCTION(BlueprintCallable, Category = "Lyra|Ability")
@@ -147,7 +156,6 @@ public:
 	}
 
 protected:
-
 	// Called when the ability fails to activate
 	virtual void NativeOnAbilityFailedToActivate(const FGameplayTagContainer& FailedReason) const;
 
@@ -185,8 +193,10 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Ability, DisplayName = "OnPawnAvatarSet")
 	void K2_OnPawnAvatarSet();
 
-protected:
+	UFUNCTION(BlueprintCallable, Category="Lyra|Ability")
+	void GetMovementDirection(ED1Direction& OutDirection, FVector& OutMovementVector) const;
 
+protected:
 	// Defines how this ability is meant to activate.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Lyra|Ability Activation")
 	ELyraAbilityActivationPolicy ActivationPolicy;
