@@ -42,7 +42,6 @@ class D1GAME_API ULyraHealthComponent : public UGameFrameworkComponent
 	GENERATED_BODY()
 
 public:
-
 	ULyraHealthComponent(const FObjectInitializer& ObjectInitializer);
 
 	// Returns the health component if one exists on the specified actor.
@@ -85,7 +84,6 @@ public:
 	virtual void DamageSelfDestruct(bool bFellOutOfWorld = false);
 
 public:
-
 	// Delegate fired when the health value has changed. This is called on the client but the instigator may not be valid
 	UPROPERTY(BlueprintAssignable)
 	FLyraHealth_AttributeChanged OnHealthChanged;
@@ -103,7 +101,6 @@ public:
 	FLyraHealth_DeathEvent OnDeathFinished;
 
 protected:
-
 	virtual void OnUnregister() override;
 
 	void ClearGameplayTags();
@@ -116,7 +113,6 @@ protected:
 	virtual void OnRep_DeathState(ELyraDeathState OldDeathState);
 
 protected:
-
 	// Ability system used by this component.
 	UPROPERTY()
 	TObjectPtr<ULyraAbilitySystemComponent> AbilitySystemComponent;
