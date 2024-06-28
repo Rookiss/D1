@@ -1,19 +1,21 @@
 ﻿#pragma once
 
-#include "Components/PlayerStateComponent.h"
-#include "D1ContractManagerComponent.generated.h"
+#include "D1ItemInteractionSubsystem.generated.h"
 
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
-UCLASS(BlueprintType)
-class UD1ContractManagerComponent : public UPlayerStateComponent
+UCLASS()
+class UD1ItemInteractionSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
 	
 public:
-	UD1ContractManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UD1ItemInteractionSubsystem();
 
+protected:
+	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
+	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	bool InvnetoryToEquipment(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos, UD1EquipmentManagerComponent* ToEquipmentManager, EEquipmentSlotType ToEquipmentSlotType);
@@ -26,7 +28,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	bool EquipmentToEquipment(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType, UD1EquipmentManagerComponent* ToEquipmentManager, EEquipmentSlotType ToEquipmentSlotType);
-	
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void AddAllowedActor(AActor* Actor);
@@ -35,7 +37,7 @@ public:
 	void RemoveAllowedActor(AActor* Actor);
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAllowedActor(AActor* Actor) const;
 	
 private:
