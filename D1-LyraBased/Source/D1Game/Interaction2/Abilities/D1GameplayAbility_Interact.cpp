@@ -6,6 +6,7 @@
 #include "Interaction2/D1Interactable.h"
 #include "Interaction2/D1InteractionInfo.h"
 #include "Player/LyraPlayerController.h"
+#include "Tasks/D1AbilityTask_GrantNearbyInteraction.h"
 #include "UI/IndicatorSystem/IndicatorDescriptor.h"
 #include "UI/IndicatorSystem/LyraIndicatorManagerComponent.h"
 
@@ -28,7 +29,7 @@ void UD1GameplayAbility_Interact::ActivateAbility(const FGameplayAbilitySpecHand
 	UAbilitySystemComponent* AbilitySystem = GetAbilitySystemComponentFromActorInfo();
 	if (AbilitySystem && AbilitySystem->GetOwnerRole() == ROLE_Authority)
 	{
-		UAbilityTask_GrantNearbyInteraction* Task = UAbilityTask_GrantNearbyInteraction::GrantAbilitiesForNearbyInteractors(this, InteractionScanRange, InteractionScanRate);
+		UD1AbilityTask_GrantNearbyInteraction* Task = UD1AbilityTask_GrantNearbyInteraction::GrantAbilitiesForNearbyInteractables(this, InteractionScanRange, InteractionScanRate);
 		Task->ReadyForActivation();
 	}
 }
