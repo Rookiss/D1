@@ -506,7 +506,7 @@ void ULyraGameplayAbility::GetMovementDirection(ED1Direction& OutDirection, FVec
 	const FRotator& FacingRotator = UKismetMathLibrary::Conv_VectorToRotator(FacingVector);
 	const FRotator& MovementRotator = UKismetMathLibrary::Conv_VectorToRotator(OutMovementVector);
 
-	const FRotator& DeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(FacingRotator, MovementRotator);
+	const FRotator& DeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotator, FacingRotator);
 	float YawAbs = FMath::Abs(DeltaRotator.Yaw);
 
 	if (OutMovementVector.IsNearlyZero())
@@ -523,7 +523,7 @@ void ULyraGameplayAbility::GetMovementDirection(ED1Direction& OutDirection, FVec
 		{
 			OutDirection = ED1Direction::Backward;
 		}
-		else if (DeltaRotator.Yaw > 0.f)
+		else if (DeltaRotator.Yaw < 0.f)
 		{
 			OutDirection = ED1Direction::Left;
 		}

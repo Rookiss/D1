@@ -561,15 +561,15 @@ AD1WeaponBase* UD1EquipManagerComponent::GetFirstEquippedWeapon() const
 
 void UD1EquipManagerComponent::OnRep_CurrentWeaponEquipState()
 {
-	BroadcastChangedMessgae(CurrentWeaponEquipState);
+	BroadcastChangedMessage(CurrentWeaponEquipState);
 }
 
-void UD1EquipManagerComponent::BroadcastChangedMessgae(EWeaponEquipState NewWeaponEquipState)
+void UD1EquipManagerComponent::BroadcastChangedMessage(EWeaponEquipState NewWeaponEquipState)
 {
-	FD1WeaponEquipStateChangedMessage Message;
-	Message.WeaponEquipState = NewWeaponEquipState;
-
-	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
+	// FD1WeaponEquipStateChangedMessage Message;
+	// Message.WeaponEquipState = NewWeaponEquipState;
+	//
+	// UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
 	// MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Item_WeaponEquipStateChanged, Message);
 }
 

@@ -22,6 +22,7 @@
 
 #define D1_ObjectChannel_Weapon         ECC_GameTraceChannel6
 #define D1_ObjectChannel_Projectile					ECC_GameTraceChannel7
+#define D1_TraceChannel_Interaction					ECC_GameTraceChannel8
 
 #define D1_PhysicalMaterial_Flesh SurfaceType4
 

@@ -28,6 +28,7 @@ public:
 private:
 	friend struct FD1EquipmentList;
 	friend class UD1EquipmentManagerComponent;
+	friend class UD1ItemManagerComponent;
 
 	UPROPERTY()
 	TObjectPtr<UD1ItemInstance> ItemInstance;
@@ -70,6 +71,7 @@ public:
 private:
 	friend class UD1EquipmentManagerComponent;
 	friend class UD1InventoryManagerComponent;
+	friend class UD1ItemManagerComponent;
 
 	UPROPERTY()
 	TArray<FD1EquipmentEntry> Entries;
@@ -97,19 +99,15 @@ public:
 
 protected:
 	virtual void InitializeComponent() override;
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 	virtual void ReadyForReplication() override;
 	
 public:
-	UFUNCTION(Server, Reliable)
-	void Server_AddEquipment_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType);
-	bool CanAddEquipment_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const;
-
-	UFUNCTION(Server, Reliable)
-	void Server_AddEquipment_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType);
-	bool CanAddEquipment_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
-
+	bool CanAddEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const;
+	bool CanAddEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
 	bool CanAddEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
 	
 public:
@@ -117,8 +115,8 @@ public:
 	void TryAddEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass, EItemRarity ItemRarity);
 
 private:
-	void AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
-	UD1ItemInstance* RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType);
+	void AddEquipment(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+	UD1ItemInstance* RemoveEquipment(EEquipmentSlotType EquipmentSlotType);
 	
 public:
 	static bool IsWeaponSlot(EEquipmentSlotType EquipmentSlotType);
@@ -145,7 +143,7 @@ public:
 	FOnEquipmentEntryChanged OnEquipmentEntryChanged;
 	
 private:
-	friend class UD1InventoryManagerComponent;
+	friend class UD1ItemManagerComponent;
 	
 	UPROPERTY(Replicated)
 	FD1EquipmentList EquipmentList;

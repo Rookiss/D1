@@ -6,8 +6,10 @@
 #include "D1EquipmentEntryWidget.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
+#include "GameFramework/PlayerState.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
+#include "Item/Managers/D1ItemManagerComponent.h"
 #include "System/LyraAssetManager.h"
 #include "UI/Item/D1ItemDragDrop.h"
 #include "UI/Item/Inventory/D1InventoryEntryWidget.h"
@@ -39,8 +41,8 @@ void UD1EquipmentSlotWeaponWidget::NativeOnInitialized()
 	APlayerController* PlayerController = Cast<APlayerController>(GetOwningPlayer());
 	check(PlayerController);
 	
-	EquipmentManagerComponent = PlayerController->GetComponentByClass<UD1EquipmentManagerComponent>();
-	check(EquipmentManagerComponent);
+	EquipmentManager = PlayerController->GetComponentByClass<UD1EquipmentManagerComponent>();
+	check(EquipmentManager);
 	
 	EntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidgetClass");
 }
@@ -68,13 +70,13 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry,
 		TargetImage = SlotImages[(int32)FromWeaponFragment->WeaponHandType];
 		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, WeaponSlotType);
 	
-		if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
+		if (UD1InventoryManagerComponent* FromInventoryManager = DragDrop->FromInventoryManager)
 		{
-			bIsValid = EquipmentManagerComponent->CanAddEquipment_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
+			bIsValid = EquipmentManager->CanAddEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
 		}
-		else if (UD1EquipmentManagerComponent* EquipmentManager = DragDrop->FromEquipmentManager)
+		else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
 		{
-			bIsValid = EquipmentManagerComponent->CanAddEquipment_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+			bIsValid = EquipmentManager->CanAddEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
 		}
 	}
 	
@@ -103,21 +105,23 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDrop(const FGeometry& InGeometry, con
 	
 	UD1ItemInstance* FromItemInstance = DragDrop->FromItemInstance;
 	check(FromItemInstance);
+
+	UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
+	check(ItemManager);
 	
-	if (const UD1ItemFragment_Equippable_Weapon* FromWeapon = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
+	if (const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 	{
-		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeapon->WeaponHandType, WeaponSlotType);
+		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, WeaponSlotType);
 	
-		if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
+		if (UD1InventoryManagerComponent* FromInventoryManager = DragDrop->FromInventoryManager)
 		{
-			EquipmentManagerComponent->Server_AddEquipment_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
+			ItemManager->Server_InventoryToEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, EquipmentManager, ToEquipmentSlotType);
 		}
-		else if (UD1EquipmentManagerComponent* EquipmentManager = DragDrop->FromEquipmentManager)
+		else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
 		{
-			EquipmentManagerComponent->Server_AddEquipment_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+			ItemManager->Server_EquipmentToEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, EquipmentManager, ToEquipmentSlotType);
 		}
 	}
-	
 	return true;
 }
 
