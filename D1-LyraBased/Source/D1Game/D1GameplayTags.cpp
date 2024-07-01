@@ -49,6 +49,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_Bow,								"Ability.Attack.Bow");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Block,									"Ability.Block");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS,										"Ability.ADS");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact_Passive,						"Ability.Interact");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact_Active,							"Ability.Interact.Active");
 
 	// Status
 	UE_DEFINE_GAMEPLAY_TAG(Status_Crouching,								"Status.Crouching");
@@ -64,6 +66,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_Dash,										"Status.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Succeeded,								"Status.Succeeded");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Failed,									"Status.Failed");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Interact,									"Status.Interact");
 	
 	// Gameplay Event
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Death,								"GameplayEvent.Death");

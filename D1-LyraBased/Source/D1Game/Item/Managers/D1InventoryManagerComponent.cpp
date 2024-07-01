@@ -1,6 +1,7 @@
 ﻿#include "D1InventoryManagerComponent.h"
 
 #include "D1EquipmentManagerComponent.h"
+#include "D1ItemManagerComponent.h"
 #include "Data/D1ItemData.h"
 #include "Engine/ActorChannel.h"
 #include "Item/D1ItemInstance.h"
@@ -309,6 +310,32 @@ void UD1InventoryManagerComponent::InitializeComponent()
 	}
 }
 
+void UD1InventoryManagerComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetOwner()))
+	{
+		if (UD1ItemManagerComponent* ItemManager = PlayerController->FindComponentByClass<UD1ItemManagerComponent>())
+		{
+			ItemManager->AddAllowedComponent(this);
+		}
+	}
+}
+
+void UD1InventoryManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetOwner()))
+	{
+		if (UD1ItemManagerComponent* ItemManager = PlayerController->FindComponentByClass<UD1ItemManagerComponent>())
+		{
+			ItemManager->RemoveAllowedComponent(this);
+		}
+	}
+	
+	Super::EndPlay(EndPlayReason);
+}
+
 void UD1InventoryManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -347,96 +374,9 @@ void UD1InventoryManagerComponent::ReadyForReplication()
 	}
 }
 
-void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromInternalInventory_Implementation(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos)
+int32 UD1InventoryManagerComponent::CanMoveOrMergeItem(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const
 {
-	check(GetOwner()->HasAuthority());
-	
-	int32 MovableItemCount = CanMoveOrMergeItem_FromInternalInventory(FromItemSlotPos, ToItemSlotPos);
-	if (MovableItemCount > 0)
-	{
-		UD1ItemInstance* RemovedItemInstance = RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
-		AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, MovableItemCount);
-	}
-}
-
-int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const
-{
-	if (FromItemSlotPos.X < 0 || FromItemSlotPos.Y < 0 || FromItemSlotPos.X >= InventorySlotCount.X || FromItemSlotPos.Y >= InventorySlotCount.Y)
-		return 0;
-
-	if (ToItemSlotPos.X < 0 || ToItemSlotPos.Y < 0 || ToItemSlotPos.X >= InventorySlotCount.X || ToItemSlotPos.Y >= InventorySlotCount.Y)
-		return 0;
-
-	const TArray<FD1InventoryEntry>& Entries = GetAllEntries();
-
-	const int32 FromIndex = FromItemSlotPos.Y * InventorySlotCount.X + FromItemSlotPos.X;
-	const FD1InventoryEntry& FromEntry = Entries[FromIndex];
-	const UD1ItemInstance* FromItemInstance = FromEntry.ItemInstance;
-	const int32 FromItemCount = FromEntry.ItemCount;
-
-	if (FromItemInstance == nullptr)
-		return 0;
-
-	if (FromItemSlotPos == ToItemSlotPos)
-		return FromItemCount;
-	
-	const int32 ToIndex = ToItemSlotPos.Y * InventorySlotCount.X + ToItemSlotPos.X;
-	const FD1InventoryEntry& ToEntry = Entries[ToIndex];
-	const UD1ItemInstance* ToItemInstance = ToEntry.ItemInstance;
-	const int32 ToItemCount = ToEntry.ItemCount;
-	
-	const int32 FromTemplateID = FromItemInstance->GetItemTemplateID();
-	const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromTemplateID);
-	
-	if (ToItemInstance)
-	{
-		const int32 ToTemplateID = ToItemInstance->GetItemTemplateID();
-		if (FromTemplateID != ToTemplateID)
-			return 0;
-
-		const UD1ItemFragment_Stackable* StackableFragment = FromItemTemplate.FindFragmentByClass<UD1ItemFragment_Stackable>();
-		if (StackableFragment == nullptr)
-			return 0;
-
-		return FMath::Min(FromItemCount + ToItemCount, StackableFragment->MaxStackCount) - ToItemCount;
-	}
-	else
-	{
-		const FIntPoint& FromItemSlotCount = FromItemTemplate.SlotCount;
-		if (ToItemSlotPos.X + FromItemSlotCount.X > InventorySlotCount.X || ToItemSlotPos.Y + FromItemSlotCount.Y > InventorySlotCount.Y)
-			return 0;
-
-		TArray<TArray<bool>> TempSlotChecks = SlotChecks;
-
-		FIntPoint StartSlotPos = FromItemSlotPos;
-		FIntPoint EndSlotPos = FromItemSlotPos + FromItemSlotCount;
-
-		for (int32 y = StartSlotPos.Y; y < EndSlotPos.Y; y++)
-		{
-			for (int32 x = StartSlotPos.X; x < EndSlotPos.X; x++)
-			{
-				TempSlotChecks[y][x] = false;
-			}
-		}
-		return IsEmpty(TempSlotChecks, ToItemSlotPos, FromItemSlotCount) ? FromItemCount : 0;
-	}
-}
-
-void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromExternalInventory_Implementation(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos)
-{
-	check(GetOwner()->HasAuthority());
-	
-	int32 MovableItemCount = CanMoveOrMergeItem_FromExternalInventory(OtherComponent, FromItemSlotPos, ToItemSlotPos);
-	if (MovableItemCount > 0)
-	{
-		UD1ItemInstance* RemovedItemInstance = OtherComponent->RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
-		AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, MovableItemCount);
-	}
-}
-
-int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const
-{
-	if (OtherComponent == nullptr || OtherComponent->GetOwner() == GetOwner())
+	if (OtherComponent == nullptr)
 		return 0;
 
 	const FIntPoint& FromInventorySlotCount = OtherComponent->GetInventorySlotCount();
@@ -456,6 +396,9 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalInventory(UD1
 
 	if (FromItemInstance == nullptr)
 		return 0;
+
+	if (this == OtherComponent && FromItemSlotPos == ToItemSlotPos)
+		return FromItemCount;
 	
 	const TArray<FD1InventoryEntry>& ToEntries = GetAllEntries();
 	const int32 ToIndex = ToItemSlotPos.Y * ToInventorySlotCount.X + ToItemSlotPos.X;
@@ -483,23 +426,31 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalInventory(UD1
 		const FIntPoint& FromItemSlotCount = FromItemTemplate.SlotCount;
 		if (ToItemSlotPos.X + FromItemSlotCount.X > InventorySlotCount.X || ToItemSlotPos.Y + FromItemSlotCount.Y > InventorySlotCount.Y)
 			return 0;
-		
-		return IsEmpty(ToItemSlotPos, FromItemSlotCount) ? FromItemCount : 0;
+
+		if (this == OtherComponent)
+		{
+			TArray<TArray<bool>> TempSlotChecks = SlotChecks;
+
+			FIntPoint StartSlotPos = FromItemSlotPos;
+			FIntPoint EndSlotPos = FromItemSlotPos + FromItemSlotCount;
+
+			for (int32 y = StartSlotPos.Y; y < EndSlotPos.Y; y++)
+			{
+				for (int32 x = StartSlotPos.X; x < EndSlotPos.X; x++)
+				{
+					TempSlotChecks[y][x] = false;
+				}
+			}
+			return IsEmpty(TempSlotChecks, ToItemSlotPos, FromItemSlotCount) ? FromItemCount : 0;
+		}
+		else
+		{
+			return IsEmpty(ToItemSlotPos, FromItemSlotCount) ? FromItemCount : 0;
+		}
 	}
 }
 
-void UD1InventoryManagerComponent::Server_RequestMoveOrMergeItem_FromExternalEquipment_Implementation(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos)
-{
-	check(GetOwner()->HasAuthority());
-	
-	if (CanMoveOrMergeItem_FromExternalEquipment(OtherComponent, FromEquipmentSlotType, ToItemSlotPos))
-	{
-		UD1ItemInstance* RemovedItemInstance = OtherComponent->RemoveEquipment_Unsafe(FromEquipmentSlotType);
-		AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, 1);
-	}
-}
-
-bool UD1InventoryManagerComponent::CanMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const
+bool UD1InventoryManagerComponent::CanMoveOrMergeItem(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const
 {
 	if (OtherComponent == nullptr)
 		return false;
@@ -547,7 +498,7 @@ void UD1InventoryManagerComponent::TryAddItemByRarity(TSubclassOf<UD1ItemTemplat
 	}
 }
 
-void UD1InventoryManagerComponent::TryAddItemByProbatility(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities)
+void UD1InventoryManagerComponent::TryAddItemByProbability(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities)
 {
 	check(GetOwner()->HasAuthority());
 
@@ -571,7 +522,7 @@ void UD1InventoryManagerComponent::TryRemoveItem(int32 ItemTemplateID, int32 Ite
 	}
 }
 
-void UD1InventoryManagerComponent::AddItem_Unsafe(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount)
+void UD1InventoryManagerComponent::AddItem(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount)
 {
 	check(GetOwner()->HasAuthority());
 
@@ -612,7 +563,7 @@ void UD1InventoryManagerComponent::AddItem_Unsafe(const FIntPoint& ItemSlotPos, 
 	}
 }
 
-UD1ItemInstance* UD1InventoryManagerComponent::RemoveItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemCount)
+UD1ItemInstance* UD1InventoryManagerComponent::RemoveItem(const FIntPoint& ItemSlotPos, int32 ItemCount)
 {
 	check(GetOwner()->HasAuthority());
 	

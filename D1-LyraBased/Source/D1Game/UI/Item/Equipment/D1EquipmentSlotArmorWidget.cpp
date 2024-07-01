@@ -4,11 +4,13 @@
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Components/SizeBox.h"
+#include "GameFramework/PlayerState.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
+#include "Item/Managers/D1ItemManagerComponent.h"
 #include "System/LyraAssetManager.h"
 #include "UI/Item/D1ItemDragDrop.h"
 #include "UI/Item/Equipment/D1EquipmentEntryWidget.h"
@@ -37,8 +39,8 @@ void UD1EquipmentSlotArmorWidget::NativeOnInitialized()
 	APlayerController* PlayerController = GetOwningPlayer();
 	check(PlayerController);
 	
-	EquipmentManagerComponent = PlayerController->GetComponentByClass<UD1EquipmentManagerComponent>();
-	check(EquipmentManagerComponent);
+	EquipmentManager = PlayerController->GetComponentByClass<UD1EquipmentManagerComponent>();
+	check(EquipmentManager);
 	
 	EntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidgetClass");
 }
@@ -60,15 +62,15 @@ bool UD1EquipmentSlotArmorWidget::NativeOnDragOver(const FGeometry& InGeometry, 
 	
 	bool bIsValid = false;
 
-	EEquipmentSlotType EquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType);
+	EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType);
 		
-	if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
+	if (UD1InventoryManagerComponent* FromInventoryManager = DragDrop->FromInventoryManager)
 	{
-		bIsValid = EquipmentManagerComponent->CanAddEquipment_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, EquipmentSlotType);
+		bIsValid = EquipmentManager->CanAddEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
 	}
-	else if (UD1EquipmentManagerComponent* EquipmentManager = DragDrop->FromEquipmentManager)
+	else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
 	{
-		bIsValid = EquipmentManagerComponent->CanAddEquipment_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, EquipmentSlotType);
+		bIsValid = EquipmentManager->CanAddEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
 	}
 	
 	ChangeHoverState(Image_Slot, bIsValid ? ESlotState::Valid : ESlotState::Invalid);
@@ -97,20 +99,22 @@ bool UD1EquipmentSlotArmorWidget::NativeOnDrop(const FGeometry& InGeometry, cons
 	UD1ItemInstance* FromItemInstance = DragDrop->FromItemInstance;
 	check(FromItemInstance);
 
+	UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
+	check(ItemManager);
+	
 	if (FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>())
 	{
 		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType);
 	
-		if (UD1InventoryManagerComponent* InventoryManager = DragDrop->FromInventoryManager)
+		if (UD1InventoryManagerComponent* FromInventoryManager = DragDrop->FromInventoryManager)
 		{
-			EquipmentManagerComponent->Server_AddEquipment_FromInventory(InventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
+			ItemManager->Server_InventoryToEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, EquipmentManager, ToEquipmentSlotType);
 		}
-		else if (UD1EquipmentManagerComponent* EquipmentManager = DragDrop->FromEquipmentManager)
+		else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
 		{
-			EquipmentManagerComponent->Server_AddEquipment_FromEquipment(EquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+			ItemManager->Server_EquipmentToEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, EquipmentManager, ToEquipmentSlotType);
 		}
 	}
-	
 	return true;
 }
 

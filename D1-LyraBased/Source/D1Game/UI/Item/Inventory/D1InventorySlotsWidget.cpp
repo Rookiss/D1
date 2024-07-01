@@ -8,7 +8,9 @@
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/D1ItemTemplate.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
+#include "Item/Managers/D1ItemManagerComponent.h"
 #include "System/LyraAssetManager.h"
 #include "UI/Item/D1ItemDragDrop.h"
 #include "UI/Item/Equipment/D1EquipmentEntryWidget.h"
@@ -31,10 +33,10 @@ void UD1InventorySlotsWidget::NativeOnInitialized()
 	APlayerController* PlayerController = GetOwningPlayer();
 	check(PlayerController);
 
-	InventoryManagerComponent = PlayerController->GetComponentByClass<UD1InventoryManagerComponent>();
-	check(InventoryManagerComponent);
+	InventoryManager = PlayerController->GetComponentByClass<UD1InventoryManagerComponent>();
+	check(InventoryManager);
 
-	const FIntPoint& InventorySlotCount = InventoryManagerComponent->GetInventorySlotCount();
+	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
 	SlotWidgets.SetNum(InventorySlotCount.X * InventorySlotCount.Y);
 	EntryWidgets.SetNum(InventorySlotCount.X * InventorySlotCount.Y);
 
@@ -48,7 +50,7 @@ void UD1InventorySlotsWidget::NativeOnInitialized()
 		}
 	}
 	
-	const TArray<FD1InventoryEntry>& Entries = InventoryManagerComponent->GetAllEntries();
+	const TArray<FD1InventoryEntry>& Entries = InventoryManager->GetAllEntries();
 	for (int32 i = 0; i < Entries.Num(); i++)
 	{
 		const FD1InventoryEntry& Entry = Entries[i];
@@ -58,7 +60,7 @@ void UD1InventorySlotsWidget::NativeOnInitialized()
 			OnInventoryEntryChanged(ItemSlotPos, ItemInstance, Entry.GetItemCount());
 		}
 	}
-	DelegateHandle = InventoryManagerComponent->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
+	DelegateHandle = InventoryManager->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
 }
 
 bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -70,12 +72,12 @@ bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, cons
 	
 	FVector2D MouseWidgetPos = InGeometry.AbsoluteToLocal(InDragDropEvent.GetScreenSpacePosition());
 	FVector2D ToWidgetPos = MouseWidgetPos - DragDrop->DeltaWidgetPos;
-	FIntPoint ToSlotPos = FIntPoint(ToWidgetPos.X / Item::UnitInventorySlotSize.X, ToWidgetPos.Y / Item::UnitInventorySlotSize.Y);
+	FIntPoint ToItemSlotPos = FIntPoint(ToWidgetPos.X / Item::UnitInventorySlotSize.X, ToWidgetPos.Y / Item::UnitInventorySlotSize.Y);
 
-	if (PrevDragOverSlotPos == ToSlotPos)
+	if (PrevDragOverSlotPos == ToItemSlotPos)
 		return true;
 	
-	PrevDragOverSlotPos = ToSlotPos;
+	PrevDragOverSlotPos = ToItemSlotPos;
 	
 	UD1ItemEntryWidget* FromEntryWidget = DragDrop->FromEntryWidget;
 	UD1ItemInstance* FromItemInstance = FromEntryWidget->GetItemInstance();
@@ -85,29 +87,22 @@ bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, cons
 	const FIntPoint& FromItemSlotCount = FromItemTemplate.SlotCount;
 
 	int32 MovableCount = 0;
-	if (DragDrop->FromInventoryManager)
+	if (UD1InventoryManagerComponent* FromInventoryManager = DragDrop->FromInventoryManager)
 	{
-		if (DragDrop->FromInventoryManager == InventoryManagerComponent)
-		{
-			MovableCount = InventoryManagerComponent->CanMoveOrMergeItem_FromInternalInventory(DragDrop->FromItemSlotPos, ToSlotPos);
-		}
-		else
-		{
-			MovableCount = InventoryManagerComponent->CanMoveOrMergeItem_FromExternalInventory(DragDrop->FromInventoryManager, DragDrop->FromItemSlotPos, ToSlotPos);
-		}
+		MovableCount = InventoryManager->CanMoveOrMergeItem(FromInventoryManager, DragDrop->FromItemSlotPos, ToItemSlotPos);
 	}
-	else if (DragDrop->FromEquipmentManager)
+	else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
 	{
-		MovableCount = InventoryManagerComponent->CanMoveOrMergeItem_FromExternalEquipment(DragDrop->FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToSlotPos);
+		MovableCount = InventoryManager->CanMoveOrMergeItem(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToItemSlotPos);
 	}
 	
 	UnhoverSlots();
 
-	const FIntPoint& InventorySlotCount = InventoryManagerComponent->GetInventorySlotCount();
+	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
 	
-	const FIntPoint StartSlotPos = FIntPoint(FMath::Max(0, ToSlotPos.X), FMath::Max(0, ToSlotPos.Y));
-	const FIntPoint EndSlotPos   = FIntPoint(FMath::Min(ToSlotPos.X + FromItemSlotCount.X, InventorySlotCount.X),
-											 FMath::Min(ToSlotPos.Y + FromItemSlotCount.Y, InventorySlotCount.Y));
+	const FIntPoint StartSlotPos = FIntPoint(FMath::Max(0, ToItemSlotPos.X), FMath::Max(0, ToItemSlotPos.Y));
+	const FIntPoint EndSlotPos   = FIntPoint(FMath::Min(ToItemSlotPos.X + FromItemSlotCount.X, InventorySlotCount.X),
+											 FMath::Min(ToItemSlotPos.Y + FromItemSlotCount.Y, InventorySlotCount.Y));
 	
 	for (int32 y = StartSlotPos.Y; y < EndSlotPos.Y; y++)
 	{
@@ -147,25 +142,20 @@ bool UD1InventorySlotsWidget::NativeOnDrop(const FGeometry& InGeometry, const FD
 	FVector2D ToWidgetPos = MouseWidgetPos - DragDrop->DeltaWidgetPos;
 	FIntPoint ToItemSlotPos = FIntPoint(ToWidgetPos.X / Item::UnitInventorySlotSize.X, ToWidgetPos.Y / Item::UnitInventorySlotSize.Y);
 
-	DragDrop->ToInventoryManager = InventoryManagerComponent;
+	DragDrop->ToInventoryManager = InventoryManager;
     DragDrop->ToItemSlotPos = ToItemSlotPos;
+
+	UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
+	check(ItemManager);
 	
-	if (DragDrop->FromInventoryManager)
+	if (UD1InventoryManagerComponent* FromInventoryManager = DragDrop->FromInventoryManager)
 	{
-		if (DragDrop->FromInventoryManager == InventoryManagerComponent)
-		{
-			InventoryManagerComponent->Server_RequestMoveOrMergeItem_FromInternalInventory(DragDrop->FromItemSlotPos, ToItemSlotPos);
-		}
-		else
-		{
-			InventoryManagerComponent->Server_RequestMoveOrMergeItem_FromExternalInventory(DragDrop->FromInventoryManager, DragDrop->FromItemSlotPos, ToItemSlotPos);
-		}
+		ItemManager->Server_InventoryToInventory(FromInventoryManager, DragDrop->FromItemSlotPos, InventoryManager, ToItemSlotPos);
 	}
-	else if (DragDrop->FromEquipmentManager)
+	else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
 	{
-		InventoryManagerComponent->Server_RequestMoveOrMergeItem_FromExternalEquipment(DragDrop->FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToItemSlotPos);
+		ItemManager->Server_EquipmentToInventory(FromEquipmentManager, DragDrop->FromEquipmentSlotType, InventoryManager, ToItemSlotPos);
 	}
-	
 	return true;
 }
 
@@ -186,7 +176,7 @@ void UD1InventorySlotsWidget::CleanUpDrag()
 
 void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlotPos, UD1ItemInstance* InItemInstance, int32 NewItemCount)
 {
-	const FIntPoint& InventorySlotCount = InventoryManagerComponent->GetInventorySlotCount();
+	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
 	int32 SlotIndex = InItemSlotPos.Y * InventorySlotCount.X + InItemSlotPos.X;
 
 	if (UD1InventoryEntryWidget* EntryWidget = EntryWidgets[SlotIndex])

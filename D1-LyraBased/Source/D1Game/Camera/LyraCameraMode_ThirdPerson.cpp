@@ -10,6 +10,8 @@
 #include "LyraCameraAssistInterface.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "Math/RotationMatrix.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraCameraMode_ThirdPerson)
@@ -36,8 +38,9 @@ void ULyraCameraMode_ThirdPerson::UpdateView(float DeltaTime)
 {
 	UpdateForTarget(DeltaTime);
 	UpdateCrouchOffset(DeltaTime);
+	UpdateJumpOffset(DeltaTime);
 
-	FVector PivotLocation = GetPivotLocation() + CurrentCrouchOffset;
+	FVector PivotLocation = GetPivotLocation() + CurrentCrouchOffset + CurrentJumpOffset;
 	FRotator PivotRotation = GetPivotRotation();
 
 	PivotRotation.Pitch = FMath::ClampAngle(PivotRotation.Pitch, ViewPitchMin, ViewPitchMax);
@@ -73,7 +76,6 @@ void ULyraCameraMode_ThirdPerson::UpdateView(float DeltaTime)
 
 void ULyraCameraMode_ThirdPerson::UpdateForTarget(float DeltaTime)
 {
-
 	if (const ACharacter* TargetCharacter = Cast<ACharacter>(GetTargetActor()))
 	{
 		if (TargetCharacter->bIsCrouched)
@@ -82,12 +84,19 @@ void ULyraCameraMode_ThirdPerson::UpdateForTarget(float DeltaTime)
 			const float CrouchedHeightAdjustment = TargetCharacterCDO->CrouchedEyeHeight - TargetCharacterCDO->BaseEyeHeight;
 
 			SetTargetCrouchOffset(FVector(0.f, 0.f, CrouchedHeightAdjustment));
+			return;
+		}
 
+		UCharacterMovementComponent* CharacterMovement = TargetCharacter->GetCharacterMovement();
+		if (CharacterMovement && CharacterMovement->IsFalling())
+		{
+			SetTargetJumpOffset(JumpOffset);
 			return;
 		}
 	}
 
 	SetTargetCrouchOffset(FVector::ZeroVector);
+	SetTargetJumpOffset(FVector::ZeroVector);
 }
 
 void ULyraCameraMode_ThirdPerson::DrawDebug(UCanvas* Canvas) const
@@ -371,3 +380,23 @@ void ULyraCameraMode_ThirdPerson::UpdateCrouchOffset(float DeltaTime)
 	}
 }
 
+void ULyraCameraMode_ThirdPerson::SetTargetJumpOffset(FVector NewTargetOffset)
+{
+	JumpOffsetBlendPct = 0.f;
+	InitialJumpOffset = CurrentJumpOffset;
+	TargetJumpOffset = NewTargetOffset;
+}
+
+void ULyraCameraMode_ThirdPerson::UpdateJumpOffset(float DeltaTime)
+{
+	if (JumpOffsetBlendPct < 1.f)
+	{
+		JumpOffsetBlendPct = FMath::Min(JumpOffsetBlendPct + DeltaTime * JumpOffsetBlendMultiplier, 1.f);
+		CurrentJumpOffset = FMath::InterpEaseInOut(InitialJumpOffset, TargetJumpOffset, JumpOffsetBlendPct, 1.f);
+	}
+	else
+	{
+		CurrentJumpOffset = TargetJumpOffset;
+		JumpOffsetBlendPct = 1.f;
+	}
+}

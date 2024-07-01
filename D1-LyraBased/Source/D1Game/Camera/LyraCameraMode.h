@@ -111,7 +111,10 @@ protected:
 	// without having to ask about a specific mode (e.g., when aiming downsights to get more accuracy)
 	UPROPERTY(EditDefaultsOnly, Category = "Blending")
 	FGameplayTag CameraTypeTag;
-
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName CameraSocketName;
+	
 	// View output produced by the camera mode.
 	FLyraCameraModeView View;
 
@@ -186,7 +189,7 @@ protected:
 
 	void UpdateStack(float DeltaTime);
 	void BlendStack(FLyraCameraModeView& OutCameraModeView) const;
-
+	
 protected:
 
 	bool bIsActive;

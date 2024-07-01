@@ -39,7 +39,7 @@ private:
 	TSubclassOf<UD1EquipmentEntryWidget> EntryWidgetClass;
 
 	UPROPERTY()
-	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
 	
 private:
 	UPROPERTY()

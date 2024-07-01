@@ -2,6 +2,7 @@
 
 #include "D1EquipManagerComponent.h"
 #include "D1InventoryManagerComponent.h"
+#include "D1ItemManagerComponent.h"
 #include "Character/LyraCharacter.h"
 #include "Data/D1ItemData.h"
 #include "Engine/ActorChannel.h"
@@ -10,6 +11,7 @@
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/LyraPlayerController.h"
+#include "Player/LyraPlayerState.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentManagerComponent)
 
@@ -131,6 +133,32 @@ void UD1EquipmentManagerComponent::InitializeComponent()
 	}
 }
 
+void UD1EquipmentManagerComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (APlayerController* PlayerController = GetPlayerController())
+	{
+		if (UD1ItemManagerComponent* ItemManager = PlayerController->FindComponentByClass<UD1ItemManagerComponent>())
+		{
+			ItemManager->AddAllowedComponent(this);
+		}
+	}
+}
+
+void UD1EquipmentManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (APlayerController* PlayerController = GetPlayerController())
+	{
+		if (UD1ItemManagerComponent* ItemManager = PlayerController->FindComponentByClass<UD1ItemManagerComponent>())
+		{
+			ItemManager->RemoveAllowedComponent(this);
+		}
+	}
+	
+	Super::EndPlay(EndPlayReason);
+}
+
 void UD1EquipmentManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -171,18 +199,7 @@ void UD1EquipmentManagerComponent::ReadyForReplication()
 	}
 }
 
-void UD1EquipmentManagerComponent::Server_AddEquipment_FromInventory_Implementation(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType)
-{
-	check(GetOwner()->HasAuthority());
-	
-	if (CanAddEquipment_FromInventory(OtherComponent, FromItemSlotPos, ToEquipmentSlotType))
-	{
-		UD1ItemInstance* RemovedItemInstance = OtherComponent->RemoveItem_Unsafe(FromItemSlotPos, 1);
-		EquipmentList.AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
-	}
-}
-
-bool UD1EquipmentManagerComponent::CanAddEquipment_FromInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanAddEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const
 {
 	if (OtherComponent == nullptr)
 		return false;
@@ -199,21 +216,7 @@ bool UD1EquipmentManagerComponent::CanAddEquipment_FromInventory(UD1InventoryMan
 	return CanAddEquipment(FromItemInstance, ToEquipmentSlotType);
 }
 
-void UD1EquipmentManagerComponent::Server_AddEquipment_FromEquipment_Implementation(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType)
-{
-	check(GetOwner()->HasAuthority());
-
-	if (this == OtherComponent && FromEquipmentSlotType == ToEquipmentSlotType)
-		return;
-	
-	if (CanAddEquipment_FromEquipment(OtherComponent, FromEquipmentSlotType, ToEquipmentSlotType))
-	{
-		UD1ItemInstance* RemovedItemInstance = OtherComponent->EquipmentList.RemoveEquipment(FromEquipmentSlotType);
-		EquipmentList.AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
-	}
-}
-
-bool UD1EquipmentManagerComponent::CanAddEquipment_FromEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanAddEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const
 {
 	if (OtherComponent == nullptr)
 		return false;
@@ -335,24 +338,22 @@ void UD1EquipmentManagerComponent::TryAddEquipment(EEquipmentSlotType EquipmentS
 	}
 }
 
-void UD1EquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
+void UD1EquipmentManagerComponent::AddEquipment(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
 {
 	check(HasAuthority());
 
 	if (EquipmentSlotType == EEquipmentSlotType::Count || ItemInstance == nullptr)
 		return;
 
-	TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
-	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
+	EquipmentList.AddEquipment(EquipmentSlotType, ItemInstance);
 	
-	Entry.Init(ItemInstance);
 	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && ItemInstance)
 	{
 		AddReplicatedSubObject(ItemInstance);
 	}
 }
 
-UD1ItemInstance* UD1EquipmentManagerComponent::RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType)
+UD1ItemInstance* UD1EquipmentManagerComponent::RemoveEquipment(EEquipmentSlotType EquipmentSlotType)
 {
 	check(HasAuthority());
 
@@ -361,16 +362,11 @@ UD1ItemInstance* UD1EquipmentManagerComponent::RemoveEquipment_Unsafe(EEquipment
 	if (EquipmentSlotType == EEquipmentSlotType::Count)
 		return RemovedItemInstance;
 
-	TArray<FD1EquipmentEntry>& Entries = EquipmentList.Entries;
-	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
-
-	if (Entry.ItemInstance)
+	RemovedItemInstance = EquipmentList.RemoveEquipment(EquipmentSlotType);
+	
+	if (IsUsingRegisteredSubObjectList() && RemovedItemInstance)
 	{
-		RemovedItemInstance = EquipmentList.RemoveEquipment(EquipmentSlotType);
-		if (IsUsingRegisteredSubObjectList() && RemovedItemInstance)
-		{
-			RemoveReplicatedSubObject(RemovedItemInstance);
-		}
+		RemoveReplicatedSubObject(RemovedItemInstance);
 	}
 	return RemovedItemInstance;
 }

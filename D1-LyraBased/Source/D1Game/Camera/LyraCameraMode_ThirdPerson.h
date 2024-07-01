@@ -57,6 +57,10 @@ protected:
 	// Alters the speed that a crouch offset is blended in or out
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Third Person")
 	float CrouchOffsetBlendMultiplier = 5.0f;
+	
+	// Alters the speed that a jump offset is blended in or out
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Third Person")
+	float JumpOffsetBlendMultiplier = 5.0f;
 
 	// Penetration prevention
 public:
@@ -102,7 +106,6 @@ public:
 #endif
 
 protected:
-	
 	void SetTargetCrouchOffset(FVector NewTargetOffset);
 	void UpdateCrouchOffset(float DeltaTime);
 
@@ -110,5 +113,16 @@ protected:
 	FVector TargetCrouchOffset = FVector::ZeroVector;
 	float CrouchOffsetBlendPct = 1.0f;
 	FVector CurrentCrouchOffset = FVector::ZeroVector;
+
+protected:
+	void SetTargetJumpOffset(FVector NewTargetOffset);
+	void UpdateJumpOffset(float DeltaTime);
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FVector JumpOffset = FVector::ZeroVector;
+	
+	FVector InitialJumpOffset = FVector::ZeroVector;
+	FVector TargetJumpOffset = FVector::ZeroVector;
+	float JumpOffsetBlendPct = 1.0f;
+	FVector CurrentJumpOffset = FVector::ZeroVector;
 };
