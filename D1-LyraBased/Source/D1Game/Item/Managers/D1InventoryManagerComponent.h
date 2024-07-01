@@ -29,6 +29,7 @@ public:
 private:
 	friend struct FD1InventoryList;
 	friend class UD1InventoryManagerComponent;
+	friend class UD1ItemManagerComponent;
 	
 	UPROPERTY()
 	TObjectPtr<UD1ItemInstance> ItemInstance;
@@ -68,6 +69,7 @@ public:
 private:
 	friend class UD1InventoryManagerComponent;
 	friend class UD1EquipmentManagerComponent;
+	friend class UD1ItemManagerComponent;
 	
 	UPROPERTY()
 	TArray<FD1InventoryEntry> Entries;
@@ -95,37 +97,29 @@ public:
 
 protected:
 	virtual void InitializeComponent() override;
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 	virtual void ReadyForReplication() override;
 	
 public:
-	// TODO: With Validation - Check Valid Contract
-	UFUNCTION(Server, Reliable)
-	void Server_RequestMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos);
-	int32 CanMoveOrMergeItem_FromInternalInventory(const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const;
-
-	UFUNCTION(Server, Reliable)
-	void Server_RequestMoveOrMergeItem_FromExternalInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos);
-	int32 CanMoveOrMergeItem_FromExternalInventory(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const;
+	int32 CanMoveOrMergeItem(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const;
+	bool CanMoveOrMergeItem(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const;
 	
-	UFUNCTION(Server, Reliable)
-	void Server_RequestMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos);
-	bool CanMoveOrMergeItem_FromExternalEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const;
-
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void TryAddItemByRarity(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, EItemRarity ItemRarity);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void TryAddItemByProbatility(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities);
+	void TryAddItemByProbability(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void TryRemoveItem(int32 ItemTemplateID, int32 ItemCount);
 
 private:
-	void AddItem_Unsafe(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount);
-	UD1ItemInstance* RemoveItem_Unsafe(const FIntPoint& ItemSlotPos, int32 ItemCount);
+	void AddItem(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount);
+	UD1ItemInstance* RemoveItem(const FIntPoint& ItemSlotPos, int32 ItemCount);
 	
 public:
 	void MarkSlotChecks(TArray<TArray<bool>>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);
@@ -146,6 +140,7 @@ public:
 	
 private:
 	friend class UD1EquipmentManagerComponent;
+	friend class UD1ItemManagerComponent;
 	
 	UPROPERTY(Replicated)
 	FD1InventoryList InventoryList;

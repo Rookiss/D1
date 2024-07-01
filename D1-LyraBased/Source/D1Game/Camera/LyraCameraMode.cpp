@@ -89,20 +89,27 @@ FVector ULyraCameraMode::GetPivotLocation() const
 		// Height adjustments for characters to account for crouching.
 		if (const ACharacter* TargetCharacter = Cast<ACharacter>(TargetPawn))
 		{
-			const ACharacter* TargetCharacterCDO = TargetCharacter->GetClass()->GetDefaultObject<ACharacter>();
-			check(TargetCharacterCDO);
+			if (TargetCharacter->GetMesh()->DoesSocketExist(CameraSocketName))
+			{
+				return TargetCharacter->GetMesh()->GetSocketLocation(CameraSocketName);
+			}
+			else
+			{
+				const ACharacter* TargetCharacterCDO = TargetCharacter->GetClass()->GetDefaultObject<ACharacter>();
+				check(TargetCharacterCDO);
 
-			const UCapsuleComponent* CapsuleComp = TargetCharacter->GetCapsuleComponent();
-			check(CapsuleComp);
+				const UCapsuleComponent* CapsuleComp = TargetCharacter->GetCapsuleComponent();
+				check(CapsuleComp);
 
-			const UCapsuleComponent* CapsuleCompCDO = TargetCharacterCDO->GetCapsuleComponent();
-			check(CapsuleCompCDO);
+				const UCapsuleComponent* CapsuleCompCDO = TargetCharacterCDO->GetCapsuleComponent();
+				check(CapsuleCompCDO);
 
-			const float DefaultHalfHeight = CapsuleCompCDO->GetUnscaledCapsuleHalfHeight();
-			const float ActualHalfHeight = CapsuleComp->GetUnscaledCapsuleHalfHeight();
-			const float HeightAdjustment = (DefaultHalfHeight - ActualHalfHeight) + TargetCharacterCDO->BaseEyeHeight;
+				const float DefaultHalfHeight = CapsuleCompCDO->GetUnscaledCapsuleHalfHeight();
+				const float ActualHalfHeight = CapsuleComp->GetUnscaledCapsuleHalfHeight();
+				const float HeightAdjustment = (DefaultHalfHeight - ActualHalfHeight) + TargetCharacterCDO->BaseEyeHeight;
 
-			return TargetCharacter->GetActorLocation() + (FVector::UpVector * HeightAdjustment);
+				return TargetCharacter->GetActorLocation() + (FVector::UpVector * HeightAdjustment);
+			}
 		}
 
 		return TargetPawn->GetPawnViewLocation();

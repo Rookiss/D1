@@ -31,7 +31,7 @@ private:
 	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 NewItemCount);
 
 public:
-	UD1InventoryManagerComponent* GetInventoryManagerComponent() const { return InventoryManagerComponent; }
+	UD1InventoryManagerComponent* GetInventoryManagerComponent() const { return InventoryManager; }
 
 private:
 	UPROPERTY()
@@ -51,7 +51,7 @@ private:
 	TArray<TObjectPtr<UD1InventorySlotWidget>> HoveredSlotWidgets;
 
 	UPROPERTY()
-	TObjectPtr<UD1InventoryManagerComponent> InventoryManagerComponent;
+	TObjectPtr<UD1InventoryManagerComponent> InventoryManager;
 	
 private:
 	UPROPERTY(meta=(BindWidget))

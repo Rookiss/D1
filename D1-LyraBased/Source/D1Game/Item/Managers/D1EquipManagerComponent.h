@@ -141,7 +141,7 @@ private:
 	UFUNCTION()
 	void OnRep_CurrentWeaponEquipState();
 
-	void BroadcastChangedMessgae(EWeaponEquipState NewWeaponEquipState);
+	void BroadcastChangedMessage(EWeaponEquipState NewWeaponEquipState);
 	
 public:
 	ALyraCharacter* GetCharacter() const;
