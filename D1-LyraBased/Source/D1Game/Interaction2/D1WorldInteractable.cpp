@@ -10,5 +10,5 @@ AD1WorldInteractable::AD1WorldInteractable(const FObjectInitializer& ObjectIniti
 
 void AD1WorldInteractable::GatherInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const
 {
-	InteractionInfoBuilder.AddInteractionInfo(InteractionInfo);
+	InteractionInfoBuilder.AddInteractionInfo(GetInteractionInfo());
 }

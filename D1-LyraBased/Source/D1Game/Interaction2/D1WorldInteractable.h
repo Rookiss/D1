@@ -14,10 +14,6 @@ public:
 public:
 	virtual void GatherInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const override;
 
-protected:
-	virtual const FD1InteractionInfo& GetInteractionInfo() const override { return InteractionInfo; }
-	
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Info")
-	FD1InteractionInfo InteractionInfo;
+public:
+	virtual FD1InteractionInfo GetInteractionInfo() const override { return FD1InteractionInfo(); }
 };

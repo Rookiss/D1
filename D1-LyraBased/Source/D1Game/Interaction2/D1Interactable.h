@@ -43,5 +43,5 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	virtual const FD1InteractionInfo& GetInteractionInfo() const abstract;
+	virtual FD1InteractionInfo GetInteractionInfo() const abstract;
 };
