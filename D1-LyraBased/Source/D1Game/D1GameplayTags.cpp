@@ -49,7 +49,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_Bow,								"Ability.Attack.Bow");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Block,									"Ability.Block");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS,										"Ability.ADS");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact_Passive,						"Ability.Interact");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact,								"Ability.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact_Active,							"Ability.Interact.Active");
 
 	// Status
@@ -93,6 +93,8 @@ namespace D1GameplayTags
 
 	// Message
 	UE_DEFINE_GAMEPLAY_TAG(Message_Notification,							"Message.Notification");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Interaction_Notice,						"Message.Interaction.Notice");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Interaction_Progress,					"Message.Interaction.Progress");
 
 	// SetByCaller
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingHeal,						"SetByCaller.IncomingHeal");

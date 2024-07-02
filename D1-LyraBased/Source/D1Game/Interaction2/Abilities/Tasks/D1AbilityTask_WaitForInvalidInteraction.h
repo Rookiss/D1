@@ -15,7 +15,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category="Ability|Tasks", meta=(HidePin="OwningAbility", DefaultToSelf="OwningAbility", BlueprintInternalUseOnly="true"))
-	static UD1AbilityTask_WaitForInvalidInteraction* WaitForInvalidInteraction(UGameplayAbility* OwningAbility, const FHitResult& HitResult, float AcceptanceAngle = 80.f, float AcceptanceDistance = 300.f);
+	static UD1AbilityTask_WaitForInvalidInteraction* WaitForInvalidInteraction(UGameplayAbility* OwningAbility, FVector InteractionLocation, float AcceptanceAngle = 80.f, float AcceptanceDistance = 300.f);
 
 protected:
 	virtual void Activate() override;
@@ -23,16 +23,19 @@ protected:
 
 private:
 	void PerformCheck();
+	float CalculateAngle() const;
 
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnInvalidInteraction InvalidInteraction;
 
 private:
-	FHitResult CachedHitResult;
+	FVector InteractionLocation;
 	float AcceptanceAngle = 80.f;
 	float AcceptanceDistance = 300.f;
 	
 private:
 	FTimerHandle CheckTimerHandle;
+	float CachedAngle = 0.f;
+	FVector CachedCharacterLocation;
 };

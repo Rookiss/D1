@@ -15,5 +15,5 @@ public:
 	virtual void GatherInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const override;
 
 public:
-	virtual FD1InteractionInfo GetInteractionInfo() const override { return FD1InteractionInfo(); }
+	virtual FD1InteractionInfo GetInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override { return FD1InteractionInfo(); }
 };
