@@ -2,17 +2,12 @@
 
 #include "AbilitySystemComponent.h"
 #include "D1GameplayTags.h"
-#include "Interaction/Tasks/AbilityTask_GrantNearbyInteraction.h"
-#include "Interaction2/D1Interactable.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
 #include "Interaction2/D1InteractionInfo.h"
-#include "Player/LyraPlayerController.h"
 #include "Tasks/D1AbilityTask_GrantNearbyInteraction.h"
-#include "UI/IndicatorSystem/IndicatorDescriptor.h"
 #include "UI/IndicatorSystem/LyraIndicatorManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Interact)
-
-struct FInteractionOption;
 
 UD1GameplayAbility_Interact::UD1GameplayAbility_Interact(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -36,43 +31,13 @@ void UD1GameplayAbility_Interact::ActivateAbility(const FGameplayAbilitySpecHand
 
 void UD1GameplayAbility_Interact::UpdateInteractions(const TArray<FD1InteractionInfo>& InteractionInfos)
 {
-	if (ALyraPlayerController* PlayerController = GetLyraPlayerControllerFromActorInfo())
-	{
-		if (ULyraIndicatorManagerComponent* IndicatorManager = ULyraIndicatorManagerComponent::GetComponent(PlayerController))
-		{
-			for (UIndicatorDescriptor* Indicator : Indicators)
-			{
-				IndicatorManager->RemoveIndicator(Indicator);
-			}
-			Indicators.Reset();
+	FD1InteractionMessage Message;
+	Message.Instigator = GetAvatarActorFromActorInfo();
+	Message.bShouldRefresh = Message.bShouldActive = InteractionInfos.Num() > 0;
+	Message.InteractionInfo = InteractionInfos.Num() > 0 ? InteractionInfos[0] : FD1InteractionInfo();
 
-			for (const FD1InteractionInfo& InteractionInfo : InteractionInfos)
-			{
-				AActor* InteractableActor = nullptr;
-				if (UObject* Object = InteractionInfo.Interactable.GetObject())
-				{
-					if (AActor* Actor = Cast<AActor>(Object))
-					{
-						InteractableActor = Actor;
-					}
-					else if (UActorComponent* ActorComponent = Cast<UActorComponent>(Object))
-					{
-						InteractableActor = ActorComponent->GetOwner();
-					}
-				}
-				
-				TSoftClassPtr<UUserWidget> InteractionWidgetClass = InteractionInfo.InteractionWidgetClass.IsNull() ? DefaultInteractionWidgetClass : InteractionInfo.InteractionWidgetClass;
-
-				UIndicatorDescriptor* Indicator = NewObject<UIndicatorDescriptor>();
-				Indicator->SetDataObject(InteractableActor);
-				Indicator->SetSceneComponent(InteractableActor->GetRootComponent());
-				Indicator->SetIndicatorClass(InteractionWidgetClass);
-				IndicatorManager->AddIndicator(Indicator);
-
-				Indicators.Add(Indicator);
-			}
-		}
-	}
+	UGameplayMessageSubsystem& MessageSystem = UGameplayMessageSubsystem::Get(GetAvatarActorFromActorInfo());
+	MessageSystem.BroadcastMessage(D1GameplayTags::Message_Interaction_Notice, Message);
 
 	CurrentInteractionInfos = InteractionInfos;
 }
@@ -106,19 +71,6 @@ void UD1GameplayAbility_Interact::TriggerInteraction()
 		Payload.Instigator = Instigator;
 		Payload.Target = InteractableActor;
 		
-		InteractionInfo.Interactable->CustomizeInteractionEventData(D1GameplayTags::Ability_Interact_Active, Payload);
-		
-		AActor* TargetActor = const_cast<AActor*>(ToRawPtr(Payload.Target));
-		
-		FGameplayAbilityActorInfo ActorInfo;
-		ActorInfo.InitFromActor(InteractableActor, TargetActor, InteractionInfo.TargetAbilitySystem);
-		
-		const bool bSuccess = InteractionInfo.TargetAbilitySystem->TriggerAbilityFromGameplayEvent(
-			InteractionInfo.TargetInteractionAbilityHandle,
-			&ActorInfo,
-			D1GameplayTags::Ability_Interact_Active,
-			&Payload,
-			*InteractionInfo.TargetAbilitySystem
-		);
+		SendGameplayEvent(D1GameplayTags::Ability_Interact_Active, Payload);
 	}
 }

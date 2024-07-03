@@ -1,6 +1,11 @@
 ﻿#include "D1GameplayAbility_Interact_Active.h"
 
 #include "AbilitySystemComponent.h"
+#include "D1GameplayAbility_Interact.h"
+#include "D1GameplayTags.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
+#include "Interaction2/D1Interactable.h"
+#include "Interaction2/D1InteractionQuery.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Interact_Active)
 
@@ -14,55 +19,71 @@ UD1GameplayAbility_Interact_Active::UD1GameplayAbility_Interact_Active(const FOb
 	bServerRespectsRemoteAbilityCancellation = false;
 }
 
-void UD1GameplayAbility_Interact_Active::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+void UD1GameplayAbility_Interact_Active::Initialize(AActor* TargetActor)
 {
-	HideInteractionDurationWidget();
-	
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	TScriptInterface<ID1Interactable> TargetInteractable(TargetActor);
+	if (TargetInteractable)
+	{
+		FD1InteractionQuery Query;
+		Query.RequestingAvatar = GetAvatarActorFromActorInfo();
+		Query.RequestingController = GetControllerFromActorInfo();
+
+		Interactable = TargetInteractable;
+		InteractableActor = TargetActor;
+		
+		InteractionInfo = TargetInteractable->GetInteractionInfo(Query);
+		InteractionInfo.Interactable = TargetInteractable;
+	}
+	else
+	{
+		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
+	}
 }
 
-void UD1GameplayAbility_Interact_Active::Initialize(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
+void UD1GameplayAbility_Interact_Active::TriggerInteraction()
 {
-	AActor* TargetActor = TargetDataHandle.Get(0)->GetHitResult()->GetActor();
-	//
-	// if (ID1Interactable* Interactable = Cast<ID1Interactable>(TargetActor))
-	// {
-	// 	CurrentTargetDataHandle = TargetDataHandle;
-	// 	CachedTargetActor = TargetActor;
-	// 	CachedHoldTime = Interactable->GetInteractionInfo().HoldTime;
-	// }
-	// else
-	// {
-	// 	CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-	// }
+	FGameplayEventData Payload;
+	Payload.EventTag = D1GameplayTags::Ability_Interact;
+	Payload.Instigator = GetAvatarActorFromActorInfo();
+	Payload.Target = InteractableActor;
+
+	Interactable->CustomizeInteractionEventData(D1GameplayTags::Ability_Interact, Payload);
+
+	AActor* TargetActor = const_cast<AActor*>(ToRawPtr(Payload.Target));
+
+	if (UAbilitySystemComponent* AbilitySystem = GetAbilitySystemComponentFromActorInfo())
+	{
+		if (FGameplayAbilitySpec* InteractionAbilitySpec = AbilitySystem->FindAbilitySpecFromClass(InteractionInfo.InteractionAbilityToGrant))
+		{
+			FGameplayAbilityActorInfo ActorInfo;
+			ActorInfo.InitFromActor(InteractableActor, TargetActor, AbilitySystem);
+		
+			AbilitySystem->TriggerAbilityFromGameplayEvent(
+				InteractionAbilitySpec->Handle,
+				&ActorInfo,
+				D1GameplayTags::Ability_Interact,
+				&Payload,
+				*AbilitySystem
+			);
+		}
+	}
 }
 
-void UD1GameplayAbility_Interact_Active::Interact()
+void UD1GameplayAbility_Interact_Active::RefreshUI(bool bShouldRefresh, bool bShouldActive)
 {
-	// if (AActor* TargetActor = CachedTargetActor.Get())
-	// {
-	// 	ID1Interactable::Execute_Interact(TargetActor, GetAvatarActorFromActorInfo());
-	// }
-}
+	FD1InteractionMessage Message;
+	Message.Instigator = GetAvatarActorFromActorInfo();
+	Message.bShouldRefresh = bShouldRefresh;
+	Message.bShouldActive = bShouldActive;
+	Message.InteractionInfo = InteractionInfo;
 
-void UD1GameplayAbility_Interact_Active::ShowInteractionDurationWidget()
-{
-	// if (AD1HUD* HUD = GetHUD())
-	// {
-	// 	if (UD1InteractionWidget* InteractionWidget = HUD->GetInteractionWidget())
-	// 	{
-	// 		InteractionWidget->ShowInteractionDurationWidget(CachedHoldTime);
-	// 	}
-	// }
-}
+	UGameplayMessageSubsystem& MessageSystem = UGameplayMessageSubsystem::Get(GetAvatarActorFromActorInfo());
+	MessageSystem.BroadcastMessage(D1GameplayTags::Message_Interaction_Progress, Message);
 
-void UD1GameplayAbility_Interact_Active::HideInteractionDurationWidget()
-{
-	// if (AD1HUD* HUD = GetHUD())
-	// {
-	// 	if (UD1InteractionWidget* InteractionWidget = HUD->GetInteractionWidget())
-	// 	{
-	// 		InteractionWidget->HideInteractionWidget();
-	// 	}
-	// }
+	if (bShouldRefresh == false)
+	{
+		Message.bShouldRefresh = false;
+		Message.bShouldActive = true;
+		MessageSystem.BroadcastMessage(D1GameplayTags::Message_Interaction_Notice, Message);
+	}
 }

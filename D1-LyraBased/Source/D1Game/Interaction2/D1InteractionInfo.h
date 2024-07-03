@@ -21,19 +21,12 @@ public:
 	FText Content;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float HoldTime = 0.f;
+	float Duration = 0.f;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UGameplayAbility> InteractionAbilityToGrant;
-
-	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UAbilitySystemComponent> TargetAbilitySystem = nullptr;
 	
-	UPROPERTY(BlueprintReadOnly)
-	FGameplayAbilitySpecHandle TargetInteractionAbilityHandle;
-	
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftClassPtr<UUserWidget> InteractionWidgetClass;
 
@@ -43,10 +36,8 @@ public:
 		return Interactable == Other.Interactable &&
 			Title.IdenticalTo(Other.Title) &&
 			Content.IdenticalTo(Other.Content) &&
-			HoldTime == Other.HoldTime &&
+			Duration == Other.Duration &&
 			InteractionAbilityToGrant == Other.InteractionAbilityToGrant &&
-			TargetAbilitySystem == Other.TargetAbilitySystem &&
-			TargetInteractionAbilityHandle == Other.TargetInteractionAbilityHandle &&
 			InteractionWidgetClass == Other.InteractionWidgetClass;
 	}
 

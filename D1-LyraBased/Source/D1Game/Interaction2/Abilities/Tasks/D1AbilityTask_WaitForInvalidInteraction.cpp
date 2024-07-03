@@ -10,10 +10,10 @@ UD1AbilityTask_WaitForInvalidInteraction::UD1AbilityTask_WaitForInvalidInteracti
     
 }
 
-UD1AbilityTask_WaitForInvalidInteraction* UD1AbilityTask_WaitForInvalidInteraction::WaitForInvalidInteraction(UGameplayAbility* OwningAbility, const FHitResult& HitResult, float AcceptanceAngle, float AcceptanceDistance)
+UD1AbilityTask_WaitForInvalidInteraction* UD1AbilityTask_WaitForInvalidInteraction::WaitForInvalidInteraction(UGameplayAbility* OwningAbility, FVector InteractionLocation, float AcceptanceAngle, float AcceptanceDistance)
 {
 	UD1AbilityTask_WaitForInvalidInteraction* Task = NewAbilityTask<UD1AbilityTask_WaitForInvalidInteraction>(OwningAbility);
-	Task->CachedHitResult = HitResult;
+	Task->InteractionLocation = InteractionLocation;
 	Task->AcceptanceAngle = AcceptanceAngle;
 	Task->AcceptanceDistance = AcceptanceDistance;
 	return Task;
@@ -24,6 +24,10 @@ void UD1AbilityTask_WaitForInvalidInteraction::Activate()
 	Super::Activate();
 
 	SetWaitingOnAvatar();
+
+	CachedAngle = CalculateAngle();
+	CachedCharacterLocation = GetAvatarActor() ? GetAvatarActor()->GetActorLocation() : FVector::ZeroVector;
+
 	GetWorld()->GetTimerManager().SetTimer(CheckTimerHandle, this, &ThisClass::PerformCheck, 0.1f, true);
 }
 
@@ -41,15 +45,8 @@ void UD1AbilityTask_WaitForInvalidInteraction::PerformCheck()
 	
 	if (AvatarActor && AvatarController)
 	{
-		FVector CameraStart;
-		FRotator CameraRotation;
-		AvatarController->GetPlayerViewPoint(CameraStart, CameraRotation);
-
-		FVector CameraToTarget = (CachedHitResult.ImpactPoint - CameraStart).GetSafeNormal();
-		FVector CameraDirection = CameraRotation.Vector();
-			
-		bool bValidAngle = UKismetMathLibrary::DegAcos(CameraToTarget.Dot(CameraDirection)) <= AcceptanceAngle;
-		bool bValidDistance = FVector::DistSquared(CachedHitResult.GetActor()->GetActorLocation(), AvatarActor->GetActorLocation()) <= AcceptanceDistance * AcceptanceDistance;
+		bool bValidAngle = FMath::Abs(CachedAngle - CalculateAngle()) <= AcceptanceAngle;
+		bool bValidDistance = FVector::DistSquared(CachedCharacterLocation, AvatarActor->GetActorLocation()) <= AcceptanceDistance * AcceptanceDistance;
 		
 		if (bValidDistance && bValidAngle)
 			return;
@@ -57,4 +54,23 @@ void UD1AbilityTask_WaitForInvalidInteraction::PerformCheck()
 
 	InvalidInteraction.Broadcast();
 	EndTask();
+}
+
+float UD1AbilityTask_WaitForInvalidInteraction::CalculateAngle() const
+{
+	AActor* AvatarActor = Ability->GetCurrentActorInfo()->AvatarActor.Get();
+	APlayerController* AvatarController = Ability->GetCurrentActorInfo()->PlayerController.Get();
+	
+	if (AvatarActor && AvatarController)
+	{
+		FVector CameraStart;
+		FRotator CameraRotation;
+		AvatarController->GetPlayerViewPoint(CameraStart, CameraRotation);
+
+		FVector CameraToTarget = (InteractionLocation - CameraStart).GetSafeNormal();
+		FVector CameraDirection = CameraRotation.Vector();
+			
+		return UKismetMathLibrary::DegAcos(CameraToTarget.Dot(CameraDirection));
+	}
+	return 0.f;
 }
