@@ -100,13 +100,11 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingHeal,						"SetByCaller.IncomingHeal");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingDamage,						"SetByCaller.IncomingDamage");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_PhysicalWeaponDamage,				"SetByCaller.PhysicalWeaponDamage");
-	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_MoveSpeed,						    "SetByCaller.MoveSpeed");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_BaseMoveSpeed,						"SetByCaller.BaseMoveSpeed");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Strength,						    "SetByCaller.Strength");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Defense,								"SetByCaller.Defense");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Vigor,								"SetByCaller.Vigor");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Agility,								"SetByCaller.Agility");
-	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Dexterity,							"SetByCaller.Dexterity");
-	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Will,								"SetByCaller.Will");
-	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Knowledge,							"SetByCaller.Knowledge");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Resourcefulness,						"SetByCaller.Resourcefulness");
 	
 	// GameplayCue

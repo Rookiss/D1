@@ -14,11 +14,13 @@ public:
 	{
 		BaseDamageDef = FGameplayEffectAttributeCaptureDefinition(ULyraCombatSet::GetBaseDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 		StrengthDef = FGameplayEffectAttributeCaptureDefinition(ULyraCombatSet::GetStrengthAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		DefenseDef = FGameplayEffectAttributeCaptureDefinition(ULyraCombatSet::GetDefenseAttribute(), EGameplayEffectAttributeCaptureSource::Target, true);
 	}
 
 public:
 	FGameplayEffectAttributeCaptureDefinition BaseDamageDef;
 	FGameplayEffectAttributeCaptureDefinition StrengthDef;
+	FGameplayEffectAttributeCaptureDefinition DefenseDef;
 };
 
 static FDamageStatics& DamageStatics()
@@ -31,6 +33,7 @@ ULyraDamageExecution::ULyraDamageExecution()
 {
 	RelevantAttributesToCapture.Add(DamageStatics().BaseDamageDef);
 	RelevantAttributesToCapture.Add(DamageStatics().StrengthDef);
+	RelevantAttributesToCapture.Add(DamageStatics().DefenseDef);
 }
 
 void ULyraDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
@@ -52,72 +55,15 @@ void ULyraDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 
 	float Strength = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().StrengthDef, EvaluateParameters, Strength);
+
+	float Defense = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DefenseDef, EvaluateParameters, Defense);
 	
-	const AActor* EffectCauser = TypedContext->GetEffectCauser();
-	const FHitResult* HitActorResult = TypedContext->GetHitResult();
-
-	AActor* HitActor = nullptr;
-	FVector ImpactLocation = FVector::ZeroVector;
-	FVector ImpactNormal = FVector::ZeroVector;
-	FVector StartTrace = FVector::ZeroVector;
-	FVector EndTrace = FVector::ZeroVector;
-	
-	if (HitActorResult)
-	{
-		const FHitResult& CurHitResult = *HitActorResult;
-		HitActor = CurHitResult.HitObjectHandle.FetchActor();
-		if (HitActor)
-		{
-			ImpactLocation = CurHitResult.ImpactPoint;
-			ImpactNormal = CurHitResult.ImpactNormal;
-			StartTrace = CurHitResult.TraceStart;
-			EndTrace = CurHitResult.TraceEnd;
-		}
-	}
-
-	// Handle case of no hit result or hit result not actually returning an actor
-	UAbilitySystemComponent* TargetAbilitySystemComponent = ExecutionParams.GetTargetAbilitySystemComponent();
-	if (!HitActor)
-	{
-		HitActor = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->GetAvatarActor_Direct() : nullptr;
-		if (HitActor)
-		{
-			ImpactLocation = HitActor->GetActorLocation();
-		}
-	}
-
-	// Apply rules for team damage/self damage/etc...
-	float DamageInteractionAllowedMultiplier = 1.0f;
-	// float DamageInteractionAllowedMultiplier = 0.0f;
-	// if (HitActor)
-	// {
-	// 	ULyraTeamSubsystem* TeamSubsystem = HitActor->GetWorld()->GetSubsystem<ULyraTeamSubsystem>();
-	// 	if (ensure(TeamSubsystem))
-	// 	{
-	// 		DamageInteractionAllowedMultiplier = TeamSubsystem->CanCauseDamage(EffectCauser, HitActor) ? 1.0 : 0.0;
-	// 	}
-	// }
-
-	// Apply ability source modifiers
-	float PhysicalMaterialAttenuation = 1.0f;
-	float DistanceAttenuation = 1.0f;
-	// if (const ILyraAbilitySourceInterface* AbilitySource = TypedContext->GetAbilitySource())
-	// {
-	// 	if (const UPhysicalMaterial* PhysMat = TypedContext->GetPhysicalMaterial())
-	// 	{
-	// 		PhysicalMaterialAttenuation = AbilitySource->GetPhysicalMaterialAttenuation(PhysMat, SourceTags, TargetTags);
-	// 	}
-	//
-	// 	DistanceAttenuation = AbilitySource->GetDistanceAttenuation(Distance, SourceTags, TargetTags);
-	// }
-	// DistanceAttenuation = FMath::Max(DistanceAttenuation, 0.0f);
-
-	// Clamping is done when damage is converted to -health
-	const float DamageDone = FMath::Max((BaseDamage / 2.f + Strength) * DistanceAttenuation * PhysicalMaterialAttenuation * DamageInteractionAllowedMultiplier, 0.0f);
+	const float DamageDone = FMath::Max((BaseDamage / 2.f + Strength - Defense), 0.0f);
 
 	if (DamageDone > 0.0f)
 	{
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(ULyraHealthSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, DamageDone));
 	}
-#endif // #if WITH_SERVER_CODE
+#endif // WITH_SERVER_CODE
 }

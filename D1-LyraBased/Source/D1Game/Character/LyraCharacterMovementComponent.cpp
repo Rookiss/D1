@@ -129,11 +129,12 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 			return 0;
 
 		bool IsADS = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_ADS);
+		bool IsBlock = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Block);
 		
 		const UAttributeSet* AttributeSet = ASC->GetAttributeSet(ULyraCombatSet::StaticClass());
 		if (const ULyraCombatSet* CombatSet = Cast<ULyraCombatSet>(AttributeSet))
 		{
-			float MaxSpeed = FMath::Max(0.f, CombatSet->GetMoveSpeed());
+			float MaxSpeed = FMath::Max(0.f, CombatSet->GetBaseMoveSpeed() + CombatSet->GetAgility());
 			switch(MovementMode)
 			{
 			case MOVE_Walking:
@@ -158,7 +159,7 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 				}
 					
 				float CrouchCheck = IsCrouching() ? DirectionCheck * CrouchMovePercent : DirectionCheck;
-				float ADSCheck = IsADS ? CrouchCheck * ADSMovePercent : CrouchCheck;
+				float ADSCheck = (IsADS || IsBlock) ? CrouchCheck * ADSMovePercent : CrouchCheck;
 				return ADSCheck;
 			}
 			case MOVE_Falling:

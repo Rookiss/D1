@@ -31,44 +31,41 @@ private:
 	FGameplayAttributeData BaseHeal;
 	
 public:
-	ATTRIBUTE_ACCESSORS(ThisClass, MoveSpeed);
+	ATTRIBUTE_ACCESSORS(ThisClass, BaseMoveSpeed);
 
 protected:
 	UFUNCTION()
-	void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
+	void OnRep_BaseMoveSpeed(const FGameplayAttributeData& OldValue);
 
 private:
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MoveSpeed, meta=(AllowPrivateAccess="true"))
-	FGameplayAttributeData MoveSpeed;
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_BaseMoveSpeed, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData BaseMoveSpeed;
 	
 public:
 	ATTRIBUTE_ACCESSORS(ThisClass, Strength);
+	ATTRIBUTE_ACCESSORS(ThisClass, Defense);
 	ATTRIBUTE_ACCESSORS(ThisClass, Vigor);
 	ATTRIBUTE_ACCESSORS(ThisClass, Agility);
-	ATTRIBUTE_ACCESSORS(ThisClass, Dexterity);
-	ATTRIBUTE_ACCESSORS(ThisClass, Will);
-	ATTRIBUTE_ACCESSORS(ThisClass, Knowledge);
 	ATTRIBUTE_ACCESSORS(ThisClass, Resourcefulness);
 	
 protected:
+	// 공격력
 	UFUNCTION()
 	void OnRep_Strength(const FGameplayAttributeData& OldValue);
+
+	// 방어력
+	UFUNCTION()
+	void OnRep_Defense(const FGameplayAttributeData& OldValue);
 	
+	// 최대 체력(+)
 	UFUNCTION()
 	void OnRep_Vigor(const FGameplayAttributeData& OldValue);
-	
+
+	// 이동 속도(+)
 	UFUNCTION()
 	void OnRep_Agility(const FGameplayAttributeData& OldValue);
-
-	UFUNCTION()
-	void OnRep_Dexterity(const FGameplayAttributeData& OldValue);
 	
-	UFUNCTION()
-	void OnRep_Will(const FGameplayAttributeData& OldValue);
-	
-	UFUNCTION()
-	void OnRep_Knowledge(const FGameplayAttributeData& OldValue);
-
+	// 상호작용 속도(+)
 	UFUNCTION()
 	void OnRep_Resourcefulness(const FGameplayAttributeData& OldValue);
 
@@ -76,20 +73,14 @@ private:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Strength, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Strength;
 	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Defense, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData Defense;
+	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Vigor, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Vigor;
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Agility, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Agility;
-
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Dexterity, meta=(AllowPrivateAccess="true"))
-	FGameplayAttributeData Dexterity;
-	
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Will, meta=(AllowPrivateAccess="true"))
-	FGameplayAttributeData Will;
-
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Knowledge, meta=(AllowPrivateAccess="true"))
-	FGameplayAttributeData Knowledge;
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Resourcefulness, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Resourcefulness;
