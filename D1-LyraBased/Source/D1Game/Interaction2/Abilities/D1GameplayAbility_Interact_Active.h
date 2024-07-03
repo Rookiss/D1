@@ -1,7 +1,10 @@
 ﻿#pragma once
 
 #include "AbilitySystem/Abilities/LyraGameplayAbility.h"
+#include "Interaction2/D1InteractionInfo.h"
 #include "D1GameplayAbility_Interact_Active.generated.h"
+
+class ID1Interactable;
 
 UCLASS()
 class UD1GameplayAbility_Interact_Active : public ULyraGameplayAbility
@@ -12,29 +15,22 @@ public:
 	UD1GameplayAbility_Interact_Active(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
-	
-protected:
 	UFUNCTION(BlueprintCallable)
-	void Initialize(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
-	
-	UFUNCTION(BlueprintCallable)
-	void Interact();
-
-protected:
-	UFUNCTION(BlueprintCallable)
-	void ShowInteractionDurationWidget();
+	void Initialize(AActor* TargetActor);
 
 	UFUNCTION(BlueprintCallable)
-	void HideInteractionDurationWidget();
+	void TriggerInteraction();
+	
+	UFUNCTION(BlueprintCallable)
+	void RefreshUI(bool bShouldRefresh, bool bShouldActive);
 	
 protected:
 	UPROPERTY(BlueprintReadOnly)
-	FGameplayAbilityTargetDataHandle CurrentTargetDataHandle;
+	TScriptInterface<ID1Interactable> Interactable;
 	
 	UPROPERTY(BlueprintReadOnly)
-	TWeakObjectPtr<AActor> CachedTargetActor;
-
+	TObjectPtr<AActor> InteractableActor;
+	
 	UPROPERTY(BlueprintReadOnly)
-	float CachedHoldTime = 0.f;
+	FD1InteractionInfo InteractionInfo;
 };

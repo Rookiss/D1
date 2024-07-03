@@ -1,11 +1,27 @@
 ﻿#pragma once
 
 #include "AbilitySystem/Abilities/LyraGameplayAbility.h"
+#include "Interaction2/D1InteractionInfo.h"
 #include "D1GameplayAbility_Interact.generated.h"
 
-class UIndicatorDescriptor;
-class UD1GameplayAbility_Interact_Active;
-struct FD1InteractionInfo;
+USTRUCT(BlueprintType)
+struct FD1InteractionMessage
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<AActor> Instigator = nullptr;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bShouldRefresh = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bShouldActive = false;
+	
+	UPROPERTY(BlueprintReadWrite)
+	FD1InteractionInfo InteractionInfo = FD1InteractionInfo();
+};
 
 UCLASS()
 class UD1GameplayAbility_Interact : public ULyraGameplayAbility
@@ -28,9 +44,6 @@ protected:
 protected:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FD1InteractionInfo> CurrentInteractionInfos;
-	
-	UPROPERTY()
-	TArray<TObjectPtr<UIndicatorDescriptor>> Indicators;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly)

@@ -91,6 +91,8 @@ namespace D1GameplayTags
 
 	// Message
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Notification);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Interaction_Notice);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Interaction_Progress);
 
 	// SetByCaller
 	D1GAME_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_IncomingHeal);

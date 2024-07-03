@@ -10,5 +10,5 @@ AD1WorldPickupable::AD1WorldPickupable(const FObjectInitializer& ObjectInitializ
 
 void AD1WorldPickupable::GatherInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const
 {
-	InteractionInfoBuilder.AddInteractionInfo(GetInteractionInfo());
+	InteractionInfoBuilder.AddInteractionInfo(GetInteractionInfo(InteractionQuery));
 }
