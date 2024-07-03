@@ -125,7 +125,7 @@ void ULyraHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackD
 	const FGameplayEffectContextHandle& EffectContext = Data.EffectSpec.GetEffectContext();
 	AActor* Instigator = EffectContext.GetOriginalInstigator();
 	AActor* Causer = EffectContext.GetEffectCauser();
-
+	
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
 		// Send a standardized verb message that other systems can observe

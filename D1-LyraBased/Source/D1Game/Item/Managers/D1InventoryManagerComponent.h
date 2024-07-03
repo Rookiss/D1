@@ -145,6 +145,6 @@ private:
 	UPROPERTY(Replicated)
 	FD1InventoryList InventoryList;
 	
-	FIntPoint InventorySlotCount = FIntPoint(10, 5);
+	FIntPoint InventorySlotCount = FIntPoint(8, 5);
 	TArray<TArray<bool>> SlotChecks;
 };
