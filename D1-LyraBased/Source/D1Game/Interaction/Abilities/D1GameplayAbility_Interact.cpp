@@ -1,0 +1,76 @@
+﻿#include "D1GameplayAbility_Interact.h"
+
+#include "AbilitySystemComponent.h"
+#include "D1GameplayTags.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
+#include "Interaction/D1InteractionInfo.h"
+#include "Tasks/D1AbilityTask_GrantNearbyInteraction.h"
+#include "UI/IndicatorSystem/LyraIndicatorManagerComponent.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Interact)
+
+UD1GameplayAbility_Interact::UD1GameplayAbility_Interact(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	ActivationPolicy = ELyraAbilityActivationPolicy::OnSpawn;
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
+}
+
+void UD1GameplayAbility_Interact::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	UAbilitySystemComponent* AbilitySystem = GetAbilitySystemComponentFromActorInfo();
+	if (AbilitySystem && AbilitySystem->GetOwnerRole() == ROLE_Authority)
+	{
+		UD1AbilityTask_GrantNearbyInteraction* Task = UD1AbilityTask_GrantNearbyInteraction::GrantAbilitiesForNearbyInteractables(this, InteractionScanRange, InteractionScanRate);
+		Task->ReadyForActivation();
+	}
+}
+
+void UD1GameplayAbility_Interact::UpdateInteractions(const TArray<FD1InteractionInfo>& InteractionInfos)
+{
+	FD1InteractionMessage Message;
+	Message.Instigator = GetAvatarActorFromActorInfo();
+	Message.bShouldRefresh = Message.bShouldActive = InteractionInfos.Num() > 0;
+	Message.InteractionInfo = InteractionInfos.Num() > 0 ? InteractionInfos[0] : FD1InteractionInfo();
+
+	UGameplayMessageSubsystem& MessageSystem = UGameplayMessageSubsystem::Get(GetAvatarActorFromActorInfo());
+	MessageSystem.BroadcastMessage(D1GameplayTags::Message_Interaction_Notice, Message);
+
+	CurrentInteractionInfos = InteractionInfos;
+}
+
+void UD1GameplayAbility_Interact::TriggerInteraction()
+{
+	if (CurrentInteractionInfos.Num() == 0)
+		return;
+	
+	if (GetAbilitySystemComponentFromActorInfo())
+	{
+		const FD1InteractionInfo& InteractionInfo = CurrentInteractionInfos[0];
+
+		AActor* Instigator = GetAvatarActorFromActorInfo();
+		AActor* InteractableActor = nullptr;
+
+		if (UObject* Object = InteractionInfo.Interactable.GetObject())
+		{
+			if (AActor* Actor = Cast<AActor>(Object))
+			{
+				InteractableActor = Actor;
+			}
+			else if (UActorComponent* ActorComponent = Cast<UActorComponent>(Object))
+			{
+				InteractableActor = ActorComponent->GetOwner();
+			}
+		}
+		
+		FGameplayEventData Payload;
+		Payload.EventTag = D1GameplayTags::Ability_Interact_Active;
+		Payload.Instigator = Instigator;
+		Payload.Target = InteractableActor;
+		
+		SendGameplayEvent(D1GameplayTags::Ability_Interact_Active, Payload);
+	}
+}

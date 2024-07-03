@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Interaction2/D1WorldInteractable.h"
+#include "Interaction/D1WorldInteractable.h"
 #include "D1ChestBase.generated.h"
 
 UCLASS(BlueprintType, Blueprintable)
