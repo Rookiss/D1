@@ -79,7 +79,7 @@ void UD1AbilityTask_GrantNearbyInteraction::QueryInteractables()
 			for (TScriptInterface<ID1Interactable>& Interactable : Interactables)
 			{
 				FD1InteractionInfoBuilder InteractionInfoBuilder(Interactable, InteractionInfos);
-				Interactable->GatherInteractionInfos(InteractionQuery, InteractionInfoBuilder);
+				Interactable->GatherPostInteractionInfos(InteractionQuery, InteractionInfoBuilder);
 			}
 
 			for (FD1InteractionInfo& InteractionInfo : InteractionInfos)

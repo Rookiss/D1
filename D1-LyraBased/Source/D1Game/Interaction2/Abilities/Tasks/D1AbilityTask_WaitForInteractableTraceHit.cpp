@@ -189,7 +189,7 @@ void UD1AbilityTask_WaitForInteractableTraceHit::UpdateInteractionInfos(const FD
 	{
 		TArray<FD1InteractionInfo> TempInteractionInfos;
 		FD1InteractionInfoBuilder InteractionInfoBuilder(Interactable, TempInteractionInfos);
-		Interactable->GatherInteractionInfos(InteractQuery, InteractionInfoBuilder);
+		Interactable->GatherPostInteractionInfos(InteractQuery, InteractionInfoBuilder);
 
 		for (FD1InteractionInfo& InteractionInfo : TempInteractionInfos)
 		{

@@ -38,10 +38,9 @@ class ID1Interactable
 	GENERATED_BODY()
 
 public:
-	virtual void GatherInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const abstract;
+	virtual void GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const abstract;
 	virtual void CustomizeInteractionEventData(const FGameplayTag& InteractionEventTag, FGameplayEventData& InOutEventData) const { }
 
-public:
-	UFUNCTION(BlueprintCallable)
-	virtual FD1InteractionInfo GetInteractionInfo(const FD1InteractionQuery& InteractionQuery) const abstract;
+protected:
+	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const abstract;
 };

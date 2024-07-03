@@ -24,15 +24,17 @@ void UD1GameplayAbility_Interact_Active::Initialize(AActor* TargetActor)
 	TScriptInterface<ID1Interactable> TargetInteractable(TargetActor);
 	if (TargetInteractable)
 	{
-		FD1InteractionQuery Query;
-		Query.RequestingAvatar = GetAvatarActorFromActorInfo();
-		Query.RequestingController = GetControllerFromActorInfo();
+		FD1InteractionQuery InteractionQuery;
+		InteractionQuery.RequestingAvatar = GetAvatarActorFromActorInfo();
+		InteractionQuery.RequestingController = GetControllerFromActorInfo();
 
 		Interactable = TargetInteractable;
 		InteractableActor = TargetActor;
-		
-		InteractionInfo = TargetInteractable->GetInteractionInfo(Query);
-		InteractionInfo.Interactable = TargetInteractable;
+
+		TArray<FD1InteractionInfo> InteractionInfos;
+		FD1InteractionInfoBuilder InteractionInfoBuilder(Interactable, InteractionInfos);
+		Interactable->GatherPostInteractionInfos(InteractionQuery, InteractionInfoBuilder);
+		InteractionInfo = InteractionInfos[0];
 	}
 	else
 	{

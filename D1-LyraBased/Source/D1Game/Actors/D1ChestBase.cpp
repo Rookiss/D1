@@ -19,7 +19,7 @@ void AD1ChestBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(ThisClass, bIsOpened);
 }
 
-FD1InteractionInfo AD1ChestBase::GetInteractionInfo(const FD1InteractionQuery& InteractionQuery) const
+FD1InteractionInfo AD1ChestBase::GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const
 {
 	return bIsOpened ? OpenedInteractionInfo : ClosedInteractionInfo;
 }

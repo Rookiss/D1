@@ -13,10 +13,10 @@ public:
 	AD1WorldPickupable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	virtual void GatherInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const override;
+	virtual void GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const override;
 
 public:
-	virtual FD1InteractionInfo GetInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override { return InteractionInfo; }
+	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override { return InteractionInfo; }
 	virtual FD1PickupInfo GetPickupInfo() const override { return PickupInfo; }
 	
 protected:

@@ -5,7 +5,6 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "D1GameplayTags.h"
-#include "LyraCharacter.h"
 #include "AbilitySystem/Attributes/LyraCombatSet.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/World.h"
@@ -134,7 +133,7 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 		const UAttributeSet* AttributeSet = ASC->GetAttributeSet(ULyraCombatSet::StaticClass());
 		if (const ULyraCombatSet* CombatSet = Cast<ULyraCombatSet>(AttributeSet))
 		{
-			float MaxSpeed = FMath::Max(0.f, CombatSet->GetBaseMoveSpeed() + CombatSet->GetAgility());
+			float MaxSpeed = FMath::Max(0.f, CombatSet->GetMoveSpeed() + CombatSet->GetAgility());
 			switch(MovementMode)
 			{
 			case MOVE_Walking:

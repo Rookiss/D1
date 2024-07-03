@@ -12,8 +12,8 @@ public:
 	AD1WorldInteractable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 public:
-	virtual void GatherInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const override;
+	virtual void GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const override;
 
-public:
-	virtual FD1InteractionInfo GetInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override { return FD1InteractionInfo(); }
+protected:
+	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override { return FD1InteractionInfo(); }
 };

@@ -16,7 +16,7 @@ void ULyraCombatSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BaseDamage, COND_OwnerOnly, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BaseHeal, COND_OwnerOnly, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BaseMoveSpeed, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeed, COND_OwnerOnly, REPNOTIFY_Always);
 	
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Strength, COND_OwnerOnly, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Defense, COND_OwnerOnly, REPNOTIFY_Always);
@@ -35,9 +35,9 @@ void ULyraCombatSet::OnRep_BaseHeal(const FGameplayAttributeData& OldValue)
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseHeal, OldValue);
 }
 
-void ULyraCombatSet::OnRep_BaseMoveSpeed(const FGameplayAttributeData& OldValue)
+void ULyraCombatSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseMoveSpeed, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MoveSpeed, OldValue);
 }
 
 void ULyraCombatSet::OnRep_Strength(const FGameplayAttributeData& OldValue)
