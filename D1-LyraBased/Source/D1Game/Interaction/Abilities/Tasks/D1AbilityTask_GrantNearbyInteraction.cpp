@@ -51,7 +51,7 @@ void UD1AbilityTask_GrantNearbyInteraction::QueryInteractables()
 		FCollisionQueryParams Params(SCENE_QUERY_STAT(UD1AbilityTask_GrantNearbyInteraction), false);
 
 		TArray<FOverlapResult> OverlapResults;
-		World->OverlapMultiByChannel(OUT OverlapResults, AvatarActor->GetActorLocation(), FQuat::Identity, D1_TraceChannel_Interaction, FCollisionShape::MakeSphere(InteractionAbilityScanRange), Params);
+		World->OverlapMultiByChannel(OverlapResults, AvatarActor->GetActorLocation(), FQuat::Identity, D1_TraceChannel_Interaction, FCollisionShape::MakeSphere(InteractionAbilityScanRange), Params);
 		
 		if (OverlapResults.Num() > 0)
 		{
@@ -63,7 +63,7 @@ void UD1AbilityTask_GrantNearbyInteraction::QueryInteractables()
 				{
 					Interactables.AddUnique(InteractableActor);
 				}
-
+		
 				TScriptInterface<ID1Interactable> InteractableComponent(OverlapResult.GetComponent());
 				if (InteractableComponent)
 				{
@@ -81,7 +81,7 @@ void UD1AbilityTask_GrantNearbyInteraction::QueryInteractables()
 				FD1InteractionInfoBuilder InteractionInfoBuilder(Interactable, InteractionInfos);
 				Interactable->GatherPostInteractionInfos(InteractionQuery, InteractionInfoBuilder);
 			}
-
+		
 			for (FD1InteractionInfo& InteractionInfo : InteractionInfos)
 			{
 				if (InteractionInfo.InteractionAbilityToGrant)

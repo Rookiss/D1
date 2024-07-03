@@ -15,7 +15,7 @@ public:
 protected:
 	virtual void Activate() override;
 	virtual void OnDestroy(bool bInOwnerFinished) override;
-
+	
 private:
 	void QueryInteractables();
 	
