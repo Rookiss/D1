@@ -17,6 +17,6 @@ void UD1ItemDragWidget::Init(const FVector2D& InWidgetSize, UTexture2D* InItemIc
 	SizeBox_Root->SetWidthOverride(InWidgetSize.X);
 	SizeBox_Root->SetHeightOverride(InWidgetSize.Y);
 	
-	Image_Icon->SetBrushFromTexture(InItemIcon);
+	Image_Icon->SetBrushFromTexture(InItemIcon, true);
 	Text_Count->SetText((InItemCount >= 2) ? FText::AsNumber(InItemCount) : FText::GetEmpty());
 }

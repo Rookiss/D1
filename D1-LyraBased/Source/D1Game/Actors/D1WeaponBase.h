@@ -46,7 +46,7 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UAnimMontage* GetHitMontage();
+	UAnimMontage* GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -71,7 +71,4 @@ public:
 
 private:
 	FLyraAbilitySet_GrantedHandles SkillAbilitySetHandles;
-
-	UPROPERTY(Transient)
-	UAnimMontage* CachedHitMontage;
 };

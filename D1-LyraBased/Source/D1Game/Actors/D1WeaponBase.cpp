@@ -8,6 +8,7 @@
 #include "Data/D1ItemData.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Physics/LyraCollisionChannels.h"
 #include "System/LyraAssetManager.h"
@@ -52,7 +53,6 @@ void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 	DOREPLIFETIME(ThisClass, TemplateID);
 	DOREPLIFETIME(ThisClass, EquipmentSlotType);
-	DOREPLIFETIME(ThisClass, bCanBlock);
 }
 
 void AD1WeaponBase::Destroyed()
@@ -149,15 +149,50 @@ UAbilitySystemComponent* AD1WeaponBase::GetAbilitySystemComponent() const
 	return Cast<ALyraCharacter>(GetOwner())->GetAbilitySystemComponent();
 }
 
-UAnimMontage* AD1WeaponBase::GetHitMontage()
+UAnimMontage* AD1WeaponBase::GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked)
 {
-	if (CachedHitMontage == nullptr && TemplateID > 0)
+	UAnimMontage* SelectedMontage = nullptr;
+	
+	if (InstigatorActor && TemplateID > 0)
 	{
 		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
 		if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 		{
-			CachedHitMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->HitMontage);
+			if (IsBlocked)
+			{
+				SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->BlockHitMontage);
+			}
+			else
+			{
+				AActor* CharacterActor = GetOwner();
+				const FVector& CharacterLocation = CharacterActor->GetActorLocation();
+				const FVector& CharacterDirection = CharacterActor->GetActorForwardVector();
+			
+				const FRotator& FacingRotator = UKismetMathLibrary::Conv_VectorToRotator(CharacterDirection);
+				const FRotator& CharacterToHitRotator = UKismetMathLibrary::Conv_VectorToRotator((HitLocation - CharacterLocation).GetSafeNormal());
+			
+				const FRotator& DeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(CharacterToHitRotator, FacingRotator);
+				float YawAbs = FMath::Abs(DeltaRotator.Yaw);
+
+				if (YawAbs < 60.f)
+				{
+					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->FrontHitMontage);
+				}
+				else if (YawAbs > 120.f)
+				{
+					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->BackHitMontage);
+				}
+				else if (DeltaRotator.Yaw < 0.f)
+				{
+					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->LeftHitMontage);
+				}
+				else
+				{
+					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->RightHitMontage);
+				}
+			}
 		}
 	}
-	return CachedHitMontage;
+	
+	return SelectedMontage;
 }
