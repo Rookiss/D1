@@ -29,6 +29,25 @@ void UD1ItemManagerComponent::Server_InventoryToEquipment_Implementation(UD1Inve
 	}
 }
 
+void UD1ItemManagerComponent::Server_InventoryToEquipment_Quick_Implementation(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos, UD1EquipmentManagerComponent* ToEquipmentManager)
+{
+	if (HasAuthority() == false)
+		return;
+	
+	if (FromInventoryManager == nullptr || ToEquipmentManager == nullptr)
+		return;
+
+	if (IsAllowedComponent(FromInventoryManager) == false ||  IsAllowedComponent(ToEquipmentManager) == false)
+		return;
+
+	EEquipmentSlotType EquipmentSlotType;
+	if (ToEquipmentManager->CanAddEquipment_Quick(FromInventoryManager, FromItemSlotPos, EquipmentSlotType))
+	{
+		UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
+		ToEquipmentManager->AddEquipment(EquipmentSlotType, RemovedItemInstance);
+	}
+}
+
 void UD1ItemManagerComponent::Server_EquipmentToInventory_Implementation(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType, UD1InventoryManagerComponent* ToInventoryManager, const FIntPoint& ToItemSlotPos)
 {
 	if (HasAuthority() == false)
@@ -41,6 +60,25 @@ void UD1ItemManagerComponent::Server_EquipmentToInventory_Implementation(UD1Equi
 		return;
 
 	if (ToInventoryManager->CanMoveOrMergeItem(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPos))
+	{
+		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
+		ToInventoryManager->AddItem(ToItemSlotPos, RemovedItemInstance, 1);
+	}
+}
+
+void UD1ItemManagerComponent::Server_EquipmentToInventory_Quick_Implementation(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType, UD1InventoryManagerComponent* ToInventoryManager)
+{
+	if (HasAuthority() == false)
+		return;
+	
+	if (FromEquipmentManager == nullptr || ToInventoryManager == nullptr)
+		return;
+
+	if (IsAllowedComponent(FromEquipmentManager) == false ||  IsAllowedComponent(ToInventoryManager) == false)
+		return;
+
+	FIntPoint ToItemSlotPos;
+	if (ToInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPos))
 	{
 		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
 		ToInventoryManager->AddItem(ToItemSlotPos, RemovedItemInstance, 1);

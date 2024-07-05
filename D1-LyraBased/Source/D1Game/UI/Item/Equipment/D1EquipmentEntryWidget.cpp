@@ -1,6 +1,7 @@
 ﻿#include "D1EquipmentEntryWidget.h"
 
 #include "D1EquipmentSlotsWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/D1ItemTemplate.h"
@@ -8,6 +9,7 @@
 #include "UI/Item/D1ItemDragWidget.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
+#include "Item/Managers/D1ItemManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentEntryWidget)
 
@@ -61,16 +63,17 @@ void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 FReply UD1EquipmentEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-
-	if (InMouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
+	
+	if (Reply.IsEventHandled() == false && UWidgetBlueprintLibrary::IsDragDropping() == false && InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
 	{
-		// APlayerController* PlayerController = GetOwningPlayer();
-		// check(PlayerController);
-		//
-		// UD1InventoryManagerComponent* InventoryManager = PlayerController->GetComponentByClass<UD1InventoryManagerComponent>();
-		// check(InventoryManager);
-		//
-		// InventoryManager->Server_RequestMoveOrMergeItem_FromExternalEquipment(EquipmentManagerComponent, EquipmentSlotType, FIntPoint::ZeroValue);
+		UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
+		UD1InventoryManagerComponent* ToInventoryManager = GetOwningPlayer()->FindComponentByClass<UD1InventoryManagerComponent>();
+		
+		if (ItemManager && ToInventoryManager)
+		{
+			ItemManager->Server_EquipmentToInventory_Quick(EquipmentManagerComponent, EquipmentSlotType, ToInventoryManager);
+			return FReply::Handled();
+		}
 	}
 
 	return Reply;

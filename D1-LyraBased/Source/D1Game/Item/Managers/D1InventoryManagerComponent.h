@@ -106,7 +106,8 @@ protected:
 public:
 	int32 CanMoveOrMergeItem(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const;
 	bool CanMoveOrMergeItem(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const;
-	
+	bool CanMoveOrMergeItem_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, FIntPoint& OutToItemSlotPos) const;
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void TryAddItemByRarity(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, EItemRarity ItemRarity);
