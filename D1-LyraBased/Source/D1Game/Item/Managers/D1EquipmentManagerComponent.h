@@ -109,6 +109,7 @@ public:
 	bool CanAddEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const;
 	bool CanAddEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
 	bool CanAddEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
+	bool CanAddEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType) const;
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)

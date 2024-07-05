@@ -16,7 +16,7 @@ class UD1ItemHoversWidget : public UUserWidget
 	
 public:
 	UD1ItemHoversWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
+	
 public:
 	void RefreshUI(const UD1ItemInstance* HoveredItemInstance);
 	void SetPosition(const FVector2D& AbsolutePosition);
