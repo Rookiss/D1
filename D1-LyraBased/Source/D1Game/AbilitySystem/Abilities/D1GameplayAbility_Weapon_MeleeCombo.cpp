@@ -65,20 +65,21 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 		{
 			const TSharedPtr<FGameplayAbilityTargetData>& TargetData = LocalTargetDataHandle.Data[i];
 
-			if (const FHitResult* HitResult = TargetData->GetHitResult())
+			if (FHitResult* HitResult = const_cast<FHitResult*>(TargetData->GetHitResult()))
 			{
 				if (AActor* HitActor = HitResult->GetActor())
 				{
+					ALyraCharacter* TargetCharacter = Cast<ALyraCharacter>(HitActor);
+					if (TargetCharacter == nullptr)
+					{
+						TargetCharacter = Cast<ALyraCharacter>(HitActor->GetOwner());
+						HitActor = TargetCharacter;
+					}
+
 					if (HitActors.Contains(HitActor) == false)
 					{
 						HitActors.Add(HitActor);
 
-						ALyraCharacter* TargetCharacter = Cast<ALyraCharacter>(HitActor);
-						if (TargetCharacter == nullptr)
-						{
-							TargetCharacter = Cast<ALyraCharacter>(HitActor->GetOwner());
-						}
-						
 						if (TargetCharacter)
 						{
 							if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(TargetCharacter))
@@ -88,10 +89,10 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 									FVector TargetLocation = HitActor->GetActorLocation();
 									FVector TargetDirection = HitActor->GetActorForwardVector();
 								
-									FVector HitLocation = HitResult->ImpactPoint;
-									FVector TargetToHit = HitLocation - TargetLocation;
+									FVector InstigatorLocation = GetAvatarActorFromActorInfo()->GetActorLocation();
+									FVector TargetToInstigator = InstigatorLocation - TargetLocation;
 								
-									float Degree = UKismetMathLibrary::DegAcos(TargetDirection.Dot(TargetToHit));
+									float Degree = UKismetMathLibrary::DegAcos(TargetDirection.Dot(TargetToInstigator.GetSafeNormal()));
 									if (Degree <= 90.f)
 									{
 										BlockHitIndex = i;
@@ -119,7 +120,6 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 			FGameplayCueParameters SourceCueParams;
 			SourceCueParams.Location = HitResult.ImpactPoint;
 			SourceCueParams.Normal = HitResult.ImpactNormal;
-			SourceCueParams.PhysicalMaterial = HitResult.PhysMaterial;
 			SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, SourceCueParams);
 
 			if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(HitResult.GetActor()))
