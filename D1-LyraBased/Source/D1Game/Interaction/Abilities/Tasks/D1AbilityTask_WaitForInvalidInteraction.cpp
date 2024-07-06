@@ -45,6 +45,8 @@ void UD1AbilityTask_WaitForInvalidInteraction::PerformCheck()
 	
 	if (AvatarActor && AvatarController)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("%f"), FMath::Abs(CachedAngle - CalculateAngle())));
+		
 		bool bValidAngle = FMath::Abs(CachedAngle - CalculateAngle()) <= AcceptanceAngle;
 		bool bValidDistance = FVector::DistSquared(CachedCharacterLocation, AvatarActor->GetActorLocation()) <= AcceptanceDistance * AcceptanceDistance;
 		
@@ -69,7 +71,7 @@ float UD1AbilityTask_WaitForInvalidInteraction::CalculateAngle() const
 
 		FVector CameraToTarget = (InteractionLocation - CameraStart).GetSafeNormal();
 		FVector CameraDirection = CameraRotation.Vector();
-			
+		
 		return UKismetMathLibrary::DegAcos(CameraToTarget.Dot(CameraDirection));
 	}
 	return 0.f;
