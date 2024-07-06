@@ -20,10 +20,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void TriggerInteraction();
-	
-	UFUNCTION(BlueprintCallable)
-	void RefreshUI(bool bShouldRefresh, bool bShouldActive);
-	
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TScriptInterface<ID1Interactable> Interactable;

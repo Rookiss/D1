@@ -93,7 +93,7 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 									FVector TargetToInstigator = InstigatorLocation - TargetLocation;
 								
 									float Degree = UKismetMathLibrary::DegAcos(TargetDirection.Dot(TargetToInstigator.GetSafeNormal()));
-									if (Degree <= 90.f)
+									if (Degree <= 45.f)
 									{
 										BlockHitIndex = i;
 										break;
@@ -122,7 +122,8 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 			SourceCueParams.Normal = HitResult.ImpactNormal;
 			SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, SourceCueParams);
 
-			if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(HitResult.GetActor()))
+			UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(HitResult.GetActor());
+			if (TargetASC)
 			{
 				FGameplayCueParameters TargetCueParams;
 				TargetCueParams.Location = HitResult.ImpactPoint;
@@ -141,6 +142,15 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 				});
 				UAnimInstance* AnimInstance = SourceASC->AbilityActorInfo->GetAnimInstance();
 				AnimInstance->Montage_SetEndDelegate(MontageEnded, BackwardMontage);
+
+				if (TargetASC)
+				{
+					FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
+					const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
+					FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
+					EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_PhysicalWeaponDamage, GetWeaponStatValue(D1GameplayTags::SetByCaller_PhysicalWeaponDamage) / 2.f);
+					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
+				}
 			}
 			
 			bBlocked = true;

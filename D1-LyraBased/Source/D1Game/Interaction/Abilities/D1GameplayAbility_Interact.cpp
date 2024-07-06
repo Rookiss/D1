@@ -33,7 +33,8 @@ void UD1GameplayAbility_Interact::UpdateInteractions(const TArray<FD1Interaction
 {
 	FD1InteractionMessage Message;
 	Message.Instigator = GetAvatarActorFromActorInfo();
-	Message.bShouldRefresh = Message.bShouldActive = InteractionInfos.Num() > 0;
+	Message.bShouldRefresh = true;
+	Message.bSwitchActive = (GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(D1GameplayTags::Status_Interact) == false);
 	Message.InteractionInfo = InteractionInfos.Num() > 0 ? InteractionInfos[0] : FD1InteractionInfo();
 
 	UGameplayMessageSubsystem& MessageSystem = UGameplayMessageSubsystem::Get(GetAvatarActorFromActorInfo());
