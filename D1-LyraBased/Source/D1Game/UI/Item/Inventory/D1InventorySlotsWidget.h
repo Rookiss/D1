@@ -39,7 +39,9 @@ protected:
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 private:
-	void InitializeUI(FGameplayTag Channel, const FInventoryInitializeMessage& Message);
+	void ConstructUI(FGameplayTag Channel, const FInventoryInitializeMessage& Message);
+	void DestructUI();
+	
 	void UnhoverSlots();
 	void CleanUpDrag();
 	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 NewItemCount);

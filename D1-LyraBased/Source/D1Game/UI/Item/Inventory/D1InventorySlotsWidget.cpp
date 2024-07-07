@@ -1,6 +1,5 @@
 ﻿#include "D1InventorySlotsWidget.h"
 
-#include "D1GameplayTags.h"
 #include "D1InventoryEntryWidget.h"
 #include "D1InventorySlotWidget.h"
 #include "Components/CanvasPanel.h"
@@ -38,11 +37,13 @@ void UD1InventorySlotsWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	ListenerHandle = MessageSubsystem.RegisterListener(MessageChannelTag, this, &ThisClass::InitializeUI);
+	ListenerHandle = MessageSubsystem.RegisterListener(MessageChannelTag, this, &ThisClass::ConstructUI);
 }
 
 void UD1InventorySlotsWidget::NativeDestruct()
 {
+	DestructUI();
+	
 	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
 	MessageSubsystem.UnregisterListener(ListenerHandle);
 	
@@ -145,9 +146,9 @@ bool UD1InventorySlotsWidget::NativeOnDrop(const FGeometry& InGeometry, const FD
 	return true;
 }
 
-void UD1InventorySlotsWidget::InitializeUI(FGameplayTag Channel, const FInventoryInitializeMessage& Message)
+void UD1InventorySlotsWidget::ConstructUI(FGameplayTag Channel, const FInventoryInitializeMessage& Message)
 {
-	if (InventoryManager || Message.InventoryManager == nullptr)
+	if (Message.InventoryManager == nullptr)
 		return;
 	
 	InventoryManager = Message.InventoryManager;
@@ -177,6 +178,18 @@ void UD1InventorySlotsWidget::InitializeUI(FGameplayTag Channel, const FInventor
 		}
 	}
 	DelegateHandle = InventoryManager->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
+}
+
+void UD1InventorySlotsWidget::DestructUI()
+{
+	InventoryManager->OnInventoryEntryChanged.Remove(DelegateHandle);
+	DelegateHandle.Reset();
+
+	CanvasPanel_Entries->ClearChildren();
+	EntryWidgets.Reset();
+	
+	GridPanel_Slots->ClearChildren();
+	SlotWidgets.Reset();
 }
 
 void UD1InventorySlotsWidget::UnhoverSlots()
