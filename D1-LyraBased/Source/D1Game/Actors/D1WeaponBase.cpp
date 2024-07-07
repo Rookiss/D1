@@ -54,7 +54,6 @@ void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ThisClass, TemplateID);
 	DOREPLIFETIME(ThisClass, EquipmentSlotType);
 	DOREPLIFETIME(ThisClass, bCanBlock);
-	DOREPLIFETIME(ThisClass, bShouldHidden);
 }
 
 void AD1WeaponBase::Destroyed()
@@ -117,30 +116,10 @@ void AD1WeaponBase::ChangeBlockState(bool bShouldBlock)
 	OnRep_CanBlock();
 }
 
-void AD1WeaponBase::ChangeVisibilityState(bool bNewShouldHidden)
-{
-	bShouldHidden = bNewShouldHidden;
-	OnRep_ShouldHidden();
-}
-
 void AD1WeaponBase::OnRep_CanBlock()
 {
 	WeaponMeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Weapon, bCanBlock ? ECR_Overlap : ECR_Ignore);
 	WeaponMeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Projectile, bCanBlock ? ECR_Block : ECR_Ignore);
-}
-
-void AD1WeaponBase::OnRep_ShouldHidden()
-{
-	TArray<UMeshComponent*> MeshComponents;
-	GetComponents(UMeshComponent::StaticClass(), MeshComponents);
-	
-	for (UMeshComponent* MeshComponent : MeshComponents)
-	{
-		if (MeshComponent)
-		{
-			MeshComponent->SetHiddenInGame(bShouldHidden);
-		}
-	}
 }
 
 void AD1WeaponBase::OnRep_TemplateID()

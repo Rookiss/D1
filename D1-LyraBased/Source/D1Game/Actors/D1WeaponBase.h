@@ -32,9 +32,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void ChangeBlockState(bool bShouldBlock);
 
-	UFUNCTION(BlueprintCallable)
-	void ChangeVisibilityState(bool bNewShouldHidden);
-
 private:
 	UFUNCTION()
 	void OnRep_TemplateID();
@@ -44,9 +41,6 @@ private:
 
 	UFUNCTION()
 	void OnRep_CanBlock();
-
-	UFUNCTION()
-	void OnRep_ShouldHidden();
 
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -70,9 +64,6 @@ protected:
 	
 	UPROPERTY(ReplicatedUsing=OnRep_EquipmentSlotType)
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
-
-	UPROPERTY(ReplicatedUsing=OnRep_ShouldHidden)
-	bool bShouldHidden = false;
 	
 public:
 	UPROPERTY(ReplicatedUsing=OnRep_CanBlock)

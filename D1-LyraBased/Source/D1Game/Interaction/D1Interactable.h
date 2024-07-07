@@ -42,6 +42,5 @@ public:
 	virtual void CustomizeInteractionEventData(const FGameplayTag& InteractionEventTag, FGameplayEventData& InOutEventData) const { }
 
 protected:
-	UFUNCTION(BlueprintCallable)
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const abstract;
 };

@@ -33,15 +33,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> MeshComponent;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Asset_Info")
+	UPROPERTY(EditDefaultsOnly, Category="Info")
 	FD1InteractionInfo OpenedInteractionInfo;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Asset_Info")
+	UPROPERTY(EditDefaultsOnly, Category="Info")
 	FD1InteractionInfo ClosedInteractionInfo;
 
-	UPROPERTY(EditDefaultsOnly, Category="Asset_Info")
+	UPROPERTY(EditDefaultsOnly, Category="Info")
 	TObjectPtr<UAnimMontage> OpenMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category="Asset_Info")
+	UPROPERTY(EditDefaultsOnly, Category="Info")
 	TObjectPtr<UAnimMontage> CloseMontage;
 };
