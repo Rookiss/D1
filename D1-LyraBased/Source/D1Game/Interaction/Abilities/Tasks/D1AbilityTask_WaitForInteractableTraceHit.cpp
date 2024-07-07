@@ -54,6 +54,7 @@ void UD1AbilityTask_WaitForInteractableTraceHit::PerformTrace()
 	
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(AvatarActor);
+	AvatarActor->GetAttachedActors(ActorsToIgnore, false, true);
 
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(D1AbilityTask_WaitForInteractableTraceHit), false);
 	Params.AddIgnoredActors(ActorsToIgnore);

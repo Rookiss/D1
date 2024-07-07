@@ -2,7 +2,9 @@
 
 #include "AbilitySystemComponent.h"
 #include "D1GameplayTags.h"
+#include "Character/LyraCharacter.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "Interaction/D1InteractionInfo.h"
 #include "Tasks/D1AbilityTask_GrantNearbyInteraction.h"
 #include "UI/IndicatorSystem/LyraIndicatorManagerComponent.h"
@@ -46,6 +48,10 @@ void UD1GameplayAbility_Interact::UpdateInteractions(const TArray<FD1Interaction
 void UD1GameplayAbility_Interact::TriggerInteraction()
 {
 	if (CurrentInteractionInfos.Num() == 0)
+		return;
+	
+	ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetAvatarActorFromActorInfo());
+	if (LyraCharacter && LyraCharacter->GetMovementComponent()->IsFalling())
 		return;
 	
 	if (GetAbilitySystemComponentFromActorInfo())

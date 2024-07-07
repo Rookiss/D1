@@ -3,6 +3,13 @@
 #include "Interaction/D1WorldInteractable.h"
 #include "D1ChestBase.generated.h"
 
+UENUM(BlueprintType)
+enum class EChestState : uint8
+{
+	Open,
+	Close
+};
+
 UCLASS(BlueprintType, Blueprintable)
 class AD1ChestBase : public AD1WorldInteractable
 {
@@ -17,24 +24,24 @@ public:
 
 private:
 	UFUNCTION()
-	void OnRep_IsOpened();
+	void OnRep_ChestState();
 	
 protected:
-	UPROPERTY(ReplicatedUsing=OnRep_IsOpened, BlueprintReadWrite)
-	bool bIsOpened = false;
+	UPROPERTY(BlueprintReadWrite, ReplicatedUsing=OnRep_ChestState)
+	EChestState ChestState = EChestState::Close;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> MeshComponent;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Asset_Info")
 	FD1InteractionInfo OpenedInteractionInfo;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Asset_Info")
 	FD1InteractionInfo ClosedInteractionInfo;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Asset_Info")
 	TObjectPtr<UAnimMontage> OpenMontage;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Asset_Info")
 	TObjectPtr<UAnimMontage> CloseMontage;
 };

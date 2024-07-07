@@ -1,11 +1,13 @@
 ﻿#include "D1InventorySlotsWidget.h"
 
+#include "D1GameplayTags.h"
 #include "D1InventoryEntryWidget.h"
 #include "D1InventorySlotWidget.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/UniformGridPanel.h"
 #include "Data/D1ItemData.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/D1ItemTemplate.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
@@ -29,38 +31,22 @@ void UD1InventorySlotsWidget::NativeOnInitialized()
 	
 	SlotWidgetClass = ULyraAssetManager::GetSubclassByName<UD1InventorySlotWidget>("InventorySlotWidgetClass");
 	EntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1InventoryEntryWidget>("InventoryEntryWidgetClass");
+}
 
-	APlayerController* PlayerController = GetOwningPlayer();
-	check(PlayerController);
+void UD1InventorySlotsWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
 
-	InventoryManager = PlayerController->GetComponentByClass<UD1InventoryManagerComponent>();
-	check(InventoryManager);
+	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
+	ListenerHandle = MessageSubsystem.RegisterListener(MessageChannelTag, this, &ThisClass::InitializeUI);
+}
 
-	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
-	SlotWidgets.SetNum(InventorySlotCount.X * InventorySlotCount.Y);
-	EntryWidgets.SetNum(InventorySlotCount.X * InventorySlotCount.Y);
-
-	for (int32 y = 0; y < InventorySlotCount.Y; y++)
-	{
-		for (int32 x = 0; x < InventorySlotCount.X; x++)
-		{
-			UD1InventorySlotWidget* SlotWidget = CreateWidget<UD1InventorySlotWidget>(GetOwningPlayer(), SlotWidgetClass);
-			SlotWidgets[y * InventorySlotCount.X + x] = SlotWidget;
-			GridPanel_Slots->AddChildToUniformGrid(SlotWidget, y, x);
-		}
-	}
+void UD1InventorySlotsWidget::NativeDestruct()
+{
+	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
+	MessageSubsystem.UnregisterListener(ListenerHandle);
 	
-	const TArray<FD1InventoryEntry>& Entries = InventoryManager->GetAllEntries();
-	for (int32 i = 0; i < Entries.Num(); i++)
-	{
-		const FD1InventoryEntry& Entry = Entries[i];
-		if (UD1ItemInstance* ItemInstance = Entry.GetItemInstance())
-		{
-			FIntPoint ItemSlotPos = FIntPoint(i % InventorySlotCount.X, i / InventorySlotCount.X);
-			OnInventoryEntryChanged(ItemSlotPos, ItemInstance, Entry.GetItemCount());
-		}
-	}
-	DelegateHandle = InventoryManager->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
+	Super::NativeDestruct();
 }
 
 bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -157,6 +143,40 @@ bool UD1InventorySlotsWidget::NativeOnDrop(const FGeometry& InGeometry, const FD
 		ItemManager->Server_EquipmentToInventory(FromEquipmentManager, DragDrop->FromEquipmentSlotType, InventoryManager, ToItemSlotPos);
 	}
 	return true;
+}
+
+void UD1InventorySlotsWidget::InitializeUI(FGameplayTag Channel, const FInventoryInitializeMessage& Message)
+{
+	if (InventoryManager || Message.InventoryManager == nullptr)
+		return;
+	
+	InventoryManager = Message.InventoryManager;
+	
+	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
+	SlotWidgets.SetNum(InventorySlotCount.X * InventorySlotCount.Y);
+	EntryWidgets.SetNum(InventorySlotCount.X * InventorySlotCount.Y);
+
+	for (int32 y = 0; y < InventorySlotCount.Y; y++)
+	{
+		for (int32 x = 0; x < InventorySlotCount.X; x++)
+		{
+			UD1InventorySlotWidget* SlotWidget = CreateWidget<UD1InventorySlotWidget>(GetOwningPlayer(), SlotWidgetClass);
+			SlotWidgets[y * InventorySlotCount.X + x] = SlotWidget;
+			GridPanel_Slots->AddChildToUniformGrid(SlotWidget, y, x);
+		}
+	}
+	
+	const TArray<FD1InventoryEntry>& Entries = InventoryManager->GetAllEntries();
+	for (int32 i = 0; i < Entries.Num(); i++)
+	{
+		const FD1InventoryEntry& Entry = Entries[i];
+		if (UD1ItemInstance* ItemInstance = Entry.GetItemInstance())
+		{
+			FIntPoint ItemSlotPos = FIntPoint(i % InventorySlotCount.X, i / InventorySlotCount.X);
+			OnInventoryEntryChanged(ItemSlotPos, ItemInstance, Entry.GetItemCount());
+		}
+	}
+	DelegateHandle = InventoryManager->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
 }
 
 void UD1InventorySlotsWidget::UnhoverSlots()

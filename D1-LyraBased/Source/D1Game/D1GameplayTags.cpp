@@ -51,6 +51,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS,										"Ability.ADS");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact,								"Ability.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact_Active,							"Ability.Interact.Active");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact_Object,							"Ability.Interact.Object");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Widget_Inventory,						"Ability.Widget.Inventory");
 
 	// Status
 	UE_DEFINE_GAMEPLAY_TAG(Status_Crouching,								"Status.Crouching");
@@ -95,6 +97,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Notification,							"Message.Notification");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Interaction_Notice,						"Message.Interaction.Notice");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Interaction_Progress,					"Message.Interaction.Progress");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_MyInventory,					"Message.Initialize.MyInventory");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_OtherInventory,				"Message.Initialize.OtherInventory");
 
 	// SetByCaller
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingHeal,						"SetByCaller.IncomingHeal");

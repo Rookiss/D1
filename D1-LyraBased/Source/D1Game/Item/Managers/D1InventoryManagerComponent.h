@@ -87,7 +87,7 @@ struct TStructOpsTypeTraits<FD1InventoryList> : public TStructOpsTypeTraitsBase2
 	};
 };
 
-UCLASS(BlueprintType, Blueprintable)
+UCLASS(BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent))
 class UD1InventoryManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()

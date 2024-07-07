@@ -519,7 +519,7 @@ UD1ItemInstance* UD1EquipmentManagerComponent::GetItemInstance(EEquipmentSlotTyp
 		Result = Entry.ItemInstance;
 	}
 	
-	return Result;;
+	return Result;
 }
 
 const TArray<FD1EquipmentEntry>& UD1EquipmentManagerComponent::GetAllEntries() const

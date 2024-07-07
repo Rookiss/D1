@@ -232,4 +232,5 @@ private:
 
 public:
 	bool bWantToCrouch = false;
+	float BaseUnscaledCapsuleHalfHeight = 0.f;
 };

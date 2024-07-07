@@ -3,6 +3,7 @@
 #include "AbilitySystemGlobals.h"
 #include "D1CosmeticManagerComponent.h"
 #include "D1EquipmentManagerComponent.h"
+#include "D1GameplayTags.h"
 #include "Engine/ActorChannel.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
@@ -204,12 +205,16 @@ void FD1EquipEntry::Equip()
 				MeshComponent->LinkAnimClassLayers(WeaponFragment->AnimInstanceClass);
 			}
 
-			UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->EquipMontage);
-			if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
+			UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent();
+			if (ASC && ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Interact) == false)
 			{
-				if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
+				UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->EquipMontage);
+				if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
 				{
-					Character->PlayAnimMontage(EquipMontage);
+					if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
+					{
+						Character->PlayAnimMontage(EquipMontage);
+					}
 				}
 			}
 		}
@@ -515,6 +520,12 @@ bool UD1EquipManagerComponent::CanChangeWeaponEquipState(EWeaponEquipState NewWe
 	if (NewWeaponEquipState == EWeaponEquipState::Count)
 		return false;
 
+	if (CurrentWeaponEquipState == EWeaponEquipState::Unarmed && NewWeaponEquipState == EWeaponEquipState::Unarmed)
+		return false;
+
+	if (CurrentWeaponEquipState == NewWeaponEquipState)
+		return true;
+	
 	UD1EquipmentManagerComponent* EquipmentManager = GetEquipmentManagerComponent();
 	check(EquipmentManager);
 	
