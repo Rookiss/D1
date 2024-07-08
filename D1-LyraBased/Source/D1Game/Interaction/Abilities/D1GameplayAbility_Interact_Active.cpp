@@ -3,7 +3,6 @@
 #include "AbilitySystemComponent.h"
 #include "D1GameplayAbility_Interact.h"
 #include "D1GameplayTags.h"
-#include "GameFramework/GameplayMessageSubsystem.h"
 #include "Interaction/D1Interactable.h"
 #include "Interaction/D1InteractionQuery.h"
 
@@ -68,24 +67,5 @@ void UD1GameplayAbility_Interact_Active::TriggerInteraction()
 				*AbilitySystem
 			);
 		}
-	}
-}
-
-void UD1GameplayAbility_Interact_Active::RefreshUI(bool bShouldRefresh, bool bShouldActive)
-{
-	FD1InteractionMessage Message;
-	Message.Instigator = GetAvatarActorFromActorInfo();
-	Message.bShouldRefresh = bShouldRefresh;
-	Message.bShouldActive = bShouldActive;
-	Message.InteractionInfo = InteractionInfo;
-
-	UGameplayMessageSubsystem& MessageSystem = UGameplayMessageSubsystem::Get(GetAvatarActorFromActorInfo());
-	MessageSystem.BroadcastMessage(D1GameplayTags::Message_Interaction_Progress, Message);
-
-	if (bShouldRefresh == false)
-	{
-		Message.bShouldRefresh = false;
-		Message.bShouldActive = true;
-		MessageSystem.BroadcastMessage(D1GameplayTags::Message_Interaction_Notice, Message);
 	}
 }

@@ -17,7 +17,7 @@ public:
 	bool bShouldRefresh = false;
 
 	UPROPERTY(BlueprintReadWrite)
-	bool bShouldActive = false;
+	bool bSwitchActive = false;
 	
 	UPROPERTY(BlueprintReadWrite)
 	FD1InteractionInfo InteractionInfo = FD1InteractionInfo();

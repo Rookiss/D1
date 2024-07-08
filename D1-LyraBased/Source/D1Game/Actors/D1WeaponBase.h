@@ -31,7 +31,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void ChangeBlockState(bool bShouldBlock);
-	
+
 private:
 	UFUNCTION()
 	void OnRep_TemplateID();
@@ -46,7 +46,7 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UAnimMontage* GetHitMontage();
+	UAnimMontage* GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -64,14 +64,11 @@ protected:
 	
 	UPROPERTY(ReplicatedUsing=OnRep_EquipmentSlotType)
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
-
+	
 public:
 	UPROPERTY(ReplicatedUsing=OnRep_CanBlock)
 	bool bCanBlock = false;
 
 private:
 	FLyraAbilitySet_GrantedHandles SkillAbilitySetHandles;
-
-	UPROPERTY(Transient)
-	UAnimMontage* CachedHitMontage;
 };

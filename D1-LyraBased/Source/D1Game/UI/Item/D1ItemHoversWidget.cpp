@@ -4,7 +4,6 @@
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/HorizontalBox.h"
-#include "Components/Overlay.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"

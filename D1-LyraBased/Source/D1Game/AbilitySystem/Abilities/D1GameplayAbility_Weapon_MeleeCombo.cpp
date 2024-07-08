@@ -8,6 +8,7 @@
 #include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
 
@@ -64,42 +65,49 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 		{
 			const TSharedPtr<FGameplayAbilityTargetData>& TargetData = LocalTargetDataHandle.Data[i];
 
-			if (const FHitResult* HitResult = TargetData->GetHitResult())
+			if (FHitResult* HitResult = const_cast<FHitResult*>(TargetData->GetHitResult()))
 			{
 				if (AActor* HitActor = HitResult->GetActor())
 				{
+					ALyraCharacter* TargetCharacter = Cast<ALyraCharacter>(HitActor);
+					if (TargetCharacter == nullptr)
+					{
+						TargetCharacter = Cast<ALyraCharacter>(HitActor->GetOwner());
+						HitActor = TargetCharacter;
+					}
+
 					if (HitActors.Contains(HitActor) == false)
 					{
 						HitActors.Add(HitActor);
 
-						bool bHitSomething = false;
-					
-						if (HitActor->IsA(ALyraCharacter::StaticClass()))
+						if (TargetCharacter)
 						{
-							bHitSomething = true;
-							AttackHitIndexes.Add(i);
-						}
-						else if (AD1WeaponBase* HitWeapon = Cast<AD1WeaponBase>(HitActor))
-						{
-							if (HitWeapon->bCanBlock)
+							if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(TargetCharacter))
 							{
-								bHitSomething = true;
-								BlockHitIndex = i;
+								if (TargetASC->HasMatchingGameplayTag(D1GameplayTags::Status_Block))
+								{
+									FVector TargetLocation = HitActor->GetActorLocation();
+									FVector TargetDirection = HitActor->GetActorForwardVector();
+								
+									FVector InstigatorLocation = GetAvatarActorFromActorInfo()->GetActorLocation();
+									FVector TargetToInstigator = InstigatorLocation - TargetLocation;
+								
+									float Degree = UKismetMathLibrary::DegAcos(TargetDirection.Dot(TargetToInstigator.GetSafeNormal()));
+									if (Degree <= 45.f)
+									{
+										BlockHitIndex = i;
+										break;
+									}
+								}
 							}
+							
+							AttackHitIndexes.Add(i);
 						}
 						else
 						{
-							bHitSomething = true;
 							BlockHitIndex = i;
+							break;
 						}
-
-#if UE_EDITOR
-						if (FORCE_DISABLE_DRAW_DEBUG == false && bHitSomething && bShowDebug)
-						{
-							FColor Color = (HasAuthority(&CurrentActivationInfo)) ? FColor::Red : FColor::Green;
-							DrawDebugSphere(GetWorld(), HitResult->ImpactPoint, 4, 32, Color, false, 5);
-						}
-#endif // UE_EDITOR
 					}
 				}
 			}
@@ -112,9 +120,18 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 			FGameplayCueParameters SourceCueParams;
 			SourceCueParams.Location = HitResult.ImpactPoint;
 			SourceCueParams.Normal = HitResult.ImpactNormal;
-			SourceCueParams.PhysicalMaterial = HitResult.PhysMaterial;
 			SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, SourceCueParams);
 
+			UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(HitResult.GetActor());
+			if (TargetASC)
+			{
+				FGameplayCueParameters TargetCueParams;
+				TargetCueParams.Location = HitResult.ImpactPoint;
+				TargetCueParams.Instigator = SourceASC->AbilityActorInfo->OwnerActor.Get();
+				TargetCueParams.RawMagnitude = true;
+				TargetASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_HitReact, TargetCueParams);
+			}
+			
 			SourceASC->BlockAnimMontageForSeconds(BackwardMontage);
 			
 			if (HasAuthority(&CurrentActivationInfo))
@@ -125,9 +142,19 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 				});
 				UAnimInstance* AnimInstance = SourceASC->AbilityActorInfo->GetAnimInstance();
 				AnimInstance->Montage_SetEndDelegate(MontageEnded, BackwardMontage);
+
+				if (TargetASC)
+				{
+					FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
+					const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
+					FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
+					EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_PhysicalWeaponDamage, GetWeaponStatValue(D1GameplayTags::SetByCaller_PhysicalWeaponDamage) / 2.f);
+					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
+				}
 			}
 			
 			bBlocked = true;
+			DrawDebugHitPoint(HitResult);
 		}
 		else
 		{
@@ -145,6 +172,8 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 				{
 					FGameplayCueParameters TargetCueParams;
 					TargetCueParams.Location = HitResult.ImpactPoint;
+					TargetCueParams.Instigator = SourceASC->AbilityActorInfo->OwnerActor.Get();
+					TargetCueParams.RawMagnitude = false;
 					TargetASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_HitReact, TargetCueParams);
 				}
 				
@@ -156,6 +185,8 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 					EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_PhysicalWeaponDamage, GetWeaponStatValue(D1GameplayTags::SetByCaller_PhysicalWeaponDamage));
 					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
 				}
+
+				DrawDebugHitPoint(HitResult);
 			}
 		}
 	}
@@ -176,4 +207,15 @@ void UD1GameplayAbility_Weapon_MeleeCombo::TryContinueToNextStage()
 	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 	}
+}
+
+void UD1GameplayAbility_Weapon_MeleeCombo::DrawDebugHitPoint(const FHitResult& HitResult)
+{
+#if UE_EDITOR
+	if (FORCE_DISABLE_DRAW_DEBUG == false && bShowDebug)
+	{
+		FColor Color = (HasAuthority(&CurrentActivationInfo)) ? FColor::Red : FColor::Green;
+		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 4, 32, Color, false, 5);
+	}
+#endif // UE_EDITOR
 }

@@ -1,12 +1,15 @@
 ﻿#include "D1InventoryEntryWidget.h"
 
 #include "D1InventorySlotsWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Image.h"
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Stackable.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "Item/Managers/D1ItemManagerComponent.h"
 #include "UI/Item/D1ItemDragDrop.h"
 #include "UI/Item/D1ItemDragWidget.h"
 
@@ -58,6 +61,19 @@ FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	
 	CachedFromSlotPos = ItemSlotPos;
 	CachedDeltaWidgetPos = MouseWidgetPos - ItemWidgetPos;
+	
+	if (Reply.IsEventHandled() == false && UWidgetBlueprintLibrary::IsDragDropping() == false && InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	{
+		UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
+		UD1InventoryManagerComponent* FromInventoryManager = SlotsWidget->GetInventoryManagerComponent();
+		UD1EquipmentManagerComponent* ToEquipmentManager = GetOwningPlayer()->FindComponentByClass<UD1EquipmentManagerComponent>();
+		
+		if (ItemManager && FromInventoryManager && ToEquipmentManager)
+		{
+			ItemManager->Server_InventoryToEquipment_Quick(FromInventoryManager, ItemSlotPos, ToEquipmentManager);
+			return FReply::Handled();
+		}
+	}
 	
 	return Reply;
 }

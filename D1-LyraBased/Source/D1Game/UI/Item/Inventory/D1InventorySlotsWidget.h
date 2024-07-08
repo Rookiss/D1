@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Blueprint/UserWidget.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
 #include "D1InventorySlotsWidget.generated.h"
 
 class UD1InventoryEntryWidget;
@@ -9,6 +10,16 @@ class UD1InventoryManagerComponent;
 class UUniformGridPanel;
 class UCanvasPanel;
 class UD1ItemInstance;
+
+USTRUCT(BlueprintType)
+struct FInventoryInitializeMessage
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UD1InventoryManagerComponent> InventoryManager;
+};
 
 UCLASS()
 class UD1InventorySlotsWidget : public UUserWidget
@@ -20,12 +31,17 @@ public:
 
 protected:
 	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 	
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 private:
+	void ConstructUI(FGameplayTag Channel, const FInventoryInitializeMessage& Message);
+	void DestructUI();
+	
 	void UnhoverSlots();
 	void CleanUpDrag();
 	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 NewItemCount);
@@ -33,6 +49,10 @@ private:
 public:
 	UD1InventoryManagerComponent* GetInventoryManagerComponent() const { return InventoryManager; }
 
+protected:
+	UPROPERTY(EditAnywhere, meta=(Categories="Message"))
+	FGameplayTag MessageChannelTag;
+	
 private:
 	UPROPERTY()
 	TSubclassOf<UD1InventorySlotWidget> SlotWidgetClass;
@@ -63,4 +83,5 @@ private:
 private:
 	FDelegateHandle DelegateHandle;
 	FIntPoint PrevDragOverSlotPos = FIntPoint(-1, -1);
+	FGameplayMessageListenerHandle ListenerHandle;
 };

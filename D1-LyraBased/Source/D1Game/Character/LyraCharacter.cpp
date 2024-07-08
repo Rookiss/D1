@@ -92,6 +92,8 @@ void ALyraCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	BaseUnscaledCapsuleHalfHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+	
 	if (UD1PocketWorldSubsystem* PocketWorldSubsystem = GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 	{
 		if (APlayerController* PlayerController = GetLyraPlayerController())

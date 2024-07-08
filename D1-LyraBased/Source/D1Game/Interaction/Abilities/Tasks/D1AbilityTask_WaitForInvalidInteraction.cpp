@@ -1,5 +1,8 @@
 ﻿#include "D1AbilityTask_WaitForInvalidInteraction.h"
 
+#include "Character/LyraCharacter.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AbilityTask_WaitForInvalidInteraction)
@@ -40,15 +43,17 @@ void UD1AbilityTask_WaitForInvalidInteraction::OnDestroy(bool bInOwnerFinished)
 
 void UD1AbilityTask_WaitForInvalidInteraction::PerformCheck()
 {
-	AActor* AvatarActor = Ability->GetCurrentActorInfo()->AvatarActor.Get();
+	ALyraCharacter* AvatarActor = Cast<ALyraCharacter>(Ability->GetCurrentActorInfo()->AvatarActor.Get());
+	UCharacterMovementComponent* CharacterMovement = AvatarActor->GetCharacterMovement();
 	APlayerController* AvatarController = Ability->GetCurrentActorInfo()->PlayerController.Get();
 	
-	if (AvatarActor && AvatarController)
+	if (AvatarActor && CharacterMovement && AvatarController)
 	{
 		bool bValidAngle = FMath::Abs(CachedAngle - CalculateAngle()) <= AcceptanceAngle;
-		bool bValidDistance = FVector::DistSquared(CachedCharacterLocation, AvatarActor->GetActorLocation()) <= AcceptanceDistance * AcceptanceDistance;
+		bool bValidDistanceXY = FVector::DistSquared2D(CachedCharacterLocation, AvatarActor->GetActorLocation()) <= (AcceptanceDistance * AcceptanceDistance);
+		bool bValidDistanceZ = FMath::Abs(CachedCharacterLocation.Z - AvatarActor->GetActorLocation().Z) <= (AcceptanceDistance + FMath::Abs(CharacterMovement->GetCrouchedHalfHeight() - AvatarActor->BaseUnscaledCapsuleHalfHeight));
 		
-		if (bValidDistance && bValidAngle)
+		if (bValidAngle && bValidDistanceXY && bValidDistanceZ)
 			return;
 	}
 
@@ -69,7 +74,7 @@ float UD1AbilityTask_WaitForInvalidInteraction::CalculateAngle() const
 
 		FVector CameraToTarget = (InteractionLocation - CameraStart).GetSafeNormal();
 		FVector CameraDirection = CameraRotation.Vector();
-			
+		
 		return UKismetMathLibrary::DegAcos(CameraToTarget.Dot(CameraDirection));
 	}
 	return 0.f;

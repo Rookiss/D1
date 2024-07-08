@@ -44,7 +44,19 @@ public:
 	TSoftObjectPtr<UAnimMontage> EquipMontage;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UAnimMontage> HitMontage;
+	TSoftObjectPtr<UAnimMontage> FrontHitMontage;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UAnimMontage> BackHitMontage;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UAnimMontage> LeftHitMontage;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UAnimMontage> RightHitMontage;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UAnimMontage> BlockHitMontage;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UAnimSequence> PocketWorldAnim;

@@ -43,16 +43,6 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
-	
-protected:
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UNiagaraSystem> ImpactEffect;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<USoundBase> ImpactSound;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Projectile", meta=(Categories="GameplayCue"))
-	FGameplayTag GameplayCueTag;
 
 private:
 	bool bHit = false;

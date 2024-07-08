@@ -16,25 +16,34 @@ void AD1ChestBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, bIsOpened);
+	DOREPLIFETIME(ThisClass, ChestState);
 }
 
 FD1InteractionInfo AD1ChestBase::GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const
 {
-	return bIsOpened ? OpenedInteractionInfo : ClosedInteractionInfo;
+	switch (ChestState)
+	{
+	case EChestState::Open:		return OpenedInteractionInfo;
+	case EChestState::Close:	return ClosedInteractionInfo;
+	default:					return FD1InteractionInfo();
+	}
 }
 
-void AD1ChestBase::OnRep_IsOpened()
+void AD1ChestBase::OnRep_ChestState()
 {
 	if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
 	{
-		if (bIsOpened)
+		UAnimMontage* SelectedMontage = nullptr;
+		
+		switch (ChestState)
 		{
-			AnimInstance->Montage_Play(CloseMontage);
+		case EChestState::Open:		SelectedMontage = OpenMontage;	break;
+		case EChestState::Close:	SelectedMontage = CloseMontage; break;
 		}
-		else
+
+		if (SelectedMontage)
 		{
-			AnimInstance->Montage_Play(OpenMontage);
+			AnimInstance->Montage_Play(SelectedMontage);
 		}
 	}
 }

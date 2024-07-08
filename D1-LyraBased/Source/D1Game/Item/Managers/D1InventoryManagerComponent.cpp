@@ -480,6 +480,48 @@ bool UD1InventoryManagerComponent::CanMoveOrMergeItem(UD1EquipmentManagerCompone
 	return IsEmpty(ToItemSlotPos, FromItemSlotCount);
 }
 
+bool UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, FIntPoint& OutToItemSlotPos) const
+{
+	if (OtherComponent == nullptr)
+		return false;
+
+	if (FromEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || FromEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || FromEquipmentSlotType == EEquipmentSlotType::Count)
+		return false;
+
+	const TArray<FD1EquipmentEntry>& FromEntries = OtherComponent->GetAllEntries();
+	const FD1EquipmentEntry& FromEntry = FromEntries[(int32)FromEquipmentSlotType];
+	const UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
+
+	if (FromItemInstance == nullptr)
+		return false;
+
+	const int32 FromTemplateID = FromItemInstance->GetItemTemplateID();
+	const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromTemplateID);
+	
+	const FIntPoint& ItemSlotCount = FromItemTemplate.SlotCount;
+
+	const FIntPoint StartSlotPos = FIntPoint::ZeroValue;
+	const FIntPoint EndSlotPos = GetInventorySlotCount() - ItemSlotCount;
+	
+	for (int32 y = StartSlotPos.Y; y <= EndSlotPos.Y; y++)
+	{
+		for (int32 x = StartSlotPos.X; x <= EndSlotPos.X; x++)
+		{
+			if (SlotChecks[y][x])
+				continue;
+
+			FIntPoint ItemSlotPos = FIntPoint(x, y);
+			if (IsEmpty(SlotChecks, ItemSlotPos, ItemSlotCount))
+			{
+				OutToItemSlotPos = ItemSlotPos;
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
 void UD1InventoryManagerComponent::TryAddItemByRarity(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, EItemRarity ItemRarity)
 {
 	check(GetOwner()->HasAuthority());

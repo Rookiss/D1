@@ -2,13 +2,13 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
-#include "GameplayCueManager.h"
+#include "D1GameplayTags.h"
+#include "D1WeaponBase.h"
 #include "NiagaraComponent.h"
-#include "NiagaraFunctionLibrary.h"
+#include "Character/LyraCharacter.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "Physics/LyraCollisionChannels.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ProjectileBase)
 
@@ -59,23 +59,6 @@ void AD1ProjectileBase::Destroyed()
 			OtherHitComponent = nullptr;
 		}
 	}
-	else
-	{
-		if (bHit == false)
-		{
-			bHit = true;
-		
-			if (ImpactSound)
-			{
-				UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-			}
-
-			if (ImpactEffect)
-			{
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-			}
-		}
-	}
 	
 	Super::Destroyed();
 }
@@ -103,35 +86,70 @@ void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AA
 			OtherComponent->OnComponentDeactivated.AddUniqueDynamic(this, &ThisClass::HandleOtherComponentDeactivated);
 			AttachToComponent(OtherComponent, FAttachmentTransformRules::KeepWorldTransform, HitResult.BoneName);
 			
-			if (HitResult.PhysMaterial.IsValid() && HitResult.PhysMaterial->SurfaceType == D1_PhysicalMaterial_Flesh && DamageEffectSpecHandle.Data.IsValid())
+			ALyraCharacter* TargetCharacter = Cast<ALyraCharacter>(OtherActor);
+			AD1WeaponBase* TargetWeapon = Cast<AD1WeaponBase>(OtherActor);
+			
+			if (TargetCharacter == nullptr)
 			{
-				if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(OtherActor))
+				TargetCharacter = Cast<ALyraCharacter>(OtherActor->GetOwner());
+				OtherActor = TargetCharacter;
+			}
+
+			bool bIsBlockHit = false;
+
+			UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(OtherActor);
+			UAbilitySystemComponent* SourceASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetInstigator());
+
+			if (TargetWeapon)
+			{
+				bIsBlockHit = true;
+			}
+			else if (TargetCharacter)
+			{
+				if (TargetASC)
 				{
-					// TODO: Team Check
-					TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+					if (TargetASC->HasMatchingGameplayTag(D1GameplayTags::Status_Block))
+					{
+						FVector TargetLocation = OtherActor->GetActorLocation();
+						FVector TargetDirection = OtherActor->GetActorForwardVector();
+								
+						FVector InstigatorLocation = GetInstigator()->GetActorLocation();
+						FVector TargetToInstigator = InstigatorLocation - TargetLocation;
+						
+						float Degree = UKismetMathLibrary::DegAcos(TargetDirection.Dot(TargetToInstigator.GetSafeNormal()));
+						if (Degree <= 45.f)
+						{
+							bIsBlockHit = true;
+						}
+					}
 				}
 			}
-		}
-		else
-		{
-			if (GameplayCueTag.IsValid())
+			else
 			{
-				FGameplayCueParameters CueParameters;
-				CueParameters.Location = HitResult.ImpactPoint;
-				CueParameters.Normal = HitResult.ImpactNormal;
-				CueParameters.PhysicalMaterial = HitResult.PhysMaterial;
-				
-				UGameplayCueManager::ExecuteGameplayCue_NonReplicated(GetOwner(), GameplayCueTag, CueParameters);
+				bIsBlockHit = true;
 			}
 
-			if (ImpactSound)
+			if (SourceASC)
 			{
-				UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+				FGameplayCueParameters SourceCueParams;
+				SourceCueParams.Location = HitResult.ImpactPoint;
+				SourceCueParams.Normal = HitResult.ImpactNormal;
+				SourceCueParams.PhysicalMaterial = bIsBlockHit ? nullptr : HitResult.PhysMaterial;
+				SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, SourceCueParams);
 			}
 
-			if (ImpactEffect)
+			if (TargetASC)
 			{
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+				FGameplayCueParameters TargetCueParams;
+				TargetCueParams.Location = HitResult.ImpactPoint;
+				TargetCueParams.Instigator = GetInstigator();
+				TargetCueParams.RawMagnitude = bIsBlockHit;
+				TargetASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_HitReact, TargetCueParams);
+
+				if (bIsBlockHit == false && DamageEffectSpecHandle.Data.IsValid())
+				{
+					TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+				}
 			}
 		}
 	}
