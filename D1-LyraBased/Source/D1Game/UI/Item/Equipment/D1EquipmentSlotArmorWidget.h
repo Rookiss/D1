@@ -22,6 +22,7 @@ public:
 	void Init(EArmorType InArmorType);
 	
 protected:
+	virtual void NativePreConstruct() override;
 	virtual void NativeOnInitialized() override;
 	
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
@@ -33,6 +34,10 @@ private:
 
 public:
 	void OnEquipmentEntryChanged(UD1ItemInstance* NewItemInstance);
+
+public:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UTexture2D> ArmorIconTexture;
 	
 private:
 	UPROPERTY()
@@ -50,6 +55,9 @@ private:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Slot;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Icon;
 
 private:
 	bool bAlreadyHovered = false;

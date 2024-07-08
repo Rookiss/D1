@@ -5,6 +5,7 @@
 #include "D1GameplayTags.h"
 #include "Interaction/D1Interactable.h"
 #include "Interaction/D1InteractionQuery.h"
+#include "Player/LyraPlayerController.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Interact_Active)
 
@@ -47,7 +48,8 @@ void UD1GameplayAbility_Interact_Active::TriggerInteraction()
 	Payload.EventTag = D1GameplayTags::Ability_Interact;
 	Payload.Instigator = GetAvatarActorFromActorInfo();
 	Payload.Target = InteractableActor;
-
+	Payload.OptionalObject = InteractionInfo.InteractionMontage;
+	
 	Interactable->CustomizeInteractionEventData(D1GameplayTags::Ability_Interact, Payload);
 
 	AActor* TargetActor = const_cast<AActor*>(ToRawPtr(Payload.Target));

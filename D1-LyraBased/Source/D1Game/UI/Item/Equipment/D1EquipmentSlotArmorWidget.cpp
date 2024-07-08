@@ -1,10 +1,10 @@
 ﻿#include "D1EquipmentSlotArmorWidget.h"
 
 #include "D1EquipmentSlotsWidget.h"
+#include "Components/Image.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Components/SizeBox.h"
-#include "GameFramework/PlayerState.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
@@ -30,6 +30,13 @@ void UD1EquipmentSlotArmorWidget::Init(EArmorType InArmorType)
 	{
 		ArmorType = InArmorType;
 	}
+}
+
+void UD1EquipmentSlotArmorWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+
+	Image_Icon->SetBrushFromTexture(ArmorIconTexture, true);
 }
 
 void UD1EquipmentSlotArmorWidget::NativeOnInitialized()
@@ -141,5 +148,11 @@ void UD1EquipmentSlotArmorWidget::OnEquipmentEntryChanged(UD1ItemInstance* NewIt
 		OverlaySlot->SetVerticalAlignment(VAlign_Fill);
 		
 		EntryWidget->Init(NewItemInstance, UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType));
+
+		Image_Icon->SetRenderOpacity(0.f);
+	}
+	else
+	{
+		Image_Icon->SetRenderOpacity(1.f);
 	}
 }

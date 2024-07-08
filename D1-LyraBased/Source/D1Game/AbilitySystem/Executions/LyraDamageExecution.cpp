@@ -59,7 +59,7 @@ void ULyraDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	float Defense = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DefenseDef, EvaluateParameters, Defense);
 	
-	const float DamageDone = FMath::Max((BaseDamage / 2.f + Strength - Defense), 0.0f);
+	const float DamageDone = FMath::Max((BaseDamage + Strength) / (FMath::Pow(Defense, 0.3f)), 0.0f);
 
 	if (DamageDone > 0.0f)
 	{
