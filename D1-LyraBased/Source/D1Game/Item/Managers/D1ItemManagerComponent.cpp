@@ -46,6 +46,16 @@ void UD1ItemManagerComponent::Server_InventoryToEquipment_Quick_Implementation(U
 		UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
 		ToEquipmentManager->AddEquipment(EquipmentSlotType, RemovedItemInstance);
 	}
+	else
+	{
+		if (FromInventoryManager->GetOwner() != ToEquipmentManager->GetOwner())
+		{
+			if (UD1InventoryManagerComponent* ToInventoryManager = ToEquipmentManager->GetOwner()->GetComponentByClass<UD1InventoryManagerComponent>())
+			{
+				Server_InventoryToInventory_Quick(FromInventoryManager, FromItemSlotPos, ToInventoryManager);
+			}
+		}
+	}
 }
 
 void UD1ItemManagerComponent::Server_EquipmentToInventory_Implementation(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType, UD1InventoryManagerComponent* ToInventoryManager, const FIntPoint& ToItemSlotPos)
@@ -120,6 +130,25 @@ void UD1ItemManagerComponent::Server_EquipmentToEquipment_Implementation(UD1Equi
 		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
 		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
 	}
+}
+
+void UD1ItemManagerComponent::Server_InventoryToInventory_Quick_Implementation(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos, UD1InventoryManagerComponent* ToInventoryManager)
+{
+	if (HasAuthority() == false)
+		return;
+	
+	if (FromInventoryManager == nullptr || ToInventoryManager == nullptr)
+		return;
+
+	if (IsAllowedComponent(FromInventoryManager) == false ||  IsAllowedComponent(ToInventoryManager) == false)
+		return;
+
+	// if (ToInventoryManager->CanMoveOrMergeItem_Quick())
+}
+
+void UD1ItemManagerComponent::Server_EquipmentToEquipment_Quick_Implementation(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType, UD1EquipmentManagerComponent* ToEquipmentManager)
+{
+	// TODO
 }
 
 void UD1ItemManagerComponent::AddAllowedComponent(UActorComponent* ActorComponent)

@@ -480,6 +480,94 @@ bool UD1InventoryManagerComponent::CanMoveOrMergeItem(UD1EquipmentManagerCompone
 	return IsEmpty(ToItemSlotPos, FromItemSlotCount);
 }
 
+int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, TArray<FIntPoint>& OutToItemSlotPoses, TArray<int32>& OutToItemCounts) const
+{
+	if (OtherComponent == nullptr || this == OtherComponent)
+		return 0;
+
+	const FIntPoint& FromInventorySlotCount = OtherComponent->GetInventorySlotCount();
+	if (FromItemSlotPos.X < 0 || FromItemSlotPos.Y < 0 || FromItemSlotPos.X >= FromInventorySlotCount.X || FromItemSlotPos.Y >= FromInventorySlotCount.Y)
+		return 0;
+	
+	const TArray<FD1InventoryEntry>& FromEntries = OtherComponent->GetAllEntries();
+	const int32 FromIndex = FromItemSlotPos.Y * FromInventorySlotCount.X + FromItemSlotPos.X;
+	const FD1InventoryEntry& FromEntry = FromEntries[FromIndex];
+	const UD1ItemInstance* FromItemInstance = FromEntry.ItemInstance;
+	int32 FromItemCount = FromEntry.ItemCount;
+	int32 LeftItemCount = FromEntry.ItemCount;
+
+	if (FromItemInstance == nullptr)
+		return 0;
+
+	const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromItemInstance->GetItemTemplateID());
+	const UD1ItemFragment_Stackable* FromStackableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Stackable>();
+	
+	if (FromStackableFragment)
+	{
+		const TArray<FD1InventoryEntry>& ToEntries = GetAllEntries();
+		for (int32 i = 0; i < ToEntries.Num(); i++)
+		{
+			// const FD1InventoryEntry& Entry = ToEntries[i];
+			//
+			// if (Entry.ItemInstance == nullptr)
+			// 	continue;
+			//
+			// if (Entry.ItemInstance->GetItemTemplateID() != ItemTemplateID)
+			// 	continue;
+			//
+			// if (Entry.ItemInstance->GetItemRarity() != ItemRarity)
+			// 	continue;
+			//
+			// if (int32 AddCount = FMath::Min(Entry.GetItemCount() + ItemCount, FromStackableFragment->MaxStackCount) - Entry.GetItemCount())
+			// {
+			// 	AddQueue.Emplace(i, AddCount);
+			// 	ItemCount -= AddCount;
+			//
+			// 	if (ItemCount == 0)
+			// 	{
+			// 		for (const auto& Pair : AddQueue)
+			// 		{
+			// 			FD1InventoryEntry& ToEntry = Entries[Pair.Key];
+			// 			ToEntry.ItemCount += Pair.Value;
+			// 			MarkItemDirty(ToEntry);
+			// 		}
+			// 		return AddedItemInstances;
+			// 	}
+			// }
+		}
+	}
+
+	const FIntPoint& FromItemSlotCount = FromItemTemplate.SlotCount;
+	TArray<TArray<bool>> TempSlotChecks = SlotChecks;
+	
+	const FIntPoint StartSlotPos = FIntPoint::ZeroValue;
+	const FIntPoint EndSlotPos = InventorySlotCount - FromItemSlotCount;
+	
+	for (int32 y = StartSlotPos.Y; y <= EndSlotPos.Y; y++)
+	{
+		for (int32 x = StartSlotPos.X; x <= EndSlotPos.X; x++)
+		{
+			if (TempSlotChecks[y][x])
+				continue;
+
+			FIntPoint ItemSlotPos = FIntPoint(x, y);
+			if (IsEmpty(TempSlotChecks, ItemSlotPos, FromItemSlotCount))
+			{
+				// MarkSlotChecks(TempSlotChecks, true, ItemSlotPos, FromItemSlotCount);
+				
+				int32 AddCount = FromStackableFragment ? FMath::Min(LeftItemCount, FromStackableFragment->MaxStackCount) : 1;
+				OutToItemSlotPoses.Emplace(x, y);
+				OutToItemCounts.Emplace(AddCount);
+				LeftItemCount -= AddCount;
+				
+				if (LeftItemCount == 0)
+					return FromItemCount;
+			}
+		}
+	}
+	return FromItemCount - LeftItemCount;
+}
+
 bool UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, FIntPoint& OutToItemSlotPos) const
 {
 	if (OtherComponent == nullptr)
