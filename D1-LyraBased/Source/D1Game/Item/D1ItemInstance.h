@@ -10,10 +10,10 @@ struct FD1ItemRarityProbability
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleDefaultsOnly)
+	UPROPERTY(VisibleAnywhere)
 	EItemRarity Rarity = EItemRarity::Junk;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	float Probability = 0;
 };
 

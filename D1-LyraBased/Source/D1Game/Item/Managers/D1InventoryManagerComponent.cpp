@@ -543,7 +543,7 @@ void UD1InventoryManagerComponent::TryAddItemByRarity(TSubclassOf<UD1ItemTemplat
 void UD1InventoryManagerComponent::TryAddItemByProbability(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities)
 {
 	check(GetOwner()->HasAuthority());
-
+	
 	TryAddItemByRarity(ItemTemplateClass, ItemCount, UD1ItemInstance::DetermineItemRarity(ItemProbabilities));
 }
 
