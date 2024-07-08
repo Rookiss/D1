@@ -4,9 +4,9 @@
 #include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "D1EquipmentEntryWidget.h"
+#include "Components/Image.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
-#include "GameFramework/PlayerState.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
@@ -28,6 +28,14 @@ void UD1EquipmentSlotWeaponWidget::Init(EWeaponSlotType InWeaponSlotType)
 		return;
 	
 	WeaponSlotType = InWeaponSlotType;
+}
+
+void UD1EquipmentSlotWeaponWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+
+	Image_Icon_Left->SetBrushFromTexture(WeaponIconTexture_Left, true);
+	Image_Icon_Right->SetBrushFromTexture(WeaponIconTexture_Right, true);
 }
 
 void UD1EquipmentSlotWeaponWidget::NativeOnInitialized()
@@ -159,5 +167,41 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 		OverlaySlot->SetVerticalAlignment(VAlign_Fill);
 		
 		EntryWidget->Init(NewItemInstance, UD1EquipManagerComponent::ConvertToEquipmentSlotType(InWeaponHandType, WeaponSlotType));
+	}
+
+	switch (InWeaponHandType)
+	{
+	case EWeaponHandType::LeftHand:
+		if (NewItemInstance)
+		{
+			Image_Icon_Left->SetRenderOpacity(0.f);
+		}
+		else
+		{
+			Image_Icon_Left->SetRenderOpacity(1.f);
+		}
+		break;
+	case EWeaponHandType::RightHand:
+		if (NewItemInstance)
+		{
+			Image_Icon_Right->SetRenderOpacity(0.f);
+		}
+		else
+		{
+			Image_Icon_Right->SetRenderOpacity(1.f);
+		}
+		break;
+	case EWeaponHandType::TwoHand:
+		if (NewItemInstance)
+		{
+			Image_Icon_Left->SetRenderOpacity(0.f);
+			Image_Icon_Right->SetRenderOpacity(0.f);
+		}
+		else
+		{
+			Image_Icon_Left->SetRenderOpacity(1.f);
+			Image_Icon_Right->SetRenderOpacity(1.f);
+		}
+		break;
 	}
 }

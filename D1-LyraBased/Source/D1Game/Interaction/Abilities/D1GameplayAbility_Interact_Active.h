@@ -20,7 +20,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void TriggerInteraction();
-
+	
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TScriptInterface<ID1Interactable> Interactable;

@@ -224,6 +224,10 @@ protected:
 	// Current camera mode set by the ability.
 	TSubclassOf<ULyraCameraMode> ActiveCameraMode;
 
+public:
+	UFUNCTION(BlueprintCallable)
+	void FlushPressedKeys();
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UInputMappingContext> InputMappingContext;

@@ -534,6 +534,14 @@ void ULyraGameplayAbility::GetMovementDirection(ED1Direction& OutDirection, FVec
 	}
 }
 
+void ULyraGameplayAbility::FlushPressedKeys()
+{
+	if (ALyraPlayerController* PC = GetLyraPlayerControllerFromActorInfo())
+	{
+		PC->FlushPressedKeys();
+	}
+}
+
 void ULyraGameplayAbility::TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const
 {
 	const bool bIsPredicting = (Spec.ActivationInfo.ActivationMode == EGameplayAbilityActivationMode::Predicting);

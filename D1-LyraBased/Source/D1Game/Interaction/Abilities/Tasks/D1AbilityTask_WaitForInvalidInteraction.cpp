@@ -72,8 +72,8 @@ float UD1AbilityTask_WaitForInvalidInteraction::CalculateAngle() const
 		FRotator CameraRotation;
 		AvatarController->GetPlayerViewPoint(CameraStart, CameraRotation);
 
-		FVector CameraToTarget = (InteractionLocation - CameraStart).GetSafeNormal();
-		FVector CameraDirection = CameraRotation.Vector();
+		FVector CameraToTarget = (InteractionLocation - CameraStart).GetSafeNormal2D();
+		FVector CameraDirection = CameraRotation.Vector().GetSafeNormal2D();
 		
 		return UKismetMathLibrary::DegAcos(CameraToTarget.Dot(CameraDirection));
 	}
