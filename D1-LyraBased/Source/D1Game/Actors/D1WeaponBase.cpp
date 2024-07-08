@@ -54,6 +54,7 @@ void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ThisClass, TemplateID);
 	DOREPLIFETIME(ThisClass, EquipmentSlotType);
 	DOREPLIFETIME(ThisClass, bCanBlock);
+	DOREPLIFETIME(ThisClass, bShouldHidden);
 }
 
 void AD1WeaponBase::Destroyed()
@@ -116,12 +117,31 @@ void AD1WeaponBase::ChangeBlockState(bool bShouldBlock)
 	OnRep_CanBlock();
 }
 
+void AD1WeaponBase::ChangeVisibilityState(bool bNewShouldHidden)
+{
+	bShouldHidden = bNewShouldHidden;
+	OnRep_ShouldHidden();
+}
+
 void AD1WeaponBase::OnRep_CanBlock()
 {
 	WeaponMeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Weapon, bCanBlock ? ECR_Overlap : ECR_Ignore);
 	WeaponMeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Projectile, bCanBlock ? ECR_Block : ECR_Ignore);
 }
 
+void AD1WeaponBase::OnRep_ShouldHidden()
+{
+	TArray<UMeshComponent*> MeshComponents;
+	GetComponents(UMeshComponent::StaticClass(), MeshComponents);
+	
+	for (UMeshComponent* MeshComponent : MeshComponents)
+	{
+		if (MeshComponent)
+		{
+			MeshComponent->SetHiddenInGame(bShouldHidden);
+		}
+	}
+}
 void AD1WeaponBase::OnRep_TemplateID()
 {
 	WeaponMeshComponent->SetHiddenInGame(false);
@@ -149,6 +169,22 @@ void AD1WeaponBase::OnRep_EquipmentSlotType()
 UAbilitySystemComponent* AD1WeaponBase::GetAbilitySystemComponent() const
 {
 	return Cast<ALyraCharacter>(GetOwner())->GetAbilitySystemComponent();
+}
+
+UAnimMontage* AD1WeaponBase::GetEquipMontage()
+{
+	UAnimMontage* EquipMontage = nullptr;
+	
+	if (TemplateID > 0)
+	{
+		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
+		if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
+		{
+			EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->EquipMontage);
+		}
+	}
+	
+	return EquipMontage;
 }
 
 UAnimMontage* AD1WeaponBase::GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked)

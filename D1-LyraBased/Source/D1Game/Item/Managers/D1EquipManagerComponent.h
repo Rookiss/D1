@@ -164,6 +164,9 @@ public:
 	AD1WeaponBase* GetEquippedWeaponActor(EWeaponHandType WeaponHandType) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
+	void GetAllEquippedWeaponActors(TArray<AD1WeaponBase*>& OutEquippedWeaponActors) const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UD1ItemInstance* GetEquippedWeaponItemInstance(EWeaponHandType WeaponHandType) const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)

@@ -32,6 +32,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void ChangeBlockState(bool bShouldBlock);
 
+	UFUNCTION(BlueprintCallable)
+	void ChangeVisibilityState(bool bNewShouldHidden);
+	
 private:
 	UFUNCTION()
 	void OnRep_TemplateID();
@@ -41,10 +44,16 @@ private:
 
 	UFUNCTION()
 	void OnRep_CanBlock();
+	
+	UFUNCTION()
+	void OnRep_ShouldHidden();
 
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UAnimMontage* GetEquipMontage();
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UAnimMontage* GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked);
 
@@ -64,6 +73,9 @@ protected:
 	
 	UPROPERTY(ReplicatedUsing=OnRep_EquipmentSlotType)
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
+
+	UPROPERTY(ReplicatedUsing=OnRep_ShouldHidden)
+	bool bShouldHidden = false;
 	
 public:
 	UPROPERTY(ReplicatedUsing=OnRep_CanBlock)
