@@ -46,10 +46,7 @@ void UD1EquipmentSlotWeaponWidget::NativeOnInitialized()
 	SlotImages   = { Image_Slot_LeftHand, Image_Slot_RightHand, Image_Slot_TwoHand };
 	SlotOverlays = { Overlay_Slot_LeftHand, Overlay_Slot_RightHand, Overlay_Slot_TwoHand };
 	
-	APlayerController* PlayerController = Cast<APlayerController>(GetOwningPlayer());
-	check(PlayerController);
-	
-	EquipmentManager = PlayerController->GetComponentByClass<UD1EquipmentManagerComponent>();
+	EquipmentManager = GetOwningPlayerPawn()->GetComponentByClass<UD1EquipmentManagerComponent>();
 	check(EquipmentManager);
 	
 	EntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidgetClass");
@@ -169,6 +166,8 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 		EntryWidget->Init(NewItemInstance, UD1EquipManagerComponent::ConvertToEquipmentSlotType(InWeaponHandType, WeaponSlotType));
 	}
 
+	FSlateBrush LeftBrush, RightBrush;
+	
 	switch (InWeaponHandType)
 	{
 	case EWeaponHandType::LeftHand:
@@ -196,11 +195,27 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 		{
 			Image_Icon_Left->SetRenderOpacity(0.f);
 			Image_Icon_Right->SetRenderOpacity(0.f);
+
+			LeftBrush = Image_Frame_Left->GetBrush();
+			LeftBrush.Margin.Right = 0.f;
+			Image_Frame_Left->SetBrush(LeftBrush);
+
+			RightBrush = Image_Frame_Right->GetBrush();
+			RightBrush.Margin.Left = 0.f;
+			Image_Frame_Right->SetBrush(RightBrush);
 		}
 		else
 		{
 			Image_Icon_Left->SetRenderOpacity(1.f);
 			Image_Icon_Right->SetRenderOpacity(1.f);
+
+			LeftBrush = Image_Frame_Left->GetBrush();
+			LeftBrush.Margin.Right = LeftBrush.Margin.Left / 2.f;
+			Image_Frame_Left->SetBrush(LeftBrush);
+
+			RightBrush = Image_Frame_Right->GetBrush();
+			RightBrush.Margin.Left = LeftBrush.Margin.Right / 2.f;
+			Image_Frame_Right->SetBrush(RightBrush);
 		}
 		break;
 	}

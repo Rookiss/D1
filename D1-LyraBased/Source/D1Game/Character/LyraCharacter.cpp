@@ -20,6 +20,7 @@
 #include "AbilitySystem/Attributes/LyraCombatSet.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "Interaction/D1InteractionQuery.h"
+#include "Physics/LyraCollisionChannels.h"
 #include "PocketWorld/D1PocketWorldSubsystem.h"
 #include "System/LyraAssetManager.h"
 
@@ -138,7 +139,7 @@ void ALyraCharacter::Reset()
 
 	K2_OnReset();
 
-	UninitAndDestroy();
+	UninitAndSpawnSpectator();
 }
 
 void ALyraCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -373,6 +374,8 @@ void ALyraCharacter::DisableMovementAndCollision()
 	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 
+	GetMesh()->SetCollisionResponseToChannel(D1_TraceChannel_Interaction, ECR_Block);
+
 	ULyraCharacterMovementComponent* LyraMoveComp = CastChecked<ULyraCharacterMovementComponent>(GetCharacterMovement());
 	LyraMoveComp->StopMovementImmediately();
 	LyraMoveComp->DisableMovement();
@@ -384,10 +387,10 @@ void ALyraCharacter::DestroyDueToDeath()
 {
 	K2_OnDeathFinished();
 
-	UninitAndDestroy();
+	UninitAndSpawnSpectator();
 }
 
-void ALyraCharacter::UninitAndDestroy()
+void ALyraCharacter::UninitAndSpawnSpectator()
 {
 	if (ULyraAbilitySystemComponent* LyraASC = GetLyraAbilitySystemComponent())
 	{
@@ -409,11 +412,7 @@ void ALyraCharacter::UninitAndDestroy()
 			ASpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(SpectatorPawnClass, GetActorLocation(), GetActorRotation(), SpawnParameters);
 			Controller->Possess(SpectatorPawn);
 		}
-		
-		SetLifeSpan(0.1f);
 	}
-	
-	SetActorHiddenInGame(true);
 }
 
 void ALyraCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)

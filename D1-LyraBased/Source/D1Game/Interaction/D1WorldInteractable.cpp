@@ -12,16 +12,3 @@ AD1WorldInteractable::AD1WorldInteractable(const FObjectInitializer& ObjectIniti
 {
 	bReplicates = true;
 }
-
-void AD1WorldInteractable::GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const
-{
-	FD1InteractionInfo InteractionInfo = GetPreInteractionInfo(InteractionQuery);
-	
-	if (UAbilitySystemComponent* AbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InteractionQuery.RequestingAvatar.Get()))
-	{
-		float Resourcefulness = AbilitySystem->GetNumericAttribute(ULyraCombatSet::GetResourcefulnessAttribute());
-		InteractionInfo.Duration = FMath::Max<float>(0.f, InteractionInfo.Duration - Resourcefulness * 0.01f);
-	}
-	
-	InteractionInfoBuilder.AddInteractionInfo(InteractionInfo);
-}

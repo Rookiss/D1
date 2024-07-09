@@ -11,7 +11,6 @@
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Net/UnrealNetwork.h"
 #include "Actors/D1WeaponBase.h"
-#include "GameFramework/GameplayMessageSubsystem.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/LyraCombatSet.h"
 #include "Actors/D1CosmeticWeapon.h"
@@ -606,9 +605,9 @@ ALyraCharacter* UD1EquipManagerComponent::GetCharacter() const
 
 ALyraPlayerController* UD1EquipManagerComponent::GetPlayerController() const
 {
-	if (ALyraCharacter* Character = GetCharacter())
+	if (ALyraCharacter* LyraCharacter = GetCharacter())
 	{
-		return Cast<ALyraPlayerController>(Character->Controller);
+		return LyraCharacter->GetLyraPlayerController();
 	}
 	return nullptr;
 }
@@ -625,9 +624,9 @@ UAbilitySystemComponent* UD1EquipManagerComponent::GetAbilitySystemComponent() c
 
 UD1EquipmentManagerComponent* UD1EquipManagerComponent::GetEquipmentManagerComponent() const
 {
-	if (ALyraPlayerController* PlayerController = GetController<ALyraPlayerController>())
+	if (ALyraCharacter* LyraCharacter = GetCharacter())
 	{
-		return PlayerController->FindComponentByClass<UD1EquipmentManagerComponent>();
+		return LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>();
 	}
 	return nullptr;
 }

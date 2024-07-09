@@ -41,25 +41,24 @@ class ID1Interactable
 	GENERATED_BODY()
 
 public:
-	virtual void GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const;
+	virtual void GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const
+	{
+		FD1InteractionInfo InteractionInfo = GetPreInteractionInfo(InteractionQuery);
+	
+		if (UAbilitySystemComponent* AbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InteractionQuery.RequestingAvatar.Get()))
+		{
+			float Resourcefulness = AbilitySystem->GetNumericAttribute(ULyraCombatSet::GetResourcefulnessAttribute());
+			InteractionInfo.Duration = FMath::Max<float>(0.f, InteractionInfo.Duration - Resourcefulness * 0.01f);
+		}
+	
+		InteractionInfoBuilder.AddInteractionInfo(InteractionInfo);
+	}
+	
 	virtual void CustomizeInteractionEventData(const FGameplayTag& InteractionEventTag, FGameplayEventData& InOutEventData) const { }
 
 	UFUNCTION(BlueprintCallable)
-	virtual UMeshComponent* GetMeshComponent() const { return nullptr; }
+	virtual UMeshComponent* GetInteractionMeshComponent() const { return nullptr; }
 	
 protected:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const { return FD1InteractionInfo(); }
 };
-
-inline void ID1Interactable::GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const
-{
-	FD1InteractionInfo InteractionInfo = GetPreInteractionInfo(InteractionQuery);
-	
-	if (UAbilitySystemComponent* AbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InteractionQuery.RequestingAvatar.Get()))
-	{
-		float Resourcefulness = AbilitySystem->GetNumericAttribute(ULyraCombatSet::GetResourcefulnessAttribute());
-		InteractionInfo.Duration = FMath::Max<float>(0.f, InteractionInfo.Duration - Resourcefulness * 0.01f);
-	}
-	
-	InteractionInfoBuilder.AddInteractionInfo(InteractionInfo);
-}

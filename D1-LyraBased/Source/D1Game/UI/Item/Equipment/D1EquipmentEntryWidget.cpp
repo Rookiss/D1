@@ -31,11 +31,8 @@ void UD1EquipmentEntryWidget::Init(UD1ItemInstance* InItemInstance, EEquipmentSl
 void UD1EquipmentEntryWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-
-	APlayerController* PlayerController = GetOwningPlayer();
-	check(PlayerController);
 	
-	EquipmentManagerComponent = PlayerController->GetComponentByClass<UD1EquipmentManagerComponent>();
+	EquipmentManagerComponent = GetOwningPlayerPawn()->GetComponentByClass<UD1EquipmentManagerComponent>();
 	check(EquipmentManagerComponent);
 }
 
@@ -67,7 +64,7 @@ FReply UD1EquipmentEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	if (Reply.IsEventHandled() == false && UWidgetBlueprintLibrary::IsDragDropping() == false && InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
 	{
 		UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
-		UD1InventoryManagerComponent* ToInventoryManager = GetOwningPlayer()->FindComponentByClass<UD1InventoryManagerComponent>();
+		UD1InventoryManagerComponent* ToInventoryManager = GetOwningPlayerPawn()->FindComponentByClass<UD1InventoryManagerComponent>();
 		
 		if (ItemManager && ToInventoryManager)
 		{

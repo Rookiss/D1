@@ -133,19 +133,6 @@ void UD1EquipmentManagerComponent::InitializeComponent()
 	}
 }
 
-void UD1EquipmentManagerComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	
-	if (APlayerController* PlayerController = GetPlayerController())
-	{
-		if (UD1ItemManagerComponent* ItemManager = PlayerController->FindComponentByClass<UD1ItemManagerComponent>())
-		{
-			ItemManager->AddAllowedComponent(this);
-		}
-	}
-}
-
 void UD1EquipmentManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (APlayerController* PlayerController = GetPlayerController())
@@ -496,16 +483,16 @@ bool UD1EquipmentManagerComponent::IsAllEmpty(EWeaponEquipState WeaponEquipState
 
 ALyraCharacter* UD1EquipmentManagerComponent::GetCharacter() const
 {
-	if (ALyraPlayerController* PlayerController = GetPlayerController())
-	{
-		return Cast<ALyraCharacter>(PlayerController->GetPawn());
-	}
-	return nullptr;
+	return Cast<ALyraCharacter>(GetOwner());
 }
 
 ALyraPlayerController* UD1EquipmentManagerComponent::GetPlayerController() const
 {
-	return Cast<ALyraPlayerController>(GetOwner());
+	if (ALyraCharacter* LyraCharacter = GetCharacter())
+	{
+		return LyraCharacter->GetLyraPlayerController();
+	}
+	return nullptr;
 }
 
 UD1ItemInstance* UD1EquipmentManagerComponent::GetItemInstance(EEquipmentSlotType EquipmentSlotType) const

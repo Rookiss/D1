@@ -28,14 +28,34 @@ void UD1EquipmentSlotsWidget::NativeOnInitialized()
 	{
 		SlotArmorWidgets[i]->Init((EArmorType)i);
 	}
+}
+
+void UD1EquipmentSlotsWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
 	
-	APlayerController* PlayerController = Cast<APlayerController>(GetOwningPlayer());
-	check(PlayerController);
+	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
+	ListenerHandle = MessageSubsystem.RegisterListener(MessageChannelTag, this, &ThisClass::ConstructUI);
+}
+
+void UD1EquipmentSlotsWidget::NativeDestruct()
+{
+	DestructUI();
 	
-	EquipmentManagerComponent = PlayerController->GetComponentByClass<UD1EquipmentManagerComponent>();
-	check(EquipmentManagerComponent);
+	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
+	MessageSubsystem.UnregisterListener(ListenerHandle);
 	
-	const TArray<FD1EquipmentEntry>& Entries = EquipmentManagerComponent->GetAllEntries();
+	Super::NativeDestruct();
+}
+
+void UD1EquipmentSlotsWidget::ConstructUI(FGameplayTag Channel, const FEquipmentInitializeMessage& Message)
+{
+	if (Message.EquipmentManager == nullptr)
+		return;
+
+	EquipmentManager = Message.EquipmentManager;
+
+	const TArray<FD1EquipmentEntry>& Entries = EquipmentManager->GetAllEntries();
 	for (int32 i = 0; i < Entries.Num(); i++)
 	{
 		const FD1EquipmentEntry& Entry = Entries[i];
@@ -44,7 +64,32 @@ void UD1EquipmentSlotsWidget::NativeOnInitialized()
 			OnEquipmentEntryChanged((EEquipmentSlotType)i, ItemInstance);
 		}
 	}
-	EquipmentManagerComponent->OnEquipmentEntryChanged.AddUObject(this, &ThisClass::OnEquipmentEntryChanged);
+	DelegateHandle = EquipmentManager->OnEquipmentEntryChanged.AddUObject(this, &ThisClass::OnEquipmentEntryChanged);
+}
+
+void UD1EquipmentSlotsWidget::DestructUI()
+{
+	EquipmentManager->OnEquipmentEntryChanged.Remove(DelegateHandle);
+	DelegateHandle.Reset();
+
+	for (UD1EquipmentSlotWeaponWidget* SlotWeaponWidget : SlotWeaponWidgets)
+	{
+		if (SlotWeaponWidget)
+		{
+			for (int32 i = 0; i < (int32)EWeaponHandType::Count; i++)
+			{
+				SlotWeaponWidget->OnEquipmentEntryChanged((EWeaponHandType)i, nullptr);
+			}
+		}
+	}
+
+	for (UD1EquipmentSlotArmorWidget* SlotArmorWidget : SlotArmorWidgets)
+	{
+		if (SlotArmorWidget)
+		{
+			SlotArmorWidget->OnEquipmentEntryChanged(nullptr);
+		}
+	}
 }
 
 void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)

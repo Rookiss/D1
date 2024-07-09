@@ -1,7 +1,9 @@
 ﻿#pragma once
 
 #include "D1Define.h"
+#include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
 #include "D1EquipmentSlotsWidget.generated.h"
 
 class UD1ItemInstance;
@@ -9,6 +11,16 @@ class UD1ItemSlotWidget;
 class UD1EquipmentSlotWeaponWidget;
 class UD1EquipmentSlotArmorWidget;
 class UD1EquipmentManagerComponent;
+
+USTRUCT(BlueprintType)
+struct FEquipmentInitializeMessage
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
+};
 
 UCLASS()
 class UD1EquipmentSlotsWidget : public UUserWidget
@@ -20,9 +32,19 @@ public:
 
 protected:
 	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 
 private:
+	void ConstructUI(FGameplayTag Channel, const FEquipmentInitializeMessage& Message);
+	void DestructUI();
+	
 	void OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+
+protected:
+protected:
+	UPROPERTY(EditAnywhere, meta=(Categories="Message"))
+	FGameplayTag MessageChannelTag;
 	
 private:
 	UPROPERTY()
@@ -32,7 +54,7 @@ private:
 	TArray<TObjectPtr<UD1EquipmentSlotArmorWidget>> SlotArmorWidgets;
 
 	UPROPERTY()
-	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
 
 protected:
 	UPROPERTY(meta=(BindWidget))
@@ -55,4 +77,8 @@ protected:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_Armor_Foot;
+
+private:
+	FDelegateHandle DelegateHandle;
+	FGameplayMessageListenerHandle ListenerHandle;
 };

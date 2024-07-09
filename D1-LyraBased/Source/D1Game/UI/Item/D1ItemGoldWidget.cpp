@@ -14,11 +14,8 @@ UD1ItemGoldWidget::UD1ItemGoldWidget(const FObjectInitializer& ObjectInitializer
 void UD1ItemGoldWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-
-	APlayerController* PlayerController = GetOwningPlayer();
-	check(PlayerController);
-
-	InventoryManagerComponent = PlayerController->GetComponentByClass<UD1InventoryManagerComponent>();
+	
+	InventoryManagerComponent = GetOwningPlayerPawn()->GetComponentByClass<UD1InventoryManagerComponent>();
 	check(InventoryManagerComponent);
 
 	RefreshGoldCount();

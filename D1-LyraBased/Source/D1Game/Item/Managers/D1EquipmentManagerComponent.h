@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "D1Define.h"
-#include "Components/ControllerComponent.h"
+#include "Components/PawnComponent.h"
 #include "Net/Serialization/FastArraySerializer.h"
 #include "D1EquipmentManagerComponent.generated.h"
 
@@ -90,7 +90,7 @@ struct TStructOpsTypeTraits<FD1EquipmentList> : public TStructOpsTypeTraitsBase2
 };
 
 UCLASS(BlueprintType)
-class UD1EquipmentManagerComponent : public UControllerComponent
+class UD1EquipmentManagerComponent : public UPawnComponent
 {
 	GENERATED_BODY()
 	
@@ -99,7 +99,6 @@ public:
 
 protected:
 	virtual void InitializeComponent() override;
-	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;

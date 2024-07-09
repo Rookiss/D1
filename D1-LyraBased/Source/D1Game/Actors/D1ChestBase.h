@@ -45,7 +45,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;
-	virtual UMeshComponent* GetMeshComponent() const override { return MeshComponent; }
+	virtual UMeshComponent* GetInteractionMeshComponent() const override { return MeshComponent; }
 	
 private:
 	UFUNCTION()

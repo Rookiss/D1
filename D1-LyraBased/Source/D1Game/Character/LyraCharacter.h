@@ -178,7 +178,7 @@ protected:
 	void DestroyDueToDeath();
 
 	UFUNCTION(BlueprintCallable)
-	void UninitAndDestroy();
+	void UninitAndSpawnSpectator();
 
 	// Called when the death sequence for the character has completed
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="OnDeathFinished"))
@@ -232,8 +232,8 @@ private:
 	void OnRep_MyTeamID(FGenericTeamId OldTeamID);
 
 public:
-	virtual void GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const override;
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;
+	virtual UMeshComponent* GetInteractionMeshComponent() const override { return GetMesh(); }
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Info")

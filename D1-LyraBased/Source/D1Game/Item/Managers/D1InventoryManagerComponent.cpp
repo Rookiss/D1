@@ -310,19 +310,6 @@ void UD1InventoryManagerComponent::InitializeComponent()
 	}
 }
 
-void UD1InventoryManagerComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetOwner()))
-	{
-		if (UD1ItemManagerComponent* ItemManager = PlayerController->FindComponentByClass<UD1ItemManagerComponent>())
-		{
-			ItemManager->AddAllowedComponent(this);
-		}
-	}
-}
-
 void UD1InventoryManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetOwner()))

@@ -101,6 +101,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Interaction_Progress,					"Message.Interaction.Progress");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_MyInventory,					"Message.Initialize.MyInventory");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_OtherInventory,				"Message.Initialize.OtherInventory");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_MyEquipment,					"Message.Initialize.MyEquipment");
+	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_OtherEquipment,				"Message.Initialize.OtherEquipment");
 
 	// SetByCaller
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingHeal,						"SetByCaller.IncomingHeal");

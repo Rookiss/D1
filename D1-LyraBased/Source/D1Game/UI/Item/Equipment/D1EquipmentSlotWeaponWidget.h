@@ -84,6 +84,12 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Icon_Right;
 
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Frame_Left;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Frame_Right;
+
 private:
 	bool bAlreadyHovered = false;
 	EWeaponSlotType WeaponSlotType = EWeaponSlotType::Count;

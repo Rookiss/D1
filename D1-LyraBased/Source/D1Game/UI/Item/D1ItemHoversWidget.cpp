@@ -26,7 +26,7 @@ void UD1ItemHoversWidget::RefreshUI(const UD1ItemInstance* HoveredItemInstance)
 	if (HoveredItemInstance)
 	{
 		UD1EquipManagerComponent* EquipManager = GetOwningPlayerPawn()->GetComponentByClass<UD1EquipManagerComponent>();
-		UD1EquipmentManagerComponent* EquipmentManager = GetOwningPlayer()->GetComponentByClass<UD1EquipmentManagerComponent>();
+		UD1EquipmentManagerComponent* EquipmentManager = GetOwningPlayerPawn()->GetComponentByClass<UD1EquipmentManagerComponent>();
 		
 		if (EquipManager && EquipmentManager)
 		{

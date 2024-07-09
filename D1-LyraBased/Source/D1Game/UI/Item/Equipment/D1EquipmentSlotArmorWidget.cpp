@@ -42,11 +42,8 @@ void UD1EquipmentSlotArmorWidget::NativePreConstruct()
 void UD1EquipmentSlotArmorWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-
-	APlayerController* PlayerController = GetOwningPlayer();
-	check(PlayerController);
 	
-	EquipmentManager = PlayerController->GetComponentByClass<UD1EquipmentManagerComponent>();
+	EquipmentManager = GetOwningPlayerPawn()->GetComponentByClass<UD1EquipmentManagerComponent>();
 	check(EquipmentManager);
 	
 	EntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidgetClass");

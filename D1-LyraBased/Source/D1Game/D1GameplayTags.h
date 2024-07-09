@@ -99,6 +99,8 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Interaction_Progress);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Initialize_MyInventory);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Initialize_OtherInventory);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Initialize_MyEquipment);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Initialize_OtherEquipment);
 
 	// SetByCaller
 	D1GAME_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_IncomingHeal);

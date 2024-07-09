@@ -73,12 +73,12 @@ FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 		{
 			if (ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
 			{
-				UD1EquipmentManagerComponent* ToEquipmentManager = GetOwningPlayer()->FindComponentByClass<UD1EquipmentManagerComponent>();
+				UD1EquipmentManagerComponent* ToEquipmentManager = GetOwningPlayerPawn()->FindComponentByClass<UD1EquipmentManagerComponent>();
 				ItemManager->Server_InventoryToEquipment_Quick(FromInventoryManager, ItemSlotPos, ToEquipmentManager);
 			}
 			else
 			{
-				UD1InventoryManagerComponent* ToInventoryManager = GetOwningPlayer()->FindComponentByClass<UD1InventoryManagerComponent>();
+				UD1InventoryManagerComponent* ToInventoryManager = GetOwningPlayerPawn()->FindComponentByClass<UD1InventoryManagerComponent>();
 				ItemManager->Server_InventoryToInventory_Quick(FromInventoryManager, ItemSlotPos, ToInventoryManager);
 			}
 			

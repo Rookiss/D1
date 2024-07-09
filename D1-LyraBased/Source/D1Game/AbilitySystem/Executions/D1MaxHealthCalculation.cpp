@@ -22,5 +22,6 @@ float UD1MaxHealthCalculation::CalculateBaseMagnitude_Implementation(const FGame
 	GetCapturedAttributeMagnitude(VigorDef, Spec, EvaluateParameters, Vigor);
 	Vigor = FMath::Max<float>(Vigor, 0.f);
 
-	return 100.f + Vigor;
+	// TODO: 체력도 같이 증가?
+	return 100.f; // + Vigor;
 }
