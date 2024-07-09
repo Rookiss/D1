@@ -18,6 +18,9 @@ class UD1ItemHoverWidget : public UUserWidget
 public:
 	UD1ItemHoverWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());\
 	
+protected:
+	virtual void NativePreConstruct() override;
+
 public:
 	void RefreshUI(const UD1ItemInstance* ItemInstance);
 
@@ -26,6 +29,9 @@ protected:
 	TObjectPtr<UTextBlock> Text_DisplayName;
 
 	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> Text_IsEquipped;
+	
+	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_AttributeModifiers;
 
 	UPROPERTY(meta=(BindWidget))
@@ -33,6 +39,9 @@ protected:
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_ItemType;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> Text_ItemRarity;
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_WeaponType;
@@ -52,6 +61,9 @@ protected:
 
 protected:
 	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UHorizontalBox> HorizontalBox_ItemRarity;
+	
+	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UHorizontalBox> HorizontalBox_WeaponType;
 
 	UPROPERTY(meta=(BindWidget))
@@ -62,4 +74,8 @@ protected:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UHorizontalBox> HorizontalBox_MaxStackCount;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsEquippedWidget = false;
 };

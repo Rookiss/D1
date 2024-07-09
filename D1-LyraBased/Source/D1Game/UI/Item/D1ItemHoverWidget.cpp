@@ -21,8 +21,24 @@ UD1ItemHoverWidget::UD1ItemHoverWidget(const FObjectInitializer& ObjectInitializ
     
 }
 
+void UD1ItemHoverWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+
+	if (bIsEquippedWidget)
+	{
+		Text_IsEquipped->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		Text_IsEquipped->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
 void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 {
+	// TODO: Support Multi-Langauge
+	
 	if (ItemInstance == nullptr)
 	{
 		SetVisibility(ESlateVisibility::Collapsed);
@@ -35,7 +51,6 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	const EItemRarity ItemRarity = ItemInstance->GetItemRarity();
 	
 	Text_DisplayName->SetText(ItemTemplate.DisplayName);
-	// Text_DisplayName->SetColorAndOpacity(FSlateColor(Item::ItemRarityColors[(int32)ItemRarity]));
 	Image_DIsplayName_Background->SetColorAndOpacity(Item::ItemRarityColors[(int32)ItemRarity]);
 	
 	Text_AttributeModifiers->SetVisibility(ESlateVisibility::Collapsed);
@@ -45,6 +60,20 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	HorizontalBox_WeaponHandType->SetVisibility(ESlateVisibility::Collapsed);
 	HorizontalBox_ArmorType->SetVisibility(ESlateVisibility::Collapsed);
 	HorizontalBox_MaxStackCount->SetVisibility(ESlateVisibility::Collapsed);
+
+	FString ItemRarityString;
+	switch (ItemRarity)
+	{
+	case EItemRarity::Junk:			ItemRarityString = TEXT("Junk");		break;
+	case EItemRarity::Poor:			ItemRarityString = TEXT("Poor");		break;
+	case EItemRarity::Normal:		ItemRarityString = TEXT("Normal");		break;
+	case EItemRarity::Special:		ItemRarityString = TEXT("Special");		break;
+	case EItemRarity::Rare:			ItemRarityString = TEXT("Rare");		break;
+	case EItemRarity::Epic:			ItemRarityString = TEXT("Epic");		break;
+	case EItemRarity::Legendary:	ItemRarityString = TEXT("Legendary");	break;
+	}
+	Text_ItemRarity->SetText(FText::FromString(ItemRarityString));
+	Text_ItemRarity->SetColorAndOpacity(Item::ItemRarityColors[(int32)ItemRarity]);
 	
 	if (const UD1ItemFragment_Equippable* EquippableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable>())
 	{
