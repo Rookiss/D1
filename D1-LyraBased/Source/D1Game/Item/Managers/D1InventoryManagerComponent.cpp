@@ -488,18 +488,22 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1InventoryManager
 	const FIntPoint& FromInventorySlotCount = OtherComponent->GetInventorySlotCount();
 	if (FromItemSlotPos.X < 0 || FromItemSlotPos.Y < 0 || FromItemSlotPos.X >= FromInventorySlotCount.X || FromItemSlotPos.Y >= FromInventorySlotCount.Y)
 		return 0;
+
+	OutToItemSlotPoses.Reset();
+	OutToItemCounts.Reset();
 	
 	const TArray<FD1InventoryEntry>& FromEntries = OtherComponent->GetAllEntries();
 	const int32 FromIndex = FromItemSlotPos.Y * FromInventorySlotCount.X + FromItemSlotPos.X;
 	const FD1InventoryEntry& FromEntry = FromEntries[FromIndex];
 	const UD1ItemInstance* FromItemInstance = FromEntry.ItemInstance;
-	int32 FromItemCount = FromEntry.ItemCount;
+	const int32 FromItemCount = FromEntry.ItemCount;
 	int32 LeftItemCount = FromEntry.ItemCount;
 
 	if (FromItemInstance == nullptr)
 		return 0;
 
-	const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromItemInstance->GetItemTemplateID());
+	const int32 FromItemTemplateID = FromItemInstance->GetItemTemplateID();
+	const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromItemTemplateID);
 	const UD1ItemFragment_Stackable* FromStackableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Stackable>();
 	
 	if (FromStackableFragment)
@@ -507,33 +511,26 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1InventoryManager
 		const TArray<FD1InventoryEntry>& ToEntries = GetAllEntries();
 		for (int32 i = 0; i < ToEntries.Num(); i++)
 		{
-			// const FD1InventoryEntry& Entry = ToEntries[i];
-			//
-			// if (Entry.ItemInstance == nullptr)
-			// 	continue;
-			//
-			// if (Entry.ItemInstance->GetItemTemplateID() != ItemTemplateID)
-			// 	continue;
-			//
-			// if (Entry.ItemInstance->GetItemRarity() != ItemRarity)
-			// 	continue;
-			//
-			// if (int32 AddCount = FMath::Min(Entry.GetItemCount() + ItemCount, FromStackableFragment->MaxStackCount) - Entry.GetItemCount())
-			// {
-			// 	AddQueue.Emplace(i, AddCount);
-			// 	ItemCount -= AddCount;
-			//
-			// 	if (ItemCount == 0)
-			// 	{
-			// 		for (const auto& Pair : AddQueue)
-			// 		{
-			// 			FD1InventoryEntry& ToEntry = Entries[Pair.Key];
-			// 			ToEntry.ItemCount += Pair.Value;
-			// 			MarkItemDirty(ToEntry);
-			// 		}
-			// 		return AddedItemInstances;
-			// 	}
-			// }
+			const FD1InventoryEntry& Entry = ToEntries[i];
+			
+			if (Entry.ItemInstance == nullptr)
+				continue;
+			
+			if (Entry.ItemInstance->GetItemTemplateID() != FromItemTemplateID)
+				continue;
+			
+			if (Entry.ItemInstance->GetItemRarity() != FromItemInstance->GetItemRarity())
+				continue;
+			
+			if (int32 AddCount = FMath::Min(Entry.GetItemCount() + LeftItemCount, FromStackableFragment->MaxStackCount) - Entry.GetItemCount())
+			{
+				OutToItemSlotPoses.Emplace(i % InventorySlotCount.X, i / InventorySlotCount.X);
+				OutToItemCounts.Emplace(AddCount);
+				LeftItemCount -= AddCount;
+			
+				if (LeftItemCount == 0)
+					return FromItemCount;
+			}
 		}
 	}
 
@@ -553,7 +550,7 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1InventoryManager
 			FIntPoint ItemSlotPos = FIntPoint(x, y);
 			if (IsEmpty(TempSlotChecks, ItemSlotPos, FromItemSlotCount))
 			{
-				// MarkSlotChecks(TempSlotChecks, true, ItemSlotPos, FromItemSlotCount);
+				MarkSlotChecks(TempSlotChecks, true, ItemSlotPos, FromItemSlotCount);
 				
 				int32 AddCount = FromStackableFragment ? FMath::Min(LeftItemCount, FromStackableFragment->MaxStackCount) : 1;
 				OutToItemSlotPoses.Emplace(x, y);
@@ -755,7 +752,17 @@ bool UD1InventoryManagerComponent::IsEmpty(const FIntPoint& ItemSlotPos, const F
 	return IsEmpty(SlotChecks, ItemSlotPos, ItemSlotCount);
 }
 
-void UD1InventoryManagerComponent::MarkSlotChecks(TArray<TArray<bool>>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount)
+bool UD1InventoryManagerComponent::IsAllEmpty()
+{
+	for (FD1InventoryEntry& Entry : InventoryList.Entries)
+	{
+		if (Entry.GetItemInstance())
+			return false;
+	}
+	return true;
+}
+
+void UD1InventoryManagerComponent::MarkSlotChecks(TArray<TArray<bool>>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const
 {
 	if (ItemSlotPos.X < 0 || ItemSlotPos.Y < 0)
 		return;

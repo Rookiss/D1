@@ -70,20 +70,30 @@ void UD1ItemHoversWidget::SetPosition(const FVector2D& AbsolutePosition)
 	if (CanvasWidgetSize.IsZero())
 		return;
 	
-	FVector2D Margin = FVector2D(5.f, 5.f);
+	FVector2D Margin = FVector2D(10.f, 15.f);
 	FVector2D MouseWidgetPos = CanvasPanel_Root->GetCachedGeometry().AbsoluteToLocal(AbsolutePosition);
 	FVector2D HoverWidgetStartPos = MouseWidgetPos + Margin;
 	FVector2D HoverWidgetEndPos = HoverWidgetStartPos + HoversWidgetSize;
 
-	if (HoverWidgetEndPos.X > CanvasWidgetSize.X)
+	FVector2D OutSize = (HoverWidgetEndPos - CanvasWidgetSize);
+	if (OutSize.X > 0.f)
 	{
-		HoverWidgetStartPos.X = MouseWidgetPos.X - (Margin.X + HoversWidgetSize.X);
+		HoverWidgetStartPos.X -= OutSize.X;
 	}
-
-	if (HoverWidgetEndPos.Y > CanvasWidgetSize.Y)
+	if (OutSize.Y > 0.f)
 	{
-		HoverWidgetStartPos.Y = MouseWidgetPos.Y - (Margin.Y + HoversWidgetSize.Y);
+		HoverWidgetStartPos.Y -= OutSize.Y;
 	}
+	//
+	// if (HoverWidgetEndPos.X > CanvasWidgetSize.X)
+	// {
+	// 	HoverWidgetStartPos.X = MouseWidgetPos.X - (Margin.X + HoversWidgetSize.X);
+	// }
+	//
+	// if (HoverWidgetEndPos.Y > CanvasWidgetSize.Y)
+	// {
+	// 	HoverWidgetStartPos.Y = MouseWidgetPos.Y - (Margin.Y + HoversWidgetSize.Y);
+	// }
 		
 	if (UCanvasPanelSlot* CanvasPanelSlot = Cast<UCanvasPanelSlot>(HorizontalBox_Hovers->Slot))
 	{

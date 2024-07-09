@@ -3,6 +3,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "D1InteractionInfo.generated.h"
 
+class UNiagaraSystem;
 class ID1Interactable;
 
 USTRUCT(BlueprintType)
@@ -29,6 +30,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> InteractionActiveMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(Categories="GameplayCue"))
+	FGameplayTag ActiveGameplayCueTag;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftClassPtr<UUserWidget> InteractionWidgetClass;

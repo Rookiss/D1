@@ -114,6 +114,30 @@ void UD1ItemManagerComponent::Server_InventoryToInventory_Implementation(UD1Inve
 	}
 }
 
+void UD1ItemManagerComponent::Server_InventoryToInventory_Quick_Implementation(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos, UD1InventoryManagerComponent* ToInventoryManager)
+{
+	if (HasAuthority() == false)
+		return;
+	
+	if (FromInventoryManager == nullptr || ToInventoryManager == nullptr)
+		return;
+
+	if (IsAllowedComponent(FromInventoryManager) == false ||  IsAllowedComponent(ToInventoryManager) == false)
+		return;
+
+	TArray<FIntPoint> OutToItemSlotPoses;
+	TArray<int32> OutToItemCounts;
+	int32 MovableItemCount = ToInventoryManager->CanMoveOrMergeItem_Quick(FromInventoryManager, FromItemSlotPos, OutToItemSlotPoses, OutToItemCounts);
+	if (MovableItemCount > 0)
+	{
+		UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem(FromItemSlotPos, MovableItemCount);
+		for (int32 i = 0; i < OutToItemSlotPoses.Num(); i++)
+		{
+			ToInventoryManager->AddItem(OutToItemSlotPoses[i], RemovedItemInstance, OutToItemCounts[i]);
+		}
+	}
+}
+
 void UD1ItemManagerComponent::Server_EquipmentToEquipment_Implementation(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType, UD1EquipmentManagerComponent* ToEquipmentManager, EEquipmentSlotType ToEquipmentSlotType)
 {
 	if (HasAuthority() == false)
@@ -130,20 +154,6 @@ void UD1ItemManagerComponent::Server_EquipmentToEquipment_Implementation(UD1Equi
 		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
 		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
 	}
-}
-
-void UD1ItemManagerComponent::Server_InventoryToInventory_Quick_Implementation(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos, UD1InventoryManagerComponent* ToInventoryManager)
-{
-	if (HasAuthority() == false)
-		return;
-	
-	if (FromInventoryManager == nullptr || ToInventoryManager == nullptr)
-		return;
-
-	if (IsAllowedComponent(FromInventoryManager) == false ||  IsAllowedComponent(ToInventoryManager) == false)
-		return;
-
-	// if (ToInventoryManager->CanMoveOrMergeItem_Quick())
 }
 
 void UD1ItemManagerComponent::Server_EquipmentToEquipment_Quick_Implementation(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType, UD1EquipmentManagerComponent* ToEquipmentManager)
