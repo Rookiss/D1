@@ -3,6 +3,8 @@
 #include "Interaction/D1WorldInteractable.h"
 #include "D1StatueBase.generated.h"
 
+class UArrowComponent;
+
 UCLASS()
 class AD1StatueBase : public AD1WorldInteractable
 {
@@ -14,12 +16,18 @@ public:
 public:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;
 	virtual UMeshComponent* GetMeshComponent() const override { return MeshComponent; }
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void OnExecute();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Info")
 	FD1InteractionInfo InteractionInfo;
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UArrowComponent> ArrowComponent;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> MeshComponent;
 };

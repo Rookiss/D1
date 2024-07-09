@@ -10,7 +10,7 @@
 AD1WorldInteractable::AD1WorldInteractable(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	
+	bReplicates = true;
 }
 
 void AD1WorldInteractable::GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const

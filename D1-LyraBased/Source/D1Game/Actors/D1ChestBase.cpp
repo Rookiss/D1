@@ -1,5 +1,6 @@
 ﻿#include "D1ChestBase.h"
 
+#include "Components/ArrowComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Net/UnrealNetwork.h"
 
@@ -17,10 +18,14 @@ FItemAddRule::FItemAddRule()
 AD1ChestBase::AD1ChestBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
+	SetRootComponent(ArrowComponent);
+	
     MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComponent"));
-	SetRootComponent(MeshComponent);
+	MeshComponent->SetupAttachment(GetRootComponent());
 	MeshComponent->SetCollisionProfileName(TEXT("Interactable"));
-
+	MeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	
 	InventoryManager = CreateDefaultSubobject<UD1InventoryManagerComponent>(TEXT("InventoryManager"));
 }
 

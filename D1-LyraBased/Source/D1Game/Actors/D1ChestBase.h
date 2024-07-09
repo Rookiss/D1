@@ -5,6 +5,7 @@
 #include "D1ChestBase.generated.h"
 
 class UD1ItemTemplate;
+class UArrowComponent;
 
 UENUM(BlueprintType)
 enum class EChestState : uint8
@@ -70,6 +71,9 @@ protected:
 	TArray<FItemAddRule> ItemAddRules;
 	
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UArrowComponent> ArrowComponent;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> MeshComponent;
 
