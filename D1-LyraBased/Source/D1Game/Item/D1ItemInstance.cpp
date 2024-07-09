@@ -63,23 +63,28 @@ void UD1ItemInstance::RemoveStatTagStack(FGameplayTag StatTag)
 
 EItemRarity UD1ItemInstance::DetermineItemRarity(const TArray<FD1ItemRarityProbability>& ItemProbabilities)
 {
-	EItemRarity ItemRarity = EItemRarity::Junk;
+	float TotalProbability = 0.f;
+	for (const FD1ItemRarityProbability& ItemProbability : ItemProbabilities)
+	{
+		TotalProbability += ItemProbability.Probability;
+	}
 
-	float TotalPercent = 0.f;
-	float RandValue = FMath::RandRange(0.f, 100.f);
+	if (TotalProbability > 100.f)
+		return EItemRarity::Count;
+	
+	float SumProbability = 0.f;
+	float RandomValue = FMath::RandRange(0.f, 100.f);
 
 	for (const FD1ItemRarityProbability& ItemProbability : ItemProbabilities)
 	{
-		TotalPercent += ItemProbability.Probability;
-		if (RandValue <= TotalPercent)
+		SumProbability += ItemProbability.Probability;
+		if (RandomValue < SumProbability)
 		{
-			ItemRarity = ItemProbability.Rarity;
-			break;
+			return ItemProbability.Rarity;
 		}
 	}
-
-	check(FMath::IsNearlyEqual(TotalPercent, 100.f));
-	return ItemRarity;
+	
+	return EItemRarity::Count;
 }
 
 bool UD1ItemInstance::HasStatTag(FGameplayTag StatTag) const

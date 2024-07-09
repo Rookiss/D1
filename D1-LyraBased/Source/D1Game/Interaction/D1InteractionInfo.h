@@ -28,7 +28,7 @@ public:
 	TSubclassOf<UGameplayAbility> InteractionAbilityToGrant;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> InteractionMontage;
+	TObjectPtr<UAnimMontage> InteractionActiveMontage;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftClassPtr<UUserWidget> InteractionWidgetClass;
@@ -41,7 +41,7 @@ public:
 			Content.IdenticalTo(Other.Content) &&
 			Duration == Other.Duration &&
 			InteractionAbilityToGrant == Other.InteractionAbilityToGrant &&
-			InteractionMontage == Other.InteractionMontage &&
+			InteractionActiveMontage == Other.InteractionActiveMontage &&
 			InteractionWidgetClass == Other.InteractionWidgetClass;
 	}
 

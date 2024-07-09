@@ -1,8 +1,18 @@
 ﻿#include "D1ChestBase.h"
 
+#include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Net/UnrealNetwork.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ChestBase)
+
+FItemAddRule::FItemAddRule()
+{
+	ItemRarityProbabilities.SetNum((int32)EItemRarity::Count);
+	for (int32 i = 0; i < ItemRarityProbabilities.Num(); i++)
+	{
+		ItemRarityProbabilities[i].Rarity = (EItemRarity)i;
+	}
+}
 
 AD1ChestBase::AD1ChestBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -10,6 +20,21 @@ AD1ChestBase::AD1ChestBase(const FObjectInitializer& ObjectInitializer)
     MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComponent"));
 	SetRootComponent(MeshComponent);
 	MeshComponent->SetCollisionProfileName(TEXT("Interactable"));
+
+	InventoryManager = CreateDefaultSubobject<UD1InventoryManagerComponent>(TEXT("InventoryManager"));
+}
+
+void AD1ChestBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (HasAuthority())
+	{
+		for (FItemAddRule& ItemAddRule : ItemAddRules)
+		{
+			InventoryManager->TryAddItemByProbability(ItemAddRule.ItemTemplateClass, 1, ItemAddRule.ItemRarityProbabilities);
+		}
+	}
 }
 
 void AD1ChestBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

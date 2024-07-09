@@ -7,8 +7,10 @@
 #include "Components/TextBlock.h"
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
+#include "Item/Fragments/D1ItemFragment_Equippable.h"
 #include "Item/Fragments/D1ItemFragment_Stackable.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
 #include "UI/Item/D1ItemDragDrop.h"
 #include "UI/Item/D1ItemDragWidget.h"
@@ -66,11 +68,20 @@ FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	{
 		UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
 		UD1InventoryManagerComponent* FromInventoryManager = SlotsWidget->GetInventoryManagerComponent();
-		UD1EquipmentManagerComponent* ToEquipmentManager = GetOwningPlayer()->FindComponentByClass<UD1EquipmentManagerComponent>();
-		
-		if (ItemManager && FromInventoryManager && ToEquipmentManager)
+
+		if (ItemManager && FromInventoryManager)
 		{
-			ItemManager->Server_InventoryToEquipment_Quick(FromInventoryManager, ItemSlotPos, ToEquipmentManager);
+			if (ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
+			{
+				UD1EquipmentManagerComponent* ToEquipmentManager = GetOwningPlayer()->FindComponentByClass<UD1EquipmentManagerComponent>();
+				ItemManager->Server_InventoryToEquipment_Quick(FromInventoryManager, ItemSlotPos, ToEquipmentManager);
+			}
+			else
+			{
+				UD1InventoryManagerComponent* ToInventoryManager = GetOwningPlayer()->FindComponentByClass<UD1InventoryManagerComponent>();
+				ItemManager->Server_InventoryToInventory_Quick(FromInventoryManager, ItemSlotPos, ToInventoryManager);
+			}
+			
 			return FReply::Handled();
 		}
 	}

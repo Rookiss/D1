@@ -542,6 +542,21 @@ AD1WeaponBase* UD1EquipManagerComponent::GetEquippedWeaponActor(EWeaponHandType 
 	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].SpawnedWeaponActor : nullptr;
 }
 
+void UD1EquipManagerComponent::GetAllEquippedWeaponActors(TArray<AD1WeaponBase*>& OutEquippedWeaponActors) const
+{
+	OutEquippedWeaponActors.Reset();
+
+	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	for (int32 i = 0; i < (int32)EWeaponHandType::Count; i++)
+	{
+		int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentWeaponEquipState);
+		if (Entries.IsValidIndex(EntryIndex) && Entries[EntryIndex].SpawnedWeaponActor)
+		{
+			OutEquippedWeaponActors.Add(Entries[EntryIndex].SpawnedWeaponActor);
+		}
+	}
+}
+
 UD1ItemInstance* UD1EquipManagerComponent::GetEquippedWeaponItemInstance(EWeaponHandType WeaponHandType) const
 {
 	if (WeaponHandType == EWeaponHandType::Count)

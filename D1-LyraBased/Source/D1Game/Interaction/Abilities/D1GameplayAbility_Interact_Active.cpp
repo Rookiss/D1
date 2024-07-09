@@ -42,13 +42,14 @@ void UD1GameplayAbility_Interact_Active::Initialize(AActor* TargetActor)
 	}
 }
 
-void UD1GameplayAbility_Interact_Active::TriggerInteraction()
+bool UD1GameplayAbility_Interact_Active::TriggerInteraction()
 {
+	bool bIsSuccess = false;
+	
 	FGameplayEventData Payload;
 	Payload.EventTag = D1GameplayTags::Ability_Interact;
 	Payload.Instigator = GetAvatarActorFromActorInfo();
 	Payload.Target = InteractableActor;
-	Payload.OptionalObject = InteractionInfo.InteractionMontage;
 	
 	Interactable->CustomizeInteractionEventData(D1GameplayTags::Ability_Interact, Payload);
 
@@ -61,7 +62,7 @@ void UD1GameplayAbility_Interact_Active::TriggerInteraction()
 			FGameplayAbilityActorInfo ActorInfo;
 			ActorInfo.InitFromActor(InteractableActor, TargetActor, AbilitySystem);
 		
-			AbilitySystem->TriggerAbilityFromGameplayEvent(
+			bIsSuccess = AbilitySystem->TriggerAbilityFromGameplayEvent(
 				InteractionAbilitySpec->Handle,
 				&ActorInfo,
 				D1GameplayTags::Ability_Interact,
@@ -70,4 +71,6 @@ void UD1GameplayAbility_Interact_Active::TriggerInteraction()
 			);
 		}
 	}
+
+	return bIsSuccess;
 }
