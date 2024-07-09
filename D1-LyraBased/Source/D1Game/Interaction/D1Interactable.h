@@ -41,6 +41,12 @@ public:
 	virtual void GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const abstract;
 	virtual void CustomizeInteractionEventData(const FGameplayTag& InteractionEventTag, FGameplayEventData& InOutEventData) const { }
 
+	UFUNCTION(BlueprintCallable)
+	virtual UMeshComponent* GetMeshComponent() const { return nullptr; }
+	
 protected:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const abstract;
+
+private:
+	
 };

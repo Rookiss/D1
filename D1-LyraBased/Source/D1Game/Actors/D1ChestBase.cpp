@@ -30,9 +30,15 @@ void AD1ChestBase::BeginPlay()
 
 	if (HasAuthority())
 	{
-		for (FItemAddRule& ItemAddRule : ItemAddRules)
+		for (int32 i = 0; i < 5; i++)
 		{
-			InventoryManager->TryAddItemByProbability(ItemAddRule.ItemTemplateClass, 1, ItemAddRule.ItemRarityProbabilities);
+			for (FItemAddRule& ItemAddRule : ItemAddRules)
+			{
+				InventoryManager->TryAddItemByProbability(ItemAddRule.ItemTemplateClass, 1, ItemAddRule.ItemRarityProbabilities);
+			}
+
+			if (InventoryManager->IsAllEmpty() == false)
+				break;
 		}
 	}
 }
