@@ -27,6 +27,7 @@
 #include "CommonSessionSubsystem.h"
 #include "TimerManager.h"
 #include "GameMapsSettings.h"
+#include "Player/D1PlayerSpawningManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraGameMode)
 
@@ -400,7 +401,7 @@ void ALyraGameMode::HandleStartingNewPlayer_Implementation(APlayerController* Ne
 
 AActor* ALyraGameMode::ChoosePlayerStart_Implementation(AController* Player)
 {
-	if (ULyraPlayerSpawningManagerComponent* PlayerSpawningComponent = GameState->FindComponentByClass<ULyraPlayerSpawningManagerComponent>())
+	if (UD1PlayerSpawningManagerComponent* PlayerSpawningComponent = GameState->FindComponentByClass<UD1PlayerSpawningManagerComponent>())
 	{
 		return PlayerSpawningComponent->ChoosePlayerStart(Player);
 	}
@@ -410,7 +411,7 @@ AActor* ALyraGameMode::ChoosePlayerStart_Implementation(AController* Player)
 
 void ALyraGameMode::FinishRestartPlayer(AController* NewPlayer, const FRotator& StartRotation)
 {
-	if (ULyraPlayerSpawningManagerComponent* PlayerSpawningComponent = GameState->FindComponentByClass<ULyraPlayerSpawningManagerComponent>())
+	if (UD1PlayerSpawningManagerComponent* PlayerSpawningComponent = GameState->FindComponentByClass<UD1PlayerSpawningManagerComponent>())
 	{
 		PlayerSpawningComponent->FinishRestartPlayer(NewPlayer, StartRotation);
 	}
@@ -441,7 +442,7 @@ bool ALyraGameMode::ControllerCanRestart(AController* Controller)
 		}
 	}
 
-	if (ULyraPlayerSpawningManagerComponent* PlayerSpawningComponent = GameState->FindComponentByClass<ULyraPlayerSpawningManagerComponent>())
+	if (UD1PlayerSpawningManagerComponent* PlayerSpawningComponent = GameState->FindComponentByClass<UD1PlayerSpawningManagerComponent>())
 	{
 		return PlayerSpawningComponent->ControllerCanRestart(Controller);
 	}
