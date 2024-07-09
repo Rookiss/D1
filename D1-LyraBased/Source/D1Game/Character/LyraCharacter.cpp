@@ -2,6 +2,7 @@
 
 #include "LyraCharacter.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Camera/LyraCameraComponent.h"
 #include "Character/LyraHealthComponent.h"
@@ -16,7 +17,9 @@
 #include "Player/LyraPlayerState.h"
 #include "System/LyraSignificanceManager.h"
 #include "TimerManager.h"
+#include "AbilitySystem/Attributes/LyraCombatSet.h"
 #include "GameFramework/SpectatorPawn.h"
+#include "Interaction/D1InteractionQuery.h"
 #include "PocketWorld/D1PocketWorldSubsystem.h"
 #include "System/LyraAssetManager.h"
 
@@ -694,4 +697,9 @@ bool FSharedRepMovement::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool
 	}
 
 	return true;
+}
+
+FD1InteractionInfo ALyraCharacter::GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const
+{
+	return InteractionInfo;
 }

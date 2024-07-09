@@ -1,7 +1,6 @@
 ﻿#include "D1AbilityTask_WaitForInvalidInteraction.h"
 
 #include "Character/LyraCharacter.h"
-#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
