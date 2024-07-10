@@ -3,6 +3,10 @@
 #include "Components/GameStateComponent.h"
 #include "D1PlayerSpawningManagerComponent.generated.h"
 
+class AController;
+class APlayerController;
+class APlayerState;
+class APlayerStart;
 class AD1PlayerStart;
 
 UCLASS()
