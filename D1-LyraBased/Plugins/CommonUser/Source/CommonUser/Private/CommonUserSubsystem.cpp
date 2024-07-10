@@ -593,7 +593,10 @@ void UCommonUserSubsystem::BindOnlineDelegatesOSSv1()
 
 bool UCommonUserSubsystem::AutoLoginOSSv1(FOnlineContextCache* System, TSharedRef<FUserLoginRequest> Request, FPlatformUserId PlatformUser)
 {
-	return System->IdentityInterface->AutoLogin(GetPlatformUserIndexForId(PlatformUser));
+	FOnlineAccountCredentials AccountCredentials;
+	AccountCredentials.Type = "accountportal";
+	return System->IdentityInterface->Login(0, AccountCredentials);	
+	// return System->IdentityInterface->AutoLogin(GetPlatformUserIndexForId(PlatformUser));
 }
 
 bool UCommonUserSubsystem::ShowLoginUIOSSv1(FOnlineContextCache* System, TSharedRef<FUserLoginRequest> Request, FPlatformUserId PlatformUser)

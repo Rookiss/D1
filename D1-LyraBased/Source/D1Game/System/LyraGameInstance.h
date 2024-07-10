@@ -17,7 +17,7 @@ class D1GAME_API ULyraGameInstance : public UCommonGameInstance
 public:
 
 	ULyraGameInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
+	
 	ALyraPlayerController* GetPrimaryPlayerController() const;
 	
 	virtual bool CanJoinRequestedSession() const override;
@@ -26,6 +26,18 @@ public:
 	virtual void ReceivedNetworkEncryptionToken(const FString& EncryptionToken, const FOnEncryptionKeyResponse& Delegate) override;
 	virtual void ReceivedNetworkEncryptionAck(const FOnEncryptionKeyResponse& Delegate) override;
 
+public:
+	UFUNCTION(BlueprintCallable)
+	void LoginWithEOS(FString ID, FString Token, FString LoginType);
+
+	void LoginWithEOSReply(int32 LocalUserNum, bool bWasSuccess, const FUniqueNetId& UserID, const FString& Error);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FString GetPlayerUsername();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsPlayerLoggedIn();
+	
 protected:
 
 	virtual void Init() override;

@@ -17,6 +17,11 @@
 #include "Misc/FileHelper.h"
 #endif // UE_WITH_DTLS
 
+#include "D1DedicatedServerSubsystem.h"
+#include "D1LogChannels.h"
+#include "OnlineSubsystemUtils.h"
+#include "Kismet/KismetSystemLibrary.h"
+
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraGameInstance)
 
 namespace Lyra
@@ -110,6 +115,23 @@ void ULyraGameInstance::Init()
 	if (UCommonSessionSubsystem* SessionSubsystem = GetSubsystem<UCommonSessionSubsystem>())
 	{
 		SessionSubsystem->OnPreClientTravelEvent.AddUObject(this, &ULyraGameInstance::OnPreClientTravelToSession);
+	}
+
+	if (UKismetSystemLibrary::IsDedicatedServer(GetWorld()))
+	{
+		if (GIsEditor == false)
+		{
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+			{
+				UD1DedicatedServerSubsystem* DedicatedServerSubsystem = GetSubsystem<UD1DedicatedServerSubsystem>();
+				DedicatedServerSubsystem->CreateDedicatedServerSession(TEXT("/Game/RuinedCrypt/ProtoLevel1"));
+			}, 3.f, false);
+		}
+	}
+	else
+	{
+		// LoginWithEOS(FString(), FString(), FString(TEXT("accountportal")));
 	}
 }
 
@@ -307,6 +329,72 @@ void ULyraGameInstance::ReceivedNetworkEncryptionAck(const FOnEncryptionKeyRespo
 	}
 
 	Delegate.ExecuteIfBound(Response);
+}
+
+void ULyraGameInstance::LoginWithEOS(FString ID, FString Token, FString LoginType)
+{
+	IOnlineSubsystem* OnlineSubsystem = Online::GetSubsystem(GetWorld());
+	if (OnlineSubsystem)
+	{
+		IOnlineIdentityPtr OnlineIdentityPtr = OnlineSubsystem->GetIdentityInterface();
+		if (OnlineIdentityPtr)
+		{
+			FOnlineAccountCredentials AccountCredentials;
+			AccountCredentials.Id = ID;
+			AccountCredentials.Token = Token;
+			AccountCredentials.Type = LoginType;
+			OnlineIdentityPtr->OnLoginCompleteDelegates->AddUObject(this, &ThisClass::LoginWithEOSReply);
+			OnlineIdentityPtr->Login(0, AccountCredentials);
+		}
+	}
+}
+
+void ULyraGameInstance::LoginWithEOSReply(int32 LocalUserNum, bool bWasSuccess, const FUniqueNetId& UserID, const FString& Error)
+{
+	if (bWasSuccess)
+	{
+		UE_LOG(LogD1, Warning, TEXT("Login Successful"));
+	}
+	else
+	{
+		UE_LOG(LogD1, Error, TEXT("Login failed: %s"), *Error);
+	}
+}
+
+FString ULyraGameInstance::GetPlayerUsername()
+{
+	IOnlineSubsystem* OnlineSubsystem = Online::GetSubsystem(GetWorld());
+	if (OnlineSubsystem)
+	{
+		IOnlineIdentityPtr OnlineIdentityPtr = OnlineSubsystem->GetIdentityInterface();
+		if (OnlineIdentityPtr)
+		{
+			if (OnlineIdentityPtr->GetLoginStatus(0) == ELoginStatus::LoggedIn)
+			{
+				return OnlineIdentityPtr->GetPlayerNickname(0);
+			}
+		}
+	}
+
+	return FString();
+}
+
+bool ULyraGameInstance::IsPlayerLoggedIn()
+{
+	IOnlineSubsystem* OnlineSubsystem = Online::GetSubsystem(GetWorld());
+	if (OnlineSubsystem)
+	{
+		IOnlineIdentityPtr OnlineIdentityPtr = OnlineSubsystem->GetIdentityInterface();
+		if (OnlineIdentityPtr)
+		{
+			if (OnlineIdentityPtr->GetLoginStatus(0) == ELoginStatus::LoggedIn)
+			{
+				return true;
+			}
+		}
+	}
+	
+	return false;
 }
 
 void ULyraGameInstance::OnPreClientTravelToSession(FString& URL)
