@@ -374,8 +374,6 @@ void ALyraCharacter::DisableMovementAndCollision()
 	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	GetMesh()->SetCollisionResponseToChannel(D1_TraceChannel_Interaction, ECR_Block);
-
 	ULyraCharacterMovementComponent* LyraMoveComp = CastChecked<ULyraCharacterMovementComponent>(GetCharacterMovement());
 	LyraMoveComp->StopMovementImmediately();
 	LyraMoveComp->DisableMovement();
@@ -399,6 +397,8 @@ void ALyraCharacter::UninitAndSpawnSpectator()
 			PawnExtComponent->UninitializeAbilitySystem();
 		}
 	}
+
+	GetMesh()->SetCollisionResponseToChannel(D1_TraceChannel_Interaction, ECR_Block);
 	
 	if (GetLocalRole() == ROLE_Authority)
 	{
@@ -408,8 +408,11 @@ void ALyraCharacter::UninitAndSpawnSpectator()
 	
 			FActorSpawnParameters SpawnParameters;
 			SpawnParameters.Owner = Controller;
-			
-			ASpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(SpectatorPawnClass, GetActorLocation(), GetActorRotation(), SpawnParameters);
+
+			FVector ViewLocation;
+			FRotator ViewRotation;
+			Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+			ASpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(SpectatorPawnClass, ViewLocation, ViewRotation, SpawnParameters);
 			Controller->Possess(SpectatorPawn);
 		}
 	}
