@@ -19,7 +19,7 @@ public:
 	UD1EquipmentSlotWeaponWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void Init(EWeaponSlotType InWeaponSlotType);
+	void Init(EWeaponSlotType InWeaponSlotType, UD1EquipmentManagerComponent* InEquipmentManager);
 	
 protected:
 	virtual void NativePreConstruct() override;

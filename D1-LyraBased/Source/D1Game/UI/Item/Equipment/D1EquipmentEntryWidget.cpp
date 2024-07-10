@@ -19,21 +19,14 @@ UD1EquipmentEntryWidget::UD1EquipmentEntryWidget(const FObjectInitializer& Objec
     
 }
 
-void UD1EquipmentEntryWidget::Init(UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType)
+void UD1EquipmentEntryWidget::Init(UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType, UD1EquipmentManagerComponent* InEquipmentManager)
 {
 	if (InEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || InEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || InEquipmentSlotType == EEquipmentSlotType::Count)
 		return;
 	
 	SetItemInstance(InItemInstance);
 	EquipmentSlotType = InEquipmentSlotType;
-}
-
-void UD1EquipmentEntryWidget::NativeOnInitialized()
-{
-	Super::NativeOnInitialized();
-	
-	EquipmentManagerComponent = GetOwningPlayerPawn()->GetComponentByClass<UD1EquipmentManagerComponent>();
-	check(EquipmentManagerComponent);
+	EquipmentManager = InEquipmentManager;
 }
 
 void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
@@ -50,7 +43,7 @@ void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	DragDrop->DefaultDragVisual = DragWidget;
 	DragDrop->Pivot = EDragPivot::CenterCenter;
 	DragDrop->FromEntryWidget = this;
-	DragDrop->FromEquipmentManager = EquipmentManagerComponent;
+	DragDrop->FromEquipmentManager = EquipmentManager;
 	DragDrop->FromEquipmentSlotType = EquipmentSlotType;
 	DragDrop->FromItemInstance = ItemInstance;
 	DragDrop->DeltaWidgetPos = (DragWidgetSize / 2.f) - (Item::UnitInventorySlotSize / 2.f);
@@ -68,7 +61,7 @@ FReply UD1EquipmentEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 		
 		if (ItemManager && ToInventoryManager)
 		{
-			ItemManager->Server_EquipmentToInventory_Quick(EquipmentManagerComponent, EquipmentSlotType, ToInventoryManager);
+			ItemManager->Server_EquipmentToInventory_Quick(EquipmentManager, EquipmentSlotType, ToInventoryManager);
 			return FReply::Handled();
 		}
 	}

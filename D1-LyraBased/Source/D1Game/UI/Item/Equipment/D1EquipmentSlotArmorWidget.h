@@ -19,7 +19,7 @@ public:
 	UD1EquipmentSlotArmorWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void Init(EArmorType InArmorType);
+	void Init(EArmorType InArmorType, UD1EquipmentManagerComponent* InEquipmentManager);
 	
 protected:
 	virtual void NativePreConstruct() override;
