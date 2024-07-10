@@ -16,16 +16,15 @@ public:
 	UD1EquipmentEntryWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void Init(UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType);
+	void Init(UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType, UD1EquipmentManagerComponent* InEquipmentManager);
 	
 protected:
-	virtual void NativeOnInitialized() override;
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 protected:
 	UPROPERTY()
-	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManagerComponent;
+	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
 
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 };
