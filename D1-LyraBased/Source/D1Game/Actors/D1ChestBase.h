@@ -46,6 +46,10 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;
 	virtual UMeshComponent* GetInteractionMeshComponent() const override { return MeshComponent; }
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void SetChestState(EChestState NewChestState);
 	
 private:
 	UFUNCTION()

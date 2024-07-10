@@ -40,11 +40,11 @@ void UD1ItemManagerComponent::Server_InventoryToEquipment_Quick_Implementation(U
 	if (IsAllowedComponent(FromInventoryManager) == false ||  IsAllowedComponent(ToEquipmentManager) == false)
 		return;
 
-	EEquipmentSlotType EquipmentSlotType;
-	if (ToEquipmentManager->CanAddEquipment_Quick(FromInventoryManager, FromItemSlotPos, EquipmentSlotType))
+	EEquipmentSlotType ToEquipmentSlotType;
+	if (ToEquipmentManager->CanAddEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
 	{
 		UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
-		ToEquipmentManager->AddEquipment(EquipmentSlotType, RemovedItemInstance);
+		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
 	}
 	else
 	{
@@ -158,7 +158,28 @@ void UD1ItemManagerComponent::Server_EquipmentToEquipment_Implementation(UD1Equi
 
 void UD1ItemManagerComponent::Server_EquipmentToEquipment_Quick_Implementation(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType, UD1EquipmentManagerComponent* ToEquipmentManager)
 {
-	// TODO
+	if (HasAuthority() == false)
+		return;
+	
+	if (FromEquipmentManager == nullptr || ToEquipmentManager == nullptr)
+		return;
+
+	if (IsAllowedComponent(FromEquipmentManager) == false ||  IsAllowedComponent(ToEquipmentManager) == false)
+		return;
+	
+	EEquipmentSlotType ToEquipmentSlotType;
+	if (ToEquipmentManager->CanAddEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
+	{
+		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
+		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
+	}
+	else
+	{
+		if (UD1InventoryManagerComponent* ToInventoryManager = ToEquipmentManager->GetOwner()->GetComponentByClass<UD1InventoryManagerComponent>())
+		{
+			Server_EquipmentToInventory_Quick(FromEquipmentManager, FromEquipmentSlotType, ToInventoryManager);
+		}
+	}
 }
 
 void UD1ItemManagerComponent::AddAllowedComponent(UActorComponent* ActorComponent)

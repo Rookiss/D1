@@ -57,12 +57,21 @@ FReply UD1EquipmentEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	if (Reply.IsEventHandled() == false && UWidgetBlueprintLibrary::IsDragDropping() == false && InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
 	{
 		UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
-		UD1InventoryManagerComponent* ToInventoryManager = GetOwningPlayerPawn()->FindComponentByClass<UD1InventoryManagerComponent>();
-		
-		if (ItemManager && ToInventoryManager)
+		UD1InventoryManagerComponent* MyInventoryManager = GetOwningPlayerPawn()->FindComponentByClass<UD1InventoryManagerComponent>();
+		UD1EquipmentManagerComponent* MyEquipmentManager = GetOwningPlayerPawn()->FindComponentByClass<UD1EquipmentManagerComponent>();
+
+		if (ItemManager && MyInventoryManager && MyEquipmentManager)
 		{
-			ItemManager->Server_EquipmentToInventory_Quick(EquipmentManager, EquipmentSlotType, ToInventoryManager);
-			return FReply::Handled();
+			if (EquipmentManager == MyEquipmentManager)
+			{
+				ItemManager->Server_EquipmentToInventory_Quick(EquipmentManager, EquipmentSlotType, MyInventoryManager);
+				return FReply::Handled();
+			}
+			else
+			{
+				ItemManager->Server_EquipmentToEquipment_Quick(EquipmentManager, EquipmentSlotType, MyEquipmentManager);
+				return FReply::Handled();
+			}
 		}
 	}
 

@@ -65,6 +65,19 @@ FD1InteractionInfo AD1ChestBase::GetPreInteractionInfo(const FD1InteractionQuery
 	}
 }
 
+void AD1ChestBase::SetChestState(EChestState NewChestState)
+{
+	if (NewChestState == ChestState)
+		return;
+
+	ChestState = NewChestState;
+	
+	if (HasAuthority())
+	{
+		OnRep_ChestState();
+	}
+}
+
 void AD1ChestBase::OnRep_ChestState()
 {
 	if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())

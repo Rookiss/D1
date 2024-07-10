@@ -81,7 +81,6 @@ FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 				UD1InventoryManagerComponent* ToInventoryManager = GetOwningPlayerPawn()->FindComponentByClass<UD1InventoryManagerComponent>();
 				ItemManager->Server_InventoryToInventory_Quick(FromInventoryManager, ItemSlotPos, ToInventoryManager);
 			}
-			
 			return FReply::Handled();
 		}
 	}
