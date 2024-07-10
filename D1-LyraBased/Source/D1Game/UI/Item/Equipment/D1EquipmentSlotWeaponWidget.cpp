@@ -22,12 +22,13 @@ UD1EquipmentSlotWeaponWidget::UD1EquipmentSlotWeaponWidget(const FObjectInitiali
 	
 }
 
-void UD1EquipmentSlotWeaponWidget::Init(EWeaponSlotType InWeaponSlotType)
+void UD1EquipmentSlotWeaponWidget::Init(EWeaponSlotType InWeaponSlotType, UD1EquipmentManagerComponent* InEquipmentManager)
 {
 	if (InWeaponSlotType == EWeaponSlotType::Count)
 		return;
 	
 	WeaponSlotType = InWeaponSlotType;
+	EquipmentManager = InEquipmentManager;
 }
 
 void UD1EquipmentSlotWeaponWidget::NativePreConstruct()
@@ -163,7 +164,7 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 		OverlaySlot->SetHorizontalAlignment(HAlign_Fill);
 		OverlaySlot->SetVerticalAlignment(VAlign_Fill);
 		
-		EntryWidget->Init(NewItemInstance, UD1EquipManagerComponent::ConvertToEquipmentSlotType(InWeaponHandType, WeaponSlotType));
+		EntryWidget->Init(NewItemInstance, UD1EquipManagerComponent::ConvertToEquipmentSlotType(InWeaponHandType, WeaponSlotType), EquipmentManager);
 	}
 
 	FSlateBrush LeftBrush, RightBrush;

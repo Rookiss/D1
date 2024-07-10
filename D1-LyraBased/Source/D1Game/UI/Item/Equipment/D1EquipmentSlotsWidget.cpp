@@ -18,16 +18,6 @@ void UD1EquipmentSlotsWidget::NativeOnInitialized()
 
 	SlotWeaponWidgets = { Equipment_Weapon_Primary, Equipment_Weapon_Secondary };
 	SlotArmorWidgets  = { Equipment_Armor_Head, Equipment_Armor_Chest, Equipment_Armor_Legs, Equipment_Armor_Hand, Equipment_Armor_Foot };
-	
-	for (int32 i = 0; i < SlotWeaponWidgets.Num(); i++)
-	{
-		SlotWeaponWidgets[i]->Init((EWeaponSlotType)i);
-	}
-	
-	for (int32 i = 0; i < SlotArmorWidgets.Num(); i++)
-	{
-		SlotArmorWidgets[i]->Init((EArmorType)i);
-	}
 }
 
 void UD1EquipmentSlotsWidget::NativeConstruct()
@@ -54,6 +44,16 @@ void UD1EquipmentSlotsWidget::ConstructUI(FGameplayTag Channel, const FEquipment
 		return;
 
 	EquipmentManager = Message.EquipmentManager;
+	
+	for (int32 i = 0; i < SlotWeaponWidgets.Num(); i++)
+	{
+		SlotWeaponWidgets[i]->Init((EWeaponSlotType)i, EquipmentManager);
+	}
+	
+	for (int32 i = 0; i < SlotArmorWidgets.Num(); i++)
+	{
+		SlotArmorWidgets[i]->Init((EArmorType)i, EquipmentManager);
+	}
 
 	const TArray<FD1EquipmentEntry>& Entries = EquipmentManager->GetAllEntries();
 	for (int32 i = 0; i < Entries.Num(); i++)

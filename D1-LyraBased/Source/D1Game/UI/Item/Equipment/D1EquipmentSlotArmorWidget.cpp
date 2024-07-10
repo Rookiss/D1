@@ -24,11 +24,12 @@ UD1EquipmentSlotArmorWidget::UD1EquipmentSlotArmorWidget(const FObjectInitialize
     
 }
 
-void UD1EquipmentSlotArmorWidget::Init(EArmorType InArmorType)
+void UD1EquipmentSlotArmorWidget::Init(EArmorType InArmorType, UD1EquipmentManagerComponent* InEquipmentManager)
 {
 	if (InArmorType != EArmorType::Count)
 	{
 		ArmorType = InArmorType;
+		EquipmentManager = InEquipmentManager;
 	}
 }
 
@@ -42,9 +43,6 @@ void UD1EquipmentSlotArmorWidget::NativePreConstruct()
 void UD1EquipmentSlotArmorWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	
-	EquipmentManager = GetOwningPlayerPawn()->GetComponentByClass<UD1EquipmentManagerComponent>();
-	check(EquipmentManager);
 	
 	EntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidgetClass");
 }
@@ -144,7 +142,7 @@ void UD1EquipmentSlotArmorWidget::OnEquipmentEntryChanged(UD1ItemInstance* NewIt
 		OverlaySlot->SetHorizontalAlignment(HAlign_Fill);
 		OverlaySlot->SetVerticalAlignment(VAlign_Fill);
 		
-		EntryWidget->Init(NewItemInstance, UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType));
+		EntryWidget->Init(NewItemInstance, UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType), EquipmentManager);
 
 		Image_Icon->SetRenderOpacity(0.f);
 	}
