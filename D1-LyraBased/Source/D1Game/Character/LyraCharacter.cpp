@@ -386,7 +386,6 @@ void ALyraCharacter::DisableMovementAndCollision()
 void ALyraCharacter::UnpossessDueToDeath()
 {
 	K2_OnDeathFinished();
-
 	UninitAndSpawnSpectator();
 }
 
@@ -400,21 +399,18 @@ void ALyraCharacter::UninitAndSpawnSpectator()
 		}
 	}
 	
-	if (GetLocalRole() == ROLE_Authority)
+	if (GetLocalRole() == ROLE_Authority && Controller)
 	{
-		if (Controller)
-		{
-			TSubclassOf<ASpectatorPawn> SpectatorPawnClass = ULyraAssetManager::GetSubclassByName<ASpectatorPawn>("SpectatorPawnClass");
+		TSubclassOf<ASpectatorPawn> SpectatorPawnClass = ULyraAssetManager::GetSubclassByName<ASpectatorPawn>("SpectatorPawnClass");
 	
-			FActorSpawnParameters SpawnParameters;
-			SpawnParameters.Owner = Controller;
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = Controller;
 
-			FVector ViewLocation;
-			FRotator ViewRotation;
-			Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
-			ASpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(SpectatorPawnClass, ViewLocation, ViewRotation, SpawnParameters);
-			Controller->Possess(SpectatorPawn);
-		}
+		FVector ViewLocation;
+		FRotator ViewRotation;
+		Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+		ASpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(SpectatorPawnClass, ViewLocation, ViewRotation, SpawnParameters);
+		Controller->Possess(SpectatorPawn);
 	}
 }
 

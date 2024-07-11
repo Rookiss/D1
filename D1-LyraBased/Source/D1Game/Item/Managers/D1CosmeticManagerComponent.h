@@ -34,6 +34,9 @@ protected:
 public:
 	void SetArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr);
 
+private:
+	void Initialize();
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Cosmetic")
 	TSubclassOf<AD1ArmorBase> CosmeticSlotClass;
@@ -44,4 +47,6 @@ protected:
 private:
 	UPROPERTY()
 	TArray<TObjectPtr<UChildActorComponent>> CosmeticSlots;
+
+	bool bInitialized = false;
 };

@@ -14,20 +14,15 @@ UD1PocketWorldWidget::UD1PocketWorldWidget(const FObjectInitializer& ObjectIniti
     
 }
 
-void UD1PocketWorldWidget::NativeOnInitialized()
+void UD1PocketWorldWidget::NativeConstruct()
 {
-	Super::NativeOnInitialized();
+	Super::NativeConstruct();
 
 	if (UD1PocketWorldSubsystem* PocketWorldSubsystem = GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 	{
 		PocketWorldSubsystem->RegisterAndCallForGetPocketStage(GetOwningLocalPlayer(), FGetPocketStageDelegate::CreateUObject(this, &UD1PocketWorldWidget::OnPocketStageReady));
 	}
-}
-
-void UD1PocketWorldWidget::NativeConstruct()
-{
-	Super::NativeConstruct();
-
+	
 	GetWorld()->GetTimerManager().SetTimer(TickTimerHandle, this, &ThisClass::RefreshUI, 0.03f, true);
 }
 

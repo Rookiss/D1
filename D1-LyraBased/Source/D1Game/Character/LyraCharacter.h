@@ -239,7 +239,7 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Info")
 	FD1InteractionInfo InteractionInfo;
-	
+
 public:
 	bool bWantToCrouch = false;
 	float BaseUnscaledCapsuleHalfHeight = 0.f;

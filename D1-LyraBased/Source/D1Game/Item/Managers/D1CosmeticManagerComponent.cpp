@@ -10,6 +10,61 @@
 UD1CosmeticManagerComponent::UD1CosmeticManagerComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	SetIsReplicatedByDefault(true);
+}
+
+void UD1CosmeticManagerComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	Initialize();
+}
+
+void UD1CosmeticManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	for (UChildActorComponent* CosmeticSlot : CosmeticSlots)
+	{
+		if (CosmeticSlot)
+		{
+			CosmeticSlot->DestroyComponent();
+		}
+	}
+	
+	Super::EndPlay(EndPlayReason);
+}
+
+void UD1CosmeticManagerComponent::SetArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr)
+{
+	if (ArmorType == EArmorType::Count)
+		return;
+
+	Initialize();
+	
+	if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)ArmorType])
+	{
+		if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
+		{
+			if (ArmorMeshPtr.IsNull())
+			{
+				const FD1CosmeticDefaultMeshEntry& DefaultMeshEntry = DefaultMeshes[(int32)ArmorType];
+				CosmeticActor->SetArmorMesh(DefaultMeshEntry.DefaultMesh);
+			}
+			else
+			{
+				USkeletalMesh* ArmorMesh = ULyraAssetManager::GetAssetByPath<USkeletalMesh>(ArmorMeshPtr);
+				CosmeticActor->SetArmorMesh(ArmorMesh);
+			}
+		}
+	}
+}
+
+void UD1CosmeticManagerComponent::Initialize()
+{
+	if (bInitialized)
+		return;
+
+	bInitialized = true;
+
 	const int32 ArmorTypeCount = (int32)EArmorType::Count; 
 
 	DefaultMeshes.SetNumZeroed(ArmorTypeCount);
@@ -19,11 +74,6 @@ UD1CosmeticManagerComponent::UD1CosmeticManagerComponent(const FObjectInitialize
 	}
 
 	CosmeticSlots.SetNumZeroed(ArmorTypeCount);
-}
-
-void UD1CosmeticManagerComponent::BeginPlay()
-{
-	Super::BeginPlay();
 	
 	check(CosmeticSlotClass);
 	
@@ -50,42 +100,6 @@ void UD1CosmeticManagerComponent::BeginPlay()
 					USkeletalMesh* CosmeticMesh = DefaultMeshes[i].DefaultMesh; 
 					SpawnedActor->SetArmorMesh(CosmeticMesh);
 				}
-			}
-		}
-	}
-}
-
-void UD1CosmeticManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	for (UChildActorComponent* CosmeticSlot : CosmeticSlots)
-	{
-		if (CosmeticSlot)
-		{
-			CosmeticSlot->DestroyComponent();
-		}
-	}
-	
-	Super::EndPlay(EndPlayReason);
-}
-
-void UD1CosmeticManagerComponent::SetArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr)
-{
-	if (ArmorType == EArmorType::Count)
-		return;
-
-	if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)ArmorType])
-	{
-		if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
-		{
-			if (ArmorMeshPtr.IsNull())
-			{
-				const FD1CosmeticDefaultMeshEntry& DefaultMeshEntry = DefaultMeshes[(int32)ArmorType];
-				CosmeticActor->SetArmorMesh(DefaultMeshEntry.DefaultMesh);
-			}
-			else
-			{
-				USkeletalMesh* ArmorMesh = ULyraAssetManager::GetAssetByPath<USkeletalMesh>(ArmorMeshPtr);
-				CosmeticActor->SetArmorMesh(ArmorMesh);
 			}
 		}
 	}
