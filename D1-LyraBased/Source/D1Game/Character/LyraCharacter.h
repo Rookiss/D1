@@ -175,7 +175,7 @@ protected:
 	virtual void OnDeathFinished(AActor* OwningActor);
 
 	void DisableMovementAndCollision();
-	void DestroyDueToDeath();
+	void UnpossessDueToDeath();
 
 	UFUNCTION(BlueprintCallable)
 	void UninitAndSpawnSpectator();

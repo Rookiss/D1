@@ -20,35 +20,35 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* NewItemInstance)
 	if (ItemInstance == NewItemInstance)
 		return;
 
-	ALyraCharacter* Character = EquipmentManager->GetCharacter();
-	check(Character);
-	
-	UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>();
-	check(EquipManager);
-	
-	if (ItemInstance)
+	if (ALyraCharacter* Character = EquipmentManager->GetCharacter())
 	{
-		EquipManager->Unequip(EquipmentSlotType);
-	}
+		if (UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>())
+		{
+			if (ItemInstance)
+			{
+				EquipManager->Unequip(EquipmentSlotType);
+			}
 	
-	ItemInstance = NewItemInstance;
+			ItemInstance = NewItemInstance;
 	
-	if (ItemInstance)
-	{
-		LastValidTemplateID = ItemInstance->GetItemTemplateID();
+			if (ItemInstance)
+			{
+				LastValidTemplateID = ItemInstance->GetItemTemplateID();
 
-		const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
-		const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
-		if (Armor || Weapon && EquipmentManager->IsSameWeaponEquipState(EquipmentSlotType, EquipManager->GetCurrentWeaponEquipState()))
-		{
-			EquipManager->Equip(EquipmentSlotType, ItemInstance);
-		}
-	}
-	else
-	{
-		if (EquipmentManager->IsAllEmpty(EquipManager->GetCurrentWeaponEquipState()))
-		{
-			EquipManager->ChangeWeaponEquipState(EWeaponEquipState::Unarmed);
+				const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
+				const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+				if (Armor || Weapon && EquipmentManager->IsSameWeaponEquipState(EquipmentSlotType, EquipManager->GetCurrentWeaponEquipState()))
+				{
+					EquipManager->Equip(EquipmentSlotType, ItemInstance);
+				}
+			}
+			else
+			{
+				if (EquipmentManager->IsAllEmpty(EquipManager->GetCurrentWeaponEquipState()))
+				{
+					EquipManager->ChangeWeaponEquipState(EWeaponEquipState::Unarmed);
+				}
+			}
 		}
 	}
 }

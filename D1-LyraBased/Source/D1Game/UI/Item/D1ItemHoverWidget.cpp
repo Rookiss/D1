@@ -51,7 +51,8 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	const EItemRarity ItemRarity = ItemInstance->GetItemRarity();
 	
 	Text_DisplayName->SetText(ItemTemplate.DisplayName);
-	Image_DIsplayName_Background->SetColorAndOpacity(Item::ItemRarityColors[(int32)ItemRarity]);
+	Text_DisplayName->SetColorAndOpacity(Item::ItemRarityTextColors[(int32)ItemRarity]);
+	Image_DIsplayName_Background->SetColorAndOpacity(Item::ItemRarityBackgroundColors[(int32)ItemRarity]);
 	
 	Text_AttributeModifiers->SetVisibility(ESlateVisibility::Collapsed);
 	Text_Description->SetVisibility(ESlateVisibility::Collapsed);
@@ -73,7 +74,7 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	case EItemRarity::Legendary:	ItemRarityString = TEXT("Legendary");	break;
 	}
 	Text_ItemRarity->SetText(FText::FromString(ItemRarityString));
-	Text_ItemRarity->SetColorAndOpacity(Item::ItemRarityColors[(int32)ItemRarity]);
+	Text_ItemRarity->SetColorAndOpacity(Item::ItemRarityTextColors[(int32)ItemRarity]);
 	
 	if (const UD1ItemFragment_Equippable* EquippableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable>())
 	{

@@ -1,14 +1,9 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "LyraGameplayAbility_Jump.h"
 
 #include "AbilitySystem/Abilities/LyraGameplayAbility.h"
 #include "Character/LyraCharacter.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraGameplayAbility_Jump)
-
-struct FGameplayTagContainer;
-
 
 ULyraGameplayAbility_Jump::ULyraGameplayAbility_Jump(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -38,14 +33,6 @@ bool ULyraGameplayAbility_Jump::CanActivateAbility(const FGameplayAbilitySpecHan
 	return true;
 }
 
-void ULyraGameplayAbility_Jump::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
-{
-	// Stop jumping in case the ability blueprint doesn't call it.
-	CharacterJumpStop();
-
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-}
-
 void ULyraGameplayAbility_Jump::CharacterJumpStart()
 {
 	if (ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo())
@@ -54,17 +41,6 @@ void ULyraGameplayAbility_Jump::CharacterJumpStart()
 		{
 			LyraCharacter->UnCrouch();
 			LyraCharacter->Jump();
-		}
-	}
-}
-
-void ULyraGameplayAbility_Jump::CharacterJumpStop()
-{
-	if (ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo())
-	{
-		if (LyraCharacter->IsLocallyControlled() && LyraCharacter->bPressedJump)
-		{
-			LyraCharacter->StopJumping();
 		}
 	}
 }

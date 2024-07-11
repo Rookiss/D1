@@ -142,19 +142,28 @@ namespace Item
 		{ EEquipmentSlotType::Quaternary_LeftHand, EEquipmentSlotType::Quaternary_RightHand, EEquipmentSlotType::Quaternary_TwoHand }
 	};
 	
-	const FLinearColor DefaultColor = FLinearColor(1.f, 1.f, 1.f, 0.f);
-	const FLinearColor RedColor     = FLinearColor(0.28f, 0.02f, 0.f, 0.32f);
-	const FLinearColor GreenColor   = FLinearColor(0.02f, 0.28f, 0.f, 0.32f);
-	const FLinearColor BlueColor    = FLinearColor(0.f, 0.02f, 0.28f, 0.32f);
+	const FColor DefaultColor = FColor(255, 255, 255, 0);
+	const FColor RedColor     = FColor(40, 7, 7, 160);
+	const FColor BlueColor    = FColor(8, 24, 41, 160);
+	const FColor GreenColor   = FColor(18, 31, 18, 160);
 
-	const TArray<FLinearColor> ItemRarityColors = {
-		FLinearColor::Gray,
-		FLinearColor(FColor::Silver),
-		FLinearColor::White,
-		FLinearColor(FColor::Green),
-		FLinearColor(FColor::Cyan),
-		FLinearColor(FColor::Purple),
-		FLinearColor(FColor::Orange),
-		FLinearColor(FColor::Yellow)
+	const TArray<FColor> ItemRarityBackgroundColors = {
+		FColor(28, 28, 28),
+		FColor(56, 56, 56),
+		FColor(18, 31, 18),
+		FColor(24, 35, 52),
+		FColor(38, 23, 58),
+		FColor(59, 40, 23),
+		FColor(69, 61, 36),
+	};
+
+	const TArray<FColor> ItemRarityTextColors = {
+		FColor(130, 130, 130),
+		FColor(205, 205, 205),
+		FColor(85, 107, 69),
+		FColor(88, 115, 138),
+		FColor(145, 90, 169),
+		FColor(168, 121, 89),
+		FColor(196, 175, 104),
 	};
 }
