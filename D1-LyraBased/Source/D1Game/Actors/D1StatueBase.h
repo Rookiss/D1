@@ -12,7 +12,7 @@ class AD1StatueBase : public AD1WorldInteractable
 	
 public:
 	AD1StatueBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
+	
 public:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;
 	virtual UMeshComponent* GetInteractionMeshComponent() const override { return MeshComponent; }
