@@ -704,3 +704,12 @@ FD1InteractionInfo ALyraCharacter::GetPreInteractionInfo(const FD1InteractionQue
 {
 	return InteractionInfo;
 }
+
+bool ALyraCharacter::CanInteraction() const
+{
+	if (HealthComponent)
+	{
+		return HealthComponent->IsDeadOrDying();
+	}
+	return false;
+}

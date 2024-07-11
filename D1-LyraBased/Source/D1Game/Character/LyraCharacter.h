@@ -234,7 +234,8 @@ private:
 public:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;
 	virtual UMeshComponent* GetInteractionMeshComponent() const override { return GetMesh(); }
-
+	virtual bool CanInteraction() const override;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Info")
 	FD1InteractionInfo InteractionInfo;

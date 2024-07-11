@@ -58,6 +58,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual UMeshComponent* GetInteractionMeshComponent() const { return nullptr; }
+
+	UFUNCTION(BlueprintCallable)
+	virtual bool CanInteraction() const { return true; }
 	
 protected:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const { return FD1InteractionInfo(); }

@@ -142,10 +142,10 @@ namespace Item
 		{ EEquipmentSlotType::Quaternary_LeftHand, EEquipmentSlotType::Quaternary_RightHand, EEquipmentSlotType::Quaternary_TwoHand }
 	};
 	
-	const FColor DefaultColor = FColor(255, 255, 255, 0);
-	const FColor RedColor     = FColor(40, 7, 7, 160);
-	const FColor BlueColor    = FColor(8, 24, 41, 160);
-	const FColor GreenColor   = FColor(18, 31, 18, 160);
+	const FLinearColor DefaultColor = FLinearColor(1.f, 1.f, 1.f, 0.f);
+	const FLinearColor RedColor     = FLinearColor(0.28f, 0.02f, 0.f, 0.32f);
+	const FLinearColor GreenColor   = FLinearColor(0.02f, 0.28f, 0.f, 0.32f);
+	const FLinearColor BlueColor    = FLinearColor(0.f, 0.02f, 0.28f, 0.32f);
 
 	const TArray<FColor> ItemRarityBackgroundColors = {
 		FColor(28, 28, 28),

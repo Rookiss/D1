@@ -199,7 +199,7 @@ void UD1AbilityTask_WaitForInteractableTraceHit::UpdateInteractionInfos(const FD
 				FGameplayAbilitySpec* InteractionAbilitySpec = AbilitySystemComponent->FindAbilitySpecFromClass(InteractionInfo.InteractionAbilityToGrant);
 				if (InteractionAbilitySpec)
 				{
-					if (InteractionAbilitySpec->Ability->CanActivateAbility(InteractionAbilitySpec->Handle, AbilitySystemComponent->AbilityActorInfo.Get()))
+					if (Interactable->CanInteraction() && InteractionAbilitySpec->Ability->CanActivateAbility(InteractionAbilitySpec->Handle, AbilitySystemComponent->AbilityActorInfo.Get()))
 					{
 						NewInteractionInfos.Add(InteractionInfo);
 					}
