@@ -43,7 +43,7 @@ void AD1PocketStage::BeginPlay()
 		UPocketCapture* PocketCapture = PocketCaptureSubsystem->CreateThumbnailRenderer(PocketCaptureClass);
 		CachedPocketCapture = PocketCapture;
 		
-		PocketCapture->SetRenderTargetSize(1024, 2048);
+		PocketCapture->SetRenderTargetSize(512, 1024);
 		PocketCapture->SetCaptureTarget(this);
 
 		RefreshAlphaMaskActors();

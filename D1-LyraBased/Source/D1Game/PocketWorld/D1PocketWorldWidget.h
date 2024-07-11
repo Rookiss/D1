@@ -14,8 +14,12 @@ public:
 	UD1PocketWorldWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
+	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	virtual void NativeDestruct() override;
+
+private:
+	void RefreshUI();
 
 private:
 	UFUNCTION()
@@ -36,5 +40,6 @@ private:
 	TObjectPtr<UTextureRenderTarget2D> AlphaRenderTarget;
 
 private:
+	FTimerHandle TickTimerHandle;
 	FDelegateHandle DelegateHandle;
 };

@@ -14,9 +14,9 @@ UD1PocketWorldWidget::UD1PocketWorldWidget(const FObjectInitializer& ObjectIniti
     
 }
 
-void UD1PocketWorldWidget::NativeConstruct()
+void UD1PocketWorldWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	if (UD1PocketWorldSubsystem* PocketWorldSubsystem = GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 	{
@@ -24,15 +24,29 @@ void UD1PocketWorldWidget::NativeConstruct()
 	}
 }
 
-void UD1PocketWorldWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+void UD1PocketWorldWidget::NativeConstruct()
 {
-	Super::NativeTick(MyGeometry, InDeltaTime);
+	Super::NativeConstruct();
 
+	GetWorld()->GetTimerManager().SetTimer(TickTimerHandle, this, &ThisClass::RefreshUI, 0.03f, true);
+}
+
+void UD1PocketWorldWidget::NativeDestruct()
+{
+	GetWorld()->GetTimerManager().ClearTimer(TickTimerHandle);
+	
+	Super::NativeDestruct();
+}
+
+void UD1PocketWorldWidget::RefreshUI()
+{
 	if (CachedPocketStage.IsValid())
 	{
-		UPocketCapture* PocketCapture = CachedPocketStage->GetPocketCapute();
-		PocketCapture->CaptureDiffuse();
-		PocketCapture->CaptureAlphaMask();
+		if (UPocketCapture* PocketCapture = CachedPocketStage->GetPocketCapute())
+		{
+			PocketCapture->CaptureDiffuse();
+			PocketCapture->CaptureAlphaMask();
+		}
 	}
 }
 

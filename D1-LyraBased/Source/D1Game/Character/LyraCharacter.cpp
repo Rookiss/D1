@@ -2,7 +2,6 @@
 
 #include "LyraCharacter.h"
 
-#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Camera/LyraCameraComponent.h"
 #include "Character/LyraHealthComponent.h"
@@ -17,7 +16,6 @@
 #include "Player/LyraPlayerState.h"
 #include "System/LyraSignificanceManager.h"
 #include "TimerManager.h"
-#include "AbilitySystem/Attributes/LyraCombatSet.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "Interaction/D1InteractionQuery.h"
 #include "Physics/LyraCollisionChannels.h"
@@ -51,6 +49,7 @@ ALyraCharacter::ALyraCharacter(const FObjectInitializer& ObjectInitializer)
 	check(MeshComp);
 	MeshComp->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));  // Rotate mesh to be X forward since it is exported as Y forward.
 	MeshComp->SetCollisionProfileName(NAME_LyraCharacterCollisionProfile_Mesh);
+	MeshComp->SetCollisionResponseToChannel(D1_TraceChannel_Interaction, ECR_Block);
 	MeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 	
 	ULyraCharacterMovementComponent* LyraMoveComp = CastChecked<ULyraCharacterMovementComponent>(GetCharacterMovement());
@@ -95,7 +94,7 @@ void ALyraCharacter::PreInitializeComponents()
 void ALyraCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	BaseUnscaledCapsuleHalfHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
 	
 	if (UD1PocketWorldSubsystem* PocketWorldSubsystem = GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
@@ -359,7 +358,7 @@ void ALyraCharacter::OnDeathStarted(AActor*)
 
 void ALyraCharacter::OnDeathFinished(AActor*)
 {
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::DestroyDueToDeath);
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::UnpossessDueToDeath);
 }
 
 void ALyraCharacter::DisableMovementAndCollision()
@@ -369,19 +368,22 @@ void ALyraCharacter::DisableMovementAndCollision()
 		Controller->SetIgnoreMoveInput(true);
 	}
 
-	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
-	check(CapsuleComp);
-	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-
-	ULyraCharacterMovementComponent* LyraMoveComp = CastChecked<ULyraCharacterMovementComponent>(GetCharacterMovement());
-	LyraMoveComp->StopMovementImmediately();
-	LyraMoveComp->DisableMovement();
+	if (UCapsuleComponent* CapsuleComp = GetCapsuleComponent())
+	{
+		CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	}
+	
+	if (ULyraCharacterMovementComponent* LyraMoveComp = CastChecked<ULyraCharacterMovementComponent>(GetCharacterMovement()))
+	{
+		LyraMoveComp->StopMovementImmediately();
+		LyraMoveComp->DisableMovement();
+	}
 
 	bUseControllerRotationYaw = false;
 }
 
-void ALyraCharacter::DestroyDueToDeath()
+void ALyraCharacter::UnpossessDueToDeath()
 {
 	K2_OnDeathFinished();
 
@@ -397,8 +399,6 @@ void ALyraCharacter::UninitAndSpawnSpectator()
 			PawnExtComponent->UninitializeAbilitySystem();
 		}
 	}
-
-	GetMesh()->SetCollisionResponseToChannel(D1_TraceChannel_Interaction, ECR_Block);
 	
 	if (GetLocalRole() == ROLE_Authority)
 	{
@@ -469,7 +469,6 @@ void ALyraCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeigh
 	{
 		LyraASC->SetLooseGameplayTagCount(D1GameplayTags::Status_Crouching, 1);
 	}
-
 
 	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
 }

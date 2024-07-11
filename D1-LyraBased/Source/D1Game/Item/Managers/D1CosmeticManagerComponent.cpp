@@ -27,29 +27,29 @@ void UD1CosmeticManagerComponent::BeginPlay()
 	
 	check(CosmeticSlotClass);
 	
-	ACharacter* Character = Cast<ACharacter>(GetOwner());
-	check(Character);
-	
-	if (Character->IsNetMode(NM_DedicatedServer) == false)
+	if (ACharacter* Character = Cast<ACharacter>(GetOwner()))
 	{
-		for (int32 i = 0; i < (int32)EArmorType::Count; i++)
+		if (Character->IsNetMode(NM_DedicatedServer) == false)
 		{
-			USceneComponent* ComponentToAttachTo = Character->GetMesh();
-			UChildActorComponent* CosmeticComponent = NewObject<UChildActorComponent>(Character);
-			CosmeticComponent->SetupAttachment(ComponentToAttachTo);
-			CosmeticComponent->SetChildActorClass(CosmeticSlotClass);
-			CosmeticComponent->RegisterComponent();
-			CosmeticSlots[i] = CosmeticComponent;
-
-			if (AD1ArmorBase* SpawnedActor = Cast<AD1ArmorBase>(CosmeticComponent->GetChildActor()))
+			for (int32 i = 0; i < (int32)EArmorType::Count; i++)
 			{
-				if (USceneComponent* SpawnedRootComponent = SpawnedActor->GetRootComponent())
+				USceneComponent* ComponentToAttachTo = Character->GetMesh();
+				UChildActorComponent* CosmeticComponent = NewObject<UChildActorComponent>(Character);
+				CosmeticComponent->SetupAttachment(ComponentToAttachTo);
+				CosmeticComponent->SetChildActorClass(CosmeticSlotClass);
+				CosmeticComponent->RegisterComponent();
+				CosmeticSlots[i] = CosmeticComponent;
+
+				if (AD1ArmorBase* SpawnedActor = Cast<AD1ArmorBase>(CosmeticComponent->GetChildActor()))
 				{
-					SpawnedRootComponent->AddTickPrerequisiteComponent(ComponentToAttachTo);
-				}
+					if (USceneComponent* SpawnedRootComponent = SpawnedActor->GetRootComponent())
+					{
+						SpawnedRootComponent->AddTickPrerequisiteComponent(ComponentToAttachTo);
+					}
 				
-				USkeletalMesh* CosmeticMesh = DefaultMeshes[i].DefaultMesh; 
-				SpawnedActor->SetArmorMesh(CosmeticMesh);
+					USkeletalMesh* CosmeticMesh = DefaultMeshes[i].DefaultMesh; 
+					SpawnedActor->SetArmorMesh(CosmeticMesh);
+				}
 			}
 		}
 	}
@@ -73,20 +73,20 @@ void UD1CosmeticManagerComponent::SetArmorMesh(EArmorType ArmorType, TSoftObject
 	if (ArmorType == EArmorType::Count)
 		return;
 
-	UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)ArmorType];
-	check(CosmeticSlot);
-
-	AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor());
-	check(CosmeticActor);
-	
-	if (ArmorMeshPtr.IsNull())
+	if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)ArmorType])
 	{
-		const FD1CosmeticDefaultMeshEntry& DefaultMeshEntry = DefaultMeshes[(int32)ArmorType];
-		CosmeticActor->SetArmorMesh(DefaultMeshEntry.DefaultMesh);
-	}
-	else
-	{
-		USkeletalMesh* ArmorMesh = ULyraAssetManager::GetAssetByPath<USkeletalMesh>(ArmorMeshPtr);
-		CosmeticActor->SetArmorMesh(ArmorMesh);
+		if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
+		{
+			if (ArmorMeshPtr.IsNull())
+			{
+				const FD1CosmeticDefaultMeshEntry& DefaultMeshEntry = DefaultMeshes[(int32)ArmorType];
+				CosmeticActor->SetArmorMesh(DefaultMeshEntry.DefaultMesh);
+			}
+			else
+			{
+				USkeletalMesh* ArmorMesh = ULyraAssetManager::GetAssetByPath<USkeletalMesh>(ArmorMeshPtr);
+				CosmeticActor->SetArmorMesh(ArmorMesh);
+			}
+		}
 	}
 }
