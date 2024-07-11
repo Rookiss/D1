@@ -12,9 +12,18 @@ AActor* AD1TargetPointBase::SpawnActor()
 {
 	if (HasAuthority() == false)
 		return nullptr;
+	
+	AActor* SpawningActor = GetWorld()->SpawnActorDeferred<AActor>(SpawnActorClass, GetActorTransform(), this, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	InitializeSpawningActor(SpawningActor);
+	SpawningActor->FinishSpawning(GetActorTransform());
+	SpawnedActor = SpawningActor;
+	
+	return SpawningActor;
+}
 
-	SpawnedActor = GetWorld()->SpawnActor<AActor>(SpawnActorClass, GetActorLocation(), GetActorRotation());
-	return SpawnedActor;
+void AD1TargetPointBase::InitializeSpawningActor(AActor* InSpawningActor)
+{
+	
 }
 
 void AD1TargetPointBase::DestroyActor()
@@ -22,7 +31,7 @@ void AD1TargetPointBase::DestroyActor()
 	if (HasAuthority() == false)
 		return;
 	
-	if (SpawnedActor)
+	if (SpawnedActor.Get())
 	{
 		SpawnedActor->Destroy(true);
 	}

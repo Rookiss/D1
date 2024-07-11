@@ -20,11 +20,11 @@ public:
 	AD1TargetPointBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	AActor* SpawnActor();
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void DestroyActor();
+
+protected:
+	virtual void InitializeSpawningActor(AActor* InSpawningActor);
 	
 public:
 	UPROPERTY(EditDefaultsOnly)
@@ -33,7 +33,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActor> SpawnActorClass;
 	
-private:
+protected:
 	UPROPERTY()
-	TObjectPtr<AActor> SpawnedActor;	
+	TWeakObjectPtr<AActor> SpawnedActor;
 };

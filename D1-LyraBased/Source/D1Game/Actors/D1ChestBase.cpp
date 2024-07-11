@@ -32,7 +32,7 @@ AD1ChestBase::AD1ChestBase(const FObjectInitializer& ObjectInitializer)
 void AD1ChestBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	if (HasAuthority())
 	{
 		for (int32 i = 0; i < 5; i++)
