@@ -69,7 +69,7 @@ bool ILoadingProcessInterface::ShouldShowLoadingScreen(UObject* TestObject, FStr
 namespace LoadingScreenCVars
 {
 	// CVars
-	static float HoldLoadingScreenAdditionalSecs = 2.0f;
+	static float HoldLoadingScreenAdditionalSecs = 5.0f;
 	static FAutoConsoleVariableRef CVarHoldLoadingScreenUpAtLeastThisLongInSecs(
 		TEXT("CommonLoadingScreen.HoldLoadingScreenAdditionalSecs"),
 		HoldLoadingScreenAdditionalSecs,
