@@ -400,12 +400,6 @@ void ULyraHeroComponent::Input_Move(const FInputActionValue& InputActionValue)
 {
 	APawn* Pawn = GetPawn<APawn>();
 	AController* Controller = Pawn ? Pawn->GetController() : nullptr;
-
-	// If the player has attempted to move again then cancel auto running
-	if (ALyraPlayerController* LyraController = Cast<ALyraPlayerController>(Controller))
-	{
-		LyraController->SetIsAutoRunning(false);
-	}
 	
 	if (Controller)
 	{
@@ -478,18 +472,6 @@ void ULyraHeroComponent::Input_Crouch(const FInputActionValue& InputActionValue)
 	if (ALyraCharacter* Character = GetPawn<ALyraCharacter>())
 	{
 		Character->bWantToCrouch = InputActionValue.Get<bool>();
-	}
-}
-
-void ULyraHeroComponent::Input_AutoRun(const FInputActionValue& InputActionValue)
-{
-	if (APawn* Pawn = GetPawn<APawn>())
-	{
-		if (ALyraPlayerController* Controller = Cast<ALyraPlayerController>(Pawn->GetController()))
-		{
-			// Toggle auto running
-			Controller->SetIsAutoRunning(!Controller->GetIsAutoRunning());
-		}
 	}
 }
 

@@ -82,8 +82,7 @@ protected:
 	void Input_LookMouse(const FInputActionValue& InputActionValue);
 	void Input_LookStick(const FInputActionValue& InputActionValue);
 	void Input_Crouch(const FInputActionValue& InputActionValue);
-	void Input_AutoRun(const FInputActionValue& InputActionValue);
-
+	
 	void Input_ChangeEquip_Primary();
 	void Input_ChangeEquip_Secondary();
 	void Input_ChangeEquip_Tertiary();

@@ -463,7 +463,7 @@ void ALyraCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeigh
 {
 	if (ULyraAbilitySystemComponent* LyraASC = GetLyraAbilitySystemComponent())
 	{
-		LyraASC->SetLooseGameplayTagCount(D1GameplayTags::Status_Crouching, 1);
+		LyraASC->SetLooseGameplayTagCount(D1GameplayTags::Status_Crouch, 1);
 	}
 
 	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
@@ -473,7 +473,7 @@ void ALyraCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightA
 {
 	if (ULyraAbilitySystemComponent* LyraASC = GetLyraAbilitySystemComponent())
 	{
-		LyraASC->SetLooseGameplayTagCount(D1GameplayTags::Status_Crouching, 0);
+		LyraASC->SetLooseGameplayTagCount(D1GameplayTags::Status_Crouch, 0);
 	}
 
 	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);

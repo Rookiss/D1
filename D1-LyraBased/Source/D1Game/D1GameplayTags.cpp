@@ -16,17 +16,19 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Move,									"InputTag.Move");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Look_Mouse,								"InputTag.Look.Mouse");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Look_Stick,								"InputTag.Look.Stick");
-	UE_DEFINE_GAMEPLAY_TAG(InputTag_Crouch,									"InputTag.Crouch");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Jump,									"InputTag.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Dash,									"InputTag.Dash");
-	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_MainHand,						"InputTag.Attack.MainHand");
-	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_OffHand,							"InputTag.Attack.OffHand");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Crouch,									"InputTag.Crouch");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Interact,								"InputTag.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Primary,					"InputTag.ChangeEquip.Primary");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Secondary,					"InputTag.ChangeEquip.Secondary");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Tertiary,					"InputTag.ChangeEquip.Tertiary");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Quaternary,					"InputTag.ChangeEquip.Quaternary");
-	UE_DEFINE_GAMEPLAY_TAG(InputTag_Widget_OpenInventory,					"InputTag.Widget.OpenInventory");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Ability_Confirm,						"InputTag.Ability.Confirm");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Ability_Cancel,							"InputTag.Ability.Cancel");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_MainHand,						"InputTag.Attack.MainHand");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_OffHand,							"InputTag.Attack.OffHand");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Widget_Inventory,						"InputTag.Widget.Inventory");
 	
 	// Ability
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ActivateFail_IsDead,						"Ability.ActivateFail.IsDead");
@@ -57,9 +59,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_HitReact,								"Ability.HitReact");
 
 	// Status
-	UE_DEFINE_GAMEPLAY_TAG(Status_Crouching,								"Status.Crouching");
-	UE_DEFINE_GAMEPLAY_TAG(Status_Jumping,									"Status.Jumping");
-	UE_DEFINE_GAMEPLAY_TAG(Status_AutoRunning,								"Status.AutoRunning");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Crouch,									"Status.Crouch");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Jump,										"Status.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Death,									"Status.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Death_Dying,								"Status.Death.Dying");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Death_Dead,								"Status.Death.Dead");
@@ -75,8 +76,6 @@ namespace D1GameplayTags
 	
 	// Gameplay Event
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Death,								"GameplayEvent.Death");
-	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Reset,								"GameplayEvent.Reset");
-	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_RequestReset,						"GameplayEvent.RequestReset");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Begin,						"GameplayEvent.Montage.Begin");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Tick,						"GameplayEvent.Montage.Tick");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_End,						"GameplayEvent.Montage.End");

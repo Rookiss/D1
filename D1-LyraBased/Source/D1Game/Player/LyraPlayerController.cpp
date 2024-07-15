@@ -10,7 +10,6 @@
 #include "UI/LyraHUD.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "EngineUtils.h"
-#include "D1GameplayTags.h"
 #include "GameFramework/Pawn.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/GameInstance.h"
@@ -87,18 +86,6 @@ void ALyraPlayerController::ReceivedPlayer()
 void ALyraPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
-
-	// If we are auto running then add some player input
-	if (GetIsAutoRunning())
-	{
-		if (APawn* CurrentPawn = GetPawn())
-		{
-			const FRotator MovementRotation(0.0f, GetControlRotation().Yaw, 0.0f);
-			const FVector MovementDirection = MovementRotation.RotateVector(FVector::ForwardVector);
-			CurrentPawn->AddMovementInput(MovementDirection, 1.0f);	
-		}
-	}
-
 	ALyraPlayerState* LyraPlayerState = GetLyraPlayerState();
 
 	if (PlayerCameraManager && LyraPlayerState)
@@ -373,52 +360,6 @@ void ALyraPlayerController::OnPossess(APawn* InPawn)
 		}
 	}
 #endif
-
-	SetIsAutoRunning(false);
-}
-
-void ALyraPlayerController::SetIsAutoRunning(const bool bEnabled)
-{
-	const bool bIsAutoRunning = GetIsAutoRunning();
-	if (bEnabled != bIsAutoRunning)
-	{
-		if (!bEnabled)
-		{
-			OnEndAutoRun();
-		}
-		else
-		{
-			OnStartAutoRun();
-		}
-	}
-}
-
-bool ALyraPlayerController::GetIsAutoRunning() const
-{
-	bool bIsAutoRunning = false;
-	if (const ULyraAbilitySystemComponent* LyraASC = GetLyraAbilitySystemComponent())
-	{
-		bIsAutoRunning = LyraASC->GetTagCount(D1GameplayTags::Status_AutoRunning) > 0;
-	}
-	return bIsAutoRunning;
-}
-
-void ALyraPlayerController::OnStartAutoRun()
-{
-	if (ULyraAbilitySystemComponent* LyraASC = GetLyraAbilitySystemComponent())
-	{
-		LyraASC->SetLooseGameplayTagCount(D1GameplayTags::Status_AutoRunning, 1);
-		K2_OnStartAutoRun();
-	}	
-}
-
-void ALyraPlayerController::OnEndAutoRun()
-{
-	if (ULyraAbilitySystemComponent* LyraASC = GetLyraAbilitySystemComponent())
-	{
-		LyraASC->SetLooseGameplayTagCount(D1GameplayTags::Status_AutoRunning, 0);
-		K2_OnEndAutoRun();
-	}
 }
 
 void ALyraPlayerController::UpdateForceFeedback(IInputInterface* InputInterface, const int32 ControllerId)

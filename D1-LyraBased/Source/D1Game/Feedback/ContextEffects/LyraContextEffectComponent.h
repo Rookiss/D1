@@ -4,7 +4,6 @@
 
 #include "Components/ActorComponent.h"
 #include "LyraContextEffectsInterface.h"
-
 #include "LyraContextEffectComponent.generated.h"
 
 namespace EEndPlayReason { enum Type : int; }

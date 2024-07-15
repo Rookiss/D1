@@ -336,10 +336,6 @@
 			"Enabled": true
 		},
 		{
-			"Name": "ShooterCore",
-			"Enabled": true
-		},
-		{
 			"Name": "WaterExtras",
 			"Enabled": true
 		},
