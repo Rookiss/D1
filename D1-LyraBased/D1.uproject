@@ -372,6 +372,14 @@
 		{
 			"Name": "FieldSystemPlugin",
 			"Enabled": true
+		},
+		{
+			"Name": "LyraExampleContent",
+			"Enabled": false
+		},
+		{
+			"Name": "LyraExtTool",
+			"Enabled": false
 		}
 	],
 	"EpicSampleNameHash": "451731683"
