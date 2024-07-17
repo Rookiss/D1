@@ -12,18 +12,19 @@ class AD1StatueBase : public AD1WorldInteractable
 	
 public:
 	AD1StatueBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-	
+
 public:
+	virtual bool CanInteraction(const FD1InteractionQuery& InteractionQuery) const override;
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;
 	virtual UMeshComponent* GetInteractionMeshComponent() const override { return MeshComponent; }
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void OnExecute();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Info")
 	FD1InteractionInfo InteractionInfo;
 
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsUsed = false;
+	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UArrowComponent> ArrowComponent;

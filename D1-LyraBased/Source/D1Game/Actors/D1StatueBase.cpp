@@ -16,6 +16,11 @@ AD1StatueBase::AD1StatueBase(const FObjectInitializer& ObjectInitializer)
 	MeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 }
 
+bool AD1StatueBase::CanInteraction(const FD1InteractionQuery& InteractionQuery) const
+{
+	return bIsUsed == false;
+}
+
 FD1InteractionInfo AD1StatueBase::GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const
 {
 	return InteractionInfo;

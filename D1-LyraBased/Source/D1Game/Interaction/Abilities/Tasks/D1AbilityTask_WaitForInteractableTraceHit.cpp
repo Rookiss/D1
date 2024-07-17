@@ -194,12 +194,12 @@ void UD1AbilityTask_WaitForInteractableTraceHit::UpdateInteractionInfos(const FD
 
 		for (FD1InteractionInfo& InteractionInfo : TempInteractionInfos)
 		{
-			if (InteractionInfo.InteractionAbilityToGrant)
+			if (InteractionInfo.AbilityToGrant)
 			{
-				FGameplayAbilitySpec* InteractionAbilitySpec = AbilitySystemComponent->FindAbilitySpecFromClass(InteractionInfo.InteractionAbilityToGrant);
+				FGameplayAbilitySpec* InteractionAbilitySpec = AbilitySystemComponent->FindAbilitySpecFromClass(InteractionInfo.AbilityToGrant);
 				if (InteractionAbilitySpec)
 				{
-					if (Interactable->CanInteraction() && InteractionAbilitySpec->Ability->CanActivateAbility(InteractionAbilitySpec->Handle, AbilitySystemComponent->AbilityActorInfo.Get()))
+					if (Interactable->CanInteraction(InteractionQuery) && InteractionAbilitySpec->Ability->CanActivateAbility(InteractionAbilitySpec->Handle, AbilitySystemComponent->AbilityActorInfo.Get()))
 					{
 						NewInteractionInfos.Add(InteractionInfo);
 					}

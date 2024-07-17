@@ -142,6 +142,7 @@ void AD1WeaponBase::OnRep_ShouldHidden()
 		}
 	}
 }
+
 void AD1WeaponBase::OnRep_TemplateID()
 {
 	WeaponMeshComponent->SetHiddenInGame(false);

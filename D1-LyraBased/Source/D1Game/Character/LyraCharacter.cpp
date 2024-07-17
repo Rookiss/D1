@@ -701,7 +701,7 @@ FD1InteractionInfo ALyraCharacter::GetPreInteractionInfo(const FD1InteractionQue
 	return InteractionInfo;
 }
 
-bool ALyraCharacter::CanInteraction() const
+bool ALyraCharacter::CanInteraction(const FD1InteractionQuery& InteractionQuery) const
 {
 	if (HealthComponent)
 	{

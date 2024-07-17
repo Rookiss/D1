@@ -77,7 +77,6 @@ void UD1GameplayAbility_Interact::TriggerInteraction()
 		Payload.EventTag = D1GameplayTags::Ability_Interact_Active;
 		Payload.Instigator = Instigator;
 		Payload.Target = InteractableActor;
-		Payload.OptionalObject = InteractionInfo.InteractionActiveMontage;
 		
 		SendGameplayEvent(D1GameplayTags::Ability_Interact_Active, Payload);
 	}

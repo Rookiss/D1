@@ -84,16 +84,16 @@ void UD1AbilityTask_GrantNearbyInteraction::QueryInteractables()
 		
 			for (FD1InteractionInfo& InteractionInfo : InteractionInfos)
 			{
-				if (InteractionInfo.InteractionAbilityToGrant)
+				if (InteractionInfo.AbilityToGrant)
 				{
-					FObjectKey ObjectKey(InteractionInfo.InteractionAbilityToGrant);
+					FObjectKey ObjectKey(InteractionInfo.AbilityToGrant);
 					if (GrantedInteractionAbilities.Find(ObjectKey))
 					{
 						RemoveKeys.Remove(ObjectKey);
 					}
 					else
 					{
-						FGameplayAbilitySpec Spec(InteractionInfo.InteractionAbilityToGrant, 1, INDEX_NONE, this);
+						FGameplayAbilitySpec Spec(InteractionInfo.AbilityToGrant, 1, INDEX_NONE, this);
 						FGameplayAbilitySpecHandle SpecHandle = AbilitySystemComponent->GiveAbility(Spec);
 						GrantedInteractionAbilities.Add(ObjectKey, SpecHandle);
 					}

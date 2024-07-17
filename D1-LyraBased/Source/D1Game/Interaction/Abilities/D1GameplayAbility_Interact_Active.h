@@ -4,7 +4,6 @@
 #include "Interaction/D1InteractionInfo.h"
 #include "D1GameplayAbility_Interact_Active.generated.h"
 
-class UNiagaraSystem;
 class ID1Interactable;
 
 UCLASS()

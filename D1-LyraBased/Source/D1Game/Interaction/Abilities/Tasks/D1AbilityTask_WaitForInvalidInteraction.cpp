@@ -27,10 +27,10 @@ void UD1AbilityTask_WaitForInvalidInteraction::Activate()
 
 	SetWaitingOnAvatar();
 
-	CachedAngle = CalculateAngle();
+	CachedAngle2D = CalculateAngle2D();
 	CachedCharacterLocation = GetAvatarActor() ? GetAvatarActor()->GetActorLocation() : FVector::ZeroVector;
 
-	GetWorld()->GetTimerManager().SetTimer(CheckTimerHandle, this, &ThisClass::PerformCheck, 0.1f, true);
+	GetWorld()->GetTimerManager().SetTimer(CheckTimerHandle, this, &ThisClass::PerformCheck, 0.05f, true);
 }
 
 void UD1AbilityTask_WaitForInvalidInteraction::OnDestroy(bool bInOwnerFinished)
@@ -42,17 +42,16 @@ void UD1AbilityTask_WaitForInvalidInteraction::OnDestroy(bool bInOwnerFinished)
 
 void UD1AbilityTask_WaitForInvalidInteraction::PerformCheck()
 {
-	ALyraCharacter* AvatarActor = Cast<ALyraCharacter>(Ability->GetCurrentActorInfo()->AvatarActor.Get());
-	UCharacterMovementComponent* CharacterMovement = AvatarActor->GetCharacterMovement();
-	APlayerController* AvatarController = Ability->GetCurrentActorInfo()->PlayerController.Get();
-	
-	if (AvatarActor && CharacterMovement && AvatarController)
+	ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(Ability->GetCurrentActorInfo()->AvatarActor.Get());
+	UCharacterMovementComponent* CharacterMovement = LyraCharacter->GetCharacterMovement();
+
+	if (LyraCharacter && CharacterMovement)
 	{
-		bool bValidAngle = FMath::Abs(CachedAngle - CalculateAngle()) <= AcceptanceAngle;
-		bool bValidDistanceXY = FVector::DistSquared2D(CachedCharacterLocation, AvatarActor->GetActorLocation()) <= (AcceptanceDistance * AcceptanceDistance);
-		bool bValidDistanceZ = FMath::Abs(CachedCharacterLocation.Z - AvatarActor->GetActorLocation().Z) <= (AcceptanceDistance + FMath::Abs(CharacterMovement->GetCrouchedHalfHeight() - AvatarActor->BaseUnscaledCapsuleHalfHeight));
-		
-		if (bValidAngle && bValidDistanceXY && bValidDistanceZ)
+		bool bValidAngle2D = FMath::Abs(CachedAngle2D - CalculateAngle2D()) <= AcceptanceAngle;
+		bool bValidDistanceXY = FVector::DistSquared2D(CachedCharacterLocation, LyraCharacter->GetActorLocation()) <= (AcceptanceDistance * AcceptanceDistance);
+		bool bValidDistanceZ = FMath::Abs(CachedCharacterLocation.Z - LyraCharacter->GetActorLocation().Z) <= (AcceptanceDistance + FMath::Abs(CharacterMovement->GetCrouchedHalfHeight() - LyraCharacter->BaseUnscaledCapsuleHalfHeight));
+
+		if (bValidAngle2D && bValidDistanceXY && bValidDistanceZ)
 			return;
 	}
 
@@ -60,21 +59,21 @@ void UD1AbilityTask_WaitForInvalidInteraction::PerformCheck()
 	EndTask();
 }
 
-float UD1AbilityTask_WaitForInvalidInteraction::CalculateAngle() const
+float UD1AbilityTask_WaitForInvalidInteraction::CalculateAngle2D() const
 {
 	AActor* AvatarActor = Ability->GetCurrentActorInfo()->AvatarActor.Get();
-	APlayerController* AvatarController = Ability->GetCurrentActorInfo()->PlayerController.Get();
+	APlayerController* PlayerController = Ability->GetCurrentActorInfo()->PlayerController.Get();
 	
-	if (AvatarActor && AvatarController)
+	if (AvatarActor && PlayerController)
 	{
 		FVector CameraStart;
 		FRotator CameraRotation;
-		AvatarController->GetPlayerViewPoint(CameraStart, CameraRotation);
+		PlayerController->GetPlayerViewPoint(CameraStart, CameraRotation);
 
-		FVector CameraToTarget = (InteractionLocation - CameraStart).GetSafeNormal2D();
+		FVector CharacterToTarget = (InteractionLocation - AvatarActor->GetActorLocation()).GetSafeNormal2D();
 		FVector CameraDirection = CameraRotation.Vector().GetSafeNormal2D();
-		
-		return UKismetMathLibrary::DegAcos(CameraToTarget.Dot(CameraDirection));
+		return UKismetMathLibrary::DegAcos(CharacterToTarget.Dot(CameraDirection));
 	}
+	
 	return 0.f;
 }

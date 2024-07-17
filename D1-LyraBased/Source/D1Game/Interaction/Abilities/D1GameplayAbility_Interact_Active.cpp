@@ -44,7 +44,7 @@ void UD1GameplayAbility_Interact_Active::Initialize(AActor* TargetActor)
 
 bool UD1GameplayAbility_Interact_Active::TriggerInteraction()
 {
-	bool bIsSuccess = false;
+	bool bWasSucceeded = false;
 	
 	FGameplayEventData Payload;
 	Payload.EventTag = D1GameplayTags::Ability_Interact;
@@ -57,13 +57,13 @@ bool UD1GameplayAbility_Interact_Active::TriggerInteraction()
 
 	if (UAbilitySystemComponent* AbilitySystem = GetAbilitySystemComponentFromActorInfo())
 	{
-		if (FGameplayAbilitySpec* InteractionAbilitySpec = AbilitySystem->FindAbilitySpecFromClass(InteractionInfo.InteractionAbilityToGrant))
+		if (FGameplayAbilitySpec* AbilitySpec = AbilitySystem->FindAbilitySpecFromClass(InteractionInfo.AbilityToGrant))
 		{
 			FGameplayAbilityActorInfo ActorInfo;
 			ActorInfo.InitFromActor(InteractableActor, TargetActor, AbilitySystem);
 		
-			bIsSuccess = AbilitySystem->TriggerAbilityFromGameplayEvent(
-				InteractionAbilitySpec->Handle,
+			bWasSucceeded = AbilitySystem->TriggerAbilityFromGameplayEvent(
+				AbilitySpec->Handle,
 				&ActorInfo,
 				D1GameplayTags::Ability_Interact,
 				&Payload,
@@ -72,5 +72,5 @@ bool UD1GameplayAbility_Interact_Active::TriggerInteraction()
 		}
 	}
 
-	return bIsSuccess;
+	return bWasSucceeded;
 }

@@ -23,7 +23,7 @@ protected:
 
 private:
 	void PerformCheck();
-	float CalculateAngle() const;
+	float CalculateAngle2D() const;
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -36,6 +36,6 @@ private:
 	
 private:
 	FTimerHandle CheckTimerHandle;
-	float CachedAngle = 0.f;
+	float CachedAngle2D = 0.f;
 	FVector CachedCharacterLocation;
 };

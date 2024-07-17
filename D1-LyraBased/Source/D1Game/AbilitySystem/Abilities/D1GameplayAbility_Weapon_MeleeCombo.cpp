@@ -32,16 +32,18 @@ void UD1GameplayAbility_Weapon_MeleeCombo::ActivateAbility(const FGameplayAbilit
 
 void UD1GameplayAbility_Weapon_MeleeCombo::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	if (IsEndAbilityValid(Handle, ActorInfo))
-	{
-		if (ScopeLockCount > 0)
-		{
-			WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::EndAbility, Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled));
-			return;
-		}
-		
-		Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-	}
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	
+	// if (IsEndAbilityValid(Handle, ActorInfo))
+	// {
+	// 	if (ScopeLockCount > 0)
+	// 	{
+	// 		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::EndAbility, Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled));
+	// 		return;
+	// 	}
+	// 	
+	// 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	// }
 }
 
 void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InTargetDataHandle)

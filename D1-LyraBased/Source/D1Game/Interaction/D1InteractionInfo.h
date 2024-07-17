@@ -3,7 +3,6 @@
 #include "Abilities/GameplayAbility.h"
 #include "D1InteractionInfo.generated.h"
 
-class UNiagaraSystem;
 class ID1Interactable;
 
 USTRUCT(BlueprintType)
@@ -26,10 +25,13 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UGameplayAbility> InteractionAbilityToGrant;
+	TSubclassOf<UGameplayAbility> AbilityToGrant;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> InteractionActiveMontage;
+	TObjectPtr<UAnimMontage> ActiveStartMontage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> ActiveEndMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(Categories="GameplayCue"))
 	FGameplayTag ActiveGameplayCueTag;
@@ -44,8 +46,10 @@ public:
 			Title.IdenticalTo(Other.Title) &&
 			Content.IdenticalTo(Other.Content) &&
 			Duration == Other.Duration &&
-			InteractionAbilityToGrant == Other.InteractionAbilityToGrant &&
-			InteractionActiveMontage == Other.InteractionActiveMontage &&
+			AbilityToGrant == Other.AbilityToGrant &&
+			ActiveStartMontage == Other.ActiveStartMontage &&
+			ActiveEndMontage == Other.ActiveEndMontage &&
+			ActiveGameplayCueTag == Other.ActiveGameplayCueTag &&
 			InteractionWidgetClass == Other.InteractionWidgetClass;
 	}
 
