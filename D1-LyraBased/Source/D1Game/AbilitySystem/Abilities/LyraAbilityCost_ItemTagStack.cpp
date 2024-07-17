@@ -31,7 +31,7 @@ bool ULyraAbilityCost_ItemTagStack::CheckCost(const ULyraGameplayAbility* Abilit
 			// Inform other abilities why this cost cannot be applied
 			if (!bCanApplyCost && OptionalRelevantTags && FailureTag.IsValid())
 			{
-				OptionalRelevantTags->AddTag(FailureTag);				
+				OptionalRelevantTags->AddTag(FailureTag);
 			}
 			return bCanApplyCost;
 		}

@@ -203,7 +203,7 @@ void ULyraGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 					FModifyContextOptions Options;
 					Options.bForceImmediately = true;
 					Options.bIgnoreAllPressedKeysUntilRelease = true;
-					Subsystem->AddMappingContext(InputMappingContext, 0, Options);
+					Subsystem->AddMappingContext(InputMappingContext, 1, Options);
 				}
 			}
 		}
