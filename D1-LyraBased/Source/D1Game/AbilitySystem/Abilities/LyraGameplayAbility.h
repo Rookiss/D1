@@ -227,6 +227,9 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable)
 	void FlushPressedKeys();
+
+	UFUNCTION(BlueprintCallable)
+	void FlushPressedInput(UInputAction* InputAction);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

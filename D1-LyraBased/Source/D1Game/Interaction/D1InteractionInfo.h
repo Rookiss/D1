@@ -34,7 +34,7 @@ public:
 	TObjectPtr<UAnimMontage> ActiveEndMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(Categories="GameplayCue"))
-	FGameplayTag ActiveGameplayCueTag;
+	FGameplayTag ActiveLoopGameplayCueTag;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftClassPtr<UUserWidget> InteractionWidgetClass;
@@ -49,7 +49,7 @@ public:
 			AbilityToGrant == Other.AbilityToGrant &&
 			ActiveStartMontage == Other.ActiveStartMontage &&
 			ActiveEndMontage == Other.ActiveEndMontage &&
-			ActiveGameplayCueTag == Other.ActiveGameplayCueTag &&
+			ActiveLoopGameplayCueTag == Other.ActiveLoopGameplayCueTag &&
 			InteractionWidgetClass == Other.InteractionWidgetClass;
 	}
 

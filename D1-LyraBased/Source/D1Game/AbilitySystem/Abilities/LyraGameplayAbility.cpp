@@ -20,6 +20,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Physics/PhysicalMaterialWithTags.h"
 #include "Camera/LyraCameraMode.h"
+#include "Input/D1EnhancedPlayerInput.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/LyraLocalPlayer.h"
 
@@ -539,6 +540,20 @@ void ULyraGameplayAbility::FlushPressedKeys()
 	if (ALyraPlayerController* PC = GetLyraPlayerControllerFromActorInfo())
 	{
 		PC->FlushPressedKeys();
+	}
+}
+
+void ULyraGameplayAbility::FlushPressedInput(UInputAction* InputAction)
+{
+	if (CurrentActorInfo)
+	{
+		if (APlayerController* PlayerController = CurrentActorInfo->PlayerController.Get())
+		{
+			if (UD1EnhancedPlayerInput* PlayerInput = Cast<UD1EnhancedPlayerInput>(PlayerController->PlayerInput))
+			{
+				PlayerInput->FlushPressedInput(InputAction);
+			}
+		}
 	}
 }
 

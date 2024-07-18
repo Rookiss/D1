@@ -12,10 +12,9 @@ UD1AbilityTask_WaitForInvalidInteraction::UD1AbilityTask_WaitForInvalidInteracti
     
 }
 
-UD1AbilityTask_WaitForInvalidInteraction* UD1AbilityTask_WaitForInvalidInteraction::WaitForInvalidInteraction(UGameplayAbility* OwningAbility, FVector InteractionLocation, float AcceptanceAngle, float AcceptanceDistance)
+UD1AbilityTask_WaitForInvalidInteraction* UD1AbilityTask_WaitForInvalidInteraction::WaitForInvalidInteraction(UGameplayAbility* OwningAbility, float AcceptanceAngle, float AcceptanceDistance)
 {
 	UD1AbilityTask_WaitForInvalidInteraction* Task = NewAbilityTask<UD1AbilityTask_WaitForInvalidInteraction>(OwningAbility);
-	Task->InteractionLocation = InteractionLocation;
 	Task->AcceptanceAngle = AcceptanceAngle;
 	Task->AcceptanceDistance = AcceptanceDistance;
 	return Task;
@@ -27,7 +26,7 @@ void UD1AbilityTask_WaitForInvalidInteraction::Activate()
 
 	SetWaitingOnAvatar();
 
-	CachedAngle2D = CalculateAngle2D();
+	CachedCharacterForward2D = GetAvatarActor() ? GetAvatarActor()->GetActorForwardVector().GetSafeNormal2D() : FVector::ZeroVector;
 	CachedCharacterLocation = GetAvatarActor() ? GetAvatarActor()->GetActorLocation() : FVector::ZeroVector;
 
 	GetWorld()->GetTimerManager().SetTimer(CheckTimerHandle, this, &ThisClass::PerformCheck, 0.05f, true);
@@ -47,7 +46,7 @@ void UD1AbilityTask_WaitForInvalidInteraction::PerformCheck()
 
 	if (LyraCharacter && CharacterMovement)
 	{
-		bool bValidAngle2D = FMath::Abs(CachedAngle2D - CalculateAngle2D()) <= AcceptanceAngle;
+		bool bValidAngle2D = CalculateAngle2D() <= AcceptanceAngle;
 		bool bValidDistanceXY = FVector::DistSquared2D(CachedCharacterLocation, LyraCharacter->GetActorLocation()) <= (AcceptanceDistance * AcceptanceDistance);
 		bool bValidDistanceZ = FMath::Abs(CachedCharacterLocation.Z - LyraCharacter->GetActorLocation().Z) <= (AcceptanceDistance + FMath::Abs(CharacterMovement->GetCrouchedHalfHeight() - LyraCharacter->BaseUnscaledCapsuleHalfHeight));
 
@@ -66,13 +65,8 @@ float UD1AbilityTask_WaitForInvalidInteraction::CalculateAngle2D() const
 	
 	if (AvatarActor && PlayerController)
 	{
-		FVector CameraStart;
-		FRotator CameraRotation;
-		PlayerController->GetPlayerViewPoint(CameraStart, CameraRotation);
-
-		FVector CharacterToTarget = (InteractionLocation - AvatarActor->GetActorLocation()).GetSafeNormal2D();
-		FVector CameraDirection = CameraRotation.Vector().GetSafeNormal2D();
-		return UKismetMathLibrary::DegAcos(CharacterToTarget.Dot(CameraDirection));
+		FVector CharacterForward2D = AvatarActor->GetActorForwardVector().GetSafeNormal2D();
+		return UKismetMathLibrary::DegAcos(CachedCharacterForward2D.Dot(CharacterForward2D));
 	}
 	
 	return 0.f;

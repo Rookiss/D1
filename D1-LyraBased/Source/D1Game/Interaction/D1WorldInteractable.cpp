@@ -7,18 +7,3 @@ AD1WorldInteractable::AD1WorldInteractable(const FObjectInitializer& ObjectIniti
 {
 	bReplicates = true;
 }
-
-void AD1WorldInteractable::OnInteractionStarted()
-{
-	K2_OnInteractionStarted();
-}
-
-void AD1WorldInteractable::OnInteractionFailed()
-{
-	K2_OnInteractionFailed();
-}
-
-void AD1WorldInteractable::OnInteractionSucceeded()
-{
-	K2_OnInteractionSucceeded();
-}

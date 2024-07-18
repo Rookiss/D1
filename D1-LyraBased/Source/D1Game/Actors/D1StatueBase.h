@@ -3,6 +3,7 @@
 #include "Interaction/D1WorldInteractable.h"
 #include "D1StatueBase.generated.h"
 
+class UNiagaraComponent;
 class UArrowComponent;
 
 UCLASS()
@@ -31,4 +32,7 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> MeshComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UNiagaraComponent> NiagaraComponent;
 };

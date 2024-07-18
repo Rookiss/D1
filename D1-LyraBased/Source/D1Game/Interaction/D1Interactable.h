@@ -41,6 +41,8 @@ class ID1Interactable
 	GENERATED_BODY()
 
 public:
+	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const { return FD1InteractionInfo(); }
+	
 	virtual void GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const
 	{
 		FD1InteractionInfo InteractionInfo = GetPreInteractionInfo(InteractionQuery);
@@ -61,16 +63,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool CanInteraction(const FD1InteractionQuery& InteractionQuery) const { return true; }
-
-	UFUNCTION(BlueprintCallable)
-	virtual void OnInteractionStarted() { }
-	
-	UFUNCTION(BlueprintCallable)
-	virtual void OnInteractionFailed() { }
-	
-	UFUNCTION(BlueprintCallable)
-	virtual void OnInteractionSucceeded() { }
-	
-protected:
-	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const { return FD1InteractionInfo(); }
 };
