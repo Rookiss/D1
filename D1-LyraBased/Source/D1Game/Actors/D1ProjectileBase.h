@@ -48,5 +48,6 @@ private:
 	bool bHit = false;
 	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 
+	UPROPERTY()
 	TWeakObjectPtr<UActorComponent> OtherHitComponent;
 };

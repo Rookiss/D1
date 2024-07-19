@@ -13,7 +13,7 @@ class UObject;
 
 #define LYRA_CAMERA_DEFAULT_FOV			(+80.0f)
 #define LYRA_CAMERA_DEFAULT_PITCH_MIN	(-65.0f)
-#define LYRA_CAMERA_DEFAULT_PITCH_MAX	(+65.0f)
+#define LYRA_CAMERA_DEFAULT_PITCH_MAX	(+55.0f)
 
 class ULyraUICameraManagerComponent;
 

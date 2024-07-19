@@ -47,7 +47,6 @@ public:
 
 public:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;
-	virtual UMeshComponent* GetInteractionMeshComponent() const override { return MeshComponent; }
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)

@@ -15,9 +15,8 @@ public:
 	AD1StatueBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	virtual bool CanInteraction(const FD1InteractionQuery& InteractionQuery) const override;
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;
-	virtual UMeshComponent* GetInteractionMeshComponent() const override { return MeshComponent; }
+	virtual bool CanInteraction(const FD1InteractionQuery& InteractionQuery) const override;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Info")
