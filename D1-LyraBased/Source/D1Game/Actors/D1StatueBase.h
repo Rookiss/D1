@@ -21,9 +21,6 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Info")
 	FD1InteractionInfo InteractionInfo;
-
-	UPROPERTY(BlueprintReadWrite)
-	bool bIsUsed = false;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

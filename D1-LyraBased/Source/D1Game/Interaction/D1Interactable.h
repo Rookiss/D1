@@ -58,7 +58,4 @@ public:
 	
 	virtual void CustomizeInteractionEventData(const FGameplayTag& InteractionEventTag, FGameplayEventData& InOutEventData) const { }
 	virtual bool CanInteraction(const FD1InteractionQuery& InteractionQuery) const { return true; }
-
-	UFUNCTION(BlueprintCallable)
-	virtual void OnInteractionStarted(AActor* Instigator) { }
 };

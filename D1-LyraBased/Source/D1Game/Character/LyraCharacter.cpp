@@ -110,6 +110,12 @@ void ALyraCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (ASC && ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Interact))
+	{
+		bWantToCrouch = false;
+	}
+	
 	if (GetCharacterMovement()->IsFalling() == false)
 	{
 		bWantToCrouch ? Crouch() : UnCrouch();
