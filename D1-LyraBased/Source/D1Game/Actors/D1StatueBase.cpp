@@ -1,6 +1,5 @@
 ﻿#include "D1StatueBase.h"
 
-#include "NiagaraComponent.h"
 #include "Components/ArrowComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1StatueBase)
@@ -16,13 +15,7 @@ AD1StatueBase::AD1StatueBase(const FObjectInitializer& ObjectInitializer)
 	MeshComponent->SetCollisionProfileName(TEXT("Interactable"));
 	MeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 
-	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
-	NiagaraComponent->SetupAttachment(MeshComponent, FName("EffectSocket"));
-}
-
-bool AD1StatueBase::CanInteraction(const FD1InteractionQuery& InteractionQuery) const
-{
-	return (bIsUsed == false);
+	bCanUsed = true;
 }
 
 FD1InteractionInfo AD1StatueBase::GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const

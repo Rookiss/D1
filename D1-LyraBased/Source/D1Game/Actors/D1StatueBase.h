@@ -3,8 +3,8 @@
 #include "Interaction/D1WorldInteractable.h"
 #include "D1StatueBase.generated.h"
 
-class UNiagaraComponent;
 class UArrowComponent;
+class UNiagaraComponent;
 
 UCLASS()
 class AD1StatueBase : public AD1WorldInteractable
@@ -16,8 +16,7 @@ public:
 
 public:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;
-	virtual bool CanInteraction(const FD1InteractionQuery& InteractionQuery) const override;
-	
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Info")
 	FD1InteractionInfo InteractionInfo;
@@ -29,6 +28,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> MeshComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<UNiagaraComponent> NiagaraComponent;
 };

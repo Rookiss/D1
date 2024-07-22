@@ -11,14 +11,38 @@ class AD1WorldInteractable : public AActor, public ID1Interactable
 public:
 	AD1WorldInteractable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 public:
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void OnInteraction();
+	UFUNCTION(BlueprintCallable)
+	virtual void OnInteractActiveStarted(AActor* Interactor);
 
-public:
-	UPROPERTY(BlueprintReadWrite)
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="OnInteractActiveStarted")
+	void K2_OnInteractActiveStarted(AActor* Interactor);
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void OnInteractActiveEnded(AActor* Interactor);
+
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="OnInteractActiveEnded")
+	void K2_OnInteractActiveEnded(AActor* Interactor);
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void OnInteractionSuccess(AActor* Interactor);
+	
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="OnInteractionSuccess")
+	void K2_OnInteractionSuccess(AActor* Interactor);
+
+protected:
+	virtual bool CanInteraction(const FD1InteractionQuery& InteractionQuery) const override;
+	
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	bool bCanUsed = false;
+	
+	UPROPERTY(BlueprintReadWrite, Replicated)
 	bool bIsUsed = false;
 
-	UPROPERTY(BlueprintReadWrite)
-	bool bIsSomeoneInteracting = false;
+	UPROPERTY()
+	TSet<TWeakObjectPtr<AActor>> CachedInteractors;
 };
