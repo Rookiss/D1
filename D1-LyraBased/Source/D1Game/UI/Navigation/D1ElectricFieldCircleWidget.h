@@ -15,7 +15,7 @@ public:
 	UD1ElectricFieldCircleWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 private:
@@ -31,4 +31,8 @@ private:
 private:
 	UPROPERTY(EditAnywhere)
 	float Thickness = 500.f;
+
+	float CachedInnerCircle = 0.f;
+	float CachedOuterCircle = 0.f;
+	float DeltaRadius = 0.f;
 };

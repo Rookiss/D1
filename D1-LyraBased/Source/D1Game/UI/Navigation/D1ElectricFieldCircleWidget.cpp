@@ -11,12 +11,17 @@ UD1ElectricFieldCircleWidget::UD1ElectricFieldCircleWidget(const FObjectInitiali
     
 }
 
-void UD1ElectricFieldCircleWidget::NativeConstruct()
+void UD1ElectricFieldCircleWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
-	
+	Super::NativeOnInitialized();
+
 	CircleDynamicMaterial = Image_ElectricFieldCircle->GetDynamicMaterial();
 	CanvasPanelSlot = Cast<UCanvasPanelSlot>(Slot);
+	
+	CircleDynamicMaterial->GetScalarParameterValue(TEXT("OuterCircle"), CachedOuterCircle);
+	CircleDynamicMaterial->GetScalarParameterValue(TEXT("InnerCircle"), CachedInnerCircle);
+	
+	DeltaRadius = FMath::Abs(CachedOuterCircle - CachedInnerCircle);
 }
 
 void UD1ElectricFieldCircleWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -26,14 +31,7 @@ void UD1ElectricFieldCircleWidget::NativeTick(const FGeometry& MyGeometry, float
 	if (CanvasPanelSlot == nullptr || CircleDynamicMaterial == nullptr)
 		return;
 	
-	float OuterCircle;
-	CircleDynamicMaterial->GetScalarParameterValue(TEXT("OuterCircle"), OuterCircle);
-	
-	float InnerCircle;
-	CircleDynamicMaterial->GetScalarParameterValue(TEXT("InnerCircle"), InnerCircle);
-	
 	float Size = CanvasPanelSlot->GetSize().X;
-	float DeltaRadius = FMath::Abs(OuterCircle - InnerCircle);
-	InnerCircle = FMath::Max(0, DeltaRadius * Thickness / Size);
+	float InnerCircle = FMath::Max(0, CachedOuterCircle - (DeltaRadius * Thickness / Size));
 	CircleDynamicMaterial->SetScalarParameterValue(TEXT("InnerCircle"), InnerCircle);
 }

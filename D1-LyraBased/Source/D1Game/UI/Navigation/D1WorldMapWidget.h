@@ -3,6 +3,8 @@
 #include "UI/D1ActivatableWidget.h"
 #include "D1WorldMapWidget.generated.h"
 
+class UD1CompassBarWidget;
+class UD1MiniMapWidget;
 class UImage;
 class UBorder;
 class UCanvasPanel;
@@ -18,57 +20,48 @@ public:
 	UD1WorldMapWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 public:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
-	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	
 	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
-// 	UFUNCTION()
-// 	bool PinIconOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent);
-// 	
-// private:
-// 	float GetCurrentWorldMapZoom();
-// 	FVector InitialWidgetPosToWorldPos();
-// 	FVector2D WorldPosToInitialWidgetPos(const FVector& WorldPos);
-// 	float WorldLengthToInitialWidgetLength(float WorldLength);
-//
-// public:
-// 	void SetMiniMapWidget(UMiniMapWidget* Widget) { MiniMapWidget = Widget; }
-// 	void SetCompassBarWidget(UCompassBarWidget* Widget) { CompassBarWidget = Widget; }
-// 	void ShowAircraftUI();
-// 	void HideAircraftUI();
-//
-// private:
-// 	UPROPERTY(VisibleAnywhere)
-// 	TObjectPtr<UCanvasPanelSlot> PinIconSlot;
-//
-// 	UPROPERTY(VisibleAnywhere)
-// 	TObjectPtr<UCanvasPanelSlot> PlayerPanelSlot;
-// 	
-// 	UPROPERTY(VisibleAnywhere)
-// 	TObjectPtr<UCanvasPanelSlot> WorldMapPanelSlot;
-//
-// 	UPROPERTY(VisibleAnywhere)
-// 	TObjectPtr<UCanvasPanelSlot> AircraftLineSlot;
-// 	
-// 	UPROPERTY(VisibleAnywhere)
-// 	TObjectPtr<UCanvasPanelSlot> AircraftIconSlot;
-//
-// 	UPROPERTY(VisibleAnywhere)
-// 	TObjectPtr<UCanvasPanelSlot> CurrCircleSlot;
-// 	
-// 	UPROPERTY(VisibleAnywhere)
-// 	TObjectPtr<UCanvasPanelSlot> TargetCircleSlot;
-// 	
-// private:
-// 	UPROPERTY(VisibleAnywhere)
-// 	TObjectPtr<UMiniMapWidget> MiniMapWidget;
-//
-// 	UPROPERTY(VisibleAnywhere)
-// 	TObjectPtr<UCompassBarWidget> CompassBarWidget;
+	UFUNCTION()
+	bool PinIconOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent);
+	
+private:
+	float GetCurrentWorldMapZoom();
+	FVector InitialWidgetPosToWorldPos();
+	FVector2D WorldPosToInitialWidgetPos(const FVector& WorldPos);
+	float WorldLengthToInitialWidgetLength(float WorldLength);
+
+public:
+	void SetMiniMapWidget(UD1MiniMapWidget* Widget) { MiniMapWidget = Widget; }
+	void SetCompassBarWidget(UD1CompassBarWidget* Widget) { CompassBarWidget = Widget; }
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UCanvasPanelSlot> PinIconSlot;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UCanvasPanelSlot> PlayerPanelSlot;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UCanvasPanelSlot> WorldMapPanelSlot;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UCanvasPanelSlot> CurrCircleSlot;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UCanvasPanelSlot> TargetCircleSlot;
+	
+private:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UD1MiniMapWidget> MiniMapWidget;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UD1CompassBarWidget> CompassBarWidget;
 	
 private:
 	UPROPERTY(meta=(BindWidget))
