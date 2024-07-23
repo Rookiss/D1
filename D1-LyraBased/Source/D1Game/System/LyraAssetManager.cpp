@@ -3,6 +3,7 @@
 #include "LyraAssetManager.h"
 #include "D1LogChannels.h"
 #include "LyraGameData.h"
+#include "Data/D1ElectricFieldPhaseData.h"
 #include "Character/LyraPawnData.h"
 #include "Data/D1ItemData.h"
 #include "Data/D1AssetData.h"
@@ -113,6 +114,11 @@ const UD1ItemData& ULyraAssetManager::GetItemData()
 	return GetOrLoadTypedGameData<UD1ItemData>(ItemDataPath);
 }
 
+const UD1ElectricFieldPhaseData& ULyraAssetManager::GetElectricFieldPhaseData()
+{
+	return GetOrLoadTypedGameData<UD1ElectricFieldPhaseData>(ElectricFieldPhaseDataPath);
+}
+
 void ULyraAssetManager::StartInitialLoading()
 {
 	SCOPED_BOOT_TIMING("ULyraAssetManager::StartInitialLoading");
@@ -141,7 +147,6 @@ void ULyraAssetManager::InitializeGameplayCueManager()
 	check(GCM);
 	GCM->LoadAlwaysLoadedCues();
 }
-
 
 const ULyraGameData& ULyraAssetManager::GetGameData()
 {

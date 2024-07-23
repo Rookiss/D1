@@ -34,6 +34,7 @@ void UD1WorldMapWidget::NativeOnInitialized()
 	Image_PinIcon->SetVisibility(ESlateVisibility::Hidden);
 	Image_PinIcon->OnMouseButtonDownEvent.BindUFunction(this, TEXT("PinIconOnMouseButtonDown"));
 
+	MaxWorldMapZoom = MinWorldMapZoom * FMath::Pow(MultiplierWorldMapZoom, StepWorldMapZoom - 1);
 	SizeConstant = (WorldPosToInitialWidgetPos(FVector(100.f, 0.f, 0.f)) - WorldPosToInitialWidgetPos(FVector(0.f, 0.f, 0.f))).Length();
 }
 
@@ -41,6 +42,12 @@ void UD1WorldMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	if (FMath::IsNearlyEqual(TargetWorldMapZoom, MinWorldMapZoom))
+	{
+		// Reset World Map Panel Target Position
+		TargetWorldMapPos = FVector2D::ZeroVector;
+	}
+	
 	// Refresh World Map Panel Size & Position
 	FVector2D NewSize = FMath::Vector2DInterpTo(WorldMapPanelSlot->GetSize(), TargetWorldMapSize, InDeltaTime, InitialInterpSpeed);
 	WorldMapPanelSlot->SetSize(NewSize);
@@ -48,24 +55,15 @@ void UD1WorldMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 	FVector2D NewPos = FMath::Vector2DInterpTo(WorldMapPanelSlot->GetPosition(), TargetWorldMapPos, InDeltaTime, InitialInterpSpeed);
 	WorldMapPanelSlot->SetPosition(NewPos);
 	
-	if (FMath::IsNearlyEqual(TargetWorldMapZoom, MinWorldMapZoom))
-	{
-		// Reset World Map Panel Target Position
-		TargetWorldMapPos = FVector2D::ZeroVector;
-	}
-	else
-	{
-		// Clamp World Map Panel Position
-		FVector2D DeltaSize = WorldMapPanelSlot->GetSize() / 2.f;
-		FVector2D WorldMapPos = WorldMapPanelSlot->GetPosition();
-		float x = FMath::Clamp(WorldMapPos.X, -DeltaSize.X, DeltaSize.X);
-		float y = FMath::Clamp(WorldMapPos.Y, -DeltaSize.Y, DeltaSize.Y);
-		WorldMapPanelSlot->SetPosition(FVector2D(x, y));
-	}
+	// Clamp World Map Panel Position
+	FVector2D HalfSize = WorldMapPanelSlot->GetSize() / 2.f;
+	FVector2D WorldMapPos = WorldMapPanelSlot->GetPosition();
+	float x = FMath::Clamp(WorldMapPos.X, -(HalfSize.X - InitialWorldMapSize.X / 2.f), +(HalfSize.X - InitialWorldMapSize.X / 2.f));
+	float y = FMath::Clamp(WorldMapPos.Y, -(HalfSize.Y - InitialWorldMapSize.Y / 2.f), +(HalfSize.Y - InitialWorldMapSize.Y / 2.f));
+	WorldMapPanelSlot->SetPosition(FVector2D(x, y));
 
 	// Refresh Player Panel Position/Rotation & Pin Icon Position
-	APawn* Pawn = GetOwningPlayerPawn();
-	if (IsValid(Pawn))
+	if (APawn* Pawn = GetOwningPlayerPawn())
 	{
 		FVector2D InitialPos = WorldPosToInitialWidgetPos(Pawn->GetActorLocation());
 		PlayerPanelSlot->SetPosition(InitialPos * GetCurrentWorldMapZoom());
@@ -74,7 +72,9 @@ void UD1WorldMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 	if (ALyraPlayerController* ControllerOwner = Cast<ALyraPlayerController>(GetOwningPlayer()))
 	{
 		if (APlayerCameraManager* CameraManager = ControllerOwner->PlayerCameraManager)
+		{
 			CanvasPanel_Player->SetRenderTransformAngle(CameraManager->GetCameraRotation().Yaw);
+		}
 	}
 
 	PinIconSlot->SetPosition(InitialPinIconPos * GetCurrentWorldMapZoom());
@@ -130,7 +130,7 @@ FReply UD1WorldMapWidget::NativeOnMouseWheel(const FGeometry& InGeometry, const 
 {
 	FReply Reply = Super::NativeOnMouseWheel(InGeometry, InMouseEvent);
 
-	if (FMath::Abs(TargetWorldMapZoom - GetCurrentWorldMapZoom()) > 0.25f)
+	if (FMath::Abs(TargetWorldMapZoom - GetCurrentWorldMapZoom()) > 0.1f)
 		return Reply;
 	
 	if (InMouseEvent.GetWheelDelta() > 0.f)
@@ -140,23 +140,23 @@ FReply UD1WorldMapWidget::NativeOnMouseWheel(const FGeometry& InGeometry, const 
 			FVector2D WorldMapPanelHalfSize = WorldMapPanelSlot->GetSize() / 2.f;
 			FVector2D WorldMapPanelPos = WorldMapPanelSlot->GetPosition();
 			FVector2D MouseLocalPos = CanvasPanel_WorldMap->GetCachedGeometry().AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-			TargetWorldMapPos = -WorldMapPanelHalfSize + WorldMapPanelPos - MouseLocalPos + (WorldMapPanelHalfSize * DeltaWorldMapZoom);
+			TargetWorldMapPos = WorldMapPanelPos - WorldMapPanelHalfSize - (MouseLocalPos * FMath::Abs(1 - MultiplierWorldMapZoom)) + (WorldMapPanelHalfSize * MultiplierWorldMapZoom);
 		}
 
-		TargetWorldMapZoom = FMath::Clamp(TargetWorldMapZoom * DeltaWorldMapZoom, MinWorldMapZoom, MaxWorldMapZoom);
+		TargetWorldMapZoom = FMath::Clamp(TargetWorldMapZoom * MultiplierWorldMapZoom, MinWorldMapZoom, MaxWorldMapZoom);
 		TargetWorldMapSize = InitialWorldMapSize * TargetWorldMapZoom;
 	}
 	else
 	{
-		if (TargetWorldMapZoom > MinWorldMapZoom * DeltaWorldMapZoom)
+		if (TargetWorldMapZoom > MinWorldMapZoom * MultiplierWorldMapZoom)
 		{
 			FVector2D WorldMapPanelHalfSize = WorldMapPanelSlot->GetSize() / 2.f;
 			FVector2D WorldMapPanelPos = WorldMapPanelSlot->GetPosition();
 			FVector2D MouseLocalPos = CanvasPanel_WorldMap->GetCachedGeometry().AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-			TargetWorldMapPos = -WorldMapPanelHalfSize + WorldMapPanelPos + (MouseLocalPos / DeltaWorldMapZoom) + (WorldMapPanelHalfSize / DeltaWorldMapZoom);
+			TargetWorldMapPos = WorldMapPanelPos - WorldMapPanelHalfSize + (MouseLocalPos / MultiplierWorldMapZoom * FMath::Abs(1 - MultiplierWorldMapZoom)) + (WorldMapPanelHalfSize / MultiplierWorldMapZoom);
 		}
 
-		TargetWorldMapZoom = FMath::Clamp(TargetWorldMapZoom / DeltaWorldMapZoom, MinWorldMapZoom, MaxWorldMapZoom);
+		TargetWorldMapZoom = FMath::Clamp(TargetWorldMapZoom / MultiplierWorldMapZoom, MinWorldMapZoom, MaxWorldMapZoom);
 		TargetWorldMapSize = InitialWorldMapSize * TargetWorldMapZoom;
 	}
 	

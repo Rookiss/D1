@@ -81,10 +81,11 @@ private:
 
 private:
 	float MinWorldMapZoom = 1.f;
-	float MaxWorldMapZoom = 16.f;
-	float DeltaWorldMapZoom = 2.f;
+	float MaxWorldMapZoom;
+	int32 StepWorldMapZoom = 5;
+	float MultiplierWorldMapZoom = 1.5f;
 
-	float InitialInterpSpeed = 15.f;
+	float InitialInterpSpeed = 25.f;
 	FVector2D InitialWorldMapSize;
 	FVector2D InitialPinIconPos;
 
@@ -98,6 +99,6 @@ private:
 	FVector2D WorldFirstPos = FVector2D(9590.f, -9590.f);
 	FVector2D WorldSecondPos = FVector2D(-9590.f, 9590.f);
 	
-	FVector2D WidgetFirstPos = FVector2D(-537.5f, -537.5f);
-	FVector2D WidgetSecondPos = FVector2D(537.5f, 537.5f);
+	FVector2D WidgetFirstPos = FVector2D(-400.f, -400.f);
+	FVector2D WidgetSecondPos = FVector2D(400.f, 400.f);
 };
