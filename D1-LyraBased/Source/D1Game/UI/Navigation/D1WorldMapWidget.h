@@ -95,9 +95,9 @@ private:
 	float SizeConstant;
 
 private:
-	FVector2D WorldFirstPos = FVector2D(79270.f, -149770.f);
-	FVector2D WorldSecondPos = FVector2D(272410.f, -262810.f);
+	FVector2D WorldFirstPos = FVector2D(9590.f, -9590.f);
+	FVector2D WorldSecondPos = FVector2D(-9590.f, 9590.f);
 	
-	FVector2D WidgetFirstPos = FVector2D(140.8f, 328.5f);
-	FVector2D WidgetSecondPos = FVector2D(-164.f, -190.f);
+	FVector2D WidgetFirstPos = FVector2D(-537.5f, -537.5f);
+	FVector2D WidgetSecondPos = FVector2D(537.5f, 537.5f);
 };

@@ -69,9 +69,9 @@ private:
 	FVector2D InitialIconPos;
 
 private:
-	FVector2D WorldFirstPos = FVector2D(79270.f, -149770.f);
-	FVector2D WorldSecondPos = FVector2D(272410.f, -262810.f);
+	FVector2D WorldFirstPos = FVector2D(9590.f, -9590.f);
+	FVector2D WorldSecondPos = FVector2D(-9590.f, 9590.f);
 	
-	FVector2D WidgetFirstPos = FVector2D(-260.8f, -608.3f);
-	FVector2D WidgetSecondPos = FVector2D(303.5f, 352.1f);
+	FVector2D WidgetFirstPos = FVector2D(995.f, 995.f);
+	FVector2D WidgetSecondPos = FVector2D(-995.f, -995.f);
 };
