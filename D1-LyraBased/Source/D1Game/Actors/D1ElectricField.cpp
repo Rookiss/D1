@@ -26,7 +26,6 @@ void AD1ElectricField::Tick(float DeltaSeconds)
 	if (HasAuthority() == false)
 		return;
 	
-	// if (ABattleRoyalGameState* GameState = Cast<ABattleRoyalGameState>(UGameplayStatics::GetGameState(this)))
 	// {
 	// 	MeshComponent->SetVisibility(GameState->bVisibleCurrCircle, true);
 	// 	SetActorLocation(GameState->CurrCirclePos);

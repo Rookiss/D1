@@ -3,12 +3,14 @@
 #include "D1CompassBarWidget.h"
 #include "D1ElectricFieldCircleWidget.h"
 #include "D1MiniMapWidget.h"
+#include "Actors/D1ElectricField.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Image.h"
-#include "GameModes/LyraGameState.h"
+#include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/LyraPlayerController.h"
+#include "System/D1ElectricFieldManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1WorldMapWidget)
 
@@ -35,7 +37,7 @@ void UD1WorldMapWidget::NativeOnInitialized()
 	Image_PinIcon->OnMouseButtonDownEvent.BindUFunction(this, TEXT("PinIconOnMouseButtonDown"));
 
 	MaxWorldMapZoom = MinWorldMapZoom * FMath::Pow(MultiplierWorldMapZoom, StepWorldMapZoom - 1);
-	SizeConstant = (WorldPosToInitialWidgetPos(FVector(100.f, 0.f, 0.f)) - WorldPosToInitialWidgetPos(FVector(0.f, 0.f, 0.f))).Length();
+	WidgetUnitSize = (WorldPosToInitialWidgetPos(FVector(100.f, 0.f, 0.f)) - WorldPosToInitialWidgetPos(FVector(0.f, 0.f, 0.f))).Length();
 }
 
 void UD1WorldMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -80,36 +82,32 @@ void UD1WorldMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 	PinIconSlot->SetPosition(InitialPinIconPos * GetCurrentWorldMapZoom());
 
 	// Refresh Circle Widget
-	if (ALyraGameState* GameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this)))
+	if (AD1ElectricField* ElectricFieldActor = GetElectricFieldActor())
 	{
-		// if (GameState->bVisibleCurrCircle)
-		// 	CurrentCircleWidget->SetVisibility(ESlateVisibility::Visible);
-		// else
-		// 	CurrentCircleWidget->SetVisibility(ESlateVisibility::Hidden);
-		//
-		// if (GameState->bVisibleTargetCircle)
-		// 	TargetCircleWidget->SetVisibility(ESlateVisibility::Visible);
-		// else
-		// 	TargetCircleWidget->SetVisibility(ESlateVisibility::Hidden);
-		
-		// FVector2D InitialPos = WorldPosToInitialWidgetPos(GameState->CurrCirclePos);
-		// CurrCircleSlot->SetPosition(InitialPos * GetCurrentWorldMapZoom());
-		//
-		// FVector2D InitialSize = FVector2D(WorldLengthToInitialWidgetLength(GameState->CurrCircleRadius * 2));
-		// CurrCircleSlot->SetSize(InitialSize * GetCurrentWorldMapZoom());
-		//
-		// InitialPos = WorldPosToInitialWidgetPos(GameState->TargetCirclePos);
-		// TargetCircleSlot->SetPosition(InitialPos * GetCurrentWorldMapZoom());
-		//
-		// InitialSize = InitialSize = FVector2D(WorldLengthToInitialWidgetLength(GameState->TargetCircleRadius * 2));
-		// TargetCircleSlot->SetSize(InitialSize * GetCurrentWorldMapZoom());
+		FVector2D InitialPos = WorldPosToInitialWidgetPos(ElectricFieldActor->GetActorLocation());
+		CurrCircleSlot->SetPosition(InitialPos * GetCurrentWorldMapZoom());
+			
+		FVector2D InitialSize = FVector2D(WorldLengthToInitialWidgetLength(ElectricFieldActor->GetActorScale3D().X * 50.f * 2.f));
+		CurrCircleSlot->SetSize(InitialSize * GetCurrentWorldMapZoom());
+
+		if (UD1ElectricFieldManagerComponent* ElectricFieldManager = UGameplayStatics::GetGameState(GetOwningPlayer())->GetComponentByClass<UD1ElectricFieldManagerComponent>())
+		{
+			if (ElectricFieldManager->bShouldShow)
+			{
+				TargetCircleWidget->SetVisibility(ESlateVisibility::Visible);
+			}
+			else
+			{
+				TargetCircleWidget->SetVisibility(ESlateVisibility::Hidden);
+			}
+			
+			InitialPos = WorldPosToInitialWidgetPos(ElectricFieldManager->TargetPhasePosition);
+			TargetCircleSlot->SetPosition(InitialPos * GetCurrentWorldMapZoom());
+			
+			InitialSize = InitialSize = FVector2D(WorldLengthToInitialWidgetLength(ElectricFieldManager->TargetPhaseRadius * 2.f));
+			TargetCircleSlot->SetSize(InitialSize * GetCurrentWorldMapZoom());
+		}
 	}
-	
-	FVector2D InitialSize = FVector2D(WorldLengthToInitialWidgetLength(50000 * 2));
-	CurrCircleSlot->SetSize(InitialSize * GetCurrentWorldMapZoom());
-	
-	InitialSize = InitialSize = FVector2D(WorldLengthToInitialWidgetLength(100000 * 2));
-	TargetCircleSlot->SetSize(InitialSize * GetCurrentWorldMapZoom());
 }
 
 FReply UD1WorldMapWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -252,5 +250,15 @@ FVector2D UD1WorldMapWidget::WorldPosToInitialWidgetPos(const FVector& WorldPos)
 
 float UD1WorldMapWidget::WorldLengthToInitialWidgetLength(float WorldLength)
 {
-	return WorldLength * (SizeConstant / 100.f);
+	return WorldLength * (WidgetUnitSize / 100.f);
+}
+
+AD1ElectricField* UD1WorldMapWidget::GetElectricFieldActor()
+{
+	if (CachedElectricFieldActor.IsValid() == false)
+	{
+		AD1ElectricField* ElectricFieldActor = Cast<AD1ElectricField>(UGameplayStatics::GetActorOfClass(GetOwningPlayer(), AD1ElectricField::StaticClass()));
+		CachedElectricFieldActor = TWeakObjectPtr<AD1ElectricField>(ElectricFieldActor);
+	}
+	return CachedElectricFieldActor.Get();
 }

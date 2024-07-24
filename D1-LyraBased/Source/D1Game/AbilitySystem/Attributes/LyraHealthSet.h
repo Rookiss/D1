@@ -91,6 +91,6 @@ private:
 	FGameplayAttributeData IncomingHeal;
 
 	// Incoming damage. This is mapped directly to -Health
-	UPROPERTY(BlueprintReadOnly, Category="Lyra|Health", Meta=(HideFromModifiers, AllowPrivateAccess=true))
+	UPROPERTY(BlueprintReadOnly, Category="Lyra|Health", Meta=(AllowPrivateAccess=true))
 	FGameplayAttributeData IncomingDamage;
 };

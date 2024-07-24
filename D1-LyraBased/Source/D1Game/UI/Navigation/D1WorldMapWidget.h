@@ -3,6 +3,7 @@
 #include "UI/D1ActivatableWidget.h"
 #include "D1WorldMapWidget.generated.h"
 
+class AD1ElectricField;
 class UD1CompassBarWidget;
 class UD1MiniMapWidget;
 class UImage;
@@ -40,6 +41,9 @@ public:
 	void SetMiniMapWidget(UD1MiniMapWidget* Widget) { MiniMapWidget = Widget; }
 	void SetCompassBarWidget(UD1CompassBarWidget* Widget) { CompassBarWidget = Widget; }
 
+private:
+	AD1ElectricField* GetElectricFieldActor();
+	
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCanvasPanelSlot> PinIconSlot;
@@ -80,6 +84,10 @@ private:
 	TObjectPtr<UD1ElectricFieldCircleWidget> TargetCircleWidget;
 
 private:
+	UPROPERTY()
+	TWeakObjectPtr<AD1ElectricField> CachedElectricFieldActor;
+	
+private:
 	float MinWorldMapZoom = 1.f;
 	float MaxWorldMapZoom;
 	int32 StepWorldMapZoom = 5;
@@ -93,12 +101,12 @@ private:
 	FVector2D TargetWorldMapSize;
 	FVector2D TargetWorldMapPos;
 
-	float SizeConstant;
+	float WidgetUnitSize;
 
 private:
-	FVector2D WorldFirstPos = FVector2D(9590.f, -9590.f);
-	FVector2D WorldSecondPos = FVector2D(-9590.f, 9590.f);
+	FVector2D WorldFirstPos = FVector2D(9560.f, -9560.f);
+	FVector2D WorldSecondPos = FVector2D(-9560.f, 9560.f);
 	
-	FVector2D WidgetFirstPos = FVector2D(-400.f, -400.f);
-	FVector2D WidgetSecondPos = FVector2D(400.f, 400.f);
+	FVector2D WidgetFirstPos = FVector2D(-450.f, -450.f);
+	FVector2D WidgetSecondPos = FVector2D(450.f, 450.f);
 };

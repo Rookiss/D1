@@ -30,7 +30,7 @@ public:
 	static const UD1ElectricFieldPhaseData& Get();
 
 public:
-	UFUNCTION(BlueprintCallable)
+	bool IsValidPhaseIndex(int32 PhaseIndex) const;
 	const FD1ElectricFieldPhaseEntry& GetPhaseEntry(int32 PhaseIndex) const;
 	
 private:

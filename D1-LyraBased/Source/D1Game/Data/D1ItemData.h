@@ -25,6 +25,9 @@ public:
 	const UD1ItemTemplate& FindItemTemplateByID(int32 ItemTemplateID) const;
 	int32 FindItemTemplateIDByClass(TSubclassOf<UD1ItemTemplate> ItemTemplateClass) const;
 
+	UFUNCTION(BlueprintCallable)
+	void GetAllItemTemplateClasses(TArray<TSubclassOf<UD1ItemTemplate>>& OutItemTemplateClasses) const;
+
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TMap<int32, TSubclassOf<UD1ItemTemplate>> ItemTemplateIDToClass;

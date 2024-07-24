@@ -1,0 +1,22 @@
+﻿#pragma once
+
+#include "Blueprint/UserWidget.h"
+#include "D1CheatListWidget.generated.h"
+
+class UScrollBox;
+
+UCLASS()
+class UD1CheatListWidget : public UUserWidget
+{
+	GENERATED_BODY()
+	
+public:
+	UD1CheatListWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+protected:
+	virtual void NativeConstruct() override;
+
+public:
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UScrollBox> ScrollBox_Entries;
+};
