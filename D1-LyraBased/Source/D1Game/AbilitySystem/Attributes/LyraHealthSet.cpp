@@ -20,8 +20,6 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Gameplay_FellOutOfWorld, "Gameplay.Damage.FellOutOfWo
 UE_DEFINE_GAMEPLAY_TAG(TAG_Lyra_Damage_Message, "Lyra.Damage.Message");
 
 ULyraHealthSet::ULyraHealthSet()
-	: Health(100.0f)
-	, MaxHealth(100.0f)
 {
 	bOutOfHealth = false;
 	MaxHealthBeforeAttributeChange = 0.0f;

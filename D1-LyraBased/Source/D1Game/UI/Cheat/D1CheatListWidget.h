@@ -3,6 +3,7 @@
 #include "Blueprint/UserWidget.h"
 #include "D1CheatListWidget.generated.h"
 
+class UD1CheatEntryWidget;
 class UScrollBox;
 
 UCLASS()
@@ -15,6 +16,9 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
+
+public:
+	void AddEntry(UD1CheatEntryWidget* EntryWidget);
 
 public:
 	UPROPERTY(meta=(BindWidget))

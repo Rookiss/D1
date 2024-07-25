@@ -1,5 +1,6 @@
 ﻿#include "D1CheatListWidget.h"
 
+#include "D1CheatEntryWidget.h"
 #include "Components/ScrollBox.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1CheatListWidget)
@@ -15,4 +16,9 @@ void UD1CheatListWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	ScrollBox_Entries->ClearChildren();
+}
+
+void UD1CheatListWidget::AddEntry(UD1CheatEntryWidget* EntryWidget)
+{
+	ScrollBox_Entries->AddChild(EntryWidget);
 }

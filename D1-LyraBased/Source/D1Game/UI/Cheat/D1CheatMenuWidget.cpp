@@ -1,5 +1,6 @@
 ﻿#include "D1CheatMenuWidget.h"
 
+#include "D1CheatEntryWidget.h"
 #include "D1CheatListWidget.h"
 #include "Components/ScrollBox.h"
 #include "Item/D1ItemTemplate.h"
@@ -15,6 +16,13 @@ UD1CheatMenuWidget::UD1CheatMenuWidget(const FObjectInitializer& ObjectInitializ
     
 }
 
+void UD1CheatMenuWidget::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	CheatEntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1CheatMenuWidget>("CheatEntryWidgetClass");
+}
+
 void UD1CheatMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -24,20 +32,26 @@ void UD1CheatMenuWidget::NativeConstruct()
 	TArray<TSubclassOf<UD1ItemTemplate>> ItemTemplateClasses;
 	ItemData.GetAllItemTemplateClasses(ItemTemplateClasses);
 
-	for (TSubclassOf<UD1ItemTemplate>& ItemTemplateClass : ItemTemplateClasses)
+	for (TSubclassOf<UD1ItemTemplate> ItemTemplateClass : ItemTemplateClasses)
 	{
 		const UD1ItemTemplate* ItemTemplate = ItemTemplateClass.GetDefaultObject();
 		if (const UD1ItemFragment_Equippable* EquippableFragment = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equippable>())
 		{
 			if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
 			{
-				const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
-				
-				// CheatList_PrimaryWeapon->ScrollBox_Entries->AddChild();
+				UD1CheatEntryWidget* CheatEntryWidget = CreateWidget<UD1CheatEntryWidget>(GetOwningPlayer(), CheatEntryWidgetClass);
+				CheatEntryWidget->InitializeUI(ED1CheatEntryType::PrimaryWeapon, ItemTemplateClass, nullptr);
+				CheatList_PrimaryWeapon->AddEntry(CheatEntryWidget);
+
+				CheatEntryWidget = CreateWidget<UD1CheatEntryWidget>(GetOwningPlayer(), CheatEntryWidgetClass);
+				CheatEntryWidget->InitializeUI(ED1CheatEntryType::SecondaryWeapon, ItemTemplateClass, nullptr);
+				CheatList_SecondaryWeapon->AddEntry(CheatEntryWidget);
 			}
 			else if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
 			{
-				
+				UD1CheatEntryWidget* CheatEntryWidget = CreateWidget<UD1CheatEntryWidget>(GetOwningPlayer(), CheatEntryWidgetClass);
+				CheatEntryWidget->InitializeUI(ED1CheatEntryType::Armor, ItemTemplateClass, nullptr);
+				CheatList_Armor->AddEntry(CheatEntryWidget);
 			}
 		}
 	}

@@ -12,14 +12,14 @@ UD1AbilityTask_WaitForInteractableTraceHit::UD1AbilityTask_WaitForInteractableTr
     
 }
 
-UD1AbilityTask_WaitForInteractableTraceHit* UD1AbilityTask_WaitForInteractableTraceHit::WaitForInteractableTraceHit(UGameplayAbility* OwningAbility, FD1InteractionQuery InteractionQuery, FCollisionProfileName TraceProfile, FGameplayAbilityTargetingLocationInfo StartLocation, float InteractionTraceRange, float InteractionTraceRate, bool bShowDebug)
+UD1AbilityTask_WaitForInteractableTraceHit* UD1AbilityTask_WaitForInteractableTraceHit::WaitForInteractableTraceHit(UGameplayAbility* OwningAbility, FD1InteractionQuery InteractionQuery, ECollisionChannel TraceChannel, FGameplayAbilityTargetingLocationInfo StartLocation, float InteractionTraceRange, float InteractionTraceRate, bool bShowDebug)
 {
 	UD1AbilityTask_WaitForInteractableTraceHit* Task = NewAbilityTask<UD1AbilityTask_WaitForInteractableTraceHit>(OwningAbility);
 	Task->InteractionTraceRange = InteractionTraceRange;
 	Task->InteractionTraceRate = InteractionTraceRate;
 	Task->StartLocation = StartLocation;
 	Task->InteractionQuery = InteractionQuery;
-	Task->TraceProfile = TraceProfile;
+	Task->TraceChannel = TraceChannel;
 	Task->bShowDebug = bShowDebug;
 	return Task;
 }
@@ -64,7 +64,7 @@ void UD1AbilityTask_WaitForInteractableTraceHit::PerformTrace()
 	AimWithPlayerController(AvatarActor, Params, TraceStart, InteractionTraceRange, TraceEnd);
 
 	FHitResult HitResult;
-	LineTrace(TraceStart, TraceEnd, TraceProfile.Name, Params, HitResult);
+	LineTrace(TraceStart, TraceEnd, Params, HitResult);
 
 	TArray<TScriptInterface<ID1Interactable>> Interactables;
 	TScriptInterface<ID1Interactable> InteractableActor(HitResult.GetActor());
@@ -116,7 +116,7 @@ void UD1AbilityTask_WaitForInteractableTraceHit::AimWithPlayerController(const A
 	ClipCameraRayToAbilityRange(CameraStart, CameraDirection, TraceStart, MaxRange, CameraEnd);
 
 	FHitResult HitResult;
-	LineTrace(CameraStart, CameraEnd, TraceProfile.Name, Params, HitResult);
+	LineTrace(CameraStart, CameraEnd, Params, HitResult);
 
 	const bool bUseTraceResult = HitResult.bBlockingHit && (FVector::DistSquared(TraceStart, HitResult.Location) <= (MaxRange * MaxRange));
 	const FVector AdjustedEnd = bUseTraceResult ? HitResult.Location : CameraEnd;
@@ -165,10 +165,10 @@ bool UD1AbilityTask_WaitForInteractableTraceHit::ClipCameraRayToAbilityRange(FVe
 	return false;
 }
 
-void UD1AbilityTask_WaitForInteractableTraceHit::LineTrace(const FVector& Start, const FVector& End, FName ProfileName, const FCollisionQueryParams& Params, FHitResult& OutHitResult) const
+void UD1AbilityTask_WaitForInteractableTraceHit::LineTrace(const FVector& Start, const FVector& End, const FCollisionQueryParams& Params, FHitResult& OutHitResult) const
 {
 	TArray<FHitResult> HitResults;
-	GetWorld()->LineTraceMultiByProfile(HitResults, Start, End, ProfileName, Params);
+	GetWorld()->LineTraceMultiByChannel(HitResults, Start, End, TraceChannel, Params);
 	
 	if (HitResults.Num() > 0)
 	{

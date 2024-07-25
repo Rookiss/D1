@@ -13,10 +13,14 @@
 #include "D1GameplayTags.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
+#include "CommonUIExtensions.h"
 #include "Character/LyraHealthComponent.h"
 #include "Character/LyraPawnExtensionComponent.h"
 #include "System/LyraSystemStatics.h"
 #include "Development/LyraDeveloperSettings.h"
+#include "UI/Cheat/D1CheatEntryWidget.h"
+#include "UI/Cheat/D1CheatListWidget.h"
+#include "UI/Cheat/D1CheatMenuWidget.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraCheatManager)
 
@@ -424,3 +428,11 @@ void ULyraCheatManager::UnlimitedHealth(int32 Enabled)
 	}
 }
 
+void ULyraCheatManager::ToggleDebugWidget()
+{
+	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
+	{
+		TSubclassOf<UD1CheatMenuWidget> CheatMenuWidgetClass = ULyraAssetManager::GetSubclassByName<UD1CheatMenuWidget>("CheatMenuWidgetClass");
+		UCommonUIExtensions::PushContentToLayer_ForPlayer(LyraPC->GetLocalPlayer(), FGameplayTag::RequestGameplayTag(FName(TEXT("UI.Layer.GameMenu"))), CheatMenuWidgetClass);
+	}
+}

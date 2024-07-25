@@ -240,7 +240,7 @@ bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const 
 				CaptureComponent->ShowFlags.SetFog(false);
 				CaptureComponent->ShowFlags.SetVolumetricFog(false);
 				CaptureComponent->ShowFlags.SetVolumetricLightmap(false);
-				CaptureComponent->ShowFlags.SetSkyLighting(false);
+				CaptureComponent->ShowFlags.SetSkyLighting(true);
 
 				CaptureComponent->CaptureSource = InCaptureSource;
 				CaptureComponent->ProfilingEventName = TEXT("Pocket Capture");

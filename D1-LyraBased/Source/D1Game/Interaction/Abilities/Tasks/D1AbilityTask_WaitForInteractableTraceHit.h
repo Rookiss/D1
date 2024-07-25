@@ -19,7 +19,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category="Ability|Tasks", meta=(HidePin="OwningAbility", DefaultToSelf="OwningAbility", BlueprintInternalUseOnly="true"))
-	static UD1AbilityTask_WaitForInteractableTraceHit* WaitForInteractableTraceHit(UGameplayAbility* OwningAbility, FD1InteractionQuery InteractionQuery, FCollisionProfileName TraceProfile, FGameplayAbilityTargetingLocationInfo StartLocation, float InteractionTraceRange = 100.f, float InteractionTraceRate = 0.1f, bool bShowDebug = false);
+	static UD1AbilityTask_WaitForInteractableTraceHit* WaitForInteractableTraceHit(UGameplayAbility* OwningAbility, FD1InteractionQuery InteractionQuery, ECollisionChannel TraceChannel, FGameplayAbilityTargetingLocationInfo StartLocation, float InteractionTraceRange = 100.f, float InteractionTraceRate = 0.1f, bool bShowDebug = false);
 
 protected:
 	virtual void Activate() override;
@@ -30,7 +30,7 @@ private:
 	
 	void AimWithPlayerController(const AActor* InSourceActor, FCollisionQueryParams Params, const FVector& TraceStart, float MaxRange, FVector& OutTraceEnd, bool bIgnorePitch = false) const;
 	bool ClipCameraRayToAbilityRange(FVector CameraLocation, FVector CameraDirection, FVector AbilityCenter, float AbilityRange, FVector& OutClippedPosition) const;
-	void LineTrace(const FVector& Start, const FVector& End, FName ProfileName, const FCollisionQueryParams& Params, FHitResult& OutHitResult) const;
+	void LineTrace(const FVector& Start, const FVector& End, const FCollisionQueryParams& Params, FHitResult& OutHitResult) const;
 
 	void UpdateInteractionInfos(const FD1InteractionQuery& InteractQuery, const TArray<TScriptInterface<ID1Interactable>>& Interactables);
 	
@@ -48,7 +48,7 @@ private:
 	UPROPERTY()
 	FGameplayAbilityTargetingLocationInfo StartLocation;
 
-	FCollisionProfileName TraceProfile;
+	ECollisionChannel TraceChannel;
 	float InteractionTraceRange = 100.f;
 	float InteractionTraceRate = 0.1f;
 	bool bShowDebug = false;

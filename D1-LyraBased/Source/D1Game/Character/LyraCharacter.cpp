@@ -374,16 +374,22 @@ void ALyraCharacter::DisableMovementAndCollision()
 		Controller->SetIgnoreMoveInput(true);
 	}
 
-	if (UCapsuleComponent* CapsuleComp = GetCapsuleComponent())
+	if (UCapsuleComponent* Capsule = GetCapsuleComponent())
 	{
-		CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+		Capsule->SetCollisionResponseToAllChannels(ECR_Ignore);
+		Capsule->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+		Capsule->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+	}
+
+	if (USkeletalMeshComponent* SkeletalMesh = GetMesh())
+	{
+		SkeletalMesh->SetCollisionResponseToChannel(D1_TraceChannel_Interaction, ECR_Block);
 	}
 	
-	if (ULyraCharacterMovementComponent* LyraMoveComp = CastChecked<ULyraCharacterMovementComponent>(GetCharacterMovement()))
+	if (ULyraCharacterMovementComponent* LyraCharacterMovement = Cast<ULyraCharacterMovementComponent>(GetCharacterMovement()))
 	{
-		LyraMoveComp->StopMovementImmediately();
-		LyraMoveComp->DisableMovement();
+		LyraCharacterMovement->Velocity = FVector(0.f, 0.f, LyraCharacterMovement->Velocity.Z);
+		LyraCharacterMovement->UpdateComponentVelocity();
 	}
 
 	bUseControllerRotationYaw = false;

@@ -98,7 +98,7 @@ int32 UD1ItemData::FindItemTemplateIDByClass(TSubclassOf<UD1ItemTemplate> ItemTe
 void UD1ItemData::GetAllItemTemplateClasses(TArray<TSubclassOf<UD1ItemTemplate>>& OutItemTemplateClasses) const
 {
 	OutItemTemplateClasses.Reset();
-	OutItemTemplateClasses.SetNum(ItemTemplateIDToClass.Num());
+	OutItemTemplateClasses.Reserve(ItemTemplateIDToClass.Num());
 	
 	for (auto& Pair : ItemTemplateIDToClass)
 	{

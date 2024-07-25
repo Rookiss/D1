@@ -5,6 +5,7 @@
 #include "GameFramework/CheatManager.h"
 #include "LyraCheatManager.generated.h"
 
+class UD1CheatMenuWidget;
 class ULyraAbilitySystemComponent;
 
 
@@ -93,8 +94,10 @@ public:
 	UFUNCTION(Exec, BlueprintAuthorityOnly)
 	virtual void UnlimitedHealth(int32 Enabled = -1);
 
-protected:
+	UFUNCTION(Exec)
+	virtual void ToggleDebugWidget();
 
+protected:
 	virtual void EnableDebugCamera() override;
 	virtual void DisableDebugCamera() override;
 	bool InDebugCamera() const;

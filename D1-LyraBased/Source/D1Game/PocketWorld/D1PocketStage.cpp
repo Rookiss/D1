@@ -55,6 +55,22 @@ void AD1PocketStage::BeginPlay()
 	}
 }
 
+void AD1PocketStage::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (UPocketCaptureSubsystem* PocketCaptureSubsystem = GetWorld()->GetSubsystem<UPocketCaptureSubsystem>())
+	{
+		PocketCaptureSubsystem->DestroyThumbnailRenderer(CachedPocketCapture);
+	}
+	
+	if (SpawnedCharacter)
+	{
+		SpawnedCharacter->Destroy();
+		SpawnedCharacter = nullptr;
+	}
+	
+	Super::EndPlay(EndPlayReason);
+}
+
 void AD1PocketStage::RefreshAlphaMaskActors()
 {
 	TArray<AActor*> AttachedActors;

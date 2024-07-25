@@ -38,6 +38,9 @@ void UD1WorldMapWidget::NativeOnInitialized()
 
 	MaxWorldMapZoom = MinWorldMapZoom * FMath::Pow(MultiplierWorldMapZoom, StepWorldMapZoom - 1);
 	WidgetUnitSize = (WorldPosToInitialWidgetPos(FVector(100.f, 0.f, 0.f)) - WorldPosToInitialWidgetPos(FVector(0.f, 0.f, 0.f))).Length();
+
+	CurrentCircleWidget->SetVisibility(ESlateVisibility::Hidden);
+	TargetCircleWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UD1WorldMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -84,6 +87,8 @@ void UD1WorldMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 	// Refresh Circle Widget
 	if (AD1ElectricField* ElectricFieldActor = GetElectricFieldActor())
 	{
+		CurrentCircleWidget->SetVisibility(ESlateVisibility::Visible);
+		
 		FVector2D InitialPos = WorldPosToInitialWidgetPos(ElectricFieldActor->GetActorLocation());
 		CurrCircleSlot->SetPosition(InitialPos * GetCurrentWorldMapZoom());
 			
