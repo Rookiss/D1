@@ -5,6 +5,7 @@
 #include "LyraGameData.h"
 #include "Data/D1ElectricFieldPhaseData.h"
 #include "Character/LyraPawnData.h"
+#include "Data/D1CheatData.h"
 #include "Data/D1ItemData.h"
 #include "Data/D1AssetData.h"
 #include "Misc/App.h"
@@ -117,6 +118,11 @@ const UD1ItemData& ULyraAssetManager::GetItemData()
 const UD1ElectricFieldPhaseData& ULyraAssetManager::GetElectricFieldPhaseData()
 {
 	return GetOrLoadTypedGameData<UD1ElectricFieldPhaseData>(ElectricFieldPhaseDataPath);
+}
+
+const UD1CheatData& ULyraAssetManager::GetCheatData()
+{
+	return GetOrLoadTypedGameData<UD1CheatData>(CheatDataPath);
 }
 
 void ULyraAssetManager::StartInitialLoading()

@@ -23,6 +23,7 @@
 #include "ReplaySubsystem.h"
 #include "Development/LyraDeveloperSettings.h"
 #include "GameMapsSettings.h"
+#include "Item/D1ItemTemplate.h"
 #include "Messages/LyraVerbMessage.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraPlayerController)
@@ -324,6 +325,32 @@ bool ALyraPlayerController::ServerCheatAll_Validate(const FString& Msg)
 	return true;
 }
 
+void ALyraPlayerController::Server_EquipWeapon_Implementation(EWeaponSlotType InWeaponSlotType, TSubclassOf<UD1ItemTemplate> InItemTemplateClass)
+{
+#if USING_CHEAT_MANAGER
+	if (InWeaponSlotType == EWeaponSlotType::Count || InItemTemplateClass == nullptr)
+		return;
+	
+	if (ULyraCheatManager* LyraCheatManager = Cast<ULyraCheatManager>(CheatManager))
+	{
+		LyraCheatManager->EquipWeapon(InWeaponSlotType, InItemTemplateClass);
+	}
+#endif // #if USING_CHEAT_MANAGER
+}
+
+void ALyraPlayerController::Server_EquipArmor_Implementation(TSubclassOf<UD1ItemTemplate> InItemTemplateClass)
+{
+#if USING_CHEAT_MANAGER
+	if (InItemTemplateClass == nullptr)
+		return;
+
+	if (ULyraCheatManager* LyraCheatManager = Cast<ULyraCheatManager>(CheatManager))
+	{
+		LyraCheatManager->EquipArmor(InItemTemplateClass);
+	}
+#endif // #if USING_CHEAT_MANAGER
+}
+
 void ALyraPlayerController::PreProcessInput(const float DeltaTime, const bool bGamePaused)
 {
 	Super::PreProcessInput(DeltaTime, bGamePaused);
@@ -468,33 +495,6 @@ void ALyraPlayerController::OnUnPossess()
 	}
 
 	Super::OnUnPossess();
-}
-
-EKeyboardLayout ALyraPlayerController::GetCurrentKeyboardLayout()
-{
-	// HKL KeyboardLayout = GetKeyboardLayout(0);
-	// if (LOWORD(KeyboardLayout) == LID_KOREAN)
-	// {
-	// 	
-	// }
-	//
-	// WCHAR LayoutName[KL_NAMELENGTH];
-	// GetKeyboardLayoutNameW(LayoutName);
-	// GetKeyboardLayoutId()
-	// FString LayoutString(LayoutName);
-
-	EKeyboardLayout KeyboardLayout = EKeyboardLayout::Undefined;
-		
-	// if (LayoutString.Equals(TEXT("00000409")))
-	// {
-	// 	KeyboardLayout = EKeyboardLayout::English;
-	// }
-	// else if (LayoutString.Equals(TEXT("00000412")) || LayoutString.Equals(TEXT("00000411")))
-	// {
-	// 	KeyboardLayout = EKeyboardLayout::Korean;
-	// }
-
-	return KeyboardLayout;
 }
 
 void ALyraReplayPlayerController::Tick(float DeltaSeconds)

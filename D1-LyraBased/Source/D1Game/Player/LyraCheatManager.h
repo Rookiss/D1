@@ -2,12 +2,13 @@
 
 #pragma once
 
+#include "D1Define.h"
 #include "GameFramework/CheatManager.h"
 #include "LyraCheatManager.generated.h"
 
 class UD1CheatMenuWidget;
 class ULyraAbilitySystemComponent;
-
+class UD1ItemTemplate;
 
 #ifndef USING_CHEAT_MANAGER
 #define USING_CHEAT_MANAGER (1 && !UE_BUILD_SHIPPING)
@@ -95,8 +96,23 @@ public:
 	virtual void UnlimitedHealth(int32 Enabled = -1);
 
 	UFUNCTION(Exec)
-	virtual void ToggleDebugWidget();
+	virtual void ShowDebugWidget();
 
+	UFUNCTION(BlueprintAuthorityOnly)
+	virtual void EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass);
+	
+	UFUNCTION(BlueprintAuthorityOnly)
+	virtual void EquipArmor(TSubclassOf<UD1ItemTemplate> ItemTemplateClass);
+
+	UFUNCTION(Exec)
+	virtual void DecreaseAnimationRate();
+	
+	UFUNCTION(Exec)
+	virtual void IncreaseAnimationRate();
+
+	UFUNCTION(Exec)
+	virtual void PlaySelectedAnimation();
+	
 protected:
 	virtual void EnableDebugCamera() override;
 	virtual void DisableDebugCamera() override;
@@ -108,6 +124,13 @@ protected:
 
 	void ApplySetByCallerDamage(ULyraAbilitySystemComponent* LyraASC, float DamageAmount);
 	void ApplySetByCallerHeal(ULyraAbilitySystemComponent* LyraASC, float HealAmount);
-
+	
 	ULyraAbilitySystemComponent* GetPlayerAbilitySystemComponent() const;
+
+public:
+	float CurrentAnimationRate = 1.0f;
+	float DeltaAnimationRate = 0.1f;
+
+	UPROPERTY()
+	TSoftObjectPtr<UAnimMontage> SelectedMontage;
 };

@@ -156,6 +156,7 @@ public:
 	static EEquipmentSlotType ConvertToEquipmentSlotType(EArmorType ArmorType);
 	static EWeaponHandType ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType);
 	static EArmorType ConvertToArmorType(EEquipmentSlotType EquipmentSlotType);
+	static EWeaponEquipState ConvertToWeaponEquipState(EWeaponSlotType WeaponSlotType);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }

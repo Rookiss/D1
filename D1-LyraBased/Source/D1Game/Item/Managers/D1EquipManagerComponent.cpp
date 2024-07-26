@@ -788,3 +788,18 @@ EArmorType UD1EquipManagerComponent::ConvertToArmorType(EEquipmentSlotType Equip
 
 	return ArmorType;
 }
+
+EWeaponEquipState UD1EquipManagerComponent::ConvertToWeaponEquipState(EWeaponSlotType WeaponSlotType)
+{
+	EWeaponEquipState WeaponEquipState = EWeaponEquipState::Count;
+
+	switch (WeaponSlotType)
+	{
+	case EWeaponSlotType::Primary:		WeaponEquipState = EWeaponEquipState::Primary;		break;
+	case EWeaponSlotType::Secondary:	WeaponEquipState = EWeaponEquipState::Secondary;	break;
+	case EWeaponSlotType::Tertiary:		WeaponEquipState = EWeaponEquipState::Tertiary;		break;
+	case EWeaponSlotType::Quaternary:	WeaponEquipState = EWeaponEquipState::Quaternary;	break;
+	}
+
+	return WeaponEquipState;
+}

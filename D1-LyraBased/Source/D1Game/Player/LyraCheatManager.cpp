@@ -14,10 +14,17 @@
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "CommonUIExtensions.h"
+#include "Character/LyraCharacter.h"
 #include "Character/LyraHealthComponent.h"
 #include "Character/LyraPawnExtensionComponent.h"
 #include "System/LyraSystemStatics.h"
 #include "Development/LyraDeveloperSettings.h"
+#include "Item/D1ItemInstance.h"
+#include "Item/D1ItemTemplate.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
+#include "Item/Managers/D1EquipManagerComponent.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "UI/Cheat/D1CheatEntryWidget.h"
 #include "UI/Cheat/D1CheatListWidget.h"
 #include "UI/Cheat/D1CheatMenuWidget.h"
@@ -428,11 +435,120 @@ void ULyraCheatManager::UnlimitedHealth(int32 Enabled)
 	}
 }
 
-void ULyraCheatManager::ToggleDebugWidget()
+void ULyraCheatManager::ShowDebugWidget()
 {
 	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
 	{
 		TSubclassOf<UD1CheatMenuWidget> CheatMenuWidgetClass = ULyraAssetManager::GetSubclassByName<UD1CheatMenuWidget>("CheatMenuWidgetClass");
 		UCommonUIExtensions::PushContentToLayer_ForPlayer(LyraPC->GetLocalPlayer(), FGameplayTag::RequestGameplayTag(FName(TEXT("UI.Layer.GameMenu"))), CheatMenuWidgetClass);
+	}
+}
+
+void ULyraCheatManager::EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass)
+{
+	if (WeaponSlotType == EWeaponSlotType::Count || ItemTemplateClass == nullptr)
+		return;
+	
+	const UD1ItemTemplate* ItemTemplate = ItemTemplateClass.GetDefaultObject();
+	if (ItemTemplate == nullptr)
+		return;
+	
+	const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+	if (WeaponFragment == nullptr)
+		return;
+	
+	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
+	{
+		if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(LyraPC->GetPawn()))
+		{
+			if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>())
+			{
+				EquipmentManager->RemoveEquipment(UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponFragment->WeaponHandType, WeaponSlotType));
+				
+				if (WeaponFragment->WeaponHandType == EWeaponHandType::LeftHand || WeaponFragment->WeaponHandType == EWeaponHandType::RightHand)
+				{
+					EquipmentManager->RemoveEquipment(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::TwoHand, WeaponSlotType));
+				}
+				else if (WeaponFragment->WeaponHandType == EWeaponHandType::TwoHand)
+				{
+					EquipmentManager->RemoveEquipment(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::LeftHand, WeaponSlotType));
+					EquipmentManager->RemoveEquipment(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::RightHand, WeaponSlotType));
+				}
+
+				UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+				int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
+				ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
+				EquipmentManager->AddEquipment(UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponFragment->WeaponHandType, WeaponSlotType), ItemInstance);
+				
+				if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
+				{
+					EWeaponEquipState TargetWeaponEquipState = UD1EquipManagerComponent::ConvertToWeaponEquipState(WeaponSlotType);
+					if (EquipManager->GetCurrentWeaponEquipState() == EWeaponEquipState::Unarmed)
+					{
+						EquipManager->ChangeWeaponEquipState(TargetWeaponEquipState);
+					}
+				}
+			}
+		}
+	}
+}
+
+void ULyraCheatManager::EquipArmor(TSubclassOf<UD1ItemTemplate> ItemTemplateClass)
+{
+	if (ItemTemplateClass == nullptr)
+		return;
+	
+	const UD1ItemTemplate* ItemTemplate = ItemTemplateClass.GetDefaultObject();
+	if (ItemTemplate == nullptr)
+		return;
+	
+	const UD1ItemFragment_Equippable_Armor* ArmorFragment = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
+	if (ArmorFragment == nullptr)
+		return;
+
+	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
+	{
+		if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(LyraPC->GetPawn()))
+		{
+			if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>())
+			{
+				EquipmentManager->RemoveEquipment(UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorFragment->ArmorType));
+
+				UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+				int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
+				ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
+				EquipmentManager->AddEquipment(UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorFragment->ArmorType), ItemInstance);
+			}
+		}
+	}
+}
+
+void ULyraCheatManager::DecreaseAnimationRate()
+{
+	CurrentAnimationRate -= DeltaAnimationRate;
+}
+
+void ULyraCheatManager::IncreaseAnimationRate()
+{
+	CurrentAnimationRate += DeltaAnimationRate;
+}
+
+void ULyraCheatManager::PlaySelectedAnimation()
+{
+	if (SelectedMontage == nullptr)
+		return;
+	
+	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
+	{
+		if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(LyraPC->GetPawn()))
+		{
+			if (USkeletalMeshComponent* SkeletalMesh = LyraCharacter->GetMesh())
+			{
+				if (UAnimInstance* AnimInstance = SkeletalMesh->GetAnimInstance())
+				{
+					AnimInstance->Montage_Play(ULyraAssetManager::GetAssetByPath(SelectedMontage), CurrentAnimationRate);
+				}
+			}
+		}
 	}
 }

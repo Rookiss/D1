@@ -9,6 +9,7 @@
 #include "Templates/SubclassOf.h"
 #include "LyraAssetManager.generated.h"
 
+class UD1CheatData;
 class UD1ElectricFieldPhaseData;
 class UPrimaryDataAsset;
 class UD1AssetData;
@@ -60,6 +61,7 @@ public:
 	const UD1ItemData& GetItemData();
 	const ULyraGameData& GetGameData();
 	const UD1ElectricFieldPhaseData& GetElectricFieldPhaseData();
+	const UD1CheatData& GetCheatData();
 	const ULyraPawnData* GetDefaultPawnData() const;
 
 protected:
@@ -101,6 +103,9 @@ protected:
 
 	UPROPERTY(Config)
 	TSoftObjectPtr<UD1ElectricFieldPhaseData> ElectricFieldPhaseDataPath;
+
+	UPROPERTY(Config)
+	TSoftObjectPtr<UD1CheatData> CheatDataPath;
 	
 	// Global game data asset to use.
 	UPROPERTY(Config)

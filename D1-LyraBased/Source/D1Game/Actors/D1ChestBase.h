@@ -6,6 +6,7 @@
 
 class UD1ItemTemplate;
 class UArrowComponent;
+class UD1InventoryManagerComponent;
 
 UENUM(BlueprintType)
 enum class EChestState : uint8

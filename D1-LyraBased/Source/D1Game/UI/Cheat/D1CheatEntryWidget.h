@@ -3,6 +3,8 @@
 #include "Blueprint/UserWidget.h"
 #include "D1CheatEntryWidget.generated.h"
 
+class USizeBox;
+class UImage;
 class UButton;
 class UCommonTextBlock;
 class UD1ItemTemplate;
@@ -25,22 +27,35 @@ class UD1CheatEntryWidget : public UUserWidget
 public:
 	UD1CheatEntryWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-public:
-	void InitializeUI(ED1CheatEntryType InCheatEntryType, TSubclassOf<UD1ItemTemplate> InItemTemplateClass, UAnimMontage* InAnimMontage);
+protected:
+	virtual void NativeOnInitialized() override;
 	
 public:
-	UPROPERTY(EditDefaultsOnly)
+	void InitializeUI(ED1CheatEntryType InCheatEntryType, TSubclassOf<UD1ItemTemplate> InItemTemplateClass, FSoftObjectPath InAnimMontage);
+
+private:
+	UFUNCTION()
+	void OnButtonClicked();
+	
+public:
+	UPROPERTY()
 	ED1CheatEntryType CheatEntryType = ED1CheatEntryType::None;
 
 	UPROPERTY()
-	TSubclassOf<UD1ItemTemplate> ItemTemplate;
+	TSubclassOf<UD1ItemTemplate> ItemTemplateClass;
 
 	UPROPERTY()
-	TObjectPtr<UAnimMontage> AnimMontage;
+	TSoftObjectPtr<UAnimMontage> AnimMontage;
 
 protected:
 	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<USizeBox> SizeBox_Entry;
+	
+	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UButton> Button_Entry;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Entry;
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UCommonTextBlock> Text_Entry;

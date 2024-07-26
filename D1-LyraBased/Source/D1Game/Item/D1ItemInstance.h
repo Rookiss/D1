@@ -29,7 +29,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool IsSupportedForNetworking() const override { return true; }
 
-private:
+public:
 	void Init(int32 InItemTemplateID, EItemRarity InItemRarity);
 
 public:
@@ -69,10 +69,6 @@ private:
 #if UE_WITH_IRIS
 	virtual void RegisterReplicationFragments(UE::Net::FFragmentRegistrationContext& Context, UE::Net::EFragmentRegistrationFlags RegistrationFlags) override;
 #endif // UE_WITH_IRIS
-	
-	friend struct FD1InventoryEntry;
-	friend class UD1EquipmentManagerComponent;
-	friend class UD1InventoryManagerComponent;
 	
 private:
 	UPROPERTY(Replicated)

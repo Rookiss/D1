@@ -2,7 +2,7 @@
 
 #include "D1CheatEntryWidget.h"
 #include "D1CheatListWidget.h"
-#include "Components/ScrollBox.h"
+#include "Data/D1CheatData.h"
 #include "Item/D1ItemTemplate.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
@@ -20,7 +20,7 @@ void UD1CheatMenuWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	CheatEntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1CheatMenuWidget>("CheatEntryWidgetClass");
+	CheatEntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1CheatEntryWidget>("CheatEntryWidgetClass");
 }
 
 void UD1CheatMenuWidget::NativeConstruct()
@@ -39,6 +39,10 @@ void UD1CheatMenuWidget::NativeConstruct()
 		{
 			if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
 			{
+				const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+				if (WeaponFragment->WeaponType == EWeaponType::Unarmed)
+					continue;
+				
 				UD1CheatEntryWidget* CheatEntryWidget = CreateWidget<UD1CheatEntryWidget>(GetOwningPlayer(), CheatEntryWidgetClass);
 				CheatEntryWidget->InitializeUI(ED1CheatEntryType::PrimaryWeapon, ItemTemplateClass, nullptr);
 				CheatList_PrimaryWeapon->AddEntry(CheatEntryWidget);
@@ -54,5 +58,14 @@ void UD1CheatMenuWidget::NativeConstruct()
 				CheatList_Armor->AddEntry(CheatEntryWidget);
 			}
 		}
+	}
+
+	const UD1CheatData& CheatData = ULyraAssetManager::Get().GetCheatData();
+	
+	for (FSoftObjectPath AnimMontagePath : CheatData.GetAnimMontages())
+	{
+		UD1CheatEntryWidget* CheatEntryWidget = CreateWidget<UD1CheatEntryWidget>(GetOwningPlayer(), CheatEntryWidgetClass);
+		CheatEntryWidget->InitializeUI(ED1CheatEntryType::Animation, nullptr, AnimMontagePath);
+		CheatList_Animation->AddEntry(CheatEntryWidget);
 	}
 }

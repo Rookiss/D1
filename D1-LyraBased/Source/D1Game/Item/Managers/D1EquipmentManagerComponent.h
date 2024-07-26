@@ -145,6 +145,7 @@ public:
 	
 private:
 	friend class UD1ItemManagerComponent;
+	friend class ULyraCheatManager;
 	
 	UPROPERTY(Replicated)
 	FD1EquipmentList EquipmentList;

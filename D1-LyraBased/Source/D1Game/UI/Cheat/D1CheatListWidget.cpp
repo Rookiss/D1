@@ -2,6 +2,7 @@
 
 #include "D1CheatEntryWidget.h"
 #include "Components/ScrollBox.h"
+#include "Components/TextBlock.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1CheatListWidget)
 
@@ -9,6 +10,13 @@ UD1CheatListWidget::UD1CheatListWidget(const FObjectInitializer& ObjectInitializ
 	: Super(ObjectInitializer)
 {
     
+}
+
+void UD1CheatListWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+
+	Text_Title->SetText(TitleText);
 }
 
 void UD1CheatListWidget::NativeConstruct()

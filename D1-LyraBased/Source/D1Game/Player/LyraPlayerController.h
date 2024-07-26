@@ -69,6 +69,12 @@ public:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerCheatAll(const FString& Msg);
 
+	UFUNCTION(Server, Reliable)
+	void Server_EquipWeapon(EWeaponSlotType InWeaponSlotType, TSubclassOf<UD1ItemTemplate> InItemTemplateClass);
+
+	UFUNCTION(Server, Reliable)
+	void Server_EquipArmor(TSubclassOf<UD1ItemTemplate> InItemTemplateClass);
+
 	//~AActor interface
 	virtual void PreInitializeComponents() override;
 	virtual void BeginPlay() override;
@@ -127,8 +133,6 @@ protected:
 	void OnSettingsChanged(ULyraSettingsShared* Settings);
 	
 	bool bHideViewTargetPawnNextFrame = false;
-
-	EKeyboardLayout GetCurrentKeyboardLayout();
 };
 
 // A player controller used for replay capture and playback
