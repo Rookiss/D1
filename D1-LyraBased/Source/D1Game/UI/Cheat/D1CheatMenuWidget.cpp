@@ -62,7 +62,7 @@ void UD1CheatMenuWidget::NativeConstruct()
 
 	const UD1CheatData& CheatData = ULyraAssetManager::Get().GetCheatData();
 	
-	for (FSoftObjectPath AnimMontagePath : CheatData.GetAnimMontages())
+	for (const TSoftObjectPtr<UAnimMontage>& AnimMontagePath : CheatData.GetAnimMontagePaths())
 	{
 		UD1CheatEntryWidget* CheatEntryWidget = CreateWidget<UD1CheatEntryWidget>(GetOwningPlayer(), CheatEntryWidgetClass);
 		CheatEntryWidget->InitializeUI(ED1CheatEntryType::Animation, nullptr, AnimMontagePath);

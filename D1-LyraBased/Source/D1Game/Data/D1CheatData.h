@@ -11,9 +11,9 @@ public:
 	static const UD1CheatData& Get();
 
 public:
-	const TArray<FSoftObjectPath>& GetAnimMontages() const;
+	const TArray<TSoftObjectPtr<UAnimMontage>>& GetAnimMontagePaths() const { return AnimMontagePaths; }
 	
-private:
+protected:
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FSoftObjectPath> AnimMontagePaths;
+	TArray<TSoftObjectPtr<UAnimMontage>> AnimMontagePaths;
 };

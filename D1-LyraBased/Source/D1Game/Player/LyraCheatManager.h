@@ -105,10 +105,10 @@ public:
 	virtual void EquipArmor(TSubclassOf<UD1ItemTemplate> ItemTemplateClass);
 
 	UFUNCTION(Exec)
-	virtual void DecreaseAnimationRate();
+	virtual void DecreaseAnimationSpeed();
 	
 	UFUNCTION(Exec)
-	virtual void IncreaseAnimationRate();
+	virtual void IncreaseAnimationSpeed();
 
 	UFUNCTION(Exec)
 	virtual void PlaySelectedAnimation();
@@ -128,8 +128,8 @@ protected:
 	ULyraAbilitySystemComponent* GetPlayerAbilitySystemComponent() const;
 
 public:
-	float CurrentAnimationRate = 1.0f;
-	float DeltaAnimationRate = 0.1f;
+	float CurrentAnimationSpeed = 1.0f;
+	float DeltaAnimationSpeed = 0.1f;
 
 	UPROPERTY()
 	TSoftObjectPtr<UAnimMontage> SelectedMontage;

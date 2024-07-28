@@ -8,8 +8,3 @@ const UD1CheatData& UD1CheatData::Get()
 {
 	return ULyraAssetManager::Get().GetCheatData();
 }
-
-const TArray<FSoftObjectPath>& UD1CheatData::GetAnimMontages() const
-{
-	return AnimMontagePaths;
-}

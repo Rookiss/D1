@@ -25,8 +25,6 @@
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
-#include "UI/Cheat/D1CheatEntryWidget.h"
-#include "UI/Cheat/D1CheatListWidget.h"
 #include "UI/Cheat/D1CheatMenuWidget.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraCheatManager)
@@ -523,19 +521,19 @@ void ULyraCheatManager::EquipArmor(TSubclassOf<UD1ItemTemplate> ItemTemplateClas
 	}
 }
 
-void ULyraCheatManager::DecreaseAnimationRate()
+void ULyraCheatManager::DecreaseAnimationSpeed()
 {
-	CurrentAnimationRate -= DeltaAnimationRate;
+	CurrentAnimationSpeed -= DeltaAnimationSpeed;
 }
 
-void ULyraCheatManager::IncreaseAnimationRate()
+void ULyraCheatManager::IncreaseAnimationSpeed()
 {
-	CurrentAnimationRate += DeltaAnimationRate;
+	CurrentAnimationSpeed += DeltaAnimationSpeed;
 }
 
 void ULyraCheatManager::PlaySelectedAnimation()
 {
-	if (SelectedMontage == nullptr)
+	if (SelectedMontage.IsNull())
 		return;
 	
 	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
@@ -546,7 +544,7 @@ void ULyraCheatManager::PlaySelectedAnimation()
 			{
 				if (UAnimInstance* AnimInstance = SkeletalMesh->GetAnimInstance())
 				{
-					AnimInstance->Montage_Play(ULyraAssetManager::GetAssetByPath(SelectedMontage), CurrentAnimationRate);
+					AnimInstance->Montage_Play(ULyraAssetManager::GetAssetByPath(SelectedMontage, false), CurrentAnimationSpeed);
 				}
 			}
 		}

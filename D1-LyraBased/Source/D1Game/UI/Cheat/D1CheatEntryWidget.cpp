@@ -23,7 +23,7 @@ void UD1CheatEntryWidget::NativeOnInitialized()
 	Button_Entry->OnClicked.AddUniqueDynamic(this, &ThisClass::OnButtonClicked);
 }
 
-void UD1CheatEntryWidget::InitializeUI(ED1CheatEntryType InCheatEntryType, TSubclassOf<UD1ItemTemplate> InItemTemplateClass, FSoftObjectPath InAnimMontage)
+void UD1CheatEntryWidget::InitializeUI(ED1CheatEntryType InCheatEntryType, TSubclassOf<UD1ItemTemplate> InItemTemplateClass, TSoftObjectPtr<UAnimMontage> InAnimMontage)
 {
 	CheatEntryType = InCheatEntryType;
 	
@@ -44,7 +44,7 @@ void UD1CheatEntryWidget::InitializeUI(ED1CheatEntryType InCheatEntryType, TSubc
 		break;
 	case ED1CheatEntryType::Animation:
 		AnimMontage = InAnimMontage;
-		if (AnimMontage)
+		if (AnimMontage.IsNull() == false)
 		{
 			Text_Entry->SetText(FText::FromString(AnimMontage.GetAssetName()));
 			SizeBox_Entry->SetVisibility(ESlateVisibility::Collapsed);

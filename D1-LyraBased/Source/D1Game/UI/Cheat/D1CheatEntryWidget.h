@@ -31,7 +31,7 @@ protected:
 	virtual void NativeOnInitialized() override;
 	
 public:
-	void InitializeUI(ED1CheatEntryType InCheatEntryType, TSubclassOf<UD1ItemTemplate> InItemTemplateClass, FSoftObjectPath InAnimMontage);
+	void InitializeUI(ED1CheatEntryType InCheatEntryType, TSubclassOf<UD1ItemTemplate> InItemTemplateClass, TSoftObjectPtr<UAnimMontage> InAnimMontage);
 
 private:
 	UFUNCTION()
