@@ -41,19 +41,25 @@ void UD1ItemManagerComponent::Server_InventoryToEquipment_Quick_Implementation(U
 		return;
 
 	EEquipmentSlotType ToEquipmentSlotType;
-	if (ToEquipmentManager->CanAddEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
+
+	// TODO: Try to Inven Add -> Equip Quick -> Equip Swap
+	if (ToEquipmentManager->CanAddEquipment_Swap(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
+	{
+		UD1ItemInstance* RemovedItemInstanceTo = ToEquipmentManager->RemoveEquipment(ToEquipmentSlotType);
+		UD1ItemInstance* RemovedItemInstanceFrom = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
+		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstanceFrom);
+		FromInventoryManager->AddItem(FromItemSlotPos, RemovedItemInstanceTo, 1);
+	}
+	else if (ToEquipmentManager->CanAddEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
 	{
 		UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
 		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
 	}
-	else
+	else if (FromInventoryManager->GetOwner() != ToEquipmentManager->GetOwner())
 	{
-		if (FromInventoryManager->GetOwner() != ToEquipmentManager->GetOwner())
+		if (UD1InventoryManagerComponent* ToInventoryManager = ToEquipmentManager->GetOwner()->GetComponentByClass<UD1InventoryManagerComponent>())
 		{
-			if (UD1InventoryManagerComponent* ToInventoryManager = ToEquipmentManager->GetOwner()->GetComponentByClass<UD1InventoryManagerComponent>())
-			{
-				Server_InventoryToInventory_Quick(FromInventoryManager, FromItemSlotPos, ToInventoryManager);
-			}
+			Server_InventoryToInventory_Quick(FromInventoryManager, FromItemSlotPos, ToInventoryManager);
 		}
 	}
 }
@@ -88,6 +94,7 @@ void UD1ItemManagerComponent::Server_EquipmentToInventory_Quick_Implementation(U
 		return;
 
 	FIntPoint ToItemSlotPos;
+	
 	if (ToInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPos))
 	{
 		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
@@ -148,7 +155,7 @@ void UD1ItemManagerComponent::Server_EquipmentToEquipment_Implementation(UD1Equi
 
 	if (IsAllowedComponent(FromEquipmentManager) == false ||  IsAllowedComponent(ToEquipmentManager) == false)
 		return;
-
+	
 	if (ToEquipmentManager->CanAddEquipment(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
 	{
 		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);

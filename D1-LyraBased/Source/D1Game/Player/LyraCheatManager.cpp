@@ -523,7 +523,7 @@ void ULyraCheatManager::EquipArmor(TSubclassOf<UD1ItemTemplate> ItemTemplateClas
 
 void ULyraCheatManager::DecreaseAnimationSpeed()
 {
-	CurrentAnimationSpeed -= DeltaAnimationSpeed;
+	CurrentAnimationSpeed = FMath::Max(0.1f, CurrentAnimationSpeed - DeltaAnimationSpeed);
 }
 
 void ULyraCheatManager::IncreaseAnimationSpeed()

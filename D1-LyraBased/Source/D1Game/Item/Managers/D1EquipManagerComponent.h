@@ -158,9 +158,15 @@ public:
 	static EArmorType ConvertToArmorType(EEquipmentSlotType EquipmentSlotType);
 	static EWeaponEquipState ConvertToWeaponEquipState(EWeaponSlotType WeaponSlotType);
 
+	UFUNCTION(BlueprintCallable)
+	void HideAllWeapons();
+
+	UFUNCTION(BlueprintCallable)
+	void ShowAllWeapons();
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AD1WeaponBase* GetEquippedWeaponActor(EWeaponHandType WeaponHandType) const;
 

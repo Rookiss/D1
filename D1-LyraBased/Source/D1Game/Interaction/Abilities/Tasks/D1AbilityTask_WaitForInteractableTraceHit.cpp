@@ -104,7 +104,8 @@ void UD1AbilityTask_WaitForInteractableTraceHit::AimWithPlayerController(const A
 		return;
 	
 	APlayerController* PlayerController = Ability->GetCurrentActorInfo()->PlayerController.Get();
-	check(PlayerController);
+	if (PlayerController == nullptr)
+		return;
 
 	FVector CameraStart;
 	FRotator CameraRotation;
@@ -147,7 +148,6 @@ void UD1AbilityTask_WaitForInteractableTraceHit::AimWithPlayerController(const A
 
 bool UD1AbilityTask_WaitForInteractableTraceHit::ClipCameraRayToAbilityRange(FVector CameraLocation, FVector CameraDirection, FVector AbilityCenter, float AbilityRange, FVector& OutClippedPosition) const
 {
-	// 캐릭터 주변으로 반지름이 Ability Range인 구를 그린다음 카메라의 앞 방향 벡터와 구가 교차하는 지점을 구한다
 	FVector CameraToCenter = AbilityCenter - CameraLocation;
 	float DistanceCameraToDot = FVector::DotProduct(CameraToCenter, CameraDirection);
 	if (DistanceCameraToDot >= 0)

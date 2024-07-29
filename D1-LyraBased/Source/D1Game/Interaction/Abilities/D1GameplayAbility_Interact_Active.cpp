@@ -42,8 +42,11 @@ void UD1GameplayAbility_Interact_Active::Initialize(AActor* TargetActor)
 	}
 }
 
-void UD1GameplayAbility_Interact_Active::TriggerInteraction()
+bool UD1GameplayAbility_Interact_Active::TriggerInteraction()
 {
+	bool bTriggerSuccessful = false;
+	bool bCanActivate = false;
+	
 	FGameplayEventData Payload;
 	Payload.EventTag = D1GameplayTags::Ability_Interact;
 	Payload.Instigator = GetAvatarActorFromActorInfo();
@@ -59,8 +62,9 @@ void UD1GameplayAbility_Interact_Active::TriggerInteraction()
 		{
 			FGameplayAbilityActorInfo ActorInfo;
 			ActorInfo.InitFromActor(InteractableActor, TargetActor, AbilitySystem);
-		
-			AbilitySystem->TriggerAbilityFromGameplayEvent(
+
+			bCanActivate = AbilitySpec->Ability->CanActivateAbility(AbilitySpec->Handle, AbilitySystem->AbilityActorInfo.Get());
+			bTriggerSuccessful = AbilitySystem->TriggerAbilityFromGameplayEvent(
 				AbilitySpec->Handle,
 				&ActorInfo,
 				D1GameplayTags::Ability_Interact,
@@ -69,4 +73,6 @@ void UD1GameplayAbility_Interact_Active::TriggerInteraction()
 			);
 		}
 	}
+
+	return bCanActivate || bTriggerSuccessful;
 }

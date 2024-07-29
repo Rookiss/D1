@@ -803,3 +803,31 @@ EWeaponEquipState UD1EquipManagerComponent::ConvertToWeaponEquipState(EWeaponSlo
 
 	return WeaponEquipState;
 }
+
+void UD1EquipManagerComponent::HideAllWeapons()
+{
+	TArray<AD1WeaponBase*> OutEquippedWeaponActors;
+	GetAllEquippedWeaponActors(OutEquippedWeaponActors);
+
+	for (AD1WeaponBase* WeaponActor : OutEquippedWeaponActors)
+	{
+		if (IsValid(WeaponActor))
+		{
+			WeaponActor->SetActorHiddenInGame(true);
+		}
+	}
+}
+
+void UD1EquipManagerComponent::ShowAllWeapons()
+{
+	TArray<AD1WeaponBase*> OutEquippedWeaponActors;
+	GetAllEquippedWeaponActors(OutEquippedWeaponActors);
+
+	for (AD1WeaponBase* WeaponActor : OutEquippedWeaponActors)
+	{
+		if (IsValid(WeaponActor))
+		{
+			WeaponActor->SetActorHiddenInGame(false);
+		}
+	}
+}

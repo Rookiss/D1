@@ -110,6 +110,10 @@ public:
 	bool CanAddEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
 	bool CanAddEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType) const;
 	bool CanAddEquipment_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType) const;
+	bool CanAddEquipment_Quick(UD1ItemInstance* FromItemInstance, EEquipmentSlotType& OutToEquipmentSlotType) const;
+	bool CanAddEquipment_Swap(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType) const;
+	bool CanAddEquipment_Swap(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType) const;
+	bool CanAddEquipment_Swap(UD1ItemInstance* FromItemInstance, EEquipmentSlotType& OutToEquipmentSlotType) const;
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)

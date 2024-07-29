@@ -19,7 +19,7 @@ protected:
 	void Initialize(AActor* TargetActor);
 
 	UFUNCTION(BlueprintCallable)
-	void TriggerInteraction();
+	bool TriggerInteraction();
 	
 protected:
 	UPROPERTY(BlueprintReadOnly)
