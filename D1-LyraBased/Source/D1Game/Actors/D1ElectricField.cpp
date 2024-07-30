@@ -18,19 +18,3 @@ AD1ElectricField::AD1ElectricField(const FObjectInitializer& ObjectInitializer)
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetRootComponent(MeshComponent);
 }
-
-void AD1ElectricField::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	if (HasAuthority() == false)
-		return;
-	
-	// {
-	// 	MeshComponent->SetVisibility(GameState->bVisibleCurrCircle, true);
-	// 	SetActorLocation(GameState->CurrCirclePos);
-	//
-	// 	float Scale = GameState->CurrCircleRadius / 100.f * 2.f;
-	// 	SetActorScale3D(FVector(Scale, Scale, 2000.f));
-	// }
-}

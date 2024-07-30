@@ -32,21 +32,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void ChangeBlockState(bool bShouldBlock);
 
-	UFUNCTION(BlueprintCallable)
-	void ChangeVisibilityState(bool bNewShouldHidden);
-	
 private:
-	UFUNCTION()
-	void OnRep_TemplateID();
-
 	UFUNCTION()
 	void OnRep_EquipmentSlotType();
 
 	UFUNCTION()
 	void OnRep_CanBlock();
-	
-	UFUNCTION()
-	void OnRep_ShouldHidden();
 
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -68,14 +59,11 @@ public:
 	TObjectPtr<UBoxComponent> TraceDebugCollision;
 	
 protected:
-	UPROPERTY(ReplicatedUsing=OnRep_TemplateID)
+	UPROPERTY(Replicated)
 	int32 TemplateID;
 	
 	UPROPERTY(ReplicatedUsing=OnRep_EquipmentSlotType)
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
-
-	UPROPERTY(ReplicatedUsing=OnRep_ShouldHidden)
-	bool bShouldHidden = false;
 	
 public:
 	UPROPERTY(ReplicatedUsing=OnRep_CanBlock)

@@ -159,10 +159,10 @@ public:
 	static EWeaponEquipState ConvertToWeaponEquipState(EWeaponSlotType WeaponSlotType);
 
 	UFUNCTION(BlueprintCallable)
-	void HideAllWeapons();
+	void ChangeShouldHiddenWeapons(bool bNewShouldHiddenWeapons);
 
-	UFUNCTION(BlueprintCallable)
-	void ShowAllWeapons();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool ShouldHiddenWeapons() const { return bShouldHiddenWeapons; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }
@@ -185,4 +185,7 @@ private:
 
 	UPROPERTY(ReplicatedUsing=OnRep_CurrentWeaponEquipState)
 	EWeaponEquipState CurrentWeaponEquipState = EWeaponEquipState::Count;
+
+	UPROPERTY(Replicated)
+	bool bShouldHiddenWeapons = false;
 };

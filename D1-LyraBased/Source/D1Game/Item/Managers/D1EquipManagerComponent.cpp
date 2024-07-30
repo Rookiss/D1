@@ -104,6 +104,7 @@ void FD1EquipEntry::Equip()
 				NewWeaponActor->Init(ItemInstance->GetItemTemplateID(), EquipmentSlotType);
 				NewWeaponActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 				NewWeaponActor->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
+				NewWeaponActor->SetActorHiddenInGame(EquipManager->ShouldHiddenWeapons());
 				NewWeaponActor->FinishSpawning(FTransform::Identity, true);
 			}
 		}
@@ -397,6 +398,7 @@ void UD1EquipManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 	DOREPLIFETIME(ThisClass, EquipList);
 	DOREPLIFETIME(ThisClass, CurrentWeaponEquipState);
+	DOREPLIFETIME(ThisClass, bShouldHiddenWeapons);
 }
 
 bool UD1EquipManagerComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
@@ -804,8 +806,10 @@ EWeaponEquipState UD1EquipManagerComponent::ConvertToWeaponEquipState(EWeaponSlo
 	return WeaponEquipState;
 }
 
-void UD1EquipManagerComponent::HideAllWeapons()
+void UD1EquipManagerComponent::ChangeShouldHiddenWeapons(bool bNewShouldHiddenWeapons)
 {
+	bShouldHiddenWeapons = bNewShouldHiddenWeapons;
+
 	TArray<AD1WeaponBase*> OutEquippedWeaponActors;
 	GetAllEquippedWeaponActors(OutEquippedWeaponActors);
 
@@ -813,21 +817,7 @@ void UD1EquipManagerComponent::HideAllWeapons()
 	{
 		if (IsValid(WeaponActor))
 		{
-			WeaponActor->SetActorHiddenInGame(true);
-		}
-	}
-}
-
-void UD1EquipManagerComponent::ShowAllWeapons()
-{
-	TArray<AD1WeaponBase*> OutEquippedWeaponActors;
-	GetAllEquippedWeaponActors(OutEquippedWeaponActors);
-
-	for (AD1WeaponBase* WeaponActor : OutEquippedWeaponActors)
-	{
-		if (IsValid(WeaponActor))
-		{
-			WeaponActor->SetActorHiddenInGame(false);
+			WeaponActor->SetActorHiddenInGame(bShouldHiddenWeapons);
 		}
 	}
 }

@@ -2,12 +2,9 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "D1GameplayTags.h"
 #include "LyraAssetManager.h"
 #include "Character/LyraCharacter.h"
 #include "Data/D1ElectricFieldPhaseData.h"
-#include "GameModes/LyraGameMode.h"
-#include "GameModes/LyraGameState.h"
 #include "Messages/LyraVerbMessage.h"
 #include "Net/UnrealNetwork.h"
 
@@ -28,7 +25,7 @@ void UD1ElectricFieldManagerComponent::Initialize()
 	check(ElectricFieldClass);
 
 	ElectricFieldActor = GetWorld()->SpawnActor<AD1ElectricField>(ElectricFieldClass);
-	StartPhasePosition = TargetPhasePosition = FVector(0.f, 0.f, -50000.f);
+	StartPhasePosition = TargetPhasePosition = FVector(0.f, 0.f, -50.f * ElectricFieldActor->GetActorScale3D().Z);
 	ElectricFieldActor->SetActorLocation(StartPhasePosition);
 
 	const UD1ElectricFieldPhaseData& PhaseData = ULyraAssetManager::Get().GetElectricFieldPhaseData();
@@ -36,7 +33,7 @@ void UD1ElectricFieldManagerComponent::Initialize()
 	StartPhaseRadius = TargetPhaseRadius = PhaseEntry.TargetRadius;
 
 	float Scale = StartPhaseRadius / 50.f;
-	ElectricFieldActor->SetActorScale3D(FVector(Scale, Scale, 1000.f));
+	ElectricFieldActor->SetActorScale3D(FVector(Scale, Scale, ElectricFieldActor->GetActorScale3D().Z));
 	
 	SetupNextElectricFieldPhase();
 #endif
@@ -89,7 +86,7 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 
 			float Radius = FMath::Lerp(StartPhaseRadius, TargetPhaseRadius, Alpha);
 			float Scale = Radius / 50.f;
-			ElectricFieldActor->SetActorScale3D(FVector(Scale, Scale, 1000.f));
+			ElectricFieldActor->SetActorScale3D(FVector(Scale, Scale, ElectricFieldActor->GetActorScale3D().Z));
 		}
 		else
 		{

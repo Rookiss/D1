@@ -415,20 +415,7 @@ bool UD1EquipmentManagerComponent::CanAddEquipment_Swap(UD1ItemInstance* FromIte
 
 	if (const UD1ItemFragment_Equippable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
 	{
-		if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
-		{
-			// const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(FromEquippableFragment);
-			// for (int32 i = 0; i < (int32)EWeaponSlotType::Count; i++)
-			// {
-			// 	OutToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, (EWeaponSlotType)i);
-			// 	if (CanAddEquipment(FromItemInstance, OutToEquipmentSlotType))
-			// 		return true;
-			// }
-			
-			OutToEquipmentSlotType = EEquipmentSlotType::Count;
-			return false;
-		}
-		else if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
+		if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
 		{
 			const UD1ItemFragment_Equippable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(FromEquippableFragment);
 			EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);

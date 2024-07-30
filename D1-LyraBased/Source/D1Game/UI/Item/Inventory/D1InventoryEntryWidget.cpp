@@ -9,7 +9,6 @@
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
 #include "Item/Fragments/D1ItemFragment_Stackable.h"
-#include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
 #include "UI/Item/D1ItemDragDrop.h"
@@ -71,16 +70,7 @@ FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 
 		if (ItemManager && FromInventoryManager)
 		{
-			if (ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
-			{
-				UD1EquipmentManagerComponent* ToEquipmentManager = GetOwningPlayerPawn()->FindComponentByClass<UD1EquipmentManagerComponent>();
-				ItemManager->Server_InventoryToEquipment_Quick(FromInventoryManager, ItemSlotPos, ToEquipmentManager);
-			}
-			else
-			{
-				UD1InventoryManagerComponent* ToInventoryManager = GetOwningPlayerPawn()->FindComponentByClass<UD1InventoryManagerComponent>();
-				ItemManager->Server_InventoryToInventory_Quick(FromInventoryManager, ItemSlotPos, ToInventoryManager);
-			}
+			ItemManager->Server_MoveQuickFromInventory(FromInventoryManager, ItemSlotPos);
 			return FReply::Handled();
 		}
 	}

@@ -7,8 +7,6 @@
 #include "Item/D1ItemTemplate.h"
 #include "UI/Item/D1ItemDragDrop.h"
 #include "UI/Item/D1ItemDragWidget.h"
-#include "Item/Managers/D1EquipmentManagerComponent.h"
-#include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentEntryWidget)
@@ -56,22 +54,10 @@ FReply UD1EquipmentEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	
 	if (Reply.IsEventHandled() == false && UWidgetBlueprintLibrary::IsDragDropping() == false && InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
 	{
-		UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
-		UD1InventoryManagerComponent* MyInventoryManager = GetOwningPlayerPawn()->FindComponentByClass<UD1InventoryManagerComponent>();
-		UD1EquipmentManagerComponent* MyEquipmentManager = GetOwningPlayerPawn()->FindComponentByClass<UD1EquipmentManagerComponent>();
-
-		if (ItemManager && MyInventoryManager && MyEquipmentManager)
+		if (UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>())
 		{
-			if (EquipmentManager == MyEquipmentManager)
-			{
-				ItemManager->Server_EquipmentToInventory_Quick(EquipmentManager, EquipmentSlotType, MyInventoryManager);
-				return FReply::Handled();
-			}
-			else
-			{
-				ItemManager->Server_EquipmentToEquipment_Quick(EquipmentManager, EquipmentSlotType, MyEquipmentManager);
-				return FReply::Handled();
-			}
+			ItemManager->Server_MoveQuickFromEquipment(EquipmentManager, EquipmentSlotType);
+			return FReply::Handled();
 		}
 	}
 

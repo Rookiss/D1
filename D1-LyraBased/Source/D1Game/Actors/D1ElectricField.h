@@ -18,15 +18,8 @@ class AD1ElectricField : public AActor
 	
 public:
 	AD1ElectricField(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-	
-protected:
-	virtual void Tick(float DeltaSeconds) override;
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> MeshComponent;
-
-public:
-	UPROPERTY(EditDefaultsOnly)
-	float Damage = 5.f;
 };

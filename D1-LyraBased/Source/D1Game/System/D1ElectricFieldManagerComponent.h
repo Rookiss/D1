@@ -45,7 +45,7 @@ public:
 	
 	UPROPERTY(Replicated)
 	FVector TargetPhasePosition = FVector::ZeroVector;
-
+	
 private:
 	UPROPERTY()
 	TObjectPtr<AD1ElectricField> ElectricFieldActor;

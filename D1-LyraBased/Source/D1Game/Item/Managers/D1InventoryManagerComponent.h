@@ -132,6 +132,7 @@ public:
 	bool IsAllEmpty();
 	
 public:
+	UD1ItemInstance* GetItemInstance(const FIntPoint& ItemSlotPos) const;
 	const TArray<FD1InventoryEntry>& GetAllEntries() const;
 	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
 	TArray<TArray<bool>>& GetSlotChecks() { return SlotChecks; }
