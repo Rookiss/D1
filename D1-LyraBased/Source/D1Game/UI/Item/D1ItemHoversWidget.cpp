@@ -21,7 +21,7 @@ UD1ItemHoversWidget::UD1ItemHoversWidget(const FObjectInitializer& ObjectInitial
 
 void UD1ItemHoversWidget::RefreshUI(const UD1ItemInstance* HoveredItemInstance)
 {
-	UD1ItemInstance* CompareItemInstance = nullptr;
+	UD1ItemInstance* SelectedItemInstance = nullptr;
 	
 	if (HoveredItemInstance)
 	{
@@ -30,35 +30,77 @@ void UD1ItemHoversWidget::RefreshUI(const UD1ItemInstance* HoveredItemInstance)
 		
 		if (EquipManager && EquipmentManager)
 		{
-			if (const UD1ItemFragment_Equippable* EquippableFragment = HoveredItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
+			if (const UD1ItemFragment_Equippable* HoveredEquippableFragment = HoveredItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
 			{
-				UD1ItemInstance* EquippedItemInstance = nullptr;
-				
-				if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
+				if (HoveredEquippableFragment->EquipmentType == EEquipmentType::Weapon)
 				{
-					const UD1ItemFragment_Equippable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(EquippableFragment);
-					EquippedItemInstance = EquipManager->GetEquippedWeaponItemInstance(WeaponFragment->WeaponHandType);
-					if (EquippedItemInstance && EquippedItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>()->WeaponType == EWeaponType::Unarmed)
+					const UD1ItemFragment_Equippable_Weapon* HoveredWeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(HoveredEquippableFragment);
+
+					UD1ItemInstance* BestPickItemInstance = nullptr;
+					UD1ItemInstance* SecondPickItemInstance = nullptr;
+					
+					TArray<UD1ItemInstance*> WeaponItemInstances;
+					EquipManager->GetAllEquippedWeaponItemInstances(WeaponItemInstances);
+
+					for (UD1ItemInstance* WeaponItemInstance : WeaponItemInstances)
 					{
-						EquippedItemInstance = nullptr;
+						const UD1ItemFragment_Equippable_Weapon* EquippedWeaponFragment = WeaponItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+						if (HoveredWeaponFragment->WeaponType == EquippedWeaponFragment->WeaponType)
+						{
+							if (HoveredWeaponFragment->WeaponHandType == EquippedWeaponFragment->WeaponHandType)
+							{
+								BestPickItemInstance = WeaponItemInstance;
+								break;
+							}
+
+							if (SecondPickItemInstance == nullptr)
+							{
+								SecondPickItemInstance = WeaponItemInstance;
+							}
+						}
 					}
+
+					if (BestPickItemInstance == nullptr)
+					{
+						EquipmentManager->GetAllWeaponItemInstances(WeaponItemInstances);
+
+						for (UD1ItemInstance* WeaponItemInstance : WeaponItemInstances)
+						{
+							const UD1ItemFragment_Equippable_Weapon* EquippedWeaponFragment = WeaponItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+							if (HoveredWeaponFragment->WeaponType == EquippedWeaponFragment->WeaponType)
+							{
+								if (HoveredWeaponFragment->WeaponHandType == EquippedWeaponFragment->WeaponHandType)
+								{
+									BestPickItemInstance = WeaponItemInstance;
+									break;
+								}
+							
+								if (SecondPickItemInstance == nullptr)
+								{
+									SecondPickItemInstance = WeaponItemInstance;
+								}
+							}
+						}
+					}
+
+					SelectedItemInstance = (BestPickItemInstance ? BestPickItemInstance : SecondPickItemInstance);
 				}
-				else if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
+				else if (HoveredEquippableFragment->EquipmentType == EEquipmentType::Armor)
 				{
-					const UD1ItemFragment_Equippable_Armor* ArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(EquippableFragment);
-					EquippedItemInstance = EquipmentManager->GetItemInstance(UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorFragment->ArmorType));
+					const UD1ItemFragment_Equippable_Armor* HoveredArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(HoveredEquippableFragment);
+					SelectedItemInstance = EquipmentManager->GetItemInstance(UD1EquipManagerComponent::ConvertToEquipmentSlotType(HoveredArmorFragment->ArmorType));
 				}
 
-				if (HoveredItemInstance != EquippedItemInstance)
+				if (HoveredItemInstance == SelectedItemInstance)
 				{
-					CompareItemInstance = EquippedItemInstance;
+					SelectedItemInstance = nullptr;
 				}
 			}
 		}
 	}
 
 	HoverWidget_Left->RefreshUI(HoveredItemInstance);
-	HoverWidget_Right->RefreshUI(CompareItemInstance);
+	HoverWidget_Right->RefreshUI(SelectedItemInstance);
 }
 
 void UD1ItemHoversWidget::SetPosition(const FVector2D& AbsolutePosition)
@@ -84,16 +126,6 @@ void UD1ItemHoversWidget::SetPosition(const FVector2D& AbsolutePosition)
 	{
 		HoverWidgetStartPos.Y -= OutSize.Y;
 	}
-	//
-	// if (HoverWidgetEndPos.X > CanvasWidgetSize.X)
-	// {
-	// 	HoverWidgetStartPos.X = MouseWidgetPos.X - (Margin.X + HoversWidgetSize.X);
-	// }
-	//
-	// if (HoverWidgetEndPos.Y > CanvasWidgetSize.Y)
-	// {
-	// 	HoverWidgetStartPos.Y = MouseWidgetPos.Y - (Margin.Y + HoversWidgetSize.Y);
-	// }
 		
 	if (UCanvasPanelSlot* CanvasPanelSlot = Cast<UCanvasPanelSlot>(HorizontalBox_Hovers->Slot))
 	{

@@ -2,6 +2,7 @@
 
 #include "D1CheatEntryWidget.h"
 #include "D1CheatListWidget.h"
+#include "Components/Button.h"
 #include "Data/D1CheatData.h"
 #include "Item/D1ItemTemplate.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
@@ -21,6 +22,7 @@ void UD1CheatMenuWidget::NativeOnInitialized()
 	Super::NativeOnInitialized();
 
 	CheatEntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1CheatEntryWidget>("CheatEntryWidgetClass");
+	Button_Exit->OnClicked.AddUniqueDynamic(this, &ThisClass::OnExitButtonClicked);
 }
 
 void UD1CheatMenuWidget::NativeConstruct()
@@ -68,4 +70,9 @@ void UD1CheatMenuWidget::NativeConstruct()
 		CheatEntryWidget->InitializeUI(ED1CheatEntryType::Animation, nullptr, AnimMontagePath);
 		CheatList_Animation->AddEntry(CheatEntryWidget);
 	}
+}
+
+void UD1CheatMenuWidget::OnExitButtonClicked()
+{
+	DeactivateWidget();
 }

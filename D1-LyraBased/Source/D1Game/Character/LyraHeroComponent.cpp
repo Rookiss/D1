@@ -492,14 +492,14 @@ void ULyraHeroComponent::Input_ChangeEquip_Secondary()
 void ULyraHeroComponent::Input_ChangeEquip_Tertiary()
 {
 	FGameplayEventData Payload;
-	Payload.EventMagnitude = (int32)EWeaponEquipState::Tertiary;
+	// Payload.EventMagnitude = (int32)EWeaponEquipState::Tertiary;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), D1GameplayTags::GameplayEvent_ChangeEquip, Payload);
 }
 
 void ULyraHeroComponent::Input_ChangeEquip_Quaternary()
 {
 	FGameplayEventData Payload;
-	Payload.EventMagnitude = (int32)EWeaponEquipState::Quaternary;
+	// Payload.EventMagnitude = (int32)EWeaponEquipState::Quaternary;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), D1GameplayTags::GameplayEvent_ChangeEquip, Payload);
 }
 

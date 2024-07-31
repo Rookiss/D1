@@ -24,7 +24,7 @@ public:
 	void DestroyActor();
 
 protected:
-	virtual void InitializeSpawningActor(AActor* InSpawningActor);
+	virtual void InitializeSpawningActor(AActor* InSpawningActor) { }
 	
 public:
 	UPROPERTY(EditDefaultsOnly)

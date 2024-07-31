@@ -157,6 +157,7 @@ public:
 	static EWeaponHandType ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType);
 	static EArmorType ConvertToArmorType(EEquipmentSlotType EquipmentSlotType);
 	static EWeaponEquipState ConvertToWeaponEquipState(EWeaponSlotType WeaponSlotType);
+	static EWeaponSlotType ConvertToWeaponSlotType(EEquipmentSlotType EquipmentSlotType);
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeShouldHiddenWeapons(bool bNewShouldHiddenWeapons);
@@ -175,9 +176,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UD1ItemInstance* GetEquippedWeaponItemInstance(EWeaponHandType WeaponHandType) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	void GetAllEquippedWeaponItemInstances(TArray<UD1ItemInstance*>& OutItemInstances) const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	AD1WeaponBase* GetFirstEquippedWeapon() const;
+	AD1WeaponBase* GetFirstEquippedWeaponActor() const;
 	
 private:
 	UPROPERTY(Replicated)

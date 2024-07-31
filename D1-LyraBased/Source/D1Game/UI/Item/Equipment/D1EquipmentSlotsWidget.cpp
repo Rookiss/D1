@@ -2,6 +2,7 @@
 
 #include "D1EquipmentSlotArmorWidget.h"
 #include "D1EquipmentSlotWeaponWidget.h"
+#include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentSlotsWidget)
@@ -96,26 +97,24 @@ void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged(EEquipmentSlotType Equipme
 {
 	if (EquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || EquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || EquipmentSlotType == EEquipmentSlotType::Count)
 		return;
-	
-	const int32 EquipmentSlotIndex = (int32)EquipmentSlotType;
-	const int32 WeaponSlotCount = (int32)EWeaponSlotType::Count * (int32)EWeaponHandType::Count;
-	const int32 ArmorStartIndex = WeaponSlotCount + (int32)EEquipmentSlotType::Primary_LeftHand;
-	
-	if (EquipmentSlotIndex < ArmorStartIndex)
-	{
-		const int32 ZeroBasedIndex = EquipmentSlotIndex - (int32)EEquipmentSlotType::Primary_LeftHand;
-		const int32 WeaponSlotIndex = ZeroBasedIndex / (int32)EWeaponHandType::Count;
-		const int32 WeaponHandIndex = ZeroBasedIndex % (int32)EWeaponHandType::Count;
 
+	if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType))
+	{
+		int32 WeaponSlotIndex = (int32)UD1EquipManagerComponent::ConvertToWeaponSlotType(EquipmentSlotType);
 		if (SlotWeaponWidgets.IsValidIndex(WeaponSlotIndex))
 		{
 			UD1EquipmentSlotWeaponWidget* SlotWeaponWidget = SlotWeaponWidgets[WeaponSlotIndex];
-			SlotWeaponWidget->OnEquipmentEntryChanged((EWeaponHandType)WeaponHandIndex, ItemInstance);
+			EWeaponHandType WeaponHandType = UD1EquipManagerComponent::ConvertToWeaponHandType(EquipmentSlotType);
+			SlotWeaponWidget->OnEquipmentEntryChanged(WeaponHandType, ItemInstance);
 		}
 	}
-	else
+	else if (UD1EquipmentManagerComponent::IsArmorSlot(EquipmentSlotType))
 	{
-		UD1EquipmentSlotArmorWidget* SlotArmorWidget = SlotArmorWidgets[EquipmentSlotIndex - ArmorStartIndex];
-		SlotArmorWidget->OnEquipmentEntryChanged(ItemInstance);
+		int32 ArmorSlotIndex = (int32)UD1EquipManagerComponent::ConvertToArmorType(EquipmentSlotType);
+		if (SlotArmorWidgets.IsValidIndex(ArmorSlotIndex))
+		{
+			UD1EquipmentSlotArmorWidget* SlotArmorWidget = SlotArmorWidgets[ArmorSlotIndex];
+			SlotArmorWidget->OnEquipmentEntryChanged(ItemInstance);
+		}
 	}
 }

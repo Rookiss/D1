@@ -2,6 +2,9 @@
 
 #include "D1EquipmentManagerComponent.h"
 #include "D1InventoryManagerComponent.h"
+#include "NavigationSystem.h"
+#include "Actors/D1PickupableItemBase.h"
+#include "Interaction/D1WorldPickupable.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
 
@@ -227,6 +230,98 @@ void UD1ItemManagerComponent::Server_MoveQuickFromEquipment_Implementation(UD1Eq
 			}
 		}
 	}
+}
+
+void UD1ItemManagerComponent::Server_DropItemFromInventory_Implementation(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos)
+{
+	if (HasAuthority() == false)
+		return;
+
+	if (FromInventoryManager == nullptr)
+		return;
+
+	if (IsAllowedComponent(FromInventoryManager) == false)
+		return;
+
+	UD1ItemInstance* FromItemInstance = FromInventoryManager->GetItemInstance(FromItemSlotPos);
+	if (FromItemInstance == nullptr)
+		return;
+
+	int32 FromItemCount = FromInventoryManager->GetItemCount(FromItemSlotPos);
+	if (FromItemCount <= 0)
+		return;
+	
+	if (DropItem(FromItemInstance, FromItemCount))
+	{
+		FromInventoryManager->RemoveItem(FromItemSlotPos, FromItemCount);
+	}
+}
+
+void UD1ItemManagerComponent::Server_DropItemFromEquipment_Implementation(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType)
+{
+	if (HasAuthority() == false)
+		return;
+	
+	if (FromEquipmentManager == nullptr || FromEquipmentSlotType == EEquipmentSlotType::Count)
+		return;
+
+	if (IsAllowedComponent(FromEquipmentManager) == false)
+		return;
+
+	UD1ItemInstance* FromItemInstance = FromEquipmentManager->GetItemInstance(FromEquipmentSlotType);
+	if (FromItemInstance == nullptr)
+		return;
+	
+	if (DropItem(FromItemInstance, 1))
+	{
+		FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
+	}
+}
+
+void UD1ItemManagerComponent::Server_PickItemFromWorld_Implementation(AD1WorldPickupable* PickedItemActor)
+{
+	if (HasAuthority() == false)
+		return;
+
+	if (PickedItemActor == nullptr)
+		return;
+}
+
+bool UD1ItemManagerComponent::DropItem(UD1ItemInstance* FromItemInstance, int32 FromItemCount)
+{
+	if (HasAuthority() == false)
+		return false;
+
+	if (FromItemInstance == nullptr || FromItemCount <= 0)
+		return false;
+
+	APawn* Pawn = nullptr;
+	if (AController* Controller = Cast<AController>(GetOwner()))
+	{
+		Pawn = Controller->GetPawn();
+	}
+
+	if (Pawn == nullptr)
+		return false;
+
+	UNavigationSystemV1* NavigationSystem = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+	if (NavigationSystem == nullptr)
+		return false;
+	
+	FNavLocation NavLocation;
+	if (NavigationSystem->GetRandomReachablePointInRadius(Pawn->GetActorLocation() + Pawn->GetActorForwardVector() * 200.f, 100.f, NavLocation) == false)
+	{
+		if (NavigationSystem->GetRandomReachablePointInRadius(Pawn->GetActorLocation(), 200.f, NavLocation) == false)
+			return false;
+	}
+	
+	FVector SpawnLocation = NavLocation.Location;
+	FRotator SpawnRotation = Pawn->GetActorForwardVector().Rotation();
+	
+	AD1PickupableItemBase* PickupableItemActor = GetWorld()->SpawnActor<AD1PickupableItemBase>(AD1PickupableItemBase::StaticClass(), SpawnLocation, SpawnRotation);
+	PickupableItemActor->InitializeActor(FromItemInstance, FromItemCount);
+
+	return true;
 }
 
 void UD1ItemManagerComponent::AddAllowedComponent(UActorComponent* ActorComponent)

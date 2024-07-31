@@ -761,6 +761,18 @@ UD1ItemInstance* UD1InventoryManagerComponent::GetItemInstance(const FIntPoint& 
 	return Entry.GetItemInstance();
 }
 
+int32 UD1InventoryManagerComponent::GetItemCount(const FIntPoint& ItemSlotPos) const
+{
+	if (ItemSlotPos.X < 0 || ItemSlotPos.Y < 0 || ItemSlotPos.X >= InventorySlotCount.X || ItemSlotPos.Y >= InventorySlotCount.Y)
+		return 0;
+	
+	const TArray<FD1InventoryEntry>& Entries = InventoryList.GetAllEntries();
+	const int32 EntryIndex = ItemSlotPos.Y * InventorySlotCount.X + ItemSlotPos.X;
+	const FD1InventoryEntry& Entry = Entries[EntryIndex];
+	
+	return Entry.GetItemCount();
+}
+
 void UD1InventoryManagerComponent::MarkSlotChecks(TArray<TArray<bool>>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const
 {
 	if (ItemSlotPos.X < 0 || ItemSlotPos.Y < 0)

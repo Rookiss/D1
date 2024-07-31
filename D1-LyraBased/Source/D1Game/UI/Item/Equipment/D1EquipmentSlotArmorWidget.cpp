@@ -92,13 +92,13 @@ bool UD1EquipmentSlotArmorWidget::NativeOnDrop(const FGeometry& InGeometry, cons
 
 	CleanUpDrag();
 
-	UD1ItemDragDrop* DragDrop = Cast<UD1ItemDragDrop>(InOperation);
-	check(DragDrop);
+	UD1ItemDragDrop* ItemDragDrop = Cast<UD1ItemDragDrop>(InOperation);
+	check(ItemDragDrop);
 
-	UD1ItemEntryWidget* FromEntryWidget = DragDrop->FromEntryWidget;
+	UD1ItemEntryWidget* FromEntryWidget = ItemDragDrop->FromEntryWidget;
     FromEntryWidget->RefreshWidgetOpacity(true);
 
-	UD1ItemInstance* FromItemInstance = DragDrop->FromItemInstance;
+	UD1ItemInstance* FromItemInstance = ItemDragDrop->FromItemInstance;
 	check(FromItemInstance);
 
 	UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
@@ -108,13 +108,13 @@ bool UD1EquipmentSlotArmorWidget::NativeOnDrop(const FGeometry& InGeometry, cons
 	{
 		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType);
 	
-		if (UD1InventoryManagerComponent* FromInventoryManager = DragDrop->FromInventoryManager)
+		if (UD1InventoryManagerComponent* FromInventoryManager = ItemDragDrop->FromInventoryManager)
 		{
-			ItemManager->Server_InventoryToEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, EquipmentManager, ToEquipmentSlotType);
+			ItemManager->Server_InventoryToEquipment(FromInventoryManager, ItemDragDrop->FromItemSlotPos, EquipmentManager, ToEquipmentSlotType);
 		}
-		else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
+		else if (UD1EquipmentManagerComponent* FromEquipmentManager = ItemDragDrop->FromEquipmentManager)
 		{
-			ItemManager->Server_EquipmentToEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, EquipmentManager, ToEquipmentSlotType);
+			ItemManager->Server_EquipmentToEquipment(FromEquipmentManager, ItemDragDrop->FromEquipmentSlotType, EquipmentManager, ToEquipmentSlotType);
 		}
 	}
 	return true;

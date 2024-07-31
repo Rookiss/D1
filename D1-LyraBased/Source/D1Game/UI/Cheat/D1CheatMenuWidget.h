@@ -3,6 +3,7 @@
 #include "UI/D1ActivatableWidget.h"
 #include "D1CheatMenuWidget.generated.h"
 
+class UButton;
 class UD1CheatEntryWidget;
 class UD1CheatListWidget;
 
@@ -17,6 +18,10 @@ public:
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
+	
+private:
+	UFUNCTION()
+	void OnExitButtonClicked();
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
@@ -34,4 +39,7 @@ protected:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UD1CheatListWidget> CheatList_Animation;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UButton> Button_Exit;
 };

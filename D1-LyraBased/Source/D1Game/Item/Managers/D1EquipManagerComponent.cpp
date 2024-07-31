@@ -527,7 +527,8 @@ bool UD1EquipManagerComponent::CanChangeWeaponEquipState(EWeaponEquipState NewWe
 		return true;
 	
 	UD1EquipmentManagerComponent* EquipmentManager = GetEquipmentManagerComponent();
-	check(EquipmentManager);
+	if (EquipmentManager == nullptr)
+		return false;
 	
 	return (EquipmentManager->IsAllEmpty(NewWeaponEquipState) == false);
 }
@@ -567,7 +568,25 @@ UD1ItemInstance* UD1EquipManagerComponent::GetEquippedWeaponItemInstance(EWeapon
 	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].GetItemInstance() : nullptr;
 }
 
-AD1WeaponBase* UD1EquipManagerComponent::GetFirstEquippedWeapon() const
+void UD1EquipManagerComponent::GetAllEquippedWeaponItemInstances(TArray<UD1ItemInstance*>& OutItemInstances) const
+{
+	OutItemInstances.Reset();
+
+	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	for (int32 i = 0; i < (int32)EWeaponHandType::Count; i++)
+	{
+		int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentWeaponEquipState);
+		if (Entries.IsValidIndex(EntryIndex))
+		{
+			if (UD1ItemInstance* ItemInstance = Entries[EntryIndex].GetItemInstance())
+			{
+				OutItemInstances.Add(ItemInstance);
+			}
+		}
+	}
+}
+
+AD1WeaponBase* UD1EquipManagerComponent::GetFirstEquippedWeaponActor() const
 {
 	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
 	
@@ -662,24 +681,6 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Secondary_TwoHand;   break;
 		}
 	}
-	else if (WeaponEquipState == EWeaponEquipState::Tertiary)
-	{
-		switch (WeaponHandType)
-		{
-		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Tertiary_LeftHand;  break;
-		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Tertiary_RightHand; break;
-		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Tertiary_TwoHand;   break;
-		}
-	}
-	else if (WeaponEquipState == EWeaponEquipState::Quaternary)
-	{
-		switch (WeaponHandType)
-		{
-		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Quaternary_LeftHand;  break;
-		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Quaternary_RightHand; break;
-		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Quaternary_TwoHand;   break;
-		}
-	}
 	
 	return EquipmentSlotType;
 }
@@ -704,24 +705,6 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Secondary_LeftHand;  break;
 		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Secondary_RightHand; break;
 		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Secondary_TwoHand;   break;
-		}
-	}
-	else if (WeaponSlotType == EWeaponSlotType::Tertiary)
-	{
-		switch (WeaponHandType)
-		{
-		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Tertiary_LeftHand;  break;
-		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Tertiary_RightHand; break;
-		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Tertiary_TwoHand;   break;
-		}
-	}
-	else if (WeaponSlotType == EWeaponSlotType::Quaternary)
-	{
-		switch (WeaponHandType)
-		{
-		case EWeaponHandType::LeftHand:  EquipmentSlotType = EEquipmentSlotType::Quaternary_LeftHand;  break;
-		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Quaternary_RightHand; break;
-		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Quaternary_TwoHand;   break;
 		}
 	}
 	
@@ -753,21 +736,15 @@ EWeaponHandType UD1EquipManagerComponent::ConvertToWeaponHandType(EEquipmentSlot
 	case EEquipmentSlotType::Unarmed_LeftHand:
 	case EEquipmentSlotType::Primary_LeftHand:
 	case EEquipmentSlotType::Secondary_LeftHand:
-	case EEquipmentSlotType::Tertiary_LeftHand:
-	case EEquipmentSlotType::Quaternary_LeftHand:
 		WeaponHandType = EWeaponHandType::LeftHand;
 		break;
 	case EEquipmentSlotType::Unarmed_RightHand:
 	case EEquipmentSlotType::Primary_RightHand:
 	case EEquipmentSlotType::Secondary_RightHand:
-	case EEquipmentSlotType::Tertiary_RightHand:
-	case EEquipmentSlotType::Quaternary_RightHand:
 		WeaponHandType = EWeaponHandType::RightHand;
 		break;
 	case EEquipmentSlotType::Primary_TwoHand:
 	case EEquipmentSlotType::Secondary_TwoHand:
-	case EEquipmentSlotType::Tertiary_TwoHand:
-	case EEquipmentSlotType::Quaternary_TwoHand:
 		WeaponHandType = EWeaponHandType::TwoHand;
 		break;
 	}
@@ -799,11 +776,30 @@ EWeaponEquipState UD1EquipManagerComponent::ConvertToWeaponEquipState(EWeaponSlo
 	{
 	case EWeaponSlotType::Primary:		WeaponEquipState = EWeaponEquipState::Primary;		break;
 	case EWeaponSlotType::Secondary:	WeaponEquipState = EWeaponEquipState::Secondary;	break;
-	case EWeaponSlotType::Tertiary:		WeaponEquipState = EWeaponEquipState::Tertiary;		break;
-	case EWeaponSlotType::Quaternary:	WeaponEquipState = EWeaponEquipState::Quaternary;	break;
 	}
 
 	return WeaponEquipState;
+}
+
+EWeaponSlotType UD1EquipManagerComponent::ConvertToWeaponSlotType(EEquipmentSlotType EquipmentSlotType)
+{
+	EWeaponSlotType WeaponSlotType = EWeaponSlotType::Count;
+
+	switch (EquipmentSlotType)
+	{
+	case EEquipmentSlotType::Primary_LeftHand:
+	case EEquipmentSlotType::Primary_RightHand:
+	case EEquipmentSlotType::Primary_TwoHand:
+		WeaponSlotType = EWeaponSlotType::Primary;
+		break;
+	case EEquipmentSlotType::Secondary_LeftHand:
+	case EEquipmentSlotType::Secondary_RightHand:
+	case EEquipmentSlotType::Secondary_TwoHand:
+		WeaponSlotType = EWeaponSlotType::Secondary;
+		break;
+	}
+
+	return WeaponSlotType;
 }
 
 void UD1EquipManagerComponent::ChangeShouldHiddenWeapons(bool bNewShouldHiddenWeapons)

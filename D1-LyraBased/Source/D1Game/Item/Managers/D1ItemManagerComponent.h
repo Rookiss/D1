@@ -3,6 +3,8 @@
 #include "Components/ControllerComponent.h"
 #include "D1ItemManagerComponent.generated.h"
 
+class UD1ItemInstance;
+class AD1WorldPickupable;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
@@ -34,6 +36,19 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_MoveQuickFromEquipment(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType);
 
+public:
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_DropItemFromInventory(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_DropItemFromEquipment(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType);
+	
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_PickItemFromWorld(AD1WorldPickupable* PickedItemActor);
+
+private:
+	bool DropItem(UD1ItemInstance* FromItemInstance, int32 FromItemCount);
+	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void AddAllowedComponent(UActorComponent* ActorComponent);

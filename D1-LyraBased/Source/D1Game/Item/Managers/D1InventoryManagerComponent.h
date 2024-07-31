@@ -133,6 +133,8 @@ public:
 	
 public:
 	UD1ItemInstance* GetItemInstance(const FIntPoint& ItemSlotPos) const;
+	int32 GetItemCount(const FIntPoint& ItemSlotPos) const;
+	
 	const TArray<FD1InventoryEntry>& GetAllEntries() const;
 	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
 	TArray<TArray<bool>>& GetSlotChecks() { return SlotChecks; }

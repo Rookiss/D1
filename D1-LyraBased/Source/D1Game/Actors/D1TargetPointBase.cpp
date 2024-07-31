@@ -21,11 +21,6 @@ AActor* AD1TargetPointBase::SpawnActor()
 	return SpawningActor;
 }
 
-void AD1TargetPointBase::InitializeSpawningActor(AActor* InSpawningActor)
-{
-	
-}
-
 void AD1TargetPointBase::DestroyActor()
 {
 	if (HasAuthority() == false)
