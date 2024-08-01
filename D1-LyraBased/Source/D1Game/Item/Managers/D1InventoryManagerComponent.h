@@ -25,7 +25,7 @@ private:
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
 	int32 GetItemCount() const { return ItemCount; }
-
+	
 private:
 	friend struct FD1InventoryList;
 	friend class UD1InventoryManagerComponent;
@@ -36,9 +36,6 @@ private:
 
 	UPROPERTY()
 	int32 ItemCount = 0;
-
-	UPROPERTY()
-	int32 LastValidTemplateID = 0;
 };
 
 USTRUCT(BlueprintType)
@@ -123,11 +120,11 @@ private:
 	UD1ItemInstance* RemoveItem(const FIntPoint& ItemSlotPos, int32 ItemCount);
 	
 public:
-	void MarkSlotChecks(TArray<TArray<bool>>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
+	void MarkSlotChecks(TArray<bool>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
 	void MarkSlotChecks(bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount);
 	
 public:
-	bool IsEmpty(const TArray<TArray<bool>>& InSlotChecks, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
+	bool IsEmpty(const TArray<bool>& InSlotChecks, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
 	bool IsEmpty(const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const;
 	bool IsAllEmpty();
 	
@@ -137,7 +134,7 @@ public:
 	
 	const TArray<FD1InventoryEntry>& GetAllEntries() const;
 	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
-	TArray<TArray<bool>>& GetSlotChecks() { return SlotChecks; }
+	TArray<bool>& GetSlotChecks() { return SlotChecks; }
 	int32 GetTotalCountByID(int32 ItemTemplateID) const;
 
 public:
@@ -150,6 +147,8 @@ private:
 	UPROPERTY(Replicated)
 	FD1InventoryList InventoryList;
 	
+	UPROPERTY(Replicated)
+	TArray<bool> SlotChecks;
+	
 	FIntPoint InventorySlotCount = FIntPoint(8, 5);
-	TArray<TArray<bool>> SlotChecks;
 };

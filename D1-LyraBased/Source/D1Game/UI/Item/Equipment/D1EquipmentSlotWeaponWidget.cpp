@@ -78,11 +78,11 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry,
 	
 		if (UD1InventoryManagerComponent* FromInventoryManager = DragDrop->FromInventoryManager)
 		{
-			bIsValid = EquipmentManager->CanAddEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
+			bIsValid = EquipmentManager->CanMoveEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
 		}
 		else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
 		{
-			bIsValid = EquipmentManager->CanAddEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+			bIsValid = EquipmentManager->CanMoveEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
 		}
 	}
 	

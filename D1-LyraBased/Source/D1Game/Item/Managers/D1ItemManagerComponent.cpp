@@ -4,7 +4,6 @@
 #include "D1InventoryManagerComponent.h"
 #include "NavigationSystem.h"
 #include "Actors/D1PickupableItemBase.h"
-#include "Interaction/D1WorldPickupable.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
 
@@ -27,10 +26,21 @@ void UD1ItemManagerComponent::Server_InventoryToEquipment_Implementation(UD1Inve
 	if (IsAllowedComponent(FromInventoryManager) == false ||  IsAllowedComponent(ToEquipmentManager) == false)
 		return;
 	
-	if (ToEquipmentManager->CanAddEquipment(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
+	if (ToEquipmentManager->CanMoveEquipment(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
 	{
 		UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
 		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
+	}
+	else
+	{
+		FIntPoint ToItemSlotPos;
+		if (ToEquipmentManager->CanSwapEquipment(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType, ToItemSlotPos))
+		{
+			UD1ItemInstance* RemovedItemInstanceTo = ToEquipmentManager->RemoveEquipment(ToEquipmentSlotType);
+			UD1ItemInstance* RemovedItemInstanceFrom = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
+			ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstanceFrom);
+			FromInventoryManager->AddItem(ToItemSlotPos, RemovedItemInstanceTo, 1);
+		}
 	}
 }
 
@@ -82,14 +92,14 @@ void UD1ItemManagerComponent::Server_EquipmentToEquipment_Implementation(UD1Equi
 	if (IsAllowedComponent(FromEquipmentManager) == false ||  IsAllowedComponent(ToEquipmentManager) == false)
 		return;
 	
-	if (ToEquipmentManager->CanAddEquipment(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
+	if (ToEquipmentManager->CanMoveEquipment(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
 	{
 		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
 		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
 	}
 }
 
-void UD1ItemManagerComponent::Server_MoveQuickFromInventory_Implementation(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos)
+void UD1ItemManagerComponent::Server_QuickFromInventory_Implementation(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos)
 {
 	if (HasAuthority() == false)
 		return;
@@ -119,7 +129,7 @@ void UD1ItemManagerComponent::Server_MoveQuickFromInventory_Implementation(UD1In
 		// 1-2. [다른 인벤토리] -> 내 장비 장착 -> 내 인벤토리 -> 내 장비 교체
 	
 		EEquipmentSlotType ToEquipmentSlotType;
-		if (MyEquipmentManager->CanAddEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
+		if (MyEquipmentManager->CanMoveEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
 		{
 			UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
 			MyEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
@@ -141,13 +151,14 @@ void UD1ItemManagerComponent::Server_MoveQuickFromInventory_Implementation(UD1In
 					return;
 				}
 			}
-		
-			if (MyEquipmentManager->CanAddEquipment_Swap(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
+
+			FIntPoint ToItemSlotPos;
+			if (MyEquipmentManager->CanSwapEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType, ToItemSlotPos))
 			{
 				UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment(ToEquipmentSlotType);
 				UD1ItemInstance* RemovedItemInstanceFrom = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
 				MyEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstanceFrom);
-				FromInventoryManager->AddItem(FromItemSlotPos, RemovedItemInstanceTo, 1);
+				FromInventoryManager->AddItem(ToItemSlotPos, RemovedItemInstanceTo, 1);
 			}
 		}
 	}
@@ -174,7 +185,7 @@ void UD1ItemManagerComponent::Server_MoveQuickFromInventory_Implementation(UD1In
 	}
 }
 
-void UD1ItemManagerComponent::Server_MoveQuickFromEquipment_Implementation(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType)
+void UD1ItemManagerComponent::Server_QuickFromEquipment_Implementation(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType)
 {
 	if (HasAuthority() == false)
 		return;
@@ -208,7 +219,7 @@ void UD1ItemManagerComponent::Server_MoveQuickFromEquipment_Implementation(UD1Eq
 	else
 	{
 		EEquipmentSlotType ToEquipmentSlotType;
-		if (MyEquipmentManager->CanAddEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
+		if (MyEquipmentManager->CanMoveEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
 		{
 			UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
 			MyEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
@@ -221,12 +232,15 @@ void UD1ItemManagerComponent::Server_MoveQuickFromEquipment_Implementation(UD1Eq
 				UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
 				MyInventoryManager->AddItem(OutToItemSlotPos, RemovedItemInstance, 1);
 			}
-			else if (MyEquipmentManager->CanAddEquipment_Swap(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
+			else
 			{
-				UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment(ToEquipmentSlotType);
-				UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
-				MyEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstanceFrom);
-				FromEquipmentManager->AddEquipment(FromEquipmentSlotType, RemovedItemInstanceTo);
+				if (MyEquipmentManager->CanSwapEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
+				{
+					UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment(ToEquipmentSlotType);
+					UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
+					MyEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstanceFrom);
+					FromEquipmentManager->AddEquipment(FromEquipmentSlotType, RemovedItemInstanceTo);
+				}
 			}
 		}
 	}

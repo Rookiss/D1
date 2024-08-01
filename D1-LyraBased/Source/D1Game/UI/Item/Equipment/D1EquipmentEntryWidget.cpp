@@ -56,7 +56,7 @@ FReply UD1EquipmentEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	{
 		if (UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>())
 		{
-			ItemManager->Server_MoveQuickFromEquipment(EquipmentManager, EquipmentSlotType);
+			ItemManager->Server_QuickFromEquipment(EquipmentManager, EquipmentSlotType);
 			return FReply::Handled();
 		}
 	}

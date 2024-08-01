@@ -33,9 +33,6 @@ private:
 	UPROPERTY()
 	TObjectPtr<UD1ItemInstance> ItemInstance;
 
-	UPROPERTY()
-	int32 LastValidTemplateID = 0;
-
 private:
 	UPROPERTY(NotReplicated)
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
@@ -105,15 +102,19 @@ protected:
 	virtual void ReadyForReplication() override;
 	
 public:
-	bool CanAddEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const;
-	bool CanAddEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
-	bool CanAddEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const;
-	bool CanAddEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType) const;
-	bool CanAddEquipment_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType) const;
-	bool CanAddEquipment_Quick(UD1ItemInstance* FromItemInstance, EEquipmentSlotType& OutToEquipmentSlotType) const;
-	bool CanAddEquipment_Swap(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType) const;
-	bool CanAddEquipment_Swap(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType) const;
-	bool CanAddEquipment_Swap(UD1ItemInstance* FromItemInstance, EEquipmentSlotType& OutToEquipmentSlotType) const;
+	bool CanMoveEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType);
+	bool CanMoveEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType);
+	bool CanMoveEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType);
+	
+	bool CanMoveEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType);
+	bool CanMoveEquipment_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType);
+	bool CanMoveEquipment_Quick(UD1ItemInstance* FromItemInstance, EEquipmentSlotType& OutToEquipmentSlotType);
+
+	bool CanSwapEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType, FIntPoint& OutToItemSlotPos);
+	bool CanSwapEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType);
+	
+	bool CanSwapEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType, FIntPoint& OutToItemSlotPos);
+	bool CanSwapEquipment_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType);
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)

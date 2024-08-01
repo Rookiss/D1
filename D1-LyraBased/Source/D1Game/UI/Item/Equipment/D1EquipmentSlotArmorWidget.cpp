@@ -63,16 +63,30 @@ bool UD1EquipmentSlotArmorWidget::NativeOnDragOver(const FGeometry& InGeometry, 
 	check(FromItemInstance);
 	
 	bool bIsValid = false;
-
 	EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType);
-		
+	
 	if (UD1InventoryManagerComponent* FromInventoryManager = DragDrop->FromInventoryManager)
 	{
-		bIsValid = EquipmentManager->CanAddEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
+		if (EquipmentManager->GetItemInstance(ToEquipmentSlotType))
+		{
+			FIntPoint OutToItemSlotPos;
+			bIsValid = EquipmentManager->CanSwapEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType, OutToItemSlotPos);
+		}
+		else
+		{
+			bIsValid = EquipmentManager->CanMoveEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
+		}
 	}
 	else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
 	{
-		bIsValid = EquipmentManager->CanAddEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+		if (EquipmentManager->GetItemInstance(ToEquipmentSlotType))
+		{
+			bIsValid = EquipmentManager->CanSwapEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+		}
+		else
+		{
+			bIsValid = EquipmentManager->CanMoveEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+		}
 	}
 	
 	ChangeHoverState(Image_Slot, bIsValid ? ESlotState::Valid : ESlotState::Invalid);

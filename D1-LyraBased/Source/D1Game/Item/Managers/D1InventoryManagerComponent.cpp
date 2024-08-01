@@ -13,7 +13,7 @@
 UD1ItemInstance* FD1InventoryEntry::Init(int32 InItemTemplateID, int32 InItemCount, EItemRarity InItemRarity)
 {
 	check(InItemTemplateID > 0 && InItemCount > 0 && InItemRarity != EItemRarity::Count);
-
+	
 	UD1ItemInstance* NewItemInstance = NewObject<UD1ItemInstance>();
 	NewItemInstance->Init(InItemTemplateID, InItemRarity);
 	Init(NewItemInstance, InItemCount);
@@ -29,8 +29,6 @@ void FD1InventoryEntry::Init(UD1ItemInstance* InItemInstance, int32 InItemCount)
 	
 	const UD1ItemFragment_Stackable* StackableFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Stackable>();
 	ItemCount = StackableFragment ? FMath::Clamp(InItemCount, 1, StackableFragment->MaxStackCount) : 1;
-	
-	LastValidTemplateID = ItemInstance->GetItemTemplateID();
 }
 
 UD1ItemInstance* FD1InventoryEntry::Reset()
@@ -55,26 +53,21 @@ void FD1InventoryList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, i
 	for (int32 AddedIndex : AddedIndices)
 	{
 		FD1InventoryEntry& Entry = Entries[AddedIndex];
-		if (Entry.ItemInstance == nullptr)
-			continue;
-
-		const int32 ItemTemplateID = Entry.ItemInstance->GetItemTemplateID();
-		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
-		const FIntPoint ItemSlotPos = FIntPoint(AddedIndex % InventorySlotCount.X, AddedIndex / InventorySlotCount.X);
-		const FIntPoint& ItemSlotCount = ItemTemplate.SlotCount;
-
-		InventoryManager->MarkSlotChecks(true, ItemSlotPos, ItemSlotCount);
-		BroadcastChangedMessage(ItemSlotPos, Entry.ItemInstance, Entry.ItemCount);
+		if (Entry.ItemInstance)
+		{
+			const FIntPoint ItemSlotPos = FIntPoint(AddedIndex % InventorySlotCount.X, AddedIndex / InventorySlotCount.X);
+			BroadcastChangedMessage(ItemSlotPos, Entry.ItemInstance, Entry.ItemCount);
+		}
 	}
 }
 
 void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize)
 {
-	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
-
 	TArray<int32> AddedIndices;
 	AddedIndices.Reserve(FinalSize);
 
+	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
+	
 	for (int32 ChangedIndex : ChangedIndices)
 	{
 		FD1InventoryEntry& Entry = Entries[ChangedIndex];
@@ -84,28 +77,15 @@ void FD1InventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 		}
 		else
 		{
-			if (Entry.LastValidTemplateID > 0)
-			{
-				const UD1ItemTemplate& ItemTemplate =  UD1ItemData::Get().FindItemTemplateByID(Entry.LastValidTemplateID);
-				const FIntPoint ItemSlotPos = FIntPoint(ChangedIndex % InventorySlotCount.X, ChangedIndex / InventorySlotCount.X);
-				const FIntPoint& ItemSlotCount = ItemTemplate.SlotCount;
-
-				InventoryManager->MarkSlotChecks(false, ItemSlotPos, ItemSlotCount);
-				BroadcastChangedMessage(ItemSlotPos, nullptr, 0);
-			}
+			const FIntPoint ItemSlotPos = FIntPoint(ChangedIndex % InventorySlotCount.X, ChangedIndex / InventorySlotCount.X);
+			BroadcastChangedMessage(ItemSlotPos, nullptr, Entry.ItemCount);
 		}
 	}
 
 	for (int32 AddedIndex : AddedIndices)
 	{
 		FD1InventoryEntry& Entry = Entries[AddedIndex];
-
-		const int32 ItemTemplateID = Entry.ItemInstance->GetItemTemplateID();
-		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
 		const FIntPoint ItemSlotPos = FIntPoint(AddedIndex % InventorySlotCount.X, AddedIndex / InventorySlotCount.X);
-		const FIntPoint& ItemSlotCount = ItemTemplate.SlotCount;
-
-		InventoryManager->MarkSlotChecks(true, ItemSlotPos, ItemSlotCount);
 		BroadcastChangedMessage(ItemSlotPos, Entry.ItemInstance, Entry.ItemCount);
 	}
 }
@@ -159,7 +139,7 @@ TArray<UD1ItemInstance*> FD1InventoryList::TryAddItem(int32 ItemTemplateID, int3
 	
 	const FIntPoint& ItemSlotCount = ItemTemplate.SlotCount;
 	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
-	TArray<TArray<bool>> TempSlotChecks = InventoryManager->GetSlotChecks();
+	TArray<bool> TempSlotChecks = InventoryManager->GetSlotChecks();
 	
 	const FIntPoint StartSlotPos = FIntPoint::ZeroValue;
 	const FIntPoint EndSlotPos = InventorySlotCount - ItemSlotCount;
@@ -168,7 +148,8 @@ TArray<UD1ItemInstance*> FD1InventoryList::TryAddItem(int32 ItemTemplateID, int3
 	{
 		for (int32 x = StartSlotPos.X; x <= EndSlotPos.X; x++)
 		{
-			if (TempSlotChecks[y][x])
+			int32 Index = y * InventorySlotCount.X + x;
+			if (TempSlotChecks.IsValidIndex(Index) == false || TempSlotChecks[Index])
 				continue;
 
 			FIntPoint ItemSlotPos = FIntPoint(x, y);
@@ -301,12 +282,8 @@ void UD1InventoryManagerComponent::InitializeComponent()
 		{
 			InventoryList.MarkItemDirty(Entry);
 		}
-	}
-	
-	SlotChecks.SetNumZeroed(InventorySlotCount.Y);
-	for (int32 y = 0; y < SlotChecks.Num(); y++)
-	{
-		SlotChecks[y].SetNumZeroed(InventorySlotCount.X);
+
+		SlotChecks.SetNumZeroed(InventorySlotCount.X * InventorySlotCount.Y);
 	}
 }
 
@@ -328,6 +305,7 @@ void UD1InventoryManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, InventoryList);
+	DOREPLIFETIME(ThisClass, SlotChecks);
 }
 
 bool UD1InventoryManagerComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
@@ -416,7 +394,7 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem(UD1InventoryManagerCompon
 
 		if (this == OtherComponent)
 		{
-			TArray<TArray<bool>> TempSlotChecks = SlotChecks;
+			TArray<bool> TempSlotChecks = SlotChecks;
 
 			FIntPoint StartSlotPos = FromItemSlotPos;
 			FIntPoint EndSlotPos = FromItemSlotPos + FromItemSlotCount;
@@ -425,7 +403,11 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem(UD1InventoryManagerCompon
 			{
 				for (int32 x = StartSlotPos.X; x < EndSlotPos.X; x++)
 				{
-					TempSlotChecks[y][x] = false;
+					int32 Index = y * InventorySlotCount.X + x;
+					if (TempSlotChecks.IsValidIndex(Index))
+					{
+						TempSlotChecks[Index] = false;
+					}
 				}
 			}
 			return IsEmpty(TempSlotChecks, ToItemSlotPos, FromItemSlotCount) ? FromItemCount : 0;
@@ -522,7 +504,7 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1InventoryManager
 	}
 
 	const FIntPoint& FromItemSlotCount = FromItemTemplate.SlotCount;
-	TArray<TArray<bool>> TempSlotChecks = SlotChecks;
+	TArray<bool> TempSlotChecks = SlotChecks;
 	
 	const FIntPoint StartSlotPos = FIntPoint::ZeroValue;
 	const FIntPoint EndSlotPos = InventorySlotCount - FromItemSlotCount;
@@ -531,7 +513,8 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1InventoryManager
 	{
 		for (int32 x = StartSlotPos.X; x <= EndSlotPos.X; x++)
 		{
-			if (TempSlotChecks[y][x])
+			int32 Index = y * InventorySlotCount.X + x;
+			if (TempSlotChecks.IsValidIndex(Index) == false || TempSlotChecks[Index])
 				continue;
 
 			FIntPoint ItemSlotPos = FIntPoint(x, y);
@@ -579,7 +562,8 @@ bool UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1EquipmentManagerC
 	{
 		for (int32 x = StartSlotPos.X; x <= EndSlotPos.X; x++)
 		{
-			if (SlotChecks[y][x])
+			int32 Index = y * InventorySlotCount.X + x;
+			if (SlotChecks.IsValidIndex(Index) == false || SlotChecks[Index])
 				continue;
 
 			FIntPoint ItemSlotPos = FIntPoint(x, y);
@@ -712,7 +696,7 @@ int32 UD1InventoryManagerComponent::GetTotalCountByID(int32 ItemTemplateID) cons
 	return InventoryList.GetTotalCountByID(ItemTemplateID);
 }
 
-bool UD1InventoryManagerComponent::IsEmpty(const TArray<TArray<bool>>& InSlotChecks, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const
+bool UD1InventoryManagerComponent::IsEmpty(const TArray<bool>& InSlotChecks, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const
 {
 	if (ItemSlotPos.X < 0 || ItemSlotPos.Y < 0)
 		return false;
@@ -727,7 +711,8 @@ bool UD1InventoryManagerComponent::IsEmpty(const TArray<TArray<bool>>& InSlotChe
 	{
 		for (int32 x = StartSlotPos.X; x < EndSlotPos.X; x++)
 		{
-			if (InSlotChecks[y][x])
+			int32 Index = y * InventorySlotCount.X + x;
+			if (InSlotChecks.IsValidIndex(Index) == false || InSlotChecks[Index])
 				return false;
 		}
 	}
@@ -773,7 +758,7 @@ int32 UD1InventoryManagerComponent::GetItemCount(const FIntPoint& ItemSlotPos) c
 	return Entry.GetItemCount();
 }
 
-void UD1InventoryManagerComponent::MarkSlotChecks(TArray<TArray<bool>>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const
+void UD1InventoryManagerComponent::MarkSlotChecks(TArray<bool>& InSlotChecks, bool bIsUsing, const FIntPoint& ItemSlotPos, const FIntPoint& ItemSlotCount) const
 {
 	if (ItemSlotPos.X < 0 || ItemSlotPos.Y < 0)
 		return;
@@ -788,7 +773,11 @@ void UD1InventoryManagerComponent::MarkSlotChecks(TArray<TArray<bool>>& InSlotCh
 	{
 		for (int32 x = StartSlotPos.X; x < EndSlotPos.X; x++)
 		{
-			InSlotChecks[y][x] = bIsUsing;
+			int32 Index = y * InventorySlotCount.X + x;
+			if (InSlotChecks.IsValidIndex(Index) == false)
+				continue;
+			
+			InSlotChecks[Index] = bIsUsing;
 		}
 	}
 }

@@ -31,11 +31,11 @@ public:
 	
 public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void Server_MoveQuickFromInventory(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos);
+	void Server_QuickFromInventory(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void Server_MoveQuickFromEquipment(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType);
-
+	void Server_QuickFromEquipment(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType);
+	
 public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_DropItemFromInventory(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos);

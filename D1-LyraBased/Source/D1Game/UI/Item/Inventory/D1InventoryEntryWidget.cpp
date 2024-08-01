@@ -70,7 +70,7 @@ FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 
 		if (ItemManager && FromInventoryManager)
 		{
-			ItemManager->Server_MoveQuickFromInventory(FromInventoryManager, ItemSlotPos);
+			ItemManager->Server_QuickFromInventory(FromInventoryManager, ItemSlotPos);
 			return FReply::Handled();
 		}
 	}

@@ -33,8 +33,6 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* NewItemInstance)
 	
 			if (ItemInstance)
 			{
-				LastValidTemplateID = ItemInstance->GetItemTemplateID();
-
 				const UD1ItemFragment_Equippable_Armor* Armor = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
 				const UD1ItemFragment_Equippable_Weapon* Weapon = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
 				if (Armor || Weapon && EquipmentManager->IsSameWeaponEquipState(EquipmentSlotType, EquipManager->GetCurrentWeaponEquipState()))
@@ -186,7 +184,7 @@ void UD1EquipmentManagerComponent::ReadyForReplication()
 	}
 }
 
-bool UD1EquipmentManagerComponent::CanAddEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanMoveEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType)
 {
 	if (OtherComponent == nullptr)
 		return false;
@@ -200,10 +198,10 @@ bool UD1EquipmentManagerComponent::CanAddEquipment(UD1InventoryManagerComponent*
 	const FD1InventoryEntry& FromEntry = FromEntries[FromIndex];
 	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
 
-	return CanAddEquipment(FromItemInstance, ToEquipmentSlotType);
+	return CanMoveEquipment(FromItemInstance, ToEquipmentSlotType);
 }
 
-bool UD1EquipmentManagerComponent::CanAddEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanMoveEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType)
 {
 	if (OtherComponent == nullptr)
 		return false;
@@ -218,10 +216,10 @@ bool UD1EquipmentManagerComponent::CanAddEquipment(UD1EquipmentManagerComponent*
 		return false;
 	
 	UD1ItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromEquipmentSlotType);
-	return CanAddEquipment(FromItemInstance, ToEquipmentSlotType);
+	return CanMoveEquipment(FromItemInstance, ToEquipmentSlotType);
 }
 
-bool UD1EquipmentManagerComponent::CanAddEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanMoveEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType)
 {
 	if (FromItemInstance == nullptr)
 		return false;
@@ -279,7 +277,7 @@ bool UD1EquipmentManagerComponent::CanAddEquipment(UD1ItemInstance* FromItemInst
 	return false;
 }
 
-bool UD1EquipmentManagerComponent::CanAddEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanMoveEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType)
 {
 	OutToEquipmentSlotType = EEquipmentSlotType::Count;
 	
@@ -295,10 +293,10 @@ bool UD1EquipmentManagerComponent::CanAddEquipment_Quick(UD1InventoryManagerComp
 	const FD1InventoryEntry& FromEntry = FromEntries[FromIndex];
 	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
 
-	return CanAddEquipment_Quick(FromItemInstance, OutToEquipmentSlotType);
+	return CanMoveEquipment_Quick(FromItemInstance, OutToEquipmentSlotType);
 }
 
-bool UD1EquipmentManagerComponent::CanAddEquipment_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanMoveEquipment_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType)
 {
 	OutToEquipmentSlotType = EEquipmentSlotType::Count;
 	
@@ -312,10 +310,10 @@ bool UD1EquipmentManagerComponent::CanAddEquipment_Quick(UD1EquipmentManagerComp
 	const FD1EquipmentEntry& FromEntry = FromEntries[(int32)FromEquipmentSlotType];
 	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
 
-	return CanAddEquipment_Quick(FromItemInstance, OutToEquipmentSlotType);
+	return CanMoveEquipment_Quick(FromItemInstance, OutToEquipmentSlotType);
 }
 
-bool UD1EquipmentManagerComponent::CanAddEquipment_Quick(UD1ItemInstance* FromItemInstance, EEquipmentSlotType& OutToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanMoveEquipment_Quick(UD1ItemInstance* FromItemInstance, EEquipmentSlotType& OutToEquipmentSlotType)
 {
 	OutToEquipmentSlotType = EEquipmentSlotType::Count;
 
@@ -330,7 +328,7 @@ bool UD1EquipmentManagerComponent::CanAddEquipment_Quick(UD1ItemInstance* FromIt
 			for (int32 i = 0; i < (int32)EWeaponSlotType::Count; i++)
 			{
 				OutToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, (EWeaponSlotType)i);
-				if (CanAddEquipment(FromItemInstance, OutToEquipmentSlotType))
+				if (CanMoveEquipment(FromItemInstance, OutToEquipmentSlotType))
 					return true;
 			}
 			
@@ -341,14 +339,100 @@ bool UD1EquipmentManagerComponent::CanAddEquipment_Quick(UD1ItemInstance* FromIt
 		{
 			const UD1ItemFragment_Equippable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(FromEquippableFragment);
 			OutToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
-			return CanAddEquipment(FromItemInstance, OutToEquipmentSlotType);
+			return CanMoveEquipment(FromItemInstance, OutToEquipmentSlotType);
 		}
 	}
 
 	return false;
 }
 
-bool UD1EquipmentManagerComponent::CanAddEquipment_Swap(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanSwapEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType, FIntPoint& OutToItemSlotPos)
+{
+	if (OtherComponent == nullptr || ToEquipmentSlotType == EEquipmentSlotType::Count)
+		return false;
+
+	const FIntPoint& FromTotalItemSlotCount = OtherComponent->GetInventorySlotCount();
+	if (FromItemSlotPos.X < 0 || FromItemSlotPos.Y < 0 || FromItemSlotPos.X >= FromTotalItemSlotCount.X || FromItemSlotPos.Y >= FromTotalItemSlotCount.Y)
+		return false;
+
+	const TArray<FD1InventoryEntry>& FromEntries = OtherComponent->GetAllEntries();
+	const int32 FromIndex = FromItemSlotPos.Y * FromTotalItemSlotCount.X + FromItemSlotPos.X;
+	const FD1InventoryEntry& FromEntry = FromEntries[FromIndex];
+	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
+
+	if (FromItemInstance == nullptr)
+		return false;
+
+	if (const UD1ItemFragment_Equippable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
+	{
+		if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
+		{
+			const UD1ItemFragment_Equippable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(FromEquippableFragment);
+			EEquipmentSlotType FromEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
+
+			if (FromEquipmentSlotType != ToEquipmentSlotType)
+				return false;
+			
+			const UD1ItemInstance* ToItemInstance = GetItemInstance(ToEquipmentSlotType);
+			if (ToItemInstance == nullptr)
+				return false;
+
+			const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromItemInstance->GetItemTemplateID());
+			const FIntPoint& FromSlotCount = FromItemTemplate.SlotCount;
+			
+			const UD1ItemTemplate& ToItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ToItemInstance->GetItemTemplateID());
+			const FIntPoint& ToSlotCount = ToItemTemplate.SlotCount;
+
+			TArray<bool> TempSlotChecks = OtherComponent->SlotChecks;
+			OtherComponent->MarkSlotChecks(TempSlotChecks, false, FromItemSlotPos, FromSlotCount);
+			
+			if (OtherComponent->IsEmpty(TempSlotChecks, FromItemSlotPos, ToSlotCount))
+			{
+				OutToItemSlotPos = FromItemSlotPos;
+				return true;
+			}
+			else
+			{
+				if (OtherComponent->CanMoveOrMergeItem_Quick(this, ToEquipmentSlotType, OutToItemSlotPos))
+					return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
+bool UD1EquipmentManagerComponent::CanSwapEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType)
+{
+	if (OtherComponent == nullptr || FromEquipmentSlotType == EEquipmentSlotType::Count)
+		return false;
+
+	const TArray<FD1EquipmentEntry>& FromEntries = OtherComponent->GetAllEntries();
+	const FD1EquipmentEntry& FromEntry = FromEntries[(int32)FromEquipmentSlotType];
+	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
+
+	if (FromItemInstance == nullptr)
+		return false;
+
+	if (const UD1ItemFragment_Equippable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
+	{
+		if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
+		{
+			if (FromEquipmentSlotType != ToEquipmentSlotType)
+				return false;
+		
+			const UD1ItemInstance* ToItemInstance = GetItemInstance(ToEquipmentSlotType);
+			if (ToItemInstance == nullptr)
+				return false;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool UD1EquipmentManagerComponent::CanSwapEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType, FIntPoint& OutToItemSlotPos)
 {
 	OutToEquipmentSlotType = EEquipmentSlotType::Count;
 	
@@ -364,30 +448,60 @@ bool UD1EquipmentManagerComponent::CanAddEquipment_Swap(UD1InventoryManagerCompo
 	const FD1InventoryEntry& FromEntry = FromEntries[FromIndex];
 	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
 
-	return CanAddEquipment_Swap(FromItemInstance, OutToEquipmentSlotType);
+	if (FromItemInstance == nullptr)
+		return false;
+	
+	if (const UD1ItemFragment_Equippable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
+	{
+		if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
+		{
+			const UD1ItemFragment_Equippable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(FromEquippableFragment);
+			EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
+
+			const UD1ItemInstance* ToItemInstance = GetItemInstance(ToEquipmentSlotType);
+			if (ToItemInstance == nullptr)
+				return false;
+
+			const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromItemInstance->GetItemTemplateID());
+			const FIntPoint& FromSlotCount = FromItemTemplate.SlotCount;
+			
+			const UD1ItemTemplate& ToItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ToItemInstance->GetItemTemplateID());
+			const FIntPoint& ToSlotCount = ToItemTemplate.SlotCount;
+
+			TArray<bool> TempSlotChecks = OtherComponent->SlotChecks;
+			OtherComponent->MarkSlotChecks(TempSlotChecks, false, FromItemSlotPos, FromSlotCount);
+			
+			if (OtherComponent->IsEmpty(TempSlotChecks, FromItemSlotPos, ToSlotCount))
+			{
+				OutToEquipmentSlotType = ToEquipmentSlotType;
+				OutToItemSlotPos = FromItemSlotPos;
+				return true;
+			}
+			else
+			{
+				if (OtherComponent->CanMoveOrMergeItem_Quick(this, ToEquipmentSlotType, OutToItemSlotPos))
+				{
+					OutToEquipmentSlotType = ToEquipmentSlotType;
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
-bool UD1EquipmentManagerComponent::CanAddEquipment_Swap(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType) const
+bool UD1EquipmentManagerComponent::CanSwapEquipment_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType)
 {
 	OutToEquipmentSlotType = EEquipmentSlotType::Count;
 	
-	if (OtherComponent == nullptr)
-		return false;
-	
-	if (FromEquipmentSlotType == EEquipmentSlotType::Count)
+	if (OtherComponent == nullptr || FromEquipmentSlotType == EEquipmentSlotType::Count)
 		return false;
 
 	const TArray<FD1EquipmentEntry>& FromEntries = OtherComponent->GetAllEntries();
 	const FD1EquipmentEntry& FromEntry = FromEntries[(int32)FromEquipmentSlotType];
 	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
 
-	return CanAddEquipment_Swap(FromItemInstance, OutToEquipmentSlotType);
-}
-
-bool UD1EquipmentManagerComponent::CanAddEquipment_Swap(UD1ItemInstance* FromItemInstance, EEquipmentSlotType& OutToEquipmentSlotType) const
-{
-	OutToEquipmentSlotType = EEquipmentSlotType::Count;
-	
 	if (FromItemInstance == nullptr)
 		return false;
 
