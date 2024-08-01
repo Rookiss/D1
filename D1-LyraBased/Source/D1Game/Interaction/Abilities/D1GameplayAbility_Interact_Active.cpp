@@ -53,20 +53,15 @@ bool UD1GameplayAbility_Interact_Active::TriggerInteraction()
 	Payload.Target = InteractableActor;
 	
 	Interactable->CustomizeInteractionEventData(D1GameplayTags::Ability_Interact, Payload);
-
-	AActor* TargetActor = const_cast<AActor*>(ToRawPtr(Payload.Target));
-
+	
 	if (UAbilitySystemComponent* AbilitySystem = GetAbilitySystemComponentFromActorInfo())
 	{
 		if (FGameplayAbilitySpec* AbilitySpec = AbilitySystem->FindAbilitySpecFromClass(InteractionInfo.AbilityToGrant))
 		{
-			FGameplayAbilityActorInfo ActorInfo;
-			ActorInfo.InitFromActor(InteractableActor, TargetActor, AbilitySystem);
-
 			bCanActivate = AbilitySpec->Ability->CanActivateAbility(AbilitySpec->Handle, AbilitySystem->AbilityActorInfo.Get());
 			bTriggerSuccessful = AbilitySystem->TriggerAbilityFromGameplayEvent(
 				AbilitySpec->Handle,
-				&ActorInfo,
+				AbilitySystem->AbilityActorInfo.Get(),
 				D1GameplayTags::Ability_Interact,
 				&Payload,
 				*AbilitySystem

@@ -97,6 +97,13 @@ void UD1ItemManagerComponent::Server_EquipmentToEquipment_Implementation(UD1Equi
 		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
 		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
 	}
+	else if (ToEquipmentManager->CanSwapEquipment(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
+	{
+		UD1ItemInstance* RemovedItemInstanceTo = ToEquipmentManager->RemoveEquipment(ToEquipmentSlotType);
+		UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
+		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstanceFrom);
+		FromEquipmentManager->AddEquipment(FromEquipmentSlotType, RemovedItemInstanceTo);
+	}
 }
 
 void UD1ItemManagerComponent::Server_QuickFromInventory_Implementation(UD1InventoryManagerComponent* FromInventoryManager, const FIntPoint& FromItemSlotPos)
