@@ -13,16 +13,21 @@ public:
 	AD1WorldPickupable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const override;
 
 public:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override { return InteractionInfo; }
 	virtual FD1PickupInfo GetPickupInfo() const override { return PickupInfo; }
+
+protected:
+	UFUNCTION()
+	virtual void OnRep_PickupInfo();
 	
 protected:
 	UPROPERTY(EditAnywhere, Category="Info")
 	FD1InteractionInfo InteractionInfo;
 	
-	UPROPERTY(EditAnywhere, Category="Info")
+	UPROPERTY(EditAnywhere, ReplicatedUsing=OnRep_PickupInfo, Category="Info")
 	FD1PickupInfo PickupInfo;
 };
