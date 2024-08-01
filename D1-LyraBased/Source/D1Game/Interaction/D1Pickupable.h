@@ -3,6 +3,7 @@
 #include "UObject/Interface.h"
 #include "D1Pickupable.generated.h"
 
+class UD1ItemTemplate;
 class UD1ItemInstance;
 
 USTRUCT(BlueprintType)
@@ -12,7 +13,7 @@ struct FD1PickupTemplate
 
 public:
 	UPROPERTY(EditAnywhere)
-	int32 ItemTemplateID = 0;
+	TSubclassOf<UD1ItemTemplate> ItemTemplateClass;
 
 	UPROPERTY(EditAnywhere)
 	int32 ItemCount = 1;
@@ -38,10 +39,10 @@ struct FD1PickupInfo
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<FD1PickupTemplate> ItemTemplates;
+	FD1PickupTemplate PickupTemplate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<FD1PickupInstance> ItemInstances;
+	FD1PickupInstance PickupInstance;
 };
 
 UINTERFACE(MinimalAPI, BlueprintType, meta=(CannotImplementInterfaceInBlueprint))

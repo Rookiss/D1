@@ -13,6 +13,9 @@ class AD1PickupableItemBase : public AD1WorldPickupable
 public:
 	AD1PickupableItemBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+protected:
+	virtual void OnRep_PickupInfo() override;
+	
 public:
 	void InitializeActor(UD1ItemInstance* InItemInstance, int32 InItemCount);
 	
@@ -21,5 +24,5 @@ protected:
 	TObjectPtr<UArrowComponent> ArrowComponent;
 	
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> ItemMeshComponent;
+	TObjectPtr<UStaticMeshComponent> PickupableMeshComponent;
 };

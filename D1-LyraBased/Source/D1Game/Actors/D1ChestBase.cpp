@@ -25,6 +25,7 @@ AD1ChestBase::AD1ChestBase(const FObjectInitializer& ObjectInitializer)
 	MeshComponent->SetupAttachment(GetRootComponent());
 	MeshComponent->SetCollisionProfileName(TEXT("Interactable"));
 	MeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	MeshComponent->SetCanEverAffectNavigation(true);
 	
 	InventoryManager = CreateDefaultSubobject<UD1InventoryManagerComponent>(TEXT("InventoryManager"));
 }
