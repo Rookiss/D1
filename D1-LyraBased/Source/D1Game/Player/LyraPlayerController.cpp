@@ -23,8 +23,9 @@
 #include "ReplaySubsystem.h"
 #include "Development/LyraDeveloperSettings.h"
 #include "GameMapsSettings.h"
+#include "Character/LyraCharacter.h"
 #include "Item/D1ItemTemplate.h"
-#include "Messages/LyraVerbMessage.h"
+#include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraPlayerController)
 
@@ -347,6 +348,32 @@ void ALyraPlayerController::Server_EquipArmor_Implementation(TSubclassOf<UD1Item
 	if (ULyraCheatManager* LyraCheatManager = Cast<ULyraCheatManager>(CheatManager))
 	{
 		LyraCheatManager->EquipArmor(InItemTemplateClass);
+	}
+#endif // #if USING_CHEAT_MANAGER
+}
+
+void ALyraPlayerController::Server_PlayMontage_Implementation(FSoftObjectPath InAnimMontagePath, float InPlayRate)
+{
+#if USING_CHEAT_MANAGER
+	if (InAnimMontagePath.IsNull() == false)
+	{
+		Multicast_PlayMontage(InAnimMontagePath, InPlayRate);
+	}
+#endif // #if USING_CHEAT_MANAGER
+}
+
+void ALyraPlayerController::Multicast_PlayMontage_Implementation(FSoftObjectPath InAnimMontagePath, float InPlayRate)
+{
+#if USING_CHEAT_MANAGER
+	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetPawn()))
+	{
+		if (USkeletalMeshComponent* MeshComponent = LyraCharacter->GetMesh())
+		{
+			if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
+			{
+				AnimInstance->Montage_Play(Cast<UAnimMontage>(InAnimMontagePath.TryLoad()), InPlayRate);
+			}
+		}
 	}
 #endif // #if USING_CHEAT_MANAGER
 }

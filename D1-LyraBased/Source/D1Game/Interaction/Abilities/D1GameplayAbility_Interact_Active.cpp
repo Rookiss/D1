@@ -4,7 +4,6 @@
 #include "D1GameplayAbility_Interact.h"
 #include "D1GameplayTags.h"
 #include "Interaction/D1Interactable.h"
-#include "Interaction/D1InteractionQuery.h"
 #include "Player/LyraPlayerController.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Interact_Active)
@@ -17,29 +16,6 @@ UD1GameplayAbility_Interact_Active::UD1GameplayAbility_Interact_Active(const FOb
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ServerOnlyTermination;
 	bServerRespectsRemoteAbilityCancellation = false;
-}
-
-void UD1GameplayAbility_Interact_Active::Initialize(AActor* TargetActor)
-{
-	TScriptInterface<ID1Interactable> TargetInteractable(TargetActor);
-	if (TargetInteractable)
-	{
-		FD1InteractionQuery InteractionQuery;
-		InteractionQuery.RequestingAvatar = GetAvatarActorFromActorInfo();
-		InteractionQuery.RequestingController = GetControllerFromActorInfo();
-
-		Interactable = TargetInteractable;
-		InteractableActor = TargetActor;
-
-		TArray<FD1InteractionInfo> InteractionInfos;
-		FD1InteractionInfoBuilder InteractionInfoBuilder(Interactable, InteractionInfos);
-		Interactable->GatherPostInteractionInfos(InteractionQuery, InteractionInfoBuilder);
-		InteractionInfo = InteractionInfos[0];
-	}
-	else
-	{
-		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-	}
 }
 
 bool UD1GameplayAbility_Interact_Active::TriggerInteraction()

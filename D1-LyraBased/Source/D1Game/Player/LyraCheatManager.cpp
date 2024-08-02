@@ -538,15 +538,6 @@ void ULyraCheatManager::PlaySelectedAnimation()
 	
 	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
 	{
-		if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(LyraPC->GetPawn()))
-		{
-			if (USkeletalMeshComponent* SkeletalMesh = LyraCharacter->GetMesh())
-			{
-				if (UAnimInstance* AnimInstance = SkeletalMesh->GetAnimInstance())
-				{
-					AnimInstance->Montage_Play(ULyraAssetManager::GetAssetByPath(SelectedMontage, false), CurrentAnimationSpeed);
-				}
-			}
-		}
+		LyraPC->Server_PlayMontage(SelectedMontage.ToSoftObjectPath(), CurrentAnimationSpeed);
 	}
 }

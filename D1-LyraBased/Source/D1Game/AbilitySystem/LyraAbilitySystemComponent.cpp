@@ -451,7 +451,7 @@ void ULyraAbilitySystemComponent::HandleAbilityFailed(const UGameplayAbility* Ab
 	if (const ULyraGameplayAbility* LyraAbility = Cast<const ULyraGameplayAbility>(Ability))
 	{
 		LyraAbility->OnAbilityFailedToActivate(FailureReason);
-	}	
+	}
 }
 
 void ULyraAbilitySystemComponent::BlockAnimMontageForSeconds(UAnimMontage* BackwardMontage)
