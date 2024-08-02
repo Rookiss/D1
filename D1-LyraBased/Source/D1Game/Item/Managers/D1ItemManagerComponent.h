@@ -42,12 +42,13 @@ public:
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_DropItemFromEquipment(UD1EquipmentManagerComponent* FromEquipmentManager, EEquipmentSlotType FromEquipmentSlotType);
-	
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void Server_PickItemFromWorld(AD1WorldPickupable* PickedItemActor);
 
-private:
-	bool DropItem(UD1ItemInstance* FromItemInstance, int32 FromItemCount);
+public:
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	bool TryPickItem(AD1WorldPickupable* PickedItemActor);
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	bool TryDropItem(UD1ItemInstance* FromItemInstance, int32 FromItemCount);
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)

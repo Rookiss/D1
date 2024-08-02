@@ -16,15 +16,15 @@ AD1PickupableItemBase::AD1PickupableItemBase(const FObjectInitializer& ObjectIni
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>("ArrowComponent");
 	SetRootComponent(ArrowComponent);
 	
-    PickupableMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("PickupableMeshComponent");
-	PickupableMeshComponent->SetupAttachment(ArrowComponent);
-	PickupableMeshComponent->SetCollisionProfileName(TEXT("Interactable"));
-	PickupableMeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+    MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("MeshComponent");
+	MeshComponent->SetupAttachment(GetRootComponent());
+	MeshComponent->SetCollisionProfileName(TEXT("Pickupable"));
+	MeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Sphere(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
 	if (SM_Sphere.Succeeded())
 	{
-		PickupableMeshComponent->SetStaticMesh(SM_Sphere.Object);
+		MeshComponent->SetStaticMesh(SM_Sphere.Object);
 	}
 }
 
@@ -32,43 +32,24 @@ void AD1PickupableItemBase::OnRep_PickupInfo()
 {
 	Super::OnRep_PickupInfo();
 
-	if (PickupableMeshComponent->GetStaticMesh() == nullptr)
-	{
-		TSoftObjectPtr<UStaticMesh> PickupableMeshPath = nullptr;
+	TSoftObjectPtr<UStaticMesh> PickupableMeshPath = nullptr;
 		
-		if (const UD1ItemInstance* ItemInstance = PickupInfo.PickupInstance.ItemInstance)
-		{
-			const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
-			PickupableMeshPath = ItemTemplate.PickupableMesh;
-		}
-		else if (TSubclassOf<UD1ItemTemplate> ItemTemplateClass = PickupInfo.PickupTemplate.ItemTemplateClass)
-		{
-			const UD1ItemTemplate* ItemTemplate = ItemTemplateClass->GetDefaultObject<UD1ItemTemplate>();
-			PickupableMeshPath = ItemTemplate->PickupableMesh;
-		}
-
-		if (PickupableMeshPath.IsNull() == false)
-		{
-			if (UStaticMesh* PickupableMesh = ULyraAssetManager::GetAssetByPath(PickupableMeshPath))
-			{
-				PickupableMeshComponent->SetStaticMesh(PickupableMesh);
-			}
-		}
-	}
-}
-
-void AD1PickupableItemBase::InitializeActor(UD1ItemInstance* InItemInstance, int32 InItemCount)
-{
-	if (HasAuthority() == false)
-		return;
-	
-	if (InItemInstance == nullptr || InItemCount <= 0)
+	if (const UD1ItemInstance* ItemInstance = PickupInfo.PickupInstance.ItemInstance)
 	{
-		Destroy();
-		return;
+		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
+		PickupableMeshPath = ItemTemplate.PickupableMesh;
+	}
+	else if (TSubclassOf<UD1ItemTemplate> ItemTemplateClass = PickupInfo.PickupTemplate.ItemTemplateClass)
+	{
+		const UD1ItemTemplate* ItemTemplate = ItemTemplateClass->GetDefaultObject<UD1ItemTemplate>();
+		PickupableMeshPath = ItemTemplate->PickupableMesh;
 	}
 
-	PickupInfo.PickupInstance.ItemInstance = InItemInstance;
-	PickupInfo.PickupInstance.ItemCount = InItemCount;
-	OnRep_PickupInfo();
+	if (PickupableMeshPath.IsNull() == false)
+	{
+		if (UStaticMesh* PickupableMesh = ULyraAssetManager::GetAssetByPath(PickupableMeshPath))
+		{
+			MeshComponent->SetStaticMesh(PickupableMesh);
+		}
+	}
 }

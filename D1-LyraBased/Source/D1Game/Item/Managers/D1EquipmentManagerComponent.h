@@ -104,7 +104,8 @@ protected:
 public:
 	bool CanMoveEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType);
 	bool CanMoveEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType);
-	bool CanMoveEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType);
+
+	bool CanAddEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType);
 	
 	bool CanMoveEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType);
 	bool CanMoveEquipment_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType);
@@ -121,8 +122,8 @@ public:
 	void TryAddEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass, EItemRarity ItemRarity);
 
 private:
-	void AddEquipment(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
-	UD1ItemInstance* RemoveEquipment(EEquipmentSlotType EquipmentSlotType);
+	void AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+	UD1ItemInstance* RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType);
 	
 public:
 	static bool IsWeaponSlot(EEquipmentSlotType EquipmentSlotType);
@@ -133,7 +134,7 @@ public:
 	static bool IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType);
 	
 	static bool IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);
-	static bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);
+	static bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);	
 	
 	bool IsAllEmpty(EWeaponEquipState WeaponEquipState) const;
 

@@ -13,6 +13,8 @@ public:
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const { return FD1InteractionInfo(); }
+	virtual bool CanInteraction(const FD1InteractionQuery& InteractionQuery) const override;
 	
 public:
 	UFUNCTION(BlueprintCallable)
@@ -32,9 +34,6 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="OnInteractionSuccess")
 	void K2_OnInteractionSuccess(AActor* Interactor);
-
-protected:
-	virtual bool CanInteraction(const FD1InteractionQuery& InteractionQuery) const override;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly)

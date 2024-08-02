@@ -15,14 +15,11 @@ public:
 
 protected:
 	virtual void OnRep_PickupInfo() override;
-	
-public:
-	void InitializeActor(UD1ItemInstance* InItemInstance, int32 InItemCount);
-	
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UArrowComponent> ArrowComponent;
 	
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> PickupableMeshComponent;
+	TObjectPtr<UStaticMeshComponent> MeshComponent;
 };

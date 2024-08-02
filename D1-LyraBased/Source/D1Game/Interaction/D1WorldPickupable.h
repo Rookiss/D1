@@ -12,18 +12,18 @@ class AD1WorldPickupable : public AActor, public ID1Interactable, public ID1Pick
 public:
 	AD1WorldPickupable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-public:
+protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	virtual void GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const override;
 
 public:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override { return InteractionInfo; }
+	virtual void SetPickupInfo(const FD1PickupInfo& InPickupInfo);
 	virtual FD1PickupInfo GetPickupInfo() const override { return PickupInfo; }
 
 protected:
 	UFUNCTION()
 	virtual void OnRep_PickupInfo();
-	
+
 protected:
 	UPROPERTY(EditAnywhere, Category="Info")
 	FD1InteractionInfo InteractionInfo;

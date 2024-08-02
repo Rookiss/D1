@@ -1,11 +1,13 @@
 ﻿#include "D1ItemManagerComponent.h"
 
+#include "D1EquipManagerComponent.h"
 #include "D1EquipmentManagerComponent.h"
 #include "D1InventoryManagerComponent.h"
 #include "NavigationSystem.h"
 #include "Actors/D1PickupableItemBase.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
+#include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemManagerComponent)
 
@@ -29,16 +31,16 @@ void UD1ItemManagerComponent::Server_InventoryToEquipment_Implementation(UD1Inve
 	if (ToEquipmentManager->CanMoveEquipment(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
 	{
 		UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
-		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
+		ToEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance);
 	}
 	else
 	{
 		FIntPoint ToItemSlotPos;
 		if (ToEquipmentManager->CanSwapEquipment(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType, ToItemSlotPos))
 		{
-			UD1ItemInstance* RemovedItemInstanceTo = ToEquipmentManager->RemoveEquipment(ToEquipmentSlotType);
+			UD1ItemInstance* RemovedItemInstanceTo = ToEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType);
 			UD1ItemInstance* RemovedItemInstanceFrom = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
-			ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstanceFrom);
+			ToEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom);
 			FromInventoryManager->AddItem(ToItemSlotPos, RemovedItemInstanceTo, 1);
 		}
 	}
@@ -57,7 +59,7 @@ void UD1ItemManagerComponent::Server_EquipmentToInventory_Implementation(UD1Equi
 
 	if (ToInventoryManager->CanMoveOrMergeItem(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPos))
 	{
-		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
+		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
 		ToInventoryManager->AddItem(ToItemSlotPos, RemovedItemInstance, 1);
 	}
 }
@@ -94,15 +96,15 @@ void UD1ItemManagerComponent::Server_EquipmentToEquipment_Implementation(UD1Equi
 	
 	if (ToEquipmentManager->CanMoveEquipment(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
 	{
-		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
-		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
+		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
+		ToEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance);
 	}
 	else if (ToEquipmentManager->CanSwapEquipment(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
 	{
-		UD1ItemInstance* RemovedItemInstanceTo = ToEquipmentManager->RemoveEquipment(ToEquipmentSlotType);
-		UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
-		ToEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstanceFrom);
-		FromEquipmentManager->AddEquipment(FromEquipmentSlotType, RemovedItemInstanceTo);
+		UD1ItemInstance* RemovedItemInstanceTo = ToEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType);
+		UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
+		ToEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom);
+		FromEquipmentManager->AddEquipment_Unsafe(FromEquipmentSlotType, RemovedItemInstanceTo);
 	}
 }
 
@@ -139,7 +141,7 @@ void UD1ItemManagerComponent::Server_QuickFromInventory_Implementation(UD1Invent
 		if (MyEquipmentManager->CanMoveEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
 		{
 			UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
-			MyEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
+			MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance);
 		}
 		else
 		{
@@ -162,9 +164,9 @@ void UD1ItemManagerComponent::Server_QuickFromInventory_Implementation(UD1Invent
 			FIntPoint ToItemSlotPos;
 			if (MyEquipmentManager->CanSwapEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType, ToItemSlotPos))
 			{
-				UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment(ToEquipmentSlotType);
+				UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType);
 				UD1ItemInstance* RemovedItemInstanceFrom = FromInventoryManager->RemoveItem(FromItemSlotPos, 1);
-				MyEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstanceFrom);
+				MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom);
 				FromInventoryManager->AddItem(ToItemSlotPos, RemovedItemInstanceTo, 1);
 			}
 		}
@@ -211,7 +213,7 @@ void UD1ItemManagerComponent::Server_QuickFromEquipment_Implementation(UD1Equipm
 	if (MyInventoryManager == nullptr || MyEquipmentManager == nullptr)
 		return;
 
-	if (IsAllowedComponent(MyEquipmentManager) == false)
+	if (IsAllowedComponent(MyInventoryManager) == false || IsAllowedComponent(MyEquipmentManager) == false)
 		return;
 
 	if (MyEquipmentManager == FromEquipmentManager)
@@ -219,7 +221,7 @@ void UD1ItemManagerComponent::Server_QuickFromEquipment_Implementation(UD1Equipm
 		FIntPoint ToItemSlotPos;
 		if (MyInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPos))
 		{
-			UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
+			UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
 			MyInventoryManager->AddItem(ToItemSlotPos, RemovedItemInstance, 1);
 		}
 	}
@@ -228,25 +230,25 @@ void UD1ItemManagerComponent::Server_QuickFromEquipment_Implementation(UD1Equipm
 		EEquipmentSlotType ToEquipmentSlotType;
 		if (MyEquipmentManager->CanMoveEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
 		{
-			UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
-			MyEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstance);
+			UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
+			MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance);
 		}
 		else
 		{
 			FIntPoint OutToItemSlotPos;
 			if (MyInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, OutToItemSlotPos))
 			{
-				UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
+				UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
 				MyInventoryManager->AddItem(OutToItemSlotPos, RemovedItemInstance, 1);
 			}
 			else
 			{
 				if (MyEquipmentManager->CanSwapEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
 				{
-					UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment(ToEquipmentSlotType);
-					UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
-					MyEquipmentManager->AddEquipment(ToEquipmentSlotType, RemovedItemInstanceFrom);
-					FromEquipmentManager->AddEquipment(FromEquipmentSlotType, RemovedItemInstanceTo);
+					UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType);
+					UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
+					MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom);
+					FromEquipmentManager->AddEquipment_Unsafe(FromEquipmentSlotType, RemovedItemInstanceTo);
 				}
 			}
 		}
@@ -272,7 +274,7 @@ void UD1ItemManagerComponent::Server_DropItemFromInventory_Implementation(UD1Inv
 	if (FromItemCount <= 0)
 		return;
 	
-	if (DropItem(FromItemInstance, FromItemCount))
+	if (TryDropItem(FromItemInstance, FromItemCount))
 	{
 		FromInventoryManager->RemoveItem(FromItemSlotPos, FromItemCount);
 	}
@@ -293,22 +295,68 @@ void UD1ItemManagerComponent::Server_DropItemFromEquipment_Implementation(UD1Equ
 	if (FromItemInstance == nullptr)
 		return;
 	
-	if (DropItem(FromItemInstance, 1))
+	if (TryDropItem(FromItemInstance, 1))
 	{
-		FromEquipmentManager->RemoveEquipment(FromEquipmentSlotType);
+		FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
 	}
 }
 
-void UD1ItemManagerComponent::Server_PickItemFromWorld_Implementation(AD1WorldPickupable* PickedItemActor)
+bool UD1ItemManagerComponent::TryPickItem(AD1WorldPickupable* PickedItemActor)
 {
 	if (HasAuthority() == false)
-		return;
+		return false;
 
-	if (PickedItemActor == nullptr)
-		return;
+	if (IsValid(PickedItemActor) == false)
+		return false;
+
+	UD1InventoryManagerComponent* MyInventoryManager = GetMyInventoryManager();
+	UD1EquipmentManagerComponent* MyEquipmentManager = GetMyEquipmentManager();
+	if (MyInventoryManager == nullptr || MyEquipmentManager == nullptr)
+		return false;
+
+	if (IsAllowedComponent(MyInventoryManager) == false || IsAllowedComponent(MyEquipmentManager) == false)
+		return false;
+
+	const FD1PickupInfo& PickupInfo = PickedItemActor->GetPickupInfo();
+	const FD1PickupInstance& PickupInstance = PickupInfo.PickupInstance;
+	const FD1PickupTemplate& PickupTemplate = PickupInfo.PickupTemplate;
+
+	UD1ItemInstance* NewItemInstance = nullptr;
+	int32 NewItemCount = 0;
+	
+	if (PickupInstance.ItemInstance)
+	{
+		if (PickupInstance.ItemCount <= 0)
+			return false;
+
+		NewItemInstance = PickupInstance.ItemInstance;
+		NewItemCount = PickupInstance.ItemCount;
+	}
+	else if (PickupTemplate.ItemTemplateClass)
+	{
+		if (PickupTemplate.ItemCount <= 0 || PickupTemplate.ItemRarity == EItemRarity::Count)
+			return false;
+		
+		int32 ItemTemmpleteID = UD1ItemData::Get().FindItemTemplateIDByClass(PickupTemplate.ItemTemplateClass);
+		NewItemInstance = NewObject<UD1ItemInstance>();
+		NewItemInstance->Init(ItemTemmpleteID, PickupTemplate.ItemRarity);
+		NewItemCount = PickupTemplate.ItemCount;
+	}
+
+	if (NewItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
+	{
+		// MyEquipmentManager->AddEquipment();
+	}
+	else
+	{
+		
+	}
+
+	PickedItemActor->Destroy();
+	return true;
 }
 
-bool UD1ItemManagerComponent::DropItem(UD1ItemInstance* FromItemInstance, int32 FromItemCount)
+bool UD1ItemManagerComponent::TryDropItem(UD1ItemInstance* FromItemInstance, int32 FromItemCount)
 {
 	if (HasAuthority() == false)
 		return false;
@@ -338,9 +386,14 @@ bool UD1ItemManagerComponent::DropItem(UD1ItemInstance* FromItemInstance, int32 
 	
 	FVector SpawnLocation = NavLocation.Location;
 	FRotator SpawnRotation = Pawn->GetActorForwardVector().Rotation();
-	
-	AD1PickupableItemBase* PickupableItemActor = GetWorld()->SpawnActor<AD1PickupableItemBase>(AD1PickupableItemBase::StaticClass(), SpawnLocation, SpawnRotation);
-	PickupableItemActor->InitializeActor(FromItemInstance, FromItemCount);
+
+	TSubclassOf<AD1PickupableItemBase> PickupableItemClass = ULyraAssetManager::Get().GetSubclassByName<AD1PickupableItemBase>("PickupableItemClass");
+	AD1PickupableItemBase* PickupableItemActor = GetWorld()->SpawnActor<AD1PickupableItemBase>(PickupableItemClass, SpawnLocation, SpawnRotation);
+
+	FD1PickupInfo PickupInfo;
+	PickupInfo.PickupInstance.ItemInstance = FromItemInstance;
+	PickupInfo.PickupInstance.ItemCount = FromItemCount;
+	PickupableItemActor->SetPickupInfo(PickupInfo);
 
 	return true;
 }

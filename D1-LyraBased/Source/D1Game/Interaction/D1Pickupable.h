@@ -1,5 +1,6 @@
 #pragma once
 
+#include "D1Define.h"
 #include "UObject/Interface.h"
 #include "D1Pickupable.generated.h"
 
@@ -15,6 +16,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UD1ItemTemplate> ItemTemplateClass;
 
+	UPROPERTY(EditAnywhere)
+	EItemRarity ItemRarity = EItemRarity::Poor;
+	
 	UPROPERTY(EditAnywhere)
 	int32 ItemCount = 1;
 };

@@ -198,7 +198,7 @@ bool UD1EquipmentManagerComponent::CanMoveEquipment(UD1InventoryManagerComponent
 	const FD1InventoryEntry& FromEntry = FromEntries[FromIndex];
 	UD1ItemInstance* FromItemInstance = FromEntry.GetItemInstance();
 
-	return CanMoveEquipment(FromItemInstance, ToEquipmentSlotType);
+	return CanAddEquipment(FromItemInstance, ToEquipmentSlotType);
 }
 
 bool UD1EquipmentManagerComponent::CanMoveEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType)
@@ -216,10 +216,10 @@ bool UD1EquipmentManagerComponent::CanMoveEquipment(UD1EquipmentManagerComponent
 		return false;
 	
 	UD1ItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromEquipmentSlotType);
-	return CanMoveEquipment(FromItemInstance, ToEquipmentSlotType);
+	return CanAddEquipment(FromItemInstance, ToEquipmentSlotType);
 }
 
-bool UD1EquipmentManagerComponent::CanMoveEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType)
+bool UD1EquipmentManagerComponent::CanAddEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType)
 {
 	if (FromItemInstance == nullptr)
 		return false;
@@ -328,7 +328,7 @@ bool UD1EquipmentManagerComponent::CanMoveEquipment_Quick(UD1ItemInstance* FromI
 			for (int32 i = 0; i < (int32)EWeaponSlotType::Count; i++)
 			{
 				OutToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, (EWeaponSlotType)i);
-				if (CanMoveEquipment(FromItemInstance, OutToEquipmentSlotType))
+				if (CanAddEquipment(FromItemInstance, OutToEquipmentSlotType))
 					return true;
 			}
 			
@@ -339,7 +339,7 @@ bool UD1EquipmentManagerComponent::CanMoveEquipment_Quick(UD1ItemInstance* FromI
 		{
 			const UD1ItemFragment_Equippable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(FromEquippableFragment);
 			OutToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
-			return CanMoveEquipment(FromItemInstance, OutToEquipmentSlotType);
+			return CanAddEquipment(FromItemInstance, OutToEquipmentSlotType);
 		}
 	}
 
@@ -548,12 +548,9 @@ void UD1EquipmentManagerComponent::TryAddEquipment(EEquipmentSlotType EquipmentS
 	}
 }
 
-void UD1EquipmentManagerComponent::AddEquipment(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
+void UD1EquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
 {
 	check(HasAuthority());
-
-	if (EquipmentSlotType == EEquipmentSlotType::Count || ItemInstance == nullptr)
-		return;
 
 	EquipmentList.AddEquipment(EquipmentSlotType, ItemInstance);
 	
@@ -563,21 +560,17 @@ void UD1EquipmentManagerComponent::AddEquipment(EEquipmentSlotType EquipmentSlot
 	}
 }
 
-UD1ItemInstance* UD1EquipmentManagerComponent::RemoveEquipment(EEquipmentSlotType EquipmentSlotType)
+UD1ItemInstance* UD1EquipmentManagerComponent::RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType)
 {
 	check(HasAuthority());
 
-	UD1ItemInstance* RemovedItemInstance = nullptr;
-	
-	if (EquipmentSlotType == EEquipmentSlotType::Count)
-		return RemovedItemInstance;
-
-	RemovedItemInstance = EquipmentList.RemoveEquipment(EquipmentSlotType);
+	UD1ItemInstance* RemovedItemInstance = EquipmentList.RemoveEquipment(EquipmentSlotType);
 	
 	if (IsUsingRegisteredSubObjectList() && RemovedItemInstance)
 	{
 		RemoveReplicatedSubObject(RemovedItemInstance);
 	}
+	
 	return RemovedItemInstance;
 }
 
