@@ -21,6 +21,7 @@ class ULyraAbilitySystemComponent;
 class ULyraSettingsShared;
 class UObject;
 class UPlayer;
+class UAnimMontage;
 struct FFrame;
 
 UENUM(BlueprintType)
@@ -75,6 +76,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_EquipArmor(TSubclassOf<UD1ItemTemplate> InItemTemplateClass);
 
+	UFUNCTION(Server, Reliable)
+	void Server_PlayMontage(FSoftObjectPath InAnimMontagePath, float InPlayRate);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayMontage(FSoftObjectPath InAnimMontagePath, float InPlayRate);
+	
 	//~AActor interface
 	virtual void PreInitializeComponents() override;
 	virtual void BeginPlay() override;

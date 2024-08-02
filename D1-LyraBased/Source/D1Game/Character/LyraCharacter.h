@@ -230,7 +230,7 @@ private:
 
 	UFUNCTION()
 	void OnRep_MyTeamID(FGenericTeamId OldTeamID);
-
+	
 public:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;
 	virtual bool CanInteraction(const FD1InteractionQuery& InteractionQuery) const override;
