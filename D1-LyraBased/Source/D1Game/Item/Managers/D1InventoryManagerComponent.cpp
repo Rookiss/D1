@@ -578,6 +578,51 @@ bool UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1EquipmentManagerC
 	return false;
 }
 
+bool UD1InventoryManagerComponent::CanAddItem(UD1ItemInstance* FromItemInstance, int32 FromItemCount, TArray<FIntPoint>& OutToItemSlotPoses, TArray<int32>& OutToItemCounts) const
+{
+	if (FromItemInstance == nullptr || FromItemCount <= 0)
+		return false;
+
+	OutToItemSlotPoses.Reset();
+	OutToItemCounts.Reset();
+	
+	const int32 TemplateID = FromItemInstance->GetItemTemplateID();
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
+
+	const FIntPoint& ItemSlotCount = ItemTemplate.SlotCount;
+	int32 LeftItemCount = FromItemCount;
+
+	const UD1ItemFragment_Stackable* FromStackableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Stackable>();
+	if (FromStackableFragment)
+	{
+		const TArray<FD1InventoryEntry>& ToEntries = GetAllEntries();
+
+		
+	}
+	
+	const FIntPoint StartSlotPos = FIntPoint::ZeroValue;
+	const FIntPoint EndSlotPos = GetInventorySlotCount() - ItemSlotCount;
+	
+	for (int32 y = StartSlotPos.Y; y <= EndSlotPos.Y; y++)
+	{
+		for (int32 x = StartSlotPos.X; x <= EndSlotPos.X; x++)
+		{
+			int32 Index = y * InventorySlotCount.X + x;
+			if (SlotChecks.IsValidIndex(Index) == false || SlotChecks[Index])
+				continue;
+
+			FIntPoint ItemSlotPos = FIntPoint(x, y);
+			if (IsEmpty(SlotChecks, ItemSlotPos, ItemSlotCount))
+			{
+				// OutToItemSlotPos = ItemSlotPos;
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
 void UD1InventoryManagerComponent::TryAddItemByRarity(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, EItemRarity ItemRarity)
 {
 	check(GetOwner()->HasAuthority());

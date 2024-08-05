@@ -38,30 +38,34 @@ void AD1PocketStage::BeginPlay()
 	SpawnedCharacter = GetWorld()->SpawnActor<ACharacter>(CharacterClass, CharacterSpawnPoint->GetComponentTransform(), SpawnParameters);
 	SpawnedCharacter->AttachToComponent(CharacterSpawnPoint, FAttachmentTransformRules::KeepWorldTransform);
 
+	if (UD1PocketWorldSubsystem* PocketWorldSubsystem = GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
+	{
+		PocketWorldSubsystem->SetPocketStage(this);
+	}
+	
 	if (UPocketCaptureSubsystem* PocketCaptureSubsystem = GetWorld()->GetSubsystem<UPocketCaptureSubsystem>())
 	{
-		UPocketCapture* PocketCapture = PocketCaptureSubsystem->CreateThumbnailRenderer(PocketCaptureClass);
-		CachedPocketCapture = PocketCapture;
-		
+		PocketCapture = PocketCaptureSubsystem->CreateThumbnailRenderer(PocketCaptureClass);
 		PocketCapture->SetRenderTargetSize(512, 1024);
 		PocketCapture->SetCaptureTarget(this);
 
 		RefreshAlphaMaskActors();
-		
-		if (UD1PocketWorldSubsystem* PocketWorldSubsystem = GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
-		{
-			PocketWorldSubsystem->SetPocketStage(this);
-		}
 	}
 }
 
 void AD1PocketStage::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (UPocketCaptureSubsystem* PocketCaptureSubsystem = GetWorld()->GetSubsystem<UPocketCaptureSubsystem>())
+	if (PocketCapture)
 	{
-		PocketCaptureSubsystem->DestroyThumbnailRenderer(CachedPocketCapture);
+		if (UPocketCaptureSubsystem* PocketCaptureSubsystem = GetWorld()->GetSubsystem<UPocketCaptureSubsystem>())
+		{
+			PocketCaptureSubsystem->DestroyThumbnailRenderer(PocketCapture);
+		}
+		
+		PocketCapture->ReleaseResources();
+		PocketCapture = nullptr;
 	}
-	
+
 	if (SpawnedCharacter)
 	{
 		SpawnedCharacter->Destroy();
@@ -76,7 +80,7 @@ void AD1PocketStage::RefreshAlphaMaskActors()
 	TArray<AActor*> AttachedActors;
 	GetAttachedActors(AttachedActors, true, true);
 
-	CachedPocketCapture->SetAlphaMaskedActors(AttachedActors);
+	PocketCapture->SetAlphaMaskedActors(AttachedActors);
 
 	for (AActor* AttachedActor : AttachedActors)
 	{

@@ -104,7 +104,8 @@ public:
 	bool CanMoveOrMergeItem(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const;
 	int32 CanMoveOrMergeItem_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, TArray<FIntPoint>& OutToItemSlotPoses, TArray<int32>& OutToItemCounts) const;
 	bool CanMoveOrMergeItem_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, FIntPoint& OutToItemSlotPos) const;
-
+	bool CanAddItem(UD1ItemInstance* FromItemInstance, int32 FromItemCount, TArray<FIntPoint>& OutToItemSlotPoses, TArray<int32>& OutToItemCounts) const;
+	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void TryAddItemByRarity(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, EItemRarity ItemRarity);

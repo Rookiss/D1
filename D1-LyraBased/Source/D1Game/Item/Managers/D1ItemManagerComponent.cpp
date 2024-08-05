@@ -343,6 +343,8 @@ bool UD1ItemManagerComponent::TryPickItem(AD1WorldPickupable* PickedItemActor)
 		NewItemCount = PickupTemplate.ItemCount;
 	}
 
+	// if (Server_QuickFromInventory(MyInventoryManager, ))
+	
 	if (NewItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
 	{
 		// MyEquipmentManager->AddEquipment();
