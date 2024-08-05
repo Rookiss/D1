@@ -4,6 +4,8 @@
 #include "Components/PawnComponent.h"
 #include "D1CosmeticManagerComponent.generated.h"
 
+class UD1ItemFragment_Equippable_Armor;
+class UD1ItemTemplate;
 class AD1ArmorBase;
 
 USTRUCT(BlueprintType)
@@ -30,12 +32,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
+	
 public:
+	void AddArmorMesh(const UD1ItemFragment_Equippable_Armor* ArmorFragment);
+	void RemoveArmorMesh(EArmorType ArmorType);
 	void SetArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr);
-
+	
 private:
-	void Initialize();
+	void InitializeComponent();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Cosmetic")
@@ -49,4 +53,5 @@ private:
 	TArray<TObjectPtr<UChildActorComponent>> CosmeticSlots;
 
 	bool bInitialized = false;
+	bool bHasFullBodyChest = false;
 };

@@ -22,3 +22,8 @@ FD1InteractionInfo AD1StatueBase::GetPreInteractionInfo(const FD1InteractionQuer
 {
 	return InteractionInfo;
 }
+
+void AD1StatueBase::GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const
+{
+	OutMeshComponents.Add(MeshComponent);
+}

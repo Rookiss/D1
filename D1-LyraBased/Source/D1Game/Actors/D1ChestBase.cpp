@@ -66,6 +66,11 @@ FD1InteractionInfo AD1ChestBase::GetPreInteractionInfo(const FD1InteractionQuery
 	}
 }
 
+void AD1ChestBase::GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const
+{
+	OutMeshComponents.Add(MeshComponent);
+}
+
 void AD1ChestBase::SetChestState(EChestState NewChestState)
 {
 	if (HasAuthority() == false || NewChestState == ChestState)

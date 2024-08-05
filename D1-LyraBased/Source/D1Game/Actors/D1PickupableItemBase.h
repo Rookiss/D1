@@ -15,7 +15,8 @@ public:
 
 protected:
 	virtual void OnRep_PickupInfo() override;
-
+	virtual void GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const override;
+	
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UArrowComponent> ArrowComponent;

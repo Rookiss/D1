@@ -13,7 +13,6 @@ public:
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const { return FD1InteractionInfo(); }
 	virtual bool CanInteraction(const FD1InteractionQuery& InteractionQuery) const override;
 	
 public:

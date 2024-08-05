@@ -1,5 +1,7 @@
 ﻿#include "D1ItemFragment_Equippable_Armor.h"
 
+#include "UObject/ObjectSaveContext.h"
+
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemFragment_Equippable_Armor)
 
 UD1ItemFragment_Equippable_Armor::UD1ItemFragment_Equippable_Armor(const FObjectInitializer& ObjectInitializer)
@@ -7,3 +9,15 @@ UD1ItemFragment_Equippable_Armor::UD1ItemFragment_Equippable_Armor(const FObject
 {
     EquipmentType = EEquipmentType::Armor;
 }
+
+#if WITH_EDITORONLY_DATA
+void UD1ItemFragment_Equippable_Armor::PreSave(FObjectPreSaveContext SaveContext)
+{
+	Super::PreSave(SaveContext);
+
+	if (ArmorType != EArmorType::Chest)
+	{
+		bIsFullBody = false;
+	}
+}
+#endif // WITH_EDITORONLY_DATA

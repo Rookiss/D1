@@ -53,3 +53,8 @@ void AD1PickupableItemBase::OnRep_PickupInfo()
 		}
 	}
 }
+
+void AD1PickupableItemBase::GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const
+{
+	OutMeshComponents.Add(MeshComponent);
+}

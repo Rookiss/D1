@@ -48,7 +48,8 @@ public:
 
 public:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;
-
+	virtual void GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const override;
+	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void SetChestState(EChestState NewChestState);

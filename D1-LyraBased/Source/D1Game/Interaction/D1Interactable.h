@@ -41,7 +41,7 @@ class ID1Interactable
 	GENERATED_BODY()
 
 public:
-	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const abstract;
+	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const { return FD1InteractionInfo(); }
 	
 	virtual void GatherPostInteractionInfos(const FD1InteractionQuery& InteractionQuery, FD1InteractionInfoBuilder& InteractionInfoBuilder) const
 	{
@@ -58,6 +58,9 @@ public:
 	
 	virtual void CustomizeInteractionEventData(const FGameplayTag& InteractionEventTag, FGameplayEventData& InOutEventData) const { }
 
+	UFUNCTION(BlueprintCallable)
+	virtual void GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const { }
+	
 	UFUNCTION(BlueprintCallable)
 	virtual bool CanInteraction(const FD1InteractionQuery& InteractionQuery) const { return true; }
 };

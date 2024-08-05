@@ -12,10 +12,18 @@ class UD1ItemFragment_Equippable_Armor : public UD1ItemFragment_Equippable
 public:
 	UD1ItemFragment_Equippable_Armor(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+protected:
+#if WITH_EDITORONLY_DATA
+	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
+#endif // WITH_EDITORONLY_DATA
+	
 public:
 	UPROPERTY(EditDefaultsOnly)
 	EArmorType ArmorType = EArmorType::Count;
 
+	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="ArmorType == EArmorType::Chest", EditConditionHides))
+	bool bIsFullBody = false;
+	
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<USkeletalMesh> ArmorMesh;
 };

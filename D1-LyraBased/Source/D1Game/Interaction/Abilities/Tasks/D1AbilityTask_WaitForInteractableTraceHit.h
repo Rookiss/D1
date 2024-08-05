@@ -33,6 +33,7 @@ private:
 	void LineTrace(const FVector& Start, const FVector& End, const FCollisionQueryParams& Params, FHitResult& OutHitResult) const;
 
 	void UpdateInteractionInfos(const FD1InteractionQuery& InteractQuery, const TArray<TScriptInterface<ID1Interactable>>& Interactables);
+	void HighlightInteractables(const TArray<FD1InteractionInfo>& InteractionInfos, bool bShouldHighlight);
 	
 protected:
 	UPROPERTY(BlueprintAssignable)

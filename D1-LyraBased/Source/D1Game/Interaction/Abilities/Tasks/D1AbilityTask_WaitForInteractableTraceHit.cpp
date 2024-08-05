@@ -232,7 +232,27 @@ void UD1AbilityTask_WaitForInteractableTraceHit::UpdateInteractionInfos(const FD
 
 	if (bInfosChanged)
 	{
+		HighlightInteractables(CurrentInteractionInfos, false);
 		CurrentInteractionInfos = NewInteractionInfos;
+		HighlightInteractables(CurrentInteractionInfos, true);
+		
 		InteractableChanged.Broadcast(CurrentInteractionInfos);
+	}
+}
+
+void UD1AbilityTask_WaitForInteractableTraceHit::HighlightInteractables(const TArray<FD1InteractionInfo>& InteractionInfos, bool bShouldHighlight)
+{
+	TArray<UMeshComponent*> MeshComponents;
+	for (const FD1InteractionInfo& InteractionInfo : InteractionInfos)
+	{
+		if (ID1Interactable* Interactable = InteractionInfo.Interactable.GetInterface())
+		{
+			Interactable->GetMeshComponents(MeshComponents);
+		}
+	}
+
+	for (UMeshComponent* MeshComponent : MeshComponents)
+	{
+		MeshComponent->SetRenderCustomDepth(bShouldHighlight);
 	}
 }
