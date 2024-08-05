@@ -22,7 +22,7 @@ public:
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UPocketCapture* GetPocketCapute() const { return CachedPocketCapture; }
+	UPocketCapture* GetPocketCapture() const { return PocketCapture; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ACharacter* GetCharacter() const { return SpawnedCharacter; }
@@ -42,10 +42,7 @@ private:
 	TObjectPtr<ACharacter> SpawnedCharacter;
 
 	UPROPERTY()
-	TObjectPtr<UPocketCapture> CachedPocketCapture;
-	
-	UPROPERTY()
-	TArray<TObjectPtr<UMaterialInterface>> CachedMaterials;
+	TObjectPtr<UPocketCapture> PocketCapture;
 
 private:
 	UPROPERTY(VisibleAnywhere)

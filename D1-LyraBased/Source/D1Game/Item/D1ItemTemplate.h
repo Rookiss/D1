@@ -40,6 +40,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	FIntPoint SlotCount = FIntPoint::ZeroValue;
 
+	UPROPERTY(EditDefaultsOnly)
+	int32 MaxStackCount = 1;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText DisplayName;
 
