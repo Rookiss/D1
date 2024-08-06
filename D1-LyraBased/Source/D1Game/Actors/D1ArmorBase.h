@@ -11,10 +11,28 @@ public:
 	AD1ArmorBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void SetArmorMesh(USkeletalMesh* ArmorMesh);
+	void InitializeActor(USkeletalMesh* InDefaultArmorMesh);
+
+	void SetArmorMesh(USkeletalMesh* InArmorMesh);
+	void SetArmorShouldDefault(bool bInShouldDefault);
+
+private:
+	void RefreshArmorMesh();
+
+public:
 	USkeletalMeshComponent* GetMeshComponent() const { return ArmorMeshComponent; }
 	
-private:
+protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> ArmorMeshComponent;
+
+protected:
+	UPROPERTY()
+	TObjectPtr<USkeletalMesh> DefaultArmorMesh;
+	
+	UPROPERTY()
+	TObjectPtr<USkeletalMesh> ArmorMesh;
+
+private:
+	bool bShouldArmorDefault = false;
 };

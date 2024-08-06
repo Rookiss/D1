@@ -52,7 +52,7 @@ void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const U
 			{
 				if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
 				{
-					// CosmeticActor->SetActorHiddenInGame(true);
+					CosmeticActor->SetArmorShouldDefault(true);
 				}
 			}
 		}
@@ -65,7 +65,7 @@ void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const U
 			{
 				if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
 				{
-					// CosmeticActor->SetActorHiddenInGame(false);
+					CosmeticActor->SetArmorShouldDefault(false);
 				}
 			}
 		}
@@ -76,16 +76,13 @@ void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const U
 
 void UD1CosmeticManagerComponent::SetArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr)
 {
-	InitializeComponent();
-	
 	if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)ArmorType])
 	{
 		if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
 		{
 			if (ArmorMeshPtr.IsNull())
 			{
-				const FD1CosmeticDefaultMeshEntry& DefaultMeshEntry = DefaultMeshes[(int32)ArmorType];
-				CosmeticActor->SetArmorMesh(DefaultMeshEntry.DefaultMesh);
+				CosmeticActor->SetArmorMesh(nullptr);
 			}
 			else
 			{
@@ -148,9 +145,8 @@ void UD1CosmeticManagerComponent::InitializeComponent()
 					{
 						SpawnedRootComponent->AddTickPrerequisiteComponent(ComponentToAttachTo);
 					}
-				
-					USkeletalMesh* CosmeticMesh = DefaultMeshes[i].DefaultMesh; 
-					SpawnedActor->SetArmorMesh(CosmeticMesh);
+					
+					SpawnedActor->InitializeActor(DefaultMeshes[i].DefaultMesh);
 				}
 			}
 		}

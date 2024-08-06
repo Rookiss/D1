@@ -10,7 +10,25 @@ AD1ArmorBase::AD1ArmorBase(const FObjectInitializer& ObjectInitializer)
 	SetRootComponent(ArmorMeshComponent);
 }
 
-void AD1ArmorBase::SetArmorMesh(USkeletalMesh* ArmorMesh)
+void AD1ArmorBase::InitializeActor(USkeletalMesh* InDefaultArmorMesh)
 {
-	ArmorMeshComponent->SetSkeletalMesh(ArmorMesh);
+	DefaultArmorMesh = InDefaultArmorMesh;
+	ArmorMeshComponent->SetSkeletalMesh(DefaultArmorMesh);
+}
+
+void AD1ArmorBase::SetArmorMesh(USkeletalMesh* InArmorMesh)
+{
+	ArmorMesh = InArmorMesh;
+	RefreshArmorMesh();
+}
+
+void AD1ArmorBase::SetArmorShouldDefault(bool bInShouldDefault)
+{
+	bShouldArmorDefault = bInShouldDefault;
+	RefreshArmorMesh();
+}
+
+void AD1ArmorBase::RefreshArmorMesh()
+{
+	ArmorMeshComponent->SetSkeletalMesh((bShouldArmorDefault || ArmorMesh == nullptr) ? DefaultArmorMesh : ArmorMesh);
 }
