@@ -44,15 +44,15 @@ void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const U
 		if (ArmorFragment == nullptr || ArmorFragment->ArmorType != ArmorType)
 			return;
 		
-		SetArmorMesh(ArmorFragment->ArmorType, ArmorFragment->ArmorMesh);
+		SetArmorMesh(ArmorType, ArmorFragment->ArmorMesh);
 		
-		if (ArmorFragment->ArmorType == EArmorType::Chest && ArmorFragment->bIsFullBody)
+		if (ArmorType == EArmorType::Chest)
 		{
 			if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)EArmorType::Legs])
 			{
 				if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
 				{
-					CosmeticActor->SetArmorShouldDefault(true);
+					CosmeticActor->SetArmorShouldDefault(ArmorFragment->bIsFullBody);
 				}
 			}
 		}
