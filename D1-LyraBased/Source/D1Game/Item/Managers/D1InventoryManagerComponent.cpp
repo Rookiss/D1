@@ -5,7 +5,7 @@
 #include "Data/D1ItemData.h"
 #include "Engine/ActorChannel.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Stackable.h"
+#include "Item/D1ItemTemplate.h"
 #include "Net/UnrealNetwork.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1InventoryManagerComponent)
@@ -27,8 +27,9 @@ void FD1InventoryEntry::Init(UD1ItemInstance* InItemInstance, int32 InItemCount)
 	
 	ItemInstance = InItemInstance;
 	
-	const UD1ItemFragment_Stackable* StackableFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Stackable>();
-	ItemCount = StackableFragment ? FMath::Clamp(InItemCount, 1, StackableFragment->MaxStackCount) : 1;
+	// const UD1ItemFragment_Stackable* StackableFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Stackable>();
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
+	ItemCount = FMath::Clamp(InItemCount, 1, ItemTemplate.MaxStackCount);
 }
 
 UD1ItemInstance* FD1InventoryEntry::Reset()
@@ -101,9 +102,9 @@ TArray<UD1ItemInstance*> FD1InventoryList::TryAddItem(int32 ItemTemplateID, int3
 	TArray<TPair<int32/*EntryIndex*/, int32/*NewCount*/>> NewQueue;
 	
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
-	const UD1ItemFragment_Stackable* StackableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Stackable>();
+	// const UD1ItemFragment_Stackable* StackableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Stackable>();
 	
-	if (StackableFragment)
+	if (ItemTemplate.MaxStackCount > 1)
 	{
 		for (int32 i = 0; i < Entries.Num(); i++)
 		{
@@ -118,7 +119,7 @@ TArray<UD1ItemInstance*> FD1InventoryList::TryAddItem(int32 ItemTemplateID, int3
 			if (Entry.ItemInstance->GetItemRarity() != ItemRarity)
 				continue;
 			
-			if (int32 AddCount = FMath::Min(Entry.GetItemCount() + ItemCount, StackableFragment->MaxStackCount) - Entry.GetItemCount())
+			if (int32 AddCount = FMath::Min(Entry.GetItemCount() + ItemCount, ItemTemplate.MaxStackCount) - Entry.GetItemCount())
 			{
 				AddQueue.Emplace(i, AddCount);
 				ItemCount -= AddCount;
@@ -157,7 +158,7 @@ TArray<UD1ItemInstance*> FD1InventoryList::TryAddItem(int32 ItemTemplateID, int3
 			{
 				InventoryManager->MarkSlotChecks(TempSlotChecks, true, ItemSlotPos, ItemSlotCount);
 				
-				int32 AddCount = StackableFragment ? FMath::Min(ItemCount, StackableFragment->MaxStackCount) : 1;
+				int32 AddCount = FMath::Min(ItemCount, ItemTemplate.MaxStackCount);
 				NewQueue.Emplace(y * InventorySlotCount.X + x, AddCount);
 				ItemCount -= AddCount;
 				
@@ -379,12 +380,11 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem(UD1InventoryManagerCompon
 		const int32 ToTemplateID = ToItemInstance->GetItemTemplateID();
 		if (FromTemplateID != ToTemplateID)
 			return 0;
-
-		const UD1ItemFragment_Stackable* StackableFragment = FromItemTemplate.FindFragmentByClass<UD1ItemFragment_Stackable>();
-		if (StackableFragment == nullptr)
+		
+		if (FromItemTemplate.MaxStackCount <= 1)
 			return 0;
 
-		return FMath::Min(FromItemCount + ToItemCount, StackableFragment->MaxStackCount) - ToItemCount;
+		return FMath::Min(FromItemCount + ToItemCount, FromItemTemplate.MaxStackCount) - ToItemCount;
 	}
 	else
 	{
@@ -473,9 +473,9 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1InventoryManager
 
 	const int32 FromItemTemplateID = FromItemInstance->GetItemTemplateID();
 	const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromItemTemplateID);
-	const UD1ItemFragment_Stackable* FromStackableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Stackable>();
+	// const UD1ItemFragment_Stackable* FromStackableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Stackable>();
 	
-	if (FromStackableFragment)
+	if (FromItemTemplate.MaxStackCount > 1)
 	{
 		const TArray<FD1InventoryEntry>& ToEntries = GetAllEntries();
 		for (int32 i = 0; i < ToEntries.Num(); i++)
@@ -491,7 +491,7 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1InventoryManager
 			if (Entry.ItemInstance->GetItemRarity() != FromItemInstance->GetItemRarity())
 				continue;
 			
-			if (int32 AddCount = FMath::Min(Entry.GetItemCount() + LeftItemCount, FromStackableFragment->MaxStackCount) - Entry.GetItemCount())
+			if (int32 AddCount = FMath::Min(Entry.GetItemCount() + LeftItemCount, FromItemTemplate.MaxStackCount) - Entry.GetItemCount())
 			{
 				OutToItemSlotPoses.Emplace(i % InventorySlotCount.X, i / InventorySlotCount.X);
 				OutToItemCounts.Emplace(AddCount);
@@ -522,7 +522,7 @@ int32 UD1InventoryManagerComponent::CanMoveOrMergeItem_Quick(UD1InventoryManager
 			{
 				MarkSlotChecks(TempSlotChecks, true, ItemSlotPos, FromItemSlotCount);
 				
-				int32 AddCount = FromStackableFragment ? FMath::Min(LeftItemCount, FromStackableFragment->MaxStackCount) : 1;
+				int32 AddCount = FMath::Min(LeftItemCount, FromItemTemplate.MaxStackCount);
 				OutToItemSlotPoses.Emplace(x, y);
 				OutToItemCounts.Emplace(AddCount);
 				LeftItemCount -= AddCount;
@@ -591,14 +591,6 @@ bool UD1InventoryManagerComponent::CanAddItem(UD1ItemInstance* FromItemInstance,
 
 	const FIntPoint& ItemSlotCount = ItemTemplate.SlotCount;
 	int32 LeftItemCount = FromItemCount;
-
-	const UD1ItemFragment_Stackable* FromStackableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Stackable>();
-	if (FromStackableFragment)
-	{
-		const TArray<FD1InventoryEntry>& ToEntries = GetAllEntries();
-
-		
-	}
 	
 	const FIntPoint StartSlotPos = FIntPoint::ZeroValue;
 	const FIntPoint EndSlotPos = GetInventorySlotCount() - ItemSlotCount;
@@ -685,14 +677,7 @@ void UD1InventoryManagerComponent::AddItem(const FIntPoint& ItemSlotPos, UD1Item
 		UD1ItemInstance* AddedItemInstance;
 		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
 		
-		if (ItemTemplate.FindFragmentByClass<UD1ItemFragment_Stackable>())
-		{
-			AddedItemInstance = DuplicateObject<UD1ItemInstance>(ItemInstance, GetTransientPackage());
-		}
-		else
-		{
-			AddedItemInstance = ItemInstance;
-		}
+		AddedItemInstance = DuplicateObject<UD1ItemInstance>(ItemInstance, GetTransientPackage());
 		
 		Entry.Init(AddedItemInstance, ItemCount);
 

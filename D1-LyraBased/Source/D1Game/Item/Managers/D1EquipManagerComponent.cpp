@@ -166,7 +166,7 @@ void FD1EquipEntry::Equip()
 			const UD1ItemFragment_Equippable_Armor* ArmorFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
 			if (UD1CosmeticManagerComponent* CharacterCosmetics = Character->FindComponentByClass<UD1CosmeticManagerComponent>())
 			{
-				CharacterCosmetics->SetArmorMesh(ArmorFragment->ArmorType, ArmorFragment->ArmorMesh);
+				CharacterCosmetics->RefreshArmorMesh(ArmorFragment->ArmorType, ArmorFragment);
 			}
 
 			// Refresh Pocket Armor Mesh
@@ -183,7 +183,7 @@ void FD1EquipEntry::Equip()
 								{
 									if (UD1CosmeticManagerComponent* CosmeticManager = PocketStage->GetCosmeticManager())
 									{
-										CosmeticManager->SetArmorMesh(ArmorFragment->ArmorType, ArmorFragment->ArmorMesh);
+										CosmeticManager->RefreshArmorMesh(ArmorFragment->ArmorType, ArmorFragment);
 									}
 								}
 							})
@@ -279,7 +279,7 @@ void FD1EquipEntry::Unequip()
 		
 				if (UD1CosmeticManagerComponent* CharacterCosmetics = Character->FindComponentByClass<UD1CosmeticManagerComponent>())
 				{
-					CharacterCosmetics->SetArmorMesh(ArmorType, nullptr);
+					CharacterCosmetics->RefreshArmorMesh(ArmorType, nullptr);
 				}
 				
 				// Refresh Pocket Armor Mesh
@@ -296,7 +296,7 @@ void FD1EquipEntry::Unequip()
 									{
 										if (UD1CosmeticManagerComponent* CosmeticManager = PocketStage->GetCosmeticManager())
 										{
-											CosmeticManager->SetArmorMesh(ArmorType, nullptr);
+											CosmeticManager->RefreshArmorMesh(ArmorType, nullptr);
 										}
 									}
 								})

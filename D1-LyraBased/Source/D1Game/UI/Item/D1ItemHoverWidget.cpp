@@ -10,7 +10,6 @@
 #include "Item/Fragments/D1ItemFragment_Consumable.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
-#include "Item/Fragments/D1ItemFragment_Stackable.h"
 #include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemHoverWidget)
@@ -146,9 +145,9 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 		Text_Description->SetVisibility(ESlateVisibility::Visible);
 	}
 
-	if (const UD1ItemFragment_Stackable* StackableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Stackable>())
+	if (ItemTemplate.MaxStackCount > 1)
 	{
-		Text_MaxStackCount->SetText(FText::AsNumber(StackableFragment ? StackableFragment->MaxStackCount : 1));
+		Text_MaxStackCount->SetText(FText::AsNumber(ItemTemplate.MaxStackCount));
 		HorizontalBox_MaxStackCount->SetVisibility(ESlateVisibility::Visible);
 	}
 }

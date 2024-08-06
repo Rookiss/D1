@@ -8,7 +8,6 @@
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
-#include "Item/Fragments/D1ItemFragment_Stackable.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
 #include "UI/Item/D1ItemDragDrop.h"
@@ -33,10 +32,7 @@ void UD1InventoryEntryWidget::Init(UD1InventorySlotsWidget* InSlotsWidget, UD1It
 	SizeBox_Root->SetWidthOverride(WidgetSize.X);
 	SizeBox_Root->SetHeightOverride(WidgetSize.Y);
 	
-	if (ItemTemplate.FindFragmentByClass<UD1ItemFragment_Stackable>())
-	{
-		RefreshItemCount(InItemCount);
-	}
+	RefreshItemCount(InItemCount);
 }
 
 void UD1InventoryEntryWidget::RefreshItemCount(int32 NewItemCount)

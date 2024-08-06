@@ -3,7 +3,6 @@
 #include "D1Define.h"
 #include "Actors/D1ArmorBase.h"
 #include "Character/LyraCharacter.h"
-#include "Item/D1ItemTemplate.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "System/LyraAssetManager.h"
 
@@ -35,47 +34,44 @@ void UD1CosmeticManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReas
 	Super::EndPlay(EndPlayReason);
 }
 
-void UD1CosmeticManagerComponent::AddArmorMesh(const UD1ItemFragment_Equippable_Armor* ArmorFragment)
-{
-	if (ArmorFragment == nullptr)
-		return;
-
-	SetArmorMesh(ArmorFragment->ArmorType, ArmorFragment->ArmorMesh);
-
-	bool bIsFullBodyChest = (ArmorFragment->ArmorType == EArmorType::Chest && ArmorFragment->bIsFullBody);
-	bHasFullBodyChest = bIsFullBodyChest || bHasFullBodyChest;
-	
-	if (bIsFullBodyChest || (bHasFullBodyChest && ArmorFragment->ArmorType == EArmorType::Legs))
-	{
-		if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)EArmorType::Legs])
-		{
-			if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
-			{
-				CosmeticActor->SetHidden(true);
-			}
-		}
-	}
-}
-
-void UD1CosmeticManagerComponent::RemoveArmorMesh(EArmorType ArmorType)
+void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const UD1ItemFragment_Equippable_Armor* ArmorFragment)
 {
 	if (ArmorType == EArmorType::Count)
 		return;
-	
-	if (ArmorType == EArmorType::Chest && bHasFullBodyChest)
-	{
-		bHasFullBodyChest = false;
 
-		if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)EArmorType::Legs])
+	if (ArmorFragment)
+	{
+		if (ArmorFragment == nullptr || ArmorFragment->ArmorType != ArmorType)
+			return;
+		
+		SetArmorMesh(ArmorFragment->ArmorType, ArmorFragment->ArmorMesh);
+		
+		if (ArmorFragment->ArmorType == EArmorType::Chest && ArmorFragment->bIsFullBody)
 		{
-			if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
+			if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)EArmorType::Legs])
 			{
-				CosmeticActor->SetHidden(false);
+				if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
+				{
+					// CosmeticActor->SetActorHiddenInGame(true);
+				}
 			}
 		}
 	}
+	else
+	{
+		if (ArmorType == EArmorType::Chest)
+		{
+			if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)EArmorType::Legs])
+			{
+				if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
+				{
+					// CosmeticActor->SetActorHiddenInGame(false);
+				}
+			}
+		}
 
-	SetArmorMesh(ArmorType, nullptr);
+		SetArmorMesh(ArmorType, nullptr);
+	}
 }
 
 void UD1CosmeticManagerComponent::SetArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr)
@@ -95,6 +91,20 @@ void UD1CosmeticManagerComponent::SetArmorMesh(EArmorType ArmorType, TSoftObject
 			{
 				USkeletalMesh* ArmorMesh = ULyraAssetManager::GetAssetByPath<USkeletalMesh>(ArmorMeshPtr);
 				CosmeticActor->SetArmorMesh(ArmorMesh);
+			}
+		}
+	}
+}
+
+void UD1CosmeticManagerComponent::GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const
+{
+	for (UChildActorComponent* CosmeticSlot : CosmeticSlots)
+	{
+		if (CosmeticSlot)
+		{
+			if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
+			{
+				OutMeshComponents.Add(CosmeticActor->GetMeshComponent());
 			}
 		}
 	}

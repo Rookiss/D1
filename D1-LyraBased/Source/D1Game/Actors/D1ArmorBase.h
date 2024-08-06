@@ -12,6 +12,7 @@ public:
 
 public:
 	void SetArmorMesh(USkeletalMesh* ArmorMesh);
+	USkeletalMeshComponent* GetMeshComponent() const { return ArmorMeshComponent; }
 	
 private:
 	UPROPERTY(VisibleAnywhere)

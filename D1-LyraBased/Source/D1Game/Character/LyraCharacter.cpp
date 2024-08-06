@@ -18,6 +18,7 @@
 #include "TimerManager.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "Interaction/D1InteractionQuery.h"
+#include "Item/Managers/D1CosmeticManagerComponent.h"
 #include "Physics/LyraCollisionChannels.h"
 #include "PocketWorld/D1PocketWorldSubsystem.h"
 #include "System/LyraAssetManager.h"
@@ -720,4 +721,12 @@ bool ALyraCharacter::CanInteraction(const FD1InteractionQuery& InteractionQuery)
 		return HealthComponent->IsDeadOrDying();
 	}
 	return false;
+}
+
+void ALyraCharacter::GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const
+{
+	if (UD1CosmeticManagerComponent* CosmeticManager = GetComponentByClass<UD1CosmeticManagerComponent>())
+	{
+		CosmeticManager->GetMeshComponents(OutMeshComponents);
+	}
 }

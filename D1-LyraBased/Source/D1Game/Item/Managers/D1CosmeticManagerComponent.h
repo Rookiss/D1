@@ -34,13 +34,13 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 public:
-	void AddArmorMesh(const UD1ItemFragment_Equippable_Armor* ArmorFragment);
-	void RemoveArmorMesh(EArmorType ArmorType);
-	void SetArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr);
-	
+	void RefreshArmorMesh(EArmorType ArmorType, const UD1ItemFragment_Equippable_Armor* ArmorFragment);
+	void GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const;
+
 private:
 	void InitializeComponent();
-	
+	void SetArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Cosmetic")
 	TSubclassOf<AD1ArmorBase> CosmeticSlotClass;
@@ -53,5 +53,4 @@ private:
 	TArray<TObjectPtr<UChildActorComponent>> CosmeticSlots;
 
 	bool bInitialized = false;
-	bool bHasFullBodyChest = false;
 };

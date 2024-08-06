@@ -8,7 +8,6 @@
 #include "Fragments/D1ItemFragment_Equippable.h"
 #include "Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "Fragments/D1ItemFragment_Equippable_Weapon.h"
-#include "Fragments/D1ItemFragment_Stackable.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemTemplate)
 
@@ -25,7 +24,6 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 
 	// Fragment Check
 	const UD1ItemFragment_Consumable* Consumable = FindFragmentByClass<UD1ItemFragment_Consumable>();
-	const UD1ItemFragment_Stackable* Stackable = FindFragmentByClass<UD1ItemFragment_Stackable>();
 	const UD1ItemFragment_Equippable* Equippable = FindFragmentByClass<UD1ItemFragment_Equippable>();
 	const UD1ItemFragment_Equippable_Armor* Armor = FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
 	const UD1ItemFragment_Equippable_Weapon* Weapon = FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
@@ -35,12 +33,6 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 		if (Armor && Weapon)
 		{
 			Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [Armor] <-> [Weapon]"))));
-			Result = EDataValidationResult::Invalid;
-		}
-
-		if (Stackable)
-		{
-			Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [Stackable] <-> [Equippable]"))));
 			Result = EDataValidationResult::Invalid;
 		}
 

@@ -34,7 +34,7 @@ private:
 
 	void UpdateInteractionInfos(const FD1InteractionQuery& InteractQuery, const TArray<TScriptInterface<ID1Interactable>>& Interactables);
 	void HighlightInteractables(const TArray<FD1InteractionInfo>& InteractionInfos, bool bShouldHighlight);
-	
+
 protected:
 	UPROPERTY(BlueprintAssignable)
 	FOnInteractableChanged InteractableChanged;
