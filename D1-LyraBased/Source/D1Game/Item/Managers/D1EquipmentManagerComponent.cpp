@@ -30,6 +30,7 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* InItemInstance, int32 InItemCount)
 			}
 	
 			ItemInstance = InItemInstance;
+			ItemCount = InItemCount;
 	
 			if (ItemInstance)
 			{
@@ -393,8 +394,15 @@ bool UD1EquipmentManagerComponent::CanSwapEquipment(UD1InventoryManagerComponent
 			}
 			else
 			{
-				if (OtherComponent->CanMoveOrMergeItem_Quick(this, ToEquipmentSlotType, OutToItemSlotPos))
+				TArray<FIntPoint> ToItemSlotPoses;
+				TArray<int32> ToItemCounts;
+
+				int32 MovableCount = OtherComponent->CanMoveOrMergeItem_Quick(this, ToEquipmentSlotType, ToItemSlotPoses, ToItemCounts);
+				if (MovableCount > 0)
+				{
+					OutToItemSlotPos = ToItemSlotPoses[0];
 					return true;
+				}
 			}
 		}
 	}
@@ -479,8 +487,13 @@ bool UD1EquipmentManagerComponent::CanSwapEquipment_Quick(UD1InventoryManagerCom
 			}
 			else
 			{
-				if (OtherComponent->CanMoveOrMergeItem_Quick(this, ToEquipmentSlotType, OutToItemSlotPos))
+				TArray<FIntPoint> ToItemSlotPoses;
+				TArray<int32> ToItemCounts;
+
+				int32 MovableCount = OtherComponent->CanMoveOrMergeItem_Quick(this, ToEquipmentSlotType, ToItemSlotPoses, ToItemCounts);
+				if (MovableCount > 0)
 				{
+					OutToItemSlotPos = ToItemSlotPoses[0];
 					OutToEquipmentSlotType = ToEquipmentSlotType;
 					return true;
 				}

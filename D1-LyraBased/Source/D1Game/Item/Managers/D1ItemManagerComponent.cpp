@@ -179,15 +179,16 @@ void UD1ItemManagerComponent::Server_QuickFromInventory_Implementation(UD1Invent
 
 		if (MyInventoryManager != FromInventoryManager)
 		{
-			TArray<FIntPoint> OutToItemSlotPoses;
-			TArray<int32> OutToItemCounts;
-			int32 MovableItemCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromInventoryManager, FromItemSlotPos, OutToItemSlotPoses, OutToItemCounts);
+			TArray<FIntPoint> ToItemSlotPoses;
+			TArray<int32> ToItemCounts;
+			
+			int32 MovableItemCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromInventoryManager, FromItemSlotPos, ToItemSlotPoses, ToItemCounts);
 			if (MovableItemCount > 0)
 			{
 				UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
-				for (int32 i = 0; i < OutToItemSlotPoses.Num(); i++)
+				for (int32 i = 0; i < ToItemSlotPoses.Num(); i++)
 				{
-					MyInventoryManager->AddItem_Unsafe(OutToItemSlotPoses[i], RemovedItemInstance, OutToItemCounts[i]);
+					MyInventoryManager->AddItem_Unsafe(ToItemSlotPoses[i], RemovedItemInstance, ToItemCounts[i]);
 				}
 			}
 		}
@@ -218,11 +219,17 @@ void UD1ItemManagerComponent::Server_QuickFromEquipment_Implementation(UD1Equipm
 
 	if (MyEquipmentManager == FromEquipmentManager)
 	{
-		FIntPoint ToItemSlotPos;
-		if (MyInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPos))
+		TArray<FIntPoint> ToItemSlotPoses;
+		TArray<int32> ToItemCounts;
+		
+		int32 MovableCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPoses, ToItemCounts);
+		if (MovableCount > 0)
 		{
 			UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
-			MyInventoryManager->AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, 1);
+			for (int32 i = 0; i < ToItemSlotPoses.Num(); i++)
+			{
+				MyInventoryManager->AddItem_Unsafe(ToItemSlotPoses[i], RemovedItemInstance, ToItemCounts[i]);
+			}
 		}
 	}
 	else
@@ -235,11 +242,17 @@ void UD1ItemManagerComponent::Server_QuickFromEquipment_Implementation(UD1Equipm
 		}
 		else
 		{
-			FIntPoint OutToItemSlotPos;
-			if (MyInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, OutToItemSlotPos))
+			TArray<FIntPoint> ToItemSlotPoses;
+			TArray<int32> ToItemCounts;
+
+			int32 MovableCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPoses, ToItemCounts);
+			if (MovableCount > 0)
 			{
 				UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
-				MyInventoryManager->AddItem_Unsafe(OutToItemSlotPos, RemovedItemInstance, 1);
+				for (int32 i = 0; i < ToItemSlotPoses.Num(); i++)
+				{
+					MyInventoryManager->AddItem_Unsafe(ToItemSlotPoses[i], RemovedItemInstance, ToItemCounts[i]);
+				}
 			}
 			else
 			{
@@ -343,16 +356,7 @@ bool UD1ItemManagerComponent::TryPickItem(AD1WorldPickupable* PickedItemActor)
 		NewItemCount = PickupTemplate.ItemCount;
 	}
 
-	// if (Server_QuickFromInventory(MyInventoryManager, ))
-	
-	if (NewItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
-	{
-		// MyEquipmentManager->AddEquipment();
-	}
-	else
-	{
-		
-	}
+	// TODO
 
 	PickedItemActor->Destroy();
 	return true;
