@@ -31,6 +31,9 @@ public:
 	UD1ItemFragment_Equippable_Weapon(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
+	virtual void OnInstanceCreated(UD1ItemInstance* ItemInstance) const override;
+	
+public:
 	UPROPERTY(EditDefaultsOnly)
 	EWeaponType WeaponType = EWeaponType::Count;
 
@@ -66,4 +69,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TObjectPtr<const ULyraAbilitySet>> SkillAbilitySets;
+	
+	UPROPERTY(EditDefaultsOnly, meta=(ForceInlineRow))
+	TArray<FRarityStatRangeSet> RarityStatRangeSets;
 };

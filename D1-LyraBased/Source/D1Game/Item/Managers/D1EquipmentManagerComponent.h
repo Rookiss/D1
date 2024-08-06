@@ -20,10 +20,11 @@ struct FD1EquipmentEntry : public FFastArraySerializerItem
 	GENERATED_BODY()
 	
 private:
-	void Init(UD1ItemInstance* NewItemInstance);
+	void Init(UD1ItemInstance* InItemInstance, int32 InItemCount);
 	
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
+	int32 GetItemCount() const { return ItemCount; }
 	
 private:
 	friend struct FD1EquipmentList;
@@ -32,6 +33,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UD1ItemInstance> ItemInstance;
+
+	UPROPERTY()
+	int32 ItemCount = 0;
 
 private:
 	UPROPERTY(NotReplicated)
@@ -140,9 +144,9 @@ public:
 
 	ALyraCharacter* GetCharacter() const;
 	ALyraPlayerController* GetPlayerController() const;
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	
 	UD1ItemInstance* GetItemInstance(EEquipmentSlotType EquipmentSlotType) const;
+	int32 GetItemCount(EEquipmentSlotType EquipmentSlotType) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	void GetAllWeaponItemInstances(TArray<UD1ItemInstance*>& OutItemInstances) const;

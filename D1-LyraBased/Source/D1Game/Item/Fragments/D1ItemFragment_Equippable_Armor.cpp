@@ -1,5 +1,6 @@
 ﻿#include "D1ItemFragment_Equippable_Armor.h"
 
+#include "Item/D1ItemInstance.h"
 #include "UObject/ObjectSaveContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemFragment_Equippable_Armor)
@@ -21,3 +22,10 @@ void UD1ItemFragment_Equippable_Armor::PreSave(FObjectPreSaveContext SaveContext
 	}
 }
 #endif // WITH_EDITORONLY_DATA
+
+void UD1ItemFragment_Equippable_Armor::OnInstanceCreated(UD1ItemInstance* ItemInstance) const
+{
+	Super::OnInstanceCreated(ItemInstance);
+	
+	AddStatTagStack(ItemInstance, RarityStatRangeSets);
+}

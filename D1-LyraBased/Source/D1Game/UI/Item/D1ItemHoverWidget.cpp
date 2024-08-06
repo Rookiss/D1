@@ -7,7 +7,6 @@
 #include "Data/D1ItemData.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Consumable.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "System/LyraAssetManager.h"
@@ -136,13 +135,6 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			Text_ArmorType->SetText(FText::FromString(ArmorTypeString));
 			HorizontalBox_ArmorType->SetVisibility(ESlateVisibility::Visible);
 		}
-	}
-	else if (const UD1ItemFragment_Consumable* ConsumableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Consumable>())
-	{
-		Text_ItemType->SetText(FText::FromString(TEXT("Consumable")));
-		
-		Text_Description->SetText(ConsumableFragment->Description);
-		Text_Description->SetVisibility(ESlateVisibility::Visible);
 	}
 
 	if (ItemTemplate.MaxStackCount > 1)

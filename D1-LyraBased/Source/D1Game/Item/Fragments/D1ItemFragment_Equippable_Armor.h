@@ -16,6 +16,9 @@ protected:
 #if WITH_EDITORONLY_DATA
 	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
 #endif // WITH_EDITORONLY_DATA
+
+public:
+	virtual void OnInstanceCreated(UD1ItemInstance* ItemInstance) const override;
 	
 public:
 	UPROPERTY(EditDefaultsOnly)
@@ -26,4 +29,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<USkeletalMesh> ArmorMesh;
+
+	UPROPERTY(EditDefaultsOnly, meta=(ForceInlineRow))
+	TArray<FRarityStatRangeSet> RarityStatRangeSets;
 };

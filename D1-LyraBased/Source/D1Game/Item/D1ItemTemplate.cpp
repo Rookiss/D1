@@ -4,9 +4,9 @@
 #include "Misc/DataValidation.h"
 #endif // WITH_EDITOR
 
-#include "Fragments/D1ItemFragment_Consumable.h"
 #include "Fragments/D1ItemFragment_Equippable.h"
 #include "Fragments/D1ItemFragment_Equippable_Armor.h"
+#include "Fragments/D1ItemFragment_Equippable_Utility.h"
 #include "Fragments/D1ItemFragment_Equippable_Weapon.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemTemplate)
@@ -22,43 +22,77 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 {
 	EDataValidationResult Result = UObject::IsDataValid(Context);
 
-	// Fragment Check
-	const UD1ItemFragment_Consumable* Consumable = FindFragmentByClass<UD1ItemFragment_Consumable>();
-	const UD1ItemFragment_Equippable* Equippable = FindFragmentByClass<UD1ItemFragment_Equippable>();
-	const UD1ItemFragment_Equippable_Armor* Armor = FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
-	const UD1ItemFragment_Equippable_Weapon* Weapon = FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
-		
-	if (Equippable)
+	if (SlotCount.X < 1 || SlotCount.Y < 1)
 	{
-		if (Armor && Weapon)
+		Context.AddError(FText::FromString(FString::Printf(TEXT("SlotCount is less than 1"))));
+		Result = EDataValidationResult::Invalid;
+	}
+	
+	if (MaxStackCount < 1)
+	{
+		Context.AddError(FText::FromString(FString::Printf(TEXT("MaxStackCount is less than 1"))));
+		Result = EDataValidationResult::Invalid;
+	}
+	
+	const UD1ItemFragment_Equippable* EquippableFragment = nullptr;
+	for (UD1ItemFragment* Fragment : Fragments)
+	{
+		if (UD1ItemFragment_Equippable* CurrentEquippable = Cast<UD1ItemFragment_Equippable>(Fragment))
 		{
-			Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [Armor] <-> [Weapon]"))));
-			Result = EDataValidationResult::Invalid;
-		}
+			if (EquippableFragment)
+			{
+				Context.AddError(FText::FromString(FString::Printf(TEXT("Duplicated Equippable Fragment"))));
+				return EDataValidationResult::Invalid;
+			}
 
-		if (Consumable)
-		{
-			Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [Consumable] <-> [Equippable]"))));
-			Result = EDataValidationResult::Invalid;
+			EquippableFragment = CurrentEquippable;
 		}
-
-		if (Armor && Armor->ArmorType == EArmorType::Count)
+	}
+	
+	if (EquippableFragment)
+	{
+		if (EquippableFragment->EquipmentType == EEquipmentType::Count)
 		{
-			Context.AddError(FText::FromString(FString::Printf(TEXT("Armor Type is Invalid : [EArmorType::Count]"))));
-			Result = EDataValidationResult::Invalid;
+			Context.AddError(FText::FromString(FString::Printf(TEXT("Equipment Type is Invalid : [EEquipmentType::Count]"))));
+			return EDataValidationResult::Invalid;
 		}
-
-		if (Weapon)
+		
+		const UD1ItemFragment_Equippable_Armor* ArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(EquippableFragment);
+		const UD1ItemFragment_Equippable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(EquippableFragment);
+		const UD1ItemFragment_Equippable_Utility* UtilityFragment = Cast<UD1ItemFragment_Equippable_Utility>(EquippableFragment);
+		
+		if (ArmorFragment)
 		{
-			if (Weapon->WeaponType == EWeaponType::Count)
+			if (ArmorFragment->ArmorType == EArmorType::Count)
+			{
+				Context.AddError(FText::FromString(FString::Printf(TEXT("Armor Type is Invalid : [EArmorType::Count]"))));
+				Result = EDataValidationResult::Invalid;
+			}
+		}
+		else if (WeaponFragment)
+		{
+			if (WeaponFragment->WeaponType == EWeaponType::Count)
 			{
 				Context.AddError(FText::FromString(FString::Printf(TEXT("Weapon Type is Invalid : [EWeaponType::Count]"))));
 				Result = EDataValidationResult::Invalid;
 			}
 				
-			if (Weapon->WeaponHandType == EWeaponHandType::Count)
+			if (WeaponFragment->WeaponHandType == EWeaponHandType::Count)
 			{
 				Context.AddError(FText::FromString(FString::Printf(TEXT("Weapon Hand Type is Invalid : [EWeaponHandType::Count]"))));
+				Result = EDataValidationResult::Invalid;
+			}
+		}
+		else if (UtilityFragment)
+		{
+			// TODO: Utility Type Check...etc
+		}
+
+		if (ArmorFragment || WeaponFragment)
+		{
+			if (MaxStackCount != 1)
+			{
+				Context.AddError(FText::FromString(FString::Printf(TEXT("Armor or Weapon Type must have MaxStackCount of 1: [MaxStackCount != 1]"))));
 				Result = EDataValidationResult::Invalid;
 			}
 		}

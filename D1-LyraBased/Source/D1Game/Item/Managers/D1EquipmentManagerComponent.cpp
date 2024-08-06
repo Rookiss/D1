@@ -15,9 +15,9 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentManagerComponent)
 
-void FD1EquipmentEntry::Init(UD1ItemInstance* NewItemInstance)
+void FD1EquipmentEntry::Init(UD1ItemInstance* InItemInstance, int32 InItemCount)
 {
-	if (ItemInstance == NewItemInstance)
+	if (ItemInstance == InItemInstance)
 		return;
 
 	if (ALyraCharacter* Character = EquipmentManager->GetCharacter())
@@ -29,7 +29,7 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* NewItemInstance)
 				EquipManager->Unequip(EquipmentSlotType);
 			}
 	
-			ItemInstance = NewItemInstance;
+			ItemInstance = InItemInstance;
 	
 			if (ItemInstance)
 			{
@@ -83,7 +83,7 @@ void FD1EquipmentList::PostReplicatedChange(const TArrayView<int32> ChangedIndic
 void FD1EquipmentList::AddEquipment(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
 {
 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
-	Entry.Init(ItemInstance);
+	Entry.Init(ItemInstance, 1);
 	MarkItemDirty(Entry);
 }
 
@@ -91,7 +91,7 @@ UD1ItemInstance* FD1EquipmentList::RemoveEquipment(EEquipmentSlotType EquipmentS
 {
 	FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 	UD1ItemInstance* ItemInstance = Entry.ItemInstance;
-	Entry.Init(nullptr);
+	Entry.Init(nullptr, 0);
 	MarkItemDirty(Entry);
 	return ItemInstance;
 }
@@ -652,16 +652,24 @@ ALyraPlayerController* UD1EquipmentManagerComponent::GetPlayerController() const
 
 UD1ItemInstance* UD1EquipmentManagerComponent::GetItemInstance(EEquipmentSlotType EquipmentSlotType) const
 {
-	UD1ItemInstance* Result = nullptr;
+	if (EquipmentSlotType == EEquipmentSlotType::Count)
+		return nullptr;
+	
 	const TArray<FD1EquipmentEntry>& Entries = EquipmentList.GetAllEntries();
+	const FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 	
-	if (Entries.IsValidIndex((int32)EquipmentSlotType))
-	{
-		const FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
-		Result = Entry.ItemInstance;
-	}
+	return Entry.GetItemInstance();
+}
+
+int32 UD1EquipmentManagerComponent::GetItemCount(EEquipmentSlotType EquipmentSlotType) const
+{
+	if (EquipmentSlotType == EEquipmentSlotType::Count)
+		return 0;
+
+	const TArray<FD1EquipmentEntry>& Entries = EquipmentList.GetAllEntries();
+	const FD1EquipmentEntry& Entry = Entries[(int32)EquipmentSlotType];
 	
-	return Result;
+	return Entry.GetItemCount();
 }
 
 void UD1EquipmentManagerComponent::GetAllWeaponItemInstances(TArray<UD1ItemInstance*>& OutItemInstances) const

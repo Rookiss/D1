@@ -93,6 +93,7 @@ enum class EEquipmentType : uint8
 {
 	Weapon,
 	Armor,
+	Utility,
 	
 	Count	UMETA(Hidden)
 };

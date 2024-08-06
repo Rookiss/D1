@@ -13,6 +13,7 @@ public:
 public:
 	void InitializeActor(USkeletalMesh* InDefaultArmorMesh);
 
+public:
 	void SetArmorMesh(USkeletalMesh* InArmorMesh);
 	void SetArmorShouldDefault(bool bInShouldDefault);
 
