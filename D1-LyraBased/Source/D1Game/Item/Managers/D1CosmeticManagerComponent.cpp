@@ -12,17 +12,36 @@ UD1CosmeticManagerComponent::UD1CosmeticManagerComponent(const FObjectInitialize
 	: Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
+
+	const int32 ArmorTypeCount = (int32)EArmorType::Count; 
+
+	DefaultMeshes.SetNum(ArmorTypeCount);
+	for (int32 i = 0; i < ArmorTypeCount; i++)
+	{
+		DefaultMeshes[i].ArmorType = (EArmorType)i;
+	}
+
+	SecondaryMeshes.SetNum(ArmorTypeCount);
+	for (int32 i = 0; i < ArmorTypeCount; i++)
+	{
+		SecondaryMeshes[i].ArmorType = (EArmorType)i;
+	}
 }
 
 void UD1CosmeticManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	InitializeComponent();
+	Initialize();
 }
 
 void UD1CosmeticManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	if (HeadSlot)
+	{
+		HeadSlot->DestroyComponent();
+	}
+	
 	for (UChildActorComponent* CosmeticSlot : CosmeticSlots)
 	{
 		if (CosmeticSlot)
@@ -44,7 +63,7 @@ void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const U
 		if (ArmorFragment == nullptr || ArmorFragment->ArmorType != ArmorType)
 			return;
 		
-		SetArmorMesh(ArmorType, ArmorFragment->ArmorMesh);
+		SetPrimaryArmorMesh(ArmorType, ArmorFragment->ArmorMesh);
 		
 		if (ArmorType == EArmorType::Chest)
 		{
@@ -52,7 +71,17 @@ void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const U
 			{
 				if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
 				{
-					CosmeticActor->SetArmorShouldDefault(ArmorFragment->bIsFullBody);
+					CosmeticActor->ShouldUseSecondaryMesh(ArmorFragment->bIsFullBody);
+				}
+			}
+		}
+		else if (ArmorType == EArmorType::Helmet)
+		{
+			if (HeadSlot)
+			{
+				if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(HeadSlot->GetChildActor()))
+				{
+					CosmeticActor->ShouldUseSecondaryMesh(true);
 				}
 			}
 		}
@@ -65,16 +94,26 @@ void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const U
 			{
 				if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
 				{
-					CosmeticActor->SetArmorShouldDefault(false);
+					CosmeticActor->ShouldUseSecondaryMesh(false);
+				}
+			}
+		}
+		else if (ArmorType == EArmorType::Helmet)
+		{
+			if (HeadSlot)
+			{
+				if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(HeadSlot->GetChildActor()))
+				{
+					CosmeticActor->ShouldUseSecondaryMesh(false);
 				}
 			}
 		}
 
-		SetArmorMesh(ArmorType, nullptr);
+		SetPrimaryArmorMesh(ArmorType, nullptr);
 	}
 }
 
-void UD1CosmeticManagerComponent::SetArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr)
+void UD1CosmeticManagerComponent::SetPrimaryArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr)
 {
 	if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)ArmorType])
 	{
@@ -82,12 +121,12 @@ void UD1CosmeticManagerComponent::SetArmorMesh(EArmorType ArmorType, TSoftObject
 		{
 			if (ArmorMeshPtr.IsNull())
 			{
-				CosmeticActor->SetArmorMesh(nullptr);
+				CosmeticActor->SetPrimaryArmorMesh(nullptr);
 			}
 			else
 			{
 				USkeletalMesh* ArmorMesh = ULyraAssetManager::GetAssetByPath<USkeletalMesh>(ArmorMeshPtr);
-				CosmeticActor->SetArmorMesh(ArmorMesh);
+				CosmeticActor->SetPrimaryArmorMesh(ArmorMesh);
 			}
 		}
 	}
@@ -95,6 +134,14 @@ void UD1CosmeticManagerComponent::SetArmorMesh(EArmorType ArmorType, TSoftObject
 
 void UD1CosmeticManagerComponent::GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const
 {
+	if (HeadSlot)
+	{
+		if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(HeadSlot->GetChildActor()))
+		{
+			OutMeshComponents.Add(CosmeticActor->GetMeshComponent());
+		}
+	}
+	
 	for (UChildActorComponent* CosmeticSlot : CosmeticSlots)
 	{
 		if (CosmeticSlot)
@@ -107,7 +154,7 @@ void UD1CosmeticManagerComponent::GetMeshComponents(TArray<UMeshComponent*>& Out
 	}
 }
 
-void UD1CosmeticManagerComponent::InitializeComponent()
+void UD1CosmeticManagerComponent::Initialize()
 {
 	if (bInitialized)
 		return;
@@ -115,13 +162,6 @@ void UD1CosmeticManagerComponent::InitializeComponent()
 	bInitialized = true;
 
 	const int32 ArmorTypeCount = (int32)EArmorType::Count; 
-
-	DefaultMeshes.SetNumZeroed(ArmorTypeCount);
-	for (int32 i = 0; i < ArmorTypeCount; i++)
-	{
-		DefaultMeshes[i].ArmorType = (EArmorType)i;
-	}
-
 	CosmeticSlots.SetNumZeroed(ArmorTypeCount);
 	
 	check(CosmeticSlotClass);
@@ -130,25 +170,38 @@ void UD1CosmeticManagerComponent::InitializeComponent()
 	{
 		if (Character->IsNetMode(NM_DedicatedServer) == false)
 		{
+			HeadSlot = SpawnCosmeticSlotActor(HeadDefaultMesh, HeadSecondaryMesh);
+			
 			for (int32 i = 0; i < (int32)EArmorType::Count; i++)
 			{
-				USceneComponent* ComponentToAttachTo = Character->GetMesh();
-				UChildActorComponent* CosmeticComponent = NewObject<UChildActorComponent>(Character);
-				CosmeticComponent->SetupAttachment(ComponentToAttachTo);
-				CosmeticComponent->SetChildActorClass(CosmeticSlotClass);
-				CosmeticComponent->RegisterComponent();
-				CosmeticSlots[i] = CosmeticComponent;
-
-				if (AD1ArmorBase* SpawnedActor = Cast<AD1ArmorBase>(CosmeticComponent->GetChildActor()))
-				{
-					if (USceneComponent* SpawnedRootComponent = SpawnedActor->GetRootComponent())
-					{
-						SpawnedRootComponent->AddTickPrerequisiteComponent(ComponentToAttachTo);
-					}
-					
-					SpawnedActor->InitializeActor(DefaultMeshes[i].DefaultMesh);
-				}
+				CosmeticSlots[i] = SpawnCosmeticSlotActor(DefaultMeshes[i].Mesh, SecondaryMeshes[i].Mesh);
 			}
 		}
 	}
+}
+
+UChildActorComponent* UD1CosmeticManagerComponent::SpawnCosmeticSlotActor(USkeletalMesh* DefaultMesh, USkeletalMesh* SecondaryMesh)
+{
+	UChildActorComponent* CosmeticComponent = nullptr;
+	
+	if (ACharacter* Character = Cast<ACharacter>(GetOwner()))
+	{
+		USceneComponent* ComponentToAttachTo = Character->GetMesh();
+		CosmeticComponent = NewObject<UChildActorComponent>(Character);
+		CosmeticComponent->SetupAttachment(ComponentToAttachTo);
+		CosmeticComponent->SetChildActorClass(CosmeticSlotClass);
+		CosmeticComponent->RegisterComponent();
+
+		if (AD1ArmorBase* SpawnedActor = Cast<AD1ArmorBase>(CosmeticComponent->GetChildActor()))
+		{
+			if (USceneComponent* SpawnedRootComponent = SpawnedActor->GetRootComponent())
+			{
+				SpawnedRootComponent->AddTickPrerequisiteComponent(ComponentToAttachTo);
+			}
+					
+			SpawnedActor->InitializeActor(DefaultMesh, SecondaryMesh);
+		}
+	}
+	
+	return CosmeticComponent;
 }

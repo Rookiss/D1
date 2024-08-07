@@ -10,25 +10,34 @@ AD1ArmorBase::AD1ArmorBase(const FObjectInitializer& ObjectInitializer)
 	SetRootComponent(ArmorMeshComponent);
 }
 
-void AD1ArmorBase::InitializeActor(USkeletalMesh* InDefaultArmorMesh)
+void AD1ArmorBase::InitializeActor(USkeletalMesh* InDefaultArmorMesh, USkeletalMesh* InSecondaryArmorMesh)
 {
 	DefaultArmorMesh = InDefaultArmorMesh;
+	SecondaryArmorMesh = (InSecondaryArmorMesh ? InSecondaryArmorMesh : InDefaultArmorMesh);
+	
 	ArmorMeshComponent->SetSkeletalMesh(DefaultArmorMesh);
 }
 
-void AD1ArmorBase::SetArmorMesh(USkeletalMesh* InArmorMesh)
+void AD1ArmorBase::SetPrimaryArmorMesh(USkeletalMesh* InPrimaryArmorMesh)
 {
-	ArmorMesh = InArmorMesh;
+	PrimaryArmorMesh = InPrimaryArmorMesh;
 	RefreshArmorMesh();
 }
 
-void AD1ArmorBase::SetArmorShouldDefault(bool bInShouldDefault)
+void AD1ArmorBase::ShouldUseSecondaryMesh(bool bInShouldUseSecondary)
 {
-	bShouldArmorDefault = bInShouldDefault;
+	bShouldUseSecondaryArmor = bInShouldUseSecondary;
 	RefreshArmorMesh();
 }
 
 void AD1ArmorBase::RefreshArmorMesh()
 {
-	ArmorMeshComponent->SetSkeletalMesh((bShouldArmorDefault || ArmorMesh == nullptr) ? DefaultArmorMesh : ArmorMesh);
+	if (bShouldUseSecondaryArmor)
+	{
+		ArmorMeshComponent->SetSkeletalMesh(SecondaryArmorMesh);
+	}
+	else
+	{
+		ArmorMeshComponent->SetSkeletalMesh(PrimaryArmorMesh ? PrimaryArmorMesh : DefaultArmorMesh);
+	}
 }

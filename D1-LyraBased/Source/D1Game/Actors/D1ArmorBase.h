@@ -11,11 +11,11 @@ public:
 	AD1ArmorBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void InitializeActor(USkeletalMesh* InDefaultArmorMesh);
+	void InitializeActor(USkeletalMesh* InDefaultArmorMesh, USkeletalMesh* InSecondaryArmorMesh);
 
 public:
-	void SetArmorMesh(USkeletalMesh* InArmorMesh);
-	void SetArmorShouldDefault(bool bInShouldDefault);
+	void SetPrimaryArmorMesh(USkeletalMesh* InPrimaryArmorMesh);
+	void ShouldUseSecondaryMesh(bool bInShouldUseSecondary);
 
 private:
 	void RefreshArmorMesh();
@@ -32,8 +32,11 @@ protected:
 	TObjectPtr<USkeletalMesh> DefaultArmorMesh;
 	
 	UPROPERTY()
-	TObjectPtr<USkeletalMesh> ArmorMesh;
+	TObjectPtr<USkeletalMesh> PrimaryArmorMesh;
+
+	UPROPERTY()
+	TObjectPtr<USkeletalMesh> SecondaryArmorMesh;
 
 private:
-	bool bShouldArmorDefault = false;
+	bool bShouldUseSecondaryArmor = false;
 };

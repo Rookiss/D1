@@ -4,12 +4,11 @@
 #include "Components/PawnComponent.h"
 #include "D1CosmeticManagerComponent.generated.h"
 
-class UD1ItemFragment_Equippable_Armor;
-class UD1ItemTemplate;
 class AD1ArmorBase;
+class UD1ItemFragment_Equippable_Armor;
 
 USTRUCT(BlueprintType)
-struct FD1CosmeticDefaultMeshEntry
+struct FD1CosmeticMeshEntry
 {
 	GENERATED_BODY()
 
@@ -18,10 +17,10 @@ public:
 	EArmorType ArmorType = EArmorType::Count;
 
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<USkeletalMesh> DefaultMesh = nullptr;
+	TObjectPtr<USkeletalMesh> Mesh = nullptr;
 };
 
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, Blueprintable)
 class UD1CosmeticManagerComponent : public UPawnComponent
 {
 	GENERATED_BODY()
@@ -38,17 +37,32 @@ public:
 	void GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const;
 
 private:
-	void InitializeComponent();
-	void SetArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr);
+	void Initialize();
+	UChildActorComponent* SpawnCosmeticSlotActor(USkeletalMesh* DefaultMesh, USkeletalMesh* SecondaryMesh);
+	void SetPrimaryArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Cosmetic")
 	TSubclassOf<AD1ArmorBase> CosmeticSlotClass;
 
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="Cosmetic")
+	TObjectPtr<USkeletalMesh> HeadDefaultMesh;
+
+	UPROPERTY(EditDefaultsOnly, Category="Cosmetic")
+	TObjectPtr<USkeletalMesh> HeadSecondaryMesh;
+
+protected:
 	UPROPERTY(EditDefaultsOnly, EditFixedSize, Category="Cosmetic")
-	TArray<FD1CosmeticDefaultMeshEntry> DefaultMeshes;
+	TArray<FD1CosmeticMeshEntry> DefaultMeshes;
+
+	UPROPERTY(EditDefaultsOnly, EditFixedSize, Category="Cosmetic")
+	TArray<FD1CosmeticMeshEntry> SecondaryMeshes;
 
 private:
+	UPROPERTY()
+	TObjectPtr<UChildActorComponent> HeadSlot;
+	
 	UPROPERTY()
 	TArray<TObjectPtr<UChildActorComponent>> CosmeticSlots;
 
