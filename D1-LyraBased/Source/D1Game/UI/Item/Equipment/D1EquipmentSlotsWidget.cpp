@@ -62,7 +62,7 @@ void UD1EquipmentSlotsWidget::ConstructUI(FGameplayTag Channel, const FEquipment
 		const FD1EquipmentEntry& Entry = Entries[i];
 		if (UD1ItemInstance* ItemInstance = Entry.GetItemInstance())
 		{
-			OnEquipmentEntryChanged((EEquipmentSlotType)i, ItemInstance);
+			OnEquipmentEntryChanged((EEquipmentSlotType)i, ItemInstance, Entry.GetItemCount());
 		}
 	}
 	DelegateHandle = EquipmentManager->OnEquipmentEntryChanged.AddUObject(this, &ThisClass::OnEquipmentEntryChanged);
@@ -93,7 +93,7 @@ void UD1EquipmentSlotsWidget::DestructUI()
 	}
 }
 
-void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
+void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount)
 {
 	if (EquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || EquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || EquipmentSlotType == EEquipmentSlotType::Count)
 		return;

@@ -1,6 +1,5 @@
 ﻿#include "D1ItemManagerComponent.h"
 
-#include "D1EquipManagerComponent.h"
 #include "D1EquipmentManagerComponent.h"
 #include "D1InventoryManagerComponent.h"
 #include "NavigationSystem.h"
@@ -27,21 +26,25 @@ void UD1ItemManagerComponent::Server_InventoryToEquipment_Implementation(UD1Inve
 
 	if (IsAllowedComponent(FromInventoryManager) == false ||  IsAllowedComponent(ToEquipmentManager) == false)
 		return;
-	
-	if (ToEquipmentManager->CanMoveEquipment(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
+
+	int32 MovableCount = ToEquipmentManager->CanMoveOrMergeEquipment(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType);
+	if (MovableCount > 0)
 	{
-		UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, 1);
-		ToEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance);
+		UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, MovableCount);
+		ToEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance, MovableCount);
 	}
 	else
 	{
 		FIntPoint ToItemSlotPos;
 		if (ToEquipmentManager->CanSwapEquipment(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType, ToItemSlotPos))
 		{
-			UD1ItemInstance* RemovedItemInstanceTo = ToEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType);
-			UD1ItemInstance* RemovedItemInstanceFrom = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, 1);
-			ToEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom);
-			FromInventoryManager->AddItem_Unsafe(ToItemSlotPos, RemovedItemInstanceTo, 1);
+			const int32 FromItemCount = FromInventoryManager->GetItemCount(FromItemSlotPos);
+			const int32 ToItemCount = ToEquipmentManager->GetItemCount(ToEquipmentSlotType);
+			
+			UD1ItemInstance* RemovedItemInstanceFrom = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, FromItemCount);
+			UD1ItemInstance* RemovedItemInstanceTo = ToEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType, ToItemCount);
+			FromInventoryManager->AddItem_Unsafe(ToItemSlotPos, RemovedItemInstanceTo, ToItemCount);
+			ToEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom, FromItemCount);
 		}
 	}
 }
@@ -57,10 +60,11 @@ void UD1ItemManagerComponent::Server_EquipmentToInventory_Implementation(UD1Equi
 	if (IsAllowedComponent(FromEquipmentManager) == false ||  IsAllowedComponent(ToInventoryManager) == false)
 		return;
 
-	if (ToInventoryManager->CanMoveOrMergeItem(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPos))
+	int32 MovableCount = ToInventoryManager->CanMoveOrMergeItem(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPos);
+	if (MovableCount > 0)
 	{
-		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
-		ToInventoryManager->AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, 1);
+		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, MovableCount);
+		ToInventoryManager->AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, MovableCount);
 	}
 }
 
@@ -75,11 +79,11 @@ void UD1ItemManagerComponent::Server_InventoryToInventory_Implementation(UD1Inve
 	if (IsAllowedComponent(FromInventoryManager) == false ||  IsAllowedComponent(ToInventoryManager) == false)
 		return;
 
-	int32 MovableItemCount = ToInventoryManager->CanMoveOrMergeItem(FromInventoryManager, FromItemSlotPos, ToItemSlotPos);
-	if (MovableItemCount > 0)
+	int32 MovableCount = ToInventoryManager->CanMoveOrMergeItem(FromInventoryManager, FromItemSlotPos, ToItemSlotPos);
+	if (MovableCount > 0)
 	{
-		UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
-		ToInventoryManager->AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, MovableItemCount);
+		UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, MovableCount);
+		ToInventoryManager->AddItem_Unsafe(ToItemSlotPos, RemovedItemInstance, MovableCount);
 	}
 }
 
@@ -93,18 +97,22 @@ void UD1ItemManagerComponent::Server_EquipmentToEquipment_Implementation(UD1Equi
 
 	if (IsAllowedComponent(FromEquipmentManager) == false ||  IsAllowedComponent(ToEquipmentManager) == false)
 		return;
-	
-	if (ToEquipmentManager->CanMoveEquipment(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
+
+	int32 MovableCount = ToEquipmentManager->CanMoveOrMergeEquipment(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType);
+	if (MovableCount > 0)
 	{
-		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
-		ToEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance);
+		UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, MovableCount);
+		ToEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance, MovableCount);
 	}
 	else if (ToEquipmentManager->CanSwapEquipment(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
 	{
-		UD1ItemInstance* RemovedItemInstanceTo = ToEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType);
-		UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
-		ToEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom);
-		FromEquipmentManager->AddEquipment_Unsafe(FromEquipmentSlotType, RemovedItemInstanceTo);
+		const int32 FromItemCount = FromEquipmentManager->GetItemCount(FromEquipmentSlotType);
+		const int32 ToItemCount = ToEquipmentManager->GetItemCount(ToEquipmentSlotType);
+		
+		UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, FromItemCount);
+		UD1ItemInstance* RemovedItemInstanceTo = ToEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType, ToItemCount);
+		FromEquipmentManager->AddEquipment_Unsafe(FromEquipmentSlotType, RemovedItemInstanceTo, ToItemCount);
+		ToEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom, FromItemCount);
 	}
 }
 
@@ -138,10 +146,11 @@ void UD1ItemManagerComponent::Server_QuickFromInventory_Implementation(UD1Invent
 		// 1-2. [다른 인벤토리] -> 내 장비 장착 -> 내 인벤토리 -> 내 장비 교체
 	
 		EEquipmentSlotType ToEquipmentSlotType;
-		if (MyEquipmentManager->CanMoveEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType))
+		int32 MovableCount = MyEquipmentManager->CanMoveOrMergeEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType);
+		if (MovableCount > 0)
 		{
-			UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, 1);
-			MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance);
+			UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, MovableCount);
+			MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance, MovableCount);
 		}
 		else
 		{
@@ -149,10 +158,10 @@ void UD1ItemManagerComponent::Server_QuickFromInventory_Implementation(UD1Invent
 			{
 				TArray<FIntPoint> OutToItemSlotPoses;
 				TArray<int32> OutToItemCounts;
-				int32 MovableItemCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromInventoryManager, FromItemSlotPos, OutToItemSlotPoses, OutToItemCounts);
-				if (MovableItemCount > 0)
+				MovableCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromInventoryManager, FromItemSlotPos, OutToItemSlotPoses, OutToItemCounts);
+				if (MovableCount > 0)
 				{
-					UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, MovableItemCount);
+					UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, MovableCount);
 					for (int32 i = 0; i < OutToItemSlotPoses.Num(); i++)
 					{
 						MyInventoryManager->AddItem_Unsafe(OutToItemSlotPoses[i], RemovedItemInstance, OutToItemCounts[i]);
@@ -164,10 +173,13 @@ void UD1ItemManagerComponent::Server_QuickFromInventory_Implementation(UD1Invent
 			FIntPoint ToItemSlotPos;
 			if (MyEquipmentManager->CanSwapEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType, ToItemSlotPos))
 			{
-				UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType);
-				UD1ItemInstance* RemovedItemInstanceFrom = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, 1);
-				MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom);
-				FromInventoryManager->AddItem_Unsafe(ToItemSlotPos, RemovedItemInstanceTo, 1);
+				const int32 FromItemCount = FromInventoryManager->GetItemCount(FromItemSlotPos);
+				const int32 ToItemCount = MyEquipmentManager->GetItemCount(ToEquipmentSlotType);
+				
+				UD1ItemInstance* RemovedItemInstanceFrom = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, FromItemCount);
+				UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType, ToItemCount);
+				FromInventoryManager->AddItem_Unsafe(ToItemSlotPos, RemovedItemInstanceTo, ToItemCount);
+				MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom, FromItemCount);
 			}
 		}
 	}
@@ -225,7 +237,7 @@ void UD1ItemManagerComponent::Server_QuickFromEquipment_Implementation(UD1Equipm
 		int32 MovableCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPoses, ToItemCounts);
 		if (MovableCount > 0)
 		{
-			UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
+			UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, MovableCount);
 			for (int32 i = 0; i < ToItemSlotPoses.Num(); i++)
 			{
 				MyInventoryManager->AddItem_Unsafe(ToItemSlotPoses[i], RemovedItemInstance, ToItemCounts[i]);
@@ -235,20 +247,21 @@ void UD1ItemManagerComponent::Server_QuickFromEquipment_Implementation(UD1Equipm
 	else
 	{
 		EEquipmentSlotType ToEquipmentSlotType;
-		if (MyEquipmentManager->CanMoveEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
+		int32 MovableCount = MyEquipmentManager->CanMoveOrMergeEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType);
+		if (MovableCount > 0)
 		{
-			UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
-			MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance);
+			UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, MovableCount);
+			MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance, MovableCount);
 		}
 		else
 		{
 			TArray<FIntPoint> ToItemSlotPoses;
 			TArray<int32> ToItemCounts;
 
-			int32 MovableCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPoses, ToItemCounts);
+			MovableCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPoses, ToItemCounts);
 			if (MovableCount > 0)
 			{
-				UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
+				UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, MovableCount);
 				for (int32 i = 0; i < ToItemSlotPoses.Num(); i++)
 				{
 					MyInventoryManager->AddItem_Unsafe(ToItemSlotPoses[i], RemovedItemInstance, ToItemCounts[i]);
@@ -258,10 +271,13 @@ void UD1ItemManagerComponent::Server_QuickFromEquipment_Implementation(UD1Equipm
 			{
 				if (MyEquipmentManager->CanSwapEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
 				{
-					UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType);
-					UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
-					MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom);
-					FromEquipmentManager->AddEquipment_Unsafe(FromEquipmentSlotType, RemovedItemInstanceTo);
+					const int32 FromItemCount = FromEquipmentManager->GetItemCount(FromEquipmentSlotType);
+					const int32 ToItemCount = MyEquipmentManager->GetItemCount(ToEquipmentSlotType);
+					
+					UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, FromItemCount);
+					UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType, ToItemCount);
+					FromEquipmentManager->AddEquipment_Unsafe(FromEquipmentSlotType, RemovedItemInstanceTo, ToItemCount);
+					MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom, FromItemCount);
 				}
 			}
 		}
@@ -307,10 +323,14 @@ void UD1ItemManagerComponent::Server_DropItemFromEquipment_Implementation(UD1Equ
 	UD1ItemInstance* FromItemInstance = FromEquipmentManager->GetItemInstance(FromEquipmentSlotType);
 	if (FromItemInstance == nullptr)
 		return;
+
+	int32 FromItemCount = FromEquipmentManager->GetItemCount(FromEquipmentSlotType);
+	if (FromItemCount <= 0)
+		return;
 	
-	if (TryDropItem(FromItemInstance, 1))
+	if (TryDropItem(FromItemInstance, FromItemCount))
 	{
-		FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType);
+		FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, FromItemCount);
 	}
 }
 
@@ -334,29 +354,29 @@ bool UD1ItemManagerComponent::TryPickItem(AD1WorldPickupable* PickedItemActor)
 	const FD1PickupInstance& PickupInstance = PickupInfo.PickupInstance;
 	const FD1PickupTemplate& PickupTemplate = PickupInfo.PickupTemplate;
 
-	UD1ItemInstance* NewItemInstance = nullptr;
-	int32 NewItemCount = 0;
-	
-	if (PickupInstance.ItemInstance)
-	{
-		if (PickupInstance.ItemCount <= 0)
-			return false;
-
-		NewItemInstance = PickupInstance.ItemInstance;
-		NewItemCount = PickupInstance.ItemCount;
-	}
-	else if (PickupTemplate.ItemTemplateClass)
-	{
-		if (PickupTemplate.ItemCount <= 0 || PickupTemplate.ItemRarity == EItemRarity::Count)
-			return false;
-		
-		int32 ItemTemmpleteID = UD1ItemData::Get().FindItemTemplateIDByClass(PickupTemplate.ItemTemplateClass);
-		NewItemInstance = NewObject<UD1ItemInstance>();
-		NewItemInstance->Init(ItemTemmpleteID, PickupTemplate.ItemRarity);
-		NewItemCount = PickupTemplate.ItemCount;
-	}
-
 	// TODO
+	
+	// UD1ItemInstance* NewItemInstance = nullptr;
+	// int32 NewItemCount = 0;
+	//
+	// if (PickupInstance.ItemInstance)
+	// {
+	// 	if (PickupInstance.ItemCount <= 0)
+	// 		return false;
+	//
+	// 	NewItemInstance = PickupInstance.ItemInstance;
+	// 	NewItemCount = PickupInstance.ItemCount;
+	// }
+	// else if (PickupTemplate.ItemTemplateClass)
+	// {
+	// 	if (PickupTemplate.ItemCount <= 0 || PickupTemplate.ItemRarity == EItemRarity::Count)
+	// 		return false;
+	// 	
+	// 	int32 ItemTemmpleteID = UD1ItemData::Get().FindItemTemplateIDByClass(PickupTemplate.ItemTemplateClass);
+	// 	NewItemInstance = NewObject<UD1ItemInstance>();
+	// 	NewItemInstance->Init(ItemTemmpleteID, PickupTemplate.ItemRarity);
+	// 	NewItemCount = PickupTemplate.ItemCount;
+	// }
 
 	PickedItemActor->Destroy();
 	return true;

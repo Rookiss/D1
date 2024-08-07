@@ -478,14 +478,14 @@ void ULyraHeroComponent::Input_Crouch(const FInputActionValue& InputActionValue)
 void ULyraHeroComponent::Input_ChangeEquip_Primary()
 {
 	FGameplayEventData Payload;
-	Payload.EventMagnitude = (int32)EWeaponEquipState::Primary;
+	Payload.EventMagnitude = (int32)EEquipState::Primary;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), D1GameplayTags::GameplayEvent_ChangeEquip, Payload);
 }
 
 void ULyraHeroComponent::Input_ChangeEquip_Secondary()
 {
 	FGameplayEventData Payload;
-	Payload.EventMagnitude = (int32)EWeaponEquipState::Secondary;
+	Payload.EventMagnitude = (int32)EEquipState::Secondary;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), D1GameplayTags::GameplayEvent_ChangeEquip, Payload);
 }
 

@@ -15,13 +15,13 @@ class UD1EquipManagerComponent;
 class UD1EquipmentManagerComponent;
 
 USTRUCT(BlueprintType)
-struct FD1WeaponEquipStateChangedMessage
+struct FD1EquipStateChangedMessage
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(BlueprintReadOnly)
-	EWeaponEquipState WeaponEquipState = EWeaponEquipState::Count;
+	EEquipState EquipState = EEquipState::Count;
 };
 
 USTRUCT(BlueprintType)
@@ -127,36 +127,38 @@ public:
 	void Equip(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
 	void Unequip(EEquipmentSlotType EquipmentSlotType);
 
+	void EquipCurrentSlots();
+	void UnequipCurrentSlots();
+	
 public:
-	void EquipWeaponInSlot();
-	void UnequipWeaponInSlot();
-
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void ChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState);
+	void ChangeEquipState(EEquipState NewEquipState);
 
 	UFUNCTION(BlueprintCallable)
-	bool CanChangeWeaponEquipState(EWeaponEquipState NewWeaponEquipState) const;
+	bool CanChangeEquipState(EEquipState NewEquipState) const;
 
 private:
 	UFUNCTION()
-	void OnRep_CurrentWeaponEquipState();
+	void OnRep_CurrentEquipState();
 
-	void BroadcastChangedMessage(EWeaponEquipState NewWeaponEquipState);
-	
+	void BroadcastChangedMessage(EEquipState NewEquipState);
+
 public:
 	ALyraCharacter* GetCharacter() const;
 	ALyraPlayerController* GetPlayerController() const;
 	
 	TArray<FD1EquipEntry>& GetAllEntries();
 	UAbilitySystemComponent* GetAbilitySystemComponent() const;
-	UD1EquipmentManagerComponent* GetEquipmentManagerComponent() const;
+	UD1EquipmentManagerComponent* GetEquipmentManager() const;
 
-	static EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EWeaponEquipState WeaponEquipState);
+	static EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EEquipState WeaponEquipState);
 	static EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EWeaponSlotType WeaponSlotType);
 	static EEquipmentSlotType ConvertToEquipmentSlotType(EArmorType ArmorType);
+	static EEquipmentSlotType ConvertToEquipmentSlotType(EUtilitySlotType UtilitySlotType);
+	
 	static EWeaponHandType ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType);
 	static EArmorType ConvertToArmorType(EEquipmentSlotType EquipmentSlotType);
-	static EWeaponEquipState ConvertToWeaponEquipState(EWeaponSlotType WeaponSlotType);
+	static EEquipState ConvertToEquipState(EWeaponSlotType WeaponSlotType);
 	static EWeaponSlotType ConvertToWeaponSlotType(EEquipmentSlotType EquipmentSlotType);
 
 	UFUNCTION(BlueprintCallable)
@@ -166,7 +168,7 @@ public:
 	bool ShouldHiddenWeapons() const { return bShouldHiddenWeapons; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	EWeaponEquipState GetCurrentWeaponEquipState() const { return CurrentWeaponEquipState; }
+	EEquipState GetCurrentEquipState() const { return CurrentEquipState; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AD1WeaponBase* GetEquippedWeaponActor(EWeaponHandType WeaponHandType) const;
@@ -187,8 +189,8 @@ private:
 	UPROPERTY(Replicated)
 	FD1EquipList EquipList;
 
-	UPROPERTY(ReplicatedUsing=OnRep_CurrentWeaponEquipState)
-	EWeaponEquipState CurrentWeaponEquipState = EWeaponEquipState::Count;
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentEquipState)
+	EEquipState CurrentEquipState = EEquipState::Count;
 
 	UPROPERTY(Replicated)
 	bool bShouldHiddenWeapons = false;

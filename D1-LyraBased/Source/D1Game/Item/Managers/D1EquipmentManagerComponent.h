@@ -5,6 +5,7 @@
 #include "Net/Serialization/FastArraySerializer.h"
 #include "D1EquipmentManagerComponent.generated.h"
 
+class UD1EquipManagerComponent;
 class ALyraCharacter;
 class ALyraPlayerController;
 class UD1ItemInstance;
@@ -12,7 +13,7 @@ class UD1ItemTemplate;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEquipmentEntryChanged, EEquipmentSlotType, UD1ItemInstance*)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnEquipmentEntryChanged, EEquipmentSlotType, UD1ItemInstance*, int32/*ItemCount*/);
 
 USTRUCT(BlueprintType)
 struct FD1EquipmentEntry : public FFastArraySerializerItem
@@ -21,6 +22,7 @@ struct FD1EquipmentEntry : public FFastArraySerializerItem
 	
 private:
 	void Init(UD1ItemInstance* InItemInstance, int32 InItemCount);
+	UD1ItemInstance* Reset();
 	
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
@@ -58,13 +60,9 @@ public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
 	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
-
+	
 private:
-	void AddEquipment(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
-	UD1ItemInstance* RemoveEquipment(EEquipmentSlotType EquipmentSlotType);
-
-private:
-	void BroadcastChangedMessage(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+	void BroadcastChangedMessage(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount);
 	
 public:
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const { return Entries; }
@@ -100,58 +98,57 @@ public:
 
 protected:
 	virtual void InitializeComponent() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 	virtual void ReadyForReplication() override;
 	
 public:
-	bool CanMoveEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType);
-	bool CanMoveEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType);
-
-	bool CanAddEquipment(UD1ItemInstance* FromItemInstance, EEquipmentSlotType ToEquipmentSlotType);
+	int32 CanMoveOrMergeEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
+	int32 CanMoveOrMergeEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const;
 	
-	bool CanMoveEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType);
-	bool CanMoveEquipment_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType);
-	bool CanMoveEquipment_Quick(UD1ItemInstance* FromItemInstance, EEquipmentSlotType& OutToEquipmentSlotType);
+	int32 CanMoveOrMergeEquipment_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType) const;
+	int32 CanMoveOrMergeEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType) const;
+	int32 CanMoveOrMergeEquipment_Quick(const UD1ItemInstance* FromItemInstance, int32 FromItemCount, EEquipmentSlotType& OutToEquipmentSlotType) const;
 
+	bool CanSwapEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
 	bool CanSwapEquipment(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType, FIntPoint& OutToItemSlotPos);
-	bool CanSwapEquipment(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType);
 	
+	bool CanSwapEquipment_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType) const;
 	bool CanSwapEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType, FIntPoint& OutToItemSlotPos);
-	bool CanSwapEquipment_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType);
+	
+	int32 CanAddEquipment(int32 ItemTemplateID, EItemRarity ItemRarity, int32 ItemCount, EEquipmentSlotType ToEquipmentSlotType) const;
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void TryAddEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass, EItemRarity ItemRarity);
+	void AddUnarmedEquipments(TSubclassOf<UD1ItemTemplate> LeftHandClass, TSubclassOf<UD1ItemTemplate> RightHandClass);
 
 private:
-	void AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
-	UD1ItemInstance* RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType);
+	void AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount);
+	UD1ItemInstance* RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, int32 ItemCount);
 	
 public:
 	static bool IsWeaponSlot(EEquipmentSlotType EquipmentSlotType);
 	static bool IsArmorSlot(EEquipmentSlotType EquipmentSlotType);
+	static bool IsUtilitySlot(EEquipmentSlotType EquipmentSlotType);
 	
-	static bool IsSameWeaponEquipState(EEquipmentSlotType EquipmentSlotType, EWeaponEquipState WeaponEquipState);
+	static bool IsSameEquipState(EEquipmentSlotType EquipmentSlotType, EEquipState WeaponEquipState);
 	static bool IsSameWeaponHandType(EEquipmentSlotType EquipmentSlotType, EWeaponHandType WeaponHandType);
 	static bool IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType);
 	
 	static bool IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);
-	static bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);	
+	static bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);
 	
-	bool IsAllEmpty(EWeaponEquipState WeaponEquipState) const;
+	bool IsAllEmpty(EEquipState EquipState) const;
 
 	ALyraCharacter* GetCharacter() const;
 	ALyraPlayerController* GetPlayerController() const;
+	UD1EquipManagerComponent* GetEquipManager() const;
 	
 	UD1ItemInstance* GetItemInstance(EEquipmentSlotType EquipmentSlotType) const;
 	int32 GetItemCount(EEquipmentSlotType EquipmentSlotType) const;
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	void GetAllWeaponItemInstances(TArray<UD1ItemInstance*>& OutItemInstances) const;
 	
 	const TArray<FD1EquipmentEntry>& GetAllEntries() const;
+	void GetAllWeaponItemInstances(TArray<UD1ItemInstance*>& OutItemInstances) const;
 
 public:
 	FOnEquipmentEntryChanged OnEquipmentEntryChanged;

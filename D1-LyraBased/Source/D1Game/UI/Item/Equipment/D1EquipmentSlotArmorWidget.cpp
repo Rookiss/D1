@@ -74,7 +74,7 @@ bool UD1EquipmentSlotArmorWidget::NativeOnDragOver(const FGeometry& InGeometry, 
 		}
 		else
 		{
-			bIsValid = EquipmentManager->CanMoveEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType);
+			bIsValid = EquipmentManager->CanMoveOrMergeEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType) > 0;
 		}
 	}
 	else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
@@ -85,7 +85,7 @@ bool UD1EquipmentSlotArmorWidget::NativeOnDragOver(const FGeometry& InGeometry, 
 		}
 		else
 		{
-			bIsValid = EquipmentManager->CanMoveEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+			bIsValid = EquipmentManager->CanMoveOrMergeEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType) > 0;
 		}
 	}
 	

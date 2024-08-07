@@ -39,7 +39,7 @@ private:
 	void ConstructUI(FGameplayTag Channel, const FEquipmentInitializeMessage& Message);
 	void DestructUI();
 	
-	void OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+	void OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount);
 
 protected:
 protected:

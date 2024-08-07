@@ -10,7 +10,7 @@ struct FD1ItemRarityProbability;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnInventoryEntryChanged, const FIntPoint&/*ItemSlotPos*/, UD1ItemInstance*/*ItemInstance*/, int32/*ItemCount*/);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnInventoryEntryChanged, const FIntPoint&/*ItemSlotPos*/, UD1ItemInstance*, int32/*ItemCount*/);
 
 USTRUCT(BlueprintType)
 struct FD1InventoryEntry : public FFastArraySerializerItem
@@ -94,10 +94,10 @@ protected:
 	virtual void ReadyForReplication() override;
 	
 public:
+	// TODO: 통합 정리 필요함
 	int32 CanMoveOrMergeItem(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const;
 	int32 CanMoveOrMergeItem(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const;
-	int32 CanMoveOrMergeItem(const UD1ItemInstance* FromItemInstance, int32 FromItemCount, const FIntPoint& ToItemSlotPos) const;
-	
+
 	int32 CanMoveOrMergeItem_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, TArray<FIntPoint>& OutToItemSlotPoses, TArray<int32>& OutToItemCounts) const;
 	int32 CanMoveOrMergeItem_Quick(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, TArray<FIntPoint>& OutToItemSlotPoses, TArray<int32>& OutToItemCounts) const;
 	

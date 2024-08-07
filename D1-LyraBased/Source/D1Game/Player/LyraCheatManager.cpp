@@ -461,29 +461,29 @@ void ULyraCheatManager::EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<
 		{
 			if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>())
 			{
-				EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponFragment->WeaponHandType, WeaponSlotType));
+				EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponFragment->WeaponHandType, WeaponSlotType), 1);
 				
 				if (WeaponFragment->WeaponHandType == EWeaponHandType::LeftHand || WeaponFragment->WeaponHandType == EWeaponHandType::RightHand)
 				{
-					EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::TwoHand, WeaponSlotType));
+					EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::TwoHand, WeaponSlotType), 1);
 				}
 				else if (WeaponFragment->WeaponHandType == EWeaponHandType::TwoHand)
 				{
-					EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::LeftHand, WeaponSlotType));
-					EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::RightHand, WeaponSlotType));
+					EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::LeftHand, WeaponSlotType), 1);
+					EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::RightHand, WeaponSlotType), 1);
 				}
 
 				UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
 				int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
 				ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
-				EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponFragment->WeaponHandType, WeaponSlotType), ItemInstance);
+				EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponFragment->WeaponHandType, WeaponSlotType), ItemInstance, 1);
 				
 				if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
 				{
-					EWeaponEquipState TargetWeaponEquipState = UD1EquipManagerComponent::ConvertToWeaponEquipState(WeaponSlotType);
-					if (EquipManager->GetCurrentWeaponEquipState() == EWeaponEquipState::Unarmed)
+					EEquipState TargetWeaponEquipState = UD1EquipManagerComponent::ConvertToEquipState(WeaponSlotType);
+					if (EquipManager->GetCurrentEquipState() == EEquipState::Unarmed)
 					{
-						EquipManager->ChangeWeaponEquipState(TargetWeaponEquipState);
+						EquipManager->ChangeEquipState(TargetWeaponEquipState);
 					}
 				}
 			}
@@ -510,12 +510,12 @@ void ULyraCheatManager::EquipArmor(TSubclassOf<UD1ItemTemplate> ItemTemplateClas
 		{
 			if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>())
 			{
-				EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorFragment->ArmorType));
+				EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorFragment->ArmorType), 1);
 
 				UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
 				int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
 				ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
-				EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorFragment->ArmorType), ItemInstance);
+				EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorFragment->ArmorType), ItemInstance, 1);
 			}
 		}
 	}
