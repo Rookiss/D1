@@ -8,7 +8,7 @@
 class ULyraAbilitySet;
 class UD1ItemInstance;
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FRarityStat
 {
 	GENERATED_BODY()
@@ -21,7 +21,7 @@ public:
 	int32 Value = 0;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FRarityStatSet
 {
 	GENERATED_BODY()
@@ -37,7 +37,7 @@ public:
 	TArray<FRarityStat> RarityStats;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FRarityStatRange
 {
 	GENERATED_BODY()
@@ -53,7 +53,7 @@ public:
 	int32 MaxValue = 0;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FRarityStatRangeSet
 {
 	GENERATED_BODY()

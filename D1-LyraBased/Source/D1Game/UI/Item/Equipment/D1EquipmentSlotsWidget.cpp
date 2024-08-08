@@ -88,7 +88,7 @@ void UD1EquipmentSlotsWidget::DestructUI()
 	{
 		if (SlotArmorWidget)
 		{
-			SlotArmorWidget->OnEquipmentEntryChanged(nullptr);
+			SlotArmorWidget->OnEquipmentEntryChanged(nullptr, 0);
 		}
 	}
 }
@@ -114,7 +114,7 @@ void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged(EEquipmentSlotType Equipme
 		if (SlotArmorWidgets.IsValidIndex(ArmorSlotIndex))
 		{
 			UD1EquipmentSlotArmorWidget* SlotArmorWidget = SlotArmorWidgets[ArmorSlotIndex];
-			SlotArmorWidget->OnEquipmentEntryChanged(ItemInstance);
+			SlotArmorWidget->OnEquipmentEntryChanged(ItemInstance, 1);
 		}
 	}
 }

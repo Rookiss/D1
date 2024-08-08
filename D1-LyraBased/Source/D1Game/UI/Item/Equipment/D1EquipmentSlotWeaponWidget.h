@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "D1Define.h"
-#include "UI/Item/D1ItemSlotWidget.h"
+#include "D1EquipmentSlotWidget.h"
 #include "D1EquipmentSlotWeaponWidget.generated.h"
 
 class UImage;
@@ -11,7 +11,7 @@ class UD1EquipmentEntryWidget;
 class UD1EquipmentManagerComponent;
 
 UCLASS()
-class UD1EquipmentSlotWeaponWidget : public UD1ItemSlotWidget
+class UD1EquipmentSlotWeaponWidget : public UD1EquipmentSlotWidget
 {
 	GENERATED_BODY()
 	
@@ -34,13 +34,6 @@ private:
 
 public:
 	void OnEquipmentEntryChanged(EWeaponHandType InWeaponHandType, UD1ItemInstance* NewItemInstance);
-	
-private:
-	UPROPERTY()
-	TSubclassOf<UD1EquipmentEntryWidget> EntryWidgetClass;
-
-	UPROPERTY()
-	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
 	
 private:
 	UPROPERTY()
@@ -91,6 +84,5 @@ private:
 	TObjectPtr<UImage> Image_Frame_Right;
 
 private:
-	bool bAlreadyHovered = false;
 	EWeaponSlotType WeaponSlotType = EWeaponSlotType::Count;
 };

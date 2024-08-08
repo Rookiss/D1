@@ -6,6 +6,7 @@
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "D1EquipmentSlotsWidget.generated.h"
 
+class UD1EquipmentSlotUtilityWidget;
 class UD1ItemInstance;
 class UD1ItemSlotWidget;
 class UD1EquipmentSlotWeaponWidget;
@@ -34,7 +35,7 @@ protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
-
+	
 private:
 	void ConstructUI(FGameplayTag Channel, const FEquipmentInitializeMessage& Message);
 	void DestructUI();
@@ -52,6 +53,9 @@ private:
 	UPROPERTY()
 	TArray<TObjectPtr<UD1EquipmentSlotArmorWidget>> SlotArmorWidgets;
 
+	UPROPERTY()
+	TArray<TObjectPtr<UD1EquipmentSlotUtilityWidget>> SlotUtilityWidgets;
+	
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
 
@@ -76,6 +80,12 @@ protected:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_Armor_Foot;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UD1EquipmentSlotUtilityWidget> Equipment_Utility_Primary;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UD1EquipmentSlotUtilityWidget> Equipment_Utility_Secondary;
 
 private:
 	FDelegateHandle DelegateHandle;

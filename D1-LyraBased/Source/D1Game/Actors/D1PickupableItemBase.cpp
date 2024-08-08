@@ -20,12 +20,6 @@ AD1PickupableItemBase::AD1PickupableItemBase(const FObjectInitializer& ObjectIni
 	MeshComponent->SetupAttachment(GetRootComponent());
 	MeshComponent->SetCollisionProfileName(TEXT("Pickupable"));
 	MeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
-
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Sphere(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
-	if (SM_Sphere.Succeeded())
-	{
-		MeshComponent->SetStaticMesh(SM_Sphere.Object);
-	}
 }
 
 void AD1PickupableItemBase::OnRep_PickupInfo()

@@ -11,7 +11,6 @@
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
-#include "System/LyraAssetManager.h"
 #include "UI/Item/D1ItemDragDrop.h"
 #include "UI/Item/Equipment/D1EquipmentEntryWidget.h"
 #include "UI/Item/Inventory/D1InventoryEntryWidget.h"
@@ -40,13 +39,6 @@ void UD1EquipmentSlotArmorWidget::NativePreConstruct()
 	Image_Icon->SetBrushFromTexture(ArmorIconTexture, true);
 }
 
-void UD1EquipmentSlotArmorWidget::NativeOnInitialized()
-{
-	Super::NativeOnInitialized();
-	
-	EntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidgetClass");
-}
-
 bool UD1EquipmentSlotArmorWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragOver(InGeometry, InDragDropEvent, InOperation);
@@ -57,10 +49,12 @@ bool UD1EquipmentSlotArmorWidget::NativeOnDragOver(const FGeometry& InGeometry, 
 	bAlreadyHovered = true;
 	
 	UD1ItemDragDrop* DragDrop = Cast<UD1ItemDragDrop>(InOperation);
-	check(DragDrop);
+	if (DragDrop == nullptr)
+		return false;
 
 	UD1ItemInstance* FromItemInstance = DragDrop->FromItemInstance;
-	check(FromItemInstance);
+	if (FromItemInstance == nullptr)
+		return false;
 	
 	bool bIsValid = false;
 	EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType);
@@ -140,7 +134,7 @@ void UD1EquipmentSlotArmorWidget::CleanUpDrag()
 	bAlreadyHovered = false;
 }
 
-void UD1EquipmentSlotArmorWidget::OnEquipmentEntryChanged(UD1ItemInstance* NewItemInstance)
+void UD1EquipmentSlotArmorWidget::OnEquipmentEntryChanged(UD1ItemInstance* NewItemInstance, int32 ItemCount)
 {
 	if (EntryWidget)
 	{

@@ -1,26 +1,24 @@
 ﻿#pragma once
 
-#include "D1Define.h"
 #include "D1EquipmentSlotWidget.h"
-#include "D1EquipmentSlotArmorWidget.generated.h"
+#include "D1EquipmentSlotUtilityWidget.generated.h"
 
-class UImage;
-class UOverlay;
-class UD1ItemInstance;
 class UD1EquipmentEntryWidget;
-class UD1EquipmentManagerComponent;
+class UOverlay;
+class UImage;
+class UD1ItemInstance;
 
 UCLASS()
-class UD1EquipmentSlotArmorWidget : public UD1EquipmentSlotWidget
+class UD1EquipmentSlotUtilityWidget : public UD1EquipmentSlotWidget
 {
 	GENERATED_BODY()
 	
 public:
-	UD1EquipmentSlotArmorWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UD1EquipmentSlotUtilityWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void Init(EArmorType InArmorType, UD1EquipmentManagerComponent* InEquipmentManager);
-	
+	void Init(EUtilitySlotType InUtilitySlotType, UD1EquipmentManagerComponent* InEquipmentManager);
+
 protected:
 	virtual void NativePreConstruct() override;
 	
@@ -30,14 +28,14 @@ protected:
 
 private:
 	void CleanUpDrag();
-
+	
 public:
 	void OnEquipmentEntryChanged(UD1ItemInstance* NewItemInstance, int32 NewItemCount);
 
 public:
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UTexture2D> ArmorIconTexture;
-	
+	TObjectPtr<UTexture2D> UtilityIconTexture;
+
 private:
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentEntryWidget> EntryWidget;
@@ -53,5 +51,5 @@ private:
 	TObjectPtr<UImage> Image_Icon;
 
 private:
-	EArmorType ArmorType = EArmorType::Count;
+	EUtilitySlotType UtilitySlotType = EUtilitySlotType::Count;
 };
