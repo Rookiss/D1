@@ -3,7 +3,6 @@
 #include "Blueprint/UserWidget.h"
 #include "D1ItemHoversWidget.generated.h"
 
-class UOverlay;
 class UD1ItemInstance;
 class UCanvasPanel;
 class UHorizontalBox;

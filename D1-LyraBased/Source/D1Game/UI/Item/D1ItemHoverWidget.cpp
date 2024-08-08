@@ -8,6 +8,7 @@
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Utility.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "System/LyraAssetManager.h"
 
@@ -93,32 +94,7 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			Text_AttributeModifiers->SetVisibility(ESlateVisibility::Visible);
 		}
 		
-		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
-		{
-			const UD1ItemFragment_Equippable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(EquippableFragment);
-			Text_ItemType->SetText(FText::FromString(TEXT("Weapon")));
-			
-			FString WeaponTypeString;
-			switch (WeaponFragment->WeaponType)
-			{
-			case EWeaponType::Sword:		    WeaponTypeString = TEXT("Sword");			break;
-			case EWeaponType::Shield:		    WeaponTypeString = TEXT("Shield");			break;
-			case EWeaponType::Bow:				WeaponTypeString = TEXT("Bow");				break;
-			}
-			Text_WeaponType->SetText(FText::FromString(WeaponTypeString));
-			HorizontalBox_WeaponType->SetVisibility(ESlateVisibility::Visible);
-	
-			FString WeaponHandTypeString;
-			switch (WeaponFragment->WeaponHandType)
-			{
-			case EWeaponHandType::LeftHand:		WeaponHandTypeString = TEXT("Left Hand");	break;
-			case EWeaponHandType::RightHand:	WeaponHandTypeString = TEXT("Right Hand");	break;
-			case EWeaponHandType::TwoHand:		WeaponHandTypeString = TEXT("Two Hand");	break;
-			}
-			Text_WeaponHandType->SetText(FText::FromString(WeaponHandTypeString));
-			HorizontalBox_WeaponHandType->SetVisibility(ESlateVisibility::Visible);
-		}
-		else if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
+		if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
 		{
 			const UD1ItemFragment_Equippable_Armor* ArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(EquippableFragment);
 			Text_ItemType->SetText(FText::FromString(TEXT("Armor")));
@@ -134,6 +110,39 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			}
 			Text_ArmorType->SetText(FText::FromString(ArmorTypeString));
 			HorizontalBox_ArmorType->SetVisibility(ESlateVisibility::Visible);
+		}
+		else if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
+		{
+			const UD1ItemFragment_Equippable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(EquippableFragment);
+			Text_ItemType->SetText(FText::FromString(TEXT("Weapon")));
+			
+			FString WeaponTypeString;
+			switch (WeaponFragment->WeaponType)
+			{
+			case EWeaponType::Sword:		    WeaponTypeString = TEXT("Sword");			break;
+			case EWeaponType::Shield:		    WeaponTypeString = TEXT("Shield");			break;
+			case EWeaponType::Bow:				WeaponTypeString = TEXT("Bow");				break;
+			}
+			Text_WeaponType->SetText(FText::FromString(WeaponTypeString));
+			HorizontalBox_WeaponType->SetVisibility(ESlateVisibility::Visible);
+	
+			FString EquipHandTypeString;
+			switch (WeaponFragment->WeaponHandType)
+			{
+			case EWeaponHandType::LeftHand:		EquipHandTypeString = TEXT("Left Hand");	break;
+			case EWeaponHandType::RightHand:	EquipHandTypeString = TEXT("Right Hand");	break;
+			case EWeaponHandType::TwoHand:		EquipHandTypeString = TEXT("Two Hand");		break;
+			}
+			Text_WeaponHandType->SetText(FText::FromString(EquipHandTypeString));
+			HorizontalBox_WeaponHandType->SetVisibility(ESlateVisibility::Visible);
+		}
+		else if (EquippableFragment->EquipmentType == EEquipmentType::Utility)
+		{
+			const UD1ItemFragment_Equippable_Utility* UtilityFragment = Cast<UD1ItemFragment_Equippable_Utility>(EquippableFragment);
+			Text_ItemType->SetText(FText::FromString(TEXT("Utility")));
+
+			Text_Description->SetText(FText::FromString(TEXT("Description")));
+			Text_Description->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
 

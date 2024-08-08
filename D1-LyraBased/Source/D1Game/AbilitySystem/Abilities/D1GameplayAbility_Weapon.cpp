@@ -41,7 +41,7 @@ int32 UD1GameplayAbility_Weapon::GetWeaponStatValue(FGameplayTag StatTag) const
 	{
 		if (const UD1ItemInstance* ItemInstance = EquipManager->GetEquippedWeaponItemInstance(WeaponHandType))
 		{
-			StatValue = ItemInstance->GetStatCountByTag(StatTag);
+			StatValue = ItemInstance->GetStackCountByTag(StatTag);
 		}
 	}
 	return StatValue;

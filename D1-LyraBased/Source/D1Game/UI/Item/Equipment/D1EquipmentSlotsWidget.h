@@ -42,7 +42,6 @@ private:
 	void OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount);
 
 protected:
-protected:
 	UPROPERTY(EditAnywhere, meta=(Categories="Message"))
 	FGameplayTag MessageChannelTag;
 	

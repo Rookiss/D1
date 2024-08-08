@@ -7,7 +7,7 @@
 #include "System/LyraAssetManager.h"
 #include "D1ItemDragWidget.h"
 #include "D1ItemHoversWidget.h"
-#include "Blueprint/SlateBlueprintLibrary.h"
+#include "Components/TextBlock.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemEntryWidget)
 
@@ -23,6 +23,8 @@ void UD1ItemEntryWidget::NativeOnInitialized()
 
 	DragWidgetClass = ULyraAssetManager::GetSubclassByName<UD1ItemDragWidget>("DragWidgetClass");
 	HoversWidgetClass = ULyraAssetManager::GetSubclassByName<UD1ItemHoversWidget>("HoversWidgetClass");
+
+	Text_Count->SetText(FText::GetEmpty());
 }
 
 void UD1ItemEntryWidget::NativeConstruct()
@@ -120,4 +122,6 @@ void UD1ItemEntryWidget::SetItemInstance(UD1ItemInstance* NewItemInstance)
 
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
 	Image_Icon->SetBrushFromTexture(ItemTemplate.IconTexture, true);
+
+	// Text_Count->SetText()
 }

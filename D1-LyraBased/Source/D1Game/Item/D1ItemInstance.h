@@ -43,14 +43,17 @@ public:
 	static EItemRarity DetermineItemRarity(const TArray<FD1ItemRarityProbability>& ItemProbabilities);
 	
 public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int32 GetItemTemplateID() const { return ItemTemplateID; }
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EItemRarity GetItemRarity() const { return ItemRarity; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool HasStatTag(FGameplayTag StatTag) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	int32 GetStatCountByTag(FGameplayTag StatTag) const;
+	int32 GetStackCountByTag(FGameplayTag StatTag) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	const FD1GameplayTagStackContainer& GetStatContainer() const { return StatContainer; }

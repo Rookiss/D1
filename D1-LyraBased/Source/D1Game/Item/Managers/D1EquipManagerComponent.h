@@ -6,7 +6,7 @@
 #include "Net/Serialization/FastArraySerializer.h"
 #include "D1EquipManagerComponent.generated.h"
 
-class AD1CosmeticWeapon;
+class AD1PocketWorldAttachment;
 class ALyraCharacter;
 class ALyraPlayerController;
 class AD1WeaponBase;
@@ -53,7 +53,7 @@ public:
 	TObjectPtr<AD1WeaponBase> SpawnedWeaponActor;
 
 	UPROPERTY(NotReplicated)
-	TObjectPtr<AD1CosmeticWeapon> SpawnedCosmeticWeapon;
+	TObjectPtr<AD1PocketWorldAttachment> SpawnedPocketWorldAttachment;
 
 private:
 	UPROPERTY(NotReplicated)

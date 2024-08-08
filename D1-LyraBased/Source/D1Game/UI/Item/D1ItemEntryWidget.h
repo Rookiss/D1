@@ -3,6 +3,7 @@
 #include "Blueprint/UserWidget.h"
 #include "D1ItemEntryWidget.generated.h"
 
+class UTextBlock;
 class UImage;
 class UD1ItemInstance;
 class UD1ItemDragWidget;
@@ -53,6 +54,9 @@ protected:
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Hover;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> Text_Count;
 
 private:
 	UPROPERTY()

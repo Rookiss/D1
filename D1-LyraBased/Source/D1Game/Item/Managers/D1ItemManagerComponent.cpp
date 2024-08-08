@@ -334,12 +334,12 @@ void UD1ItemManagerComponent::Server_DropItemFromEquipment_Implementation(UD1Equ
 	}
 }
 
-bool UD1ItemManagerComponent::TryPickItem(AD1WorldPickupable* PickedItemActor)
+bool UD1ItemManagerComponent::TryPickItem(AD1PickupableItemBase* PickupableItemActor)
 {
 	if (HasAuthority() == false)
 		return false;
 
-	if (IsValid(PickedItemActor) == false)
+	if (IsValid(PickupableItemActor) == false)
 		return false;
 
 	UD1InventoryManagerComponent* MyInventoryManager = GetMyInventoryManager();
@@ -350,36 +350,75 @@ bool UD1ItemManagerComponent::TryPickItem(AD1WorldPickupable* PickedItemActor)
 	if (IsAllowedComponent(MyInventoryManager) == false || IsAllowedComponent(MyEquipmentManager) == false)
 		return false;
 
-	const FD1PickupInfo& PickupInfo = PickedItemActor->GetPickupInfo();
+	const FD1PickupInfo& PickupInfo = PickupableItemActor->GetPickupInfo();
 	const FD1PickupInstance& PickupInstance = PickupInfo.PickupInstance;
 	const FD1PickupTemplate& PickupTemplate = PickupInfo.PickupTemplate;
 
-	// TODO
+	int32 ItemTemplateID = 0;
+	EItemRarity ItemRarity = EItemRarity::Count;
+	int32 ItemCount = 0;
+	UD1ItemInstance* ItemInstance = nullptr;
 	
-	// UD1ItemInstance* NewItemInstance = nullptr;
-	// int32 NewItemCount = 0;
-	//
-	// if (PickupInstance.ItemInstance)
-	// {
-	// 	if (PickupInstance.ItemCount <= 0)
-	// 		return false;
-	//
-	// 	NewItemInstance = PickupInstance.ItemInstance;
-	// 	NewItemCount = PickupInstance.ItemCount;
-	// }
-	// else if (PickupTemplate.ItemTemplateClass)
-	// {
-	// 	if (PickupTemplate.ItemCount <= 0 || PickupTemplate.ItemRarity == EItemRarity::Count)
-	// 		return false;
-	// 	
-	// 	int32 ItemTemmpleteID = UD1ItemData::Get().FindItemTemplateIDByClass(PickupTemplate.ItemTemplateClass);
-	// 	NewItemInstance = NewObject<UD1ItemInstance>();
-	// 	NewItemInstance->Init(ItemTemmpleteID, PickupTemplate.ItemRarity);
-	// 	NewItemCount = PickupTemplate.ItemCount;
-	// }
+	if (PickupInstance.ItemInstance)
+	{
+		if (PickupInstance.ItemCount <= 0)
+			return false;
 
-	PickedItemActor->Destroy();
-	return true;
+		ItemTemplateID = PickupInstance.ItemInstance->GetItemTemplateID();
+		ItemRarity = PickupInstance.ItemInstance->GetItemRarity();
+		ItemCount = PickupInstance.ItemCount;
+		ItemInstance = PickupInstance.ItemInstance;
+	}
+	else if (PickupTemplate.ItemTemplateClass)
+	{
+		if (PickupTemplate.ItemCount <= 0 || PickupTemplate.ItemRarity == EItemRarity::Count)
+			return false;
+		
+		ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(PickupTemplate.ItemTemplateClass);
+		ItemRarity = PickupTemplate.ItemRarity;
+		ItemCount = PickupTemplate.ItemCount;
+	}
+
+	EEquipmentSlotType ToEquipmentSlotType;
+	int32 MovableCount = MyEquipmentManager->CanMoveOrMergeEquipment_Quick(ItemTemplateID, ItemRarity, ItemCount, ToEquipmentSlotType);
+	if (MovableCount == ItemCount)
+	{
+		if (ItemInstance == nullptr)
+		{
+			ItemInstance = NewObject<UD1ItemInstance>();
+			ItemInstance->Init(ItemTemplateID, ItemRarity);
+		}
+		
+		MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, ItemInstance, MovableCount);
+		
+		PickupableItemActor->Destroy();
+		return true;
+	}
+	else
+	{
+		TArray<FIntPoint> ToItemSlotPoses;
+		TArray<int32> ToItemCounts;
+			
+		MovableCount = MyInventoryManager->CanAddItem(ItemTemplateID, ItemRarity, ItemCount, ToItemSlotPoses, ToItemCounts);
+		if (MovableCount == ItemCount)
+		{
+			if (ItemInstance == nullptr)
+			{
+				ItemInstance = NewObject<UD1ItemInstance>();
+				ItemInstance->Init(ItemTemplateID, ItemRarity);
+			}
+			
+			for (int32 i = 0; i < ToItemSlotPoses.Num(); i++)
+			{
+				MyInventoryManager->AddItem_Unsafe(ToItemSlotPoses[i], ItemInstance, ToItemCounts[i]);
+			}
+			
+			PickupableItemActor->Destroy();
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 bool UD1ItemManagerComponent::TryDropItem(UD1ItemInstance* FromItemInstance, int32 FromItemCount)
@@ -404,11 +443,8 @@ bool UD1ItemManagerComponent::TryDropItem(UD1ItemInstance* FromItemInstance, int
 		return false;
 	
 	FNavLocation NavLocation;
-	if (NavigationSystem->GetRandomReachablePointInRadius(Pawn->GetActorLocation() + Pawn->GetActorForwardVector() * 200.f, 100.f, NavLocation) == false)
-	{
-		if (NavigationSystem->GetRandomReachablePointInRadius(Pawn->GetActorLocation(), 200.f, NavLocation) == false)
-			return false;
-	}
+	if (NavigationSystem->GetRandomReachablePointInRadius(Pawn->GetActorLocation(), 150.f, NavLocation) == false)
+		return false;
 	
 	FVector SpawnLocation = NavLocation.Location;
 	FRotator SpawnRotation = Pawn->GetActorForwardVector().Rotation();

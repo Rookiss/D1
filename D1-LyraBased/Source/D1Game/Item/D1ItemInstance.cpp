@@ -27,7 +27,7 @@ void UD1ItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 void UD1ItemInstance::Init(int32 InItemTemplateID, EItemRarity InItemRarity)
 {
-	if (InItemTemplateID <= 0 || InItemRarity == EItemRarity::Count)
+	if (InItemTemplateID <= INDEX_NONE || InItemRarity == EItemRarity::Count)
 		return;
 
 	ItemTemplateID = InItemTemplateID;
@@ -92,14 +92,14 @@ bool UD1ItemInstance::HasStatTag(FGameplayTag StatTag) const
 	return StatContainer.ContainsTag(StatTag);
 }
 
-int32 UD1ItemInstance::GetStatCountByTag(FGameplayTag StatTag) const
+int32 UD1ItemInstance::GetStackCountByTag(FGameplayTag StatTag) const
 {
 	return StatContainer.GetStackCount(StatTag);
 }
 
 const UD1ItemFragment* UD1ItemInstance::FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const
 {
-	if (ItemTemplateID > 0 && FragmentClass)
+	if (ItemTemplateID > INDEX_NONE && FragmentClass)
 	{
 		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
 		return ItemTemplate.FindFragmentByClass(FragmentClass);

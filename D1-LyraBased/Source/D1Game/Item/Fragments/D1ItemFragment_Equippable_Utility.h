@@ -15,6 +15,9 @@ public:
 	virtual void OnInstanceCreated(UD1ItemInstance* ItemInstance) const override;
 
 public:
+	UPROPERTY(EditDefaultsOnly)
+	EUtilityType UtilityType = EUtilityType::Count;
+	
 	UPROPERTY(EditDefaultsOnly, meta=(ForceInlineRow))
 	TArray<FRarityStatSet> RarityStatSets;
 };

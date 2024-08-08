@@ -41,13 +41,6 @@ void UD1InventoryEntryWidget::RefreshItemCount(int32 NewItemCount)
 	Text_Count->SetText((ItemCount >= 2) ? FText::AsNumber(ItemCount) : FText::GetEmpty());
 }
 
-void UD1InventoryEntryWidget::NativeOnInitialized()
-{
-	Super::NativeOnInitialized();
-	
-	Text_Count->SetText(FText::GetEmpty());
-}
-
 FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);

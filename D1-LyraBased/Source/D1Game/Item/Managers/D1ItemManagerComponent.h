@@ -4,7 +4,7 @@
 #include "D1ItemManagerComponent.generated.h"
 
 class UD1ItemInstance;
-class AD1WorldPickupable;
+class AD1PickupableItemBase;
 class UD1EquipmentManagerComponent;
 class UD1InventoryManagerComponent;
 
@@ -45,7 +45,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool TryPickItem(AD1WorldPickupable* PickedItemActor);
+	bool TryPickItem(AD1PickupableItemBase* PickupableItemActor);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	bool TryDropItem(UD1ItemInstance* FromItemInstance, int32 FromItemCount);

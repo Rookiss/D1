@@ -4,8 +4,6 @@
 #include "D1ItemHoverWidget.generated.h"
 
 class UImage;
-class UCanvasPanel;
-class UOverlay;
 class UTextBlock;
 class UHorizontalBox;
 class UD1ItemInstance;

@@ -37,27 +37,6 @@ enum class EEquipmentSlotType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EWeaponType : uint8
-{
-	Unarmed,
-	Sword,
-	Shield,
-	Bow,
-
-	Count	UMETA(Hidden)
-};
-
-UENUM(BlueprintType)
-enum class EWeaponHandType : uint8
-{
-	LeftHand,
-	RightHand,
-	TwoHand,
-
-	Count	UMETA(Hidden)
-};
-
-UENUM(BlueprintType)
 enum class EEquipState : uint8
 {
 	Unarmed,
@@ -70,20 +49,12 @@ enum class EEquipState : uint8
 };
 
 UENUM(BlueprintType)
-enum class EWeaponSlotType : uint8
+enum class EEquipmentType : uint8
 {
-	Primary,
-	Secondary,
-
-	Count	UMETA(Hidden)
-};
-
-UENUM(BlueprintType)
-enum class EUtilitySlotType : uint8
-{
-	Primary,
-	Secondary,
-
+	Armor,
+	Weapon,
+	Utility,
+	
 	Count	UMETA(Hidden)
 };
 
@@ -100,12 +71,50 @@ enum class EArmorType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EEquipmentType : uint8
+enum class EWeaponType : uint8
 {
-	Weapon,
-	Armor,
-	Utility,
-	
+	Unarmed,
+	Sword,
+	Shield,
+	Bow,
+
+	Count	UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EWeaponSlotType : uint8
+{
+	Primary,
+	Secondary,
+
+	Count	UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EWeaponHandType : uint8
+{
+	LeftHand,
+	RightHand,
+	TwoHand,
+
+	Count	UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EUtilityType : uint8
+{
+	Drink,
+	LightSource,
+
+	Count	UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EUtilitySlotType : uint8
+{
+	Primary,
+	Secondary,
+
 	Count	UMETA(Hidden)
 };
 
@@ -141,7 +150,7 @@ namespace Item
 		{ EEquipmentSlotType::Unarmed_LeftHand,    EEquipmentSlotType::Unarmed_RightHand                                            },
 		{ EEquipmentSlotType::Primary_LeftHand,    EEquipmentSlotType::Primary_RightHand,    EEquipmentSlotType::Primary_TwoHand    },
 		{ EEquipmentSlotType::Secondary_LeftHand,  EEquipmentSlotType::Secondary_RightHand,  EEquipmentSlotType::Secondary_TwoHand  },
-		{ EEquipmentSlotType::Utility_Primary },
+		{ EEquipmentSlotType::Utility_Primary   },
 		{ EEquipmentSlotType::Utility_Secondary },
 	};
 	

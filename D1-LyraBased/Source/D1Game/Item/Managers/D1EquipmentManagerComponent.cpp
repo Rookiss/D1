@@ -225,7 +225,10 @@ int32 UD1EquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(UD1EquipmentMa
 	const UD1ItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromEquipmentSlotType);
 	const int32 FromItemCount = OtherComponent->GetItemCount(FromEquipmentSlotType);
 
-	return CanMoveOrMergeEquipment_Quick(FromItemInstance, FromItemCount, OutToEquipmentSlotType);
+	if (FromItemInstance == nullptr)
+		return 0;
+	
+	return CanMoveOrMergeEquipment_Quick(FromItemInstance->GetItemTemplateID(), FromItemInstance->GetItemRarity(), FromItemCount, OutToEquipmentSlotType);
 }
 
 int32 UD1EquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType) const
@@ -242,17 +245,21 @@ int32 UD1EquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(UD1InventoryMa
 	const UD1ItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromItemSlotPos);
 	const int32 FromItemCount = OtherComponent->GetItemCount(FromItemSlotPos);
 
-	return CanMoveOrMergeEquipment_Quick(FromItemInstance, FromItemCount, OutToEquipmentSlotType);
+	if (FromItemInstance == nullptr)
+		return 0;
+	
+	return CanMoveOrMergeEquipment_Quick(FromItemInstance->GetItemTemplateID(), FromItemInstance->GetItemRarity(), FromItemCount, OutToEquipmentSlotType);
 }
 
-int32 UD1EquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(const UD1ItemInstance* FromItemInstance, int32 FromItemCount, EEquipmentSlotType& OutToEquipmentSlotType) const
+int32 UD1EquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(int32 FromItemTemplateID, EItemRarity FromItemRarity, int32 FromItemCount, EEquipmentSlotType& OutToEquipmentSlotType) const
 {
 	OutToEquipmentSlotType = EEquipmentSlotType::Count;
 
-	if (FromItemInstance == nullptr || FromItemCount <= 0)
+	if (FromItemTemplateID <= 0 || FromItemRarity == EItemRarity::Count || FromItemCount <= 0)
 		return 0;
-	
-	const UD1ItemFragment_Equippable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
+
+	const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromItemTemplateID);
+	const UD1ItemFragment_Equippable* FromEquippableFragment = FromItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable>();
 	if (FromEquippableFragment == nullptr)
 		return 0;
 	
@@ -263,7 +270,7 @@ int32 UD1EquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(const UD1ItemI
 		for (int32 i = 0; i < (int32)EWeaponSlotType::Count; i++)
 		{
 			EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, (EWeaponSlotType)i);
-			int32 MovableCount = CanAddEquipment(FromItemInstance->GetItemTemplateID(), FromItemInstance->GetItemRarity(), FromItemCount, ToEquipmentSlotType);
+			int32 MovableCount = CanAddEquipment(FromItemTemplateID, FromItemRarity, FromItemCount, ToEquipmentSlotType);
 			if (MovableCount > 0)
 			{
 				OutToEquipmentSlotType = ToEquipmentSlotType;
@@ -276,7 +283,7 @@ int32 UD1EquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(const UD1ItemI
 		const UD1ItemFragment_Equippable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(FromEquippableFragment);
 
 		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
-		int32 MovableCount = CanAddEquipment(FromItemInstance->GetItemTemplateID(), FromItemInstance->GetItemRarity(), FromItemCount, ToEquipmentSlotType);
+		int32 MovableCount = CanAddEquipment(FromItemTemplateID, FromItemRarity, FromItemCount, ToEquipmentSlotType);
 		if (MovableCount > 0)
 		{
 			OutToEquipmentSlotType = ToEquipmentSlotType;
@@ -288,7 +295,7 @@ int32 UD1EquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(const UD1ItemI
 		for (int32 i = 0; i < (int32)EUtilitySlotType::Count; i++)
 		{
 			EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType((EUtilitySlotType)i);
-			int32 MovableCount = CanAddEquipment(FromItemInstance->GetItemTemplateID(), FromItemInstance->GetItemRarity(), FromItemCount, ToEquipmentSlotType);
+			int32 MovableCount = CanAddEquipment(FromItemTemplateID,FromItemRarity, FromItemCount, ToEquipmentSlotType);
 			if (MovableCount > 0)
 			{
 				OutToEquipmentSlotType = ToEquipmentSlotType;
