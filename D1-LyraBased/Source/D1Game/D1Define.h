@@ -40,8 +40,8 @@ UENUM(BlueprintType)
 enum class EEquipState : uint8
 {
 	Unarmed,
-	Primary,
-	Secondary,
+	Weapon_Primary,
+	Weapon_Secondary,
 	Utility_Primary,
 	Utility_Secondary,
 

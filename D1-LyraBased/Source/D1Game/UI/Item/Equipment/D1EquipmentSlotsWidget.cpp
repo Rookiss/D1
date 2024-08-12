@@ -1,6 +1,7 @@
 ﻿#include "D1EquipmentSlotsWidget.h"
 
 #include "D1EquipmentSlotArmorWidget.h"
+#include "D1EquipmentSlotUtilityWidget.h"
 #include "D1EquipmentSlotWeaponWidget.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
@@ -17,8 +18,9 @@ void UD1EquipmentSlotsWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	SlotWeaponWidgets = { Equipment_Weapon_Primary, Equipment_Weapon_Secondary };
-	SlotArmorWidgets  = { Equipment_Armor_Head, Equipment_Armor_Chest, Equipment_Armor_Legs, Equipment_Armor_Hand, Equipment_Armor_Foot };
+	WeaponSlotWidgets  = { Equipment_Weapon_Primary, Equipment_Weapon_Secondary };
+	ArmorSlotWidgets   = { Equipment_Armor_Head, Equipment_Armor_Chest, Equipment_Armor_Legs, Equipment_Armor_Hand, Equipment_Armor_Foot };
+	UtilitySlotWidgets = { Equipment_Utility_Primary, Equipment_Utility_Secondary };
 }
 
 void UD1EquipmentSlotsWidget::NativeConstruct()
@@ -46,14 +48,19 @@ void UD1EquipmentSlotsWidget::ConstructUI(FGameplayTag Channel, const FEquipment
 
 	EquipmentManager = Message.EquipmentManager;
 	
-	for (int32 i = 0; i < SlotWeaponWidgets.Num(); i++)
+	for (int32 i = 0; i < WeaponSlotWidgets.Num(); i++)
 	{
-		SlotWeaponWidgets[i]->Init((EWeaponSlotType)i, EquipmentManager);
+		WeaponSlotWidgets[i]->Init((EWeaponSlotType)i, EquipmentManager);
 	}
 	
-	for (int32 i = 0; i < SlotArmorWidgets.Num(); i++)
+	for (int32 i = 0; i < ArmorSlotWidgets.Num(); i++)
 	{
-		SlotArmorWidgets[i]->Init((EArmorType)i, EquipmentManager);
+		ArmorSlotWidgets[i]->Init((EArmorType)i, EquipmentManager);
+	}
+
+	for (int32 i = 0; i < WeaponSlotWidgets.Num(); i++)
+	{
+		UtilitySlotWidgets[i]->Init((EUtilitySlotType)i, EquipmentManager);
 	}
 
 	const TArray<FD1EquipmentEntry>& Entries = EquipmentManager->GetAllEntries();
@@ -73,22 +80,30 @@ void UD1EquipmentSlotsWidget::DestructUI()
 	EquipmentManager->OnEquipmentEntryChanged.Remove(DelegateHandle);
 	DelegateHandle.Reset();
 
-	for (UD1EquipmentSlotWeaponWidget* SlotWeaponWidget : SlotWeaponWidgets)
+	for (UD1EquipmentSlotWeaponWidget* SlotWeaponWidget : WeaponSlotWidgets)
 	{
 		if (SlotWeaponWidget)
 		{
 			for (int32 i = 0; i < (int32)EWeaponHandType::Count; i++)
 			{
-				SlotWeaponWidget->OnEquipmentEntryChanged((EWeaponHandType)i, nullptr);
+				SlotWeaponWidget->OnEquipmentEntryChanged((EWeaponHandType)i, nullptr, 0);
 			}
 		}
 	}
 
-	for (UD1EquipmentSlotArmorWidget* SlotArmorWidget : SlotArmorWidgets)
+	for (UD1EquipmentSlotArmorWidget* SlotArmorWidget : ArmorSlotWidgets)
 	{
 		if (SlotArmorWidget)
 		{
 			SlotArmorWidget->OnEquipmentEntryChanged(nullptr, 0);
+		}
+	}
+
+	for (UD1EquipmentSlotUtilityWidget* SlotUtilityWidget : UtilitySlotWidgets)
+	{
+		if (SlotUtilityWidget)
+		{
+			SlotUtilityWidget->OnEquipmentEntryChanged(nullptr, 0);
 		}
 	}
 }
@@ -101,20 +116,35 @@ void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged(EEquipmentSlotType Equipme
 	if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType))
 	{
 		int32 WeaponSlotIndex = (int32)UD1EquipManagerComponent::ConvertToWeaponSlotType(EquipmentSlotType);
-		if (SlotWeaponWidgets.IsValidIndex(WeaponSlotIndex))
+		if (WeaponSlotWidgets.IsValidIndex(WeaponSlotIndex))
 		{
-			UD1EquipmentSlotWeaponWidget* SlotWeaponWidget = SlotWeaponWidgets[WeaponSlotIndex];
-			EWeaponHandType WeaponHandType = UD1EquipManagerComponent::ConvertToWeaponHandType(EquipmentSlotType);
-			SlotWeaponWidget->OnEquipmentEntryChanged(WeaponHandType, ItemInstance);
+			if (UD1EquipmentSlotWeaponWidget* WeaponSlotWidget = WeaponSlotWidgets[WeaponSlotIndex])
+			{
+				EWeaponHandType WeaponHandType = UD1EquipManagerComponent::ConvertToWeaponHandType(EquipmentSlotType);
+				WeaponSlotWidget->OnEquipmentEntryChanged(WeaponHandType, ItemInstance, ItemCount);
+			}
 		}
 	}
 	else if (UD1EquipmentManagerComponent::IsArmorSlot(EquipmentSlotType))
 	{
 		int32 ArmorSlotIndex = (int32)UD1EquipManagerComponent::ConvertToArmorType(EquipmentSlotType);
-		if (SlotArmorWidgets.IsValidIndex(ArmorSlotIndex))
+		if (ArmorSlotWidgets.IsValidIndex(ArmorSlotIndex))
 		{
-			UD1EquipmentSlotArmorWidget* SlotArmorWidget = SlotArmorWidgets[ArmorSlotIndex];
-			SlotArmorWidget->OnEquipmentEntryChanged(ItemInstance, 1);
+			if (UD1EquipmentSlotArmorWidget* ArmorSlotWidget = ArmorSlotWidgets[ArmorSlotIndex])
+			{
+				ArmorSlotWidget->OnEquipmentEntryChanged(ItemInstance, ItemCount);
+			}
+		}
+	}
+	else if (UD1EquipmentManagerComponent::IsUtilitySlot(EquipmentSlotType))
+	{
+		int32 UtilitySlotIndex = (int32)UD1EquipManagerComponent::ConvertToUtilitySlotType(EquipmentSlotType);
+		if (UtilitySlotWidgets.IsValidIndex(UtilitySlotIndex))
+		{
+			if (UD1EquipmentSlotUtilityWidget* UtilitySlotWidget = UtilitySlotWidgets[UtilitySlotIndex])
+			{
+				UtilitySlotWidget->OnEquipmentEntryChanged(ItemInstance, ItemCount);
+			}
 		}
 	}
 }

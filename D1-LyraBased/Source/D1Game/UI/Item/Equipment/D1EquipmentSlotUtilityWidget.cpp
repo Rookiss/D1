@@ -1,8 +1,11 @@
 ﻿#include "D1EquipmentSlotUtilityWidget.h"
 
+#include "D1EquipmentEntryWidget.h"
 #include "Components/Image.h"
+#include "Components/Overlay.h"
+#include "Components/OverlaySlot.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Utility.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
@@ -19,11 +22,10 @@ UD1EquipmentSlotUtilityWidget::UD1EquipmentSlotUtilityWidget(const FObjectInitia
 
 void UD1EquipmentSlotUtilityWidget::Init(EUtilitySlotType InUtilitySlotType, UD1EquipmentManagerComponent* InEquipmentManager)
 {
-	if (InUtilitySlotType != EUtilitySlotType::Count)
-	{
-		UtilitySlotType = InUtilitySlotType;
-		EquipmentManager = InEquipmentManager;
-	}
+	check(InUtilitySlotType != EUtilitySlotType::Count && InEquipmentManager != nullptr);
+
+	UtilitySlotType = InUtilitySlotType;
+	EquipmentManager = InEquipmentManager;
 }
 
 void UD1EquipmentSlotUtilityWidget::NativePreConstruct()
@@ -42,36 +44,38 @@ bool UD1EquipmentSlotUtilityWidget::NativeOnDragOver(const FGeometry& InGeometry
 
 	bAlreadyHovered = true;
 	
-	UD1ItemDragDrop* DragDrop = Cast<UD1ItemDragDrop>(InOperation);
-	check(DragDrop);
+	UD1ItemDragDrop* ItemDragDrop = Cast<UD1ItemDragDrop>(InOperation);
+	if (ItemDragDrop == nullptr)
+		return false;
 
-	UD1ItemInstance* FromItemInstance = DragDrop->FromItemInstance;
-	check(FromItemInstance);
+	UD1ItemInstance* FromItemInstance = ItemDragDrop->FromItemInstance;
+	if (FromItemInstance == nullptr)
+		return false;
 	
 	bool bIsValid = false;
 	EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(UtilitySlotType);
 	
-	if (UD1InventoryManagerComponent* FromInventoryManager = DragDrop->FromInventoryManager)
+	if (UD1InventoryManagerComponent* FromInventoryManager = ItemDragDrop->FromInventoryManager)
 	{
 		if (EquipmentManager->GetItemInstance(ToEquipmentSlotType))
 		{
 			FIntPoint OutToItemSlotPos;
-			bIsValid = EquipmentManager->CanSwapEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType, OutToItemSlotPos);
+			bIsValid = EquipmentManager->CanSwapEquipment(FromInventoryManager, ItemDragDrop->FromItemSlotPos, ToEquipmentSlotType, OutToItemSlotPos);
 		}
 		else
 		{
-			bIsValid = EquipmentManager->CanMoveOrMergeEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType) > 0;
+			bIsValid = EquipmentManager->CanMoveOrMergeEquipment(FromInventoryManager, ItemDragDrop->FromItemSlotPos, ToEquipmentSlotType) > 0;
 		}
 	}
-	else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
+	else if (UD1EquipmentManagerComponent* FromEquipmentManager = ItemDragDrop->FromEquipmentManager)
 	{
 		if (EquipmentManager->GetItemInstance(ToEquipmentSlotType))
 		{
-			bIsValid = EquipmentManager->CanSwapEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+			bIsValid = EquipmentManager->CanSwapEquipment(FromEquipmentManager, ItemDragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
 		}
 		else
 		{
-			bIsValid = EquipmentManager->CanMoveOrMergeEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType) > 0;
+			bIsValid = EquipmentManager->CanMoveOrMergeEquipment(FromEquipmentManager, ItemDragDrop->FromEquipmentSlotType, ToEquipmentSlotType) > 0;
 		}
 	}
 	
@@ -79,75 +83,74 @@ bool UD1EquipmentSlotUtilityWidget::NativeOnDragOver(const FGeometry& InGeometry
 	return true;
 }
 
-void UD1EquipmentSlotUtilityWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
-{
-	Super::NativeOnDragLeave(InDragDropEvent, InOperation);
-
-	CleanUpDrag();
-}
-
 bool UD1EquipmentSlotUtilityWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
-	CleanUpDrag();
+	FinishDrag();
 
-	// UD1ItemDragDrop* ItemDragDrop = Cast<UD1ItemDragDrop>(InOperation);
-	// check(ItemDragDrop);
-	//
-	// UD1ItemEntryWidget* FromEntryWidget = ItemDragDrop->FromEntryWidget;
-	// FromEntryWidget->RefreshWidgetOpacity(true);
-	//
-	// UD1ItemInstance* FromItemInstance = ItemDragDrop->FromItemInstance;
-	// check(FromItemInstance);
-	//
-	// UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
-	// check(ItemManager);
-	//
-	// if (FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>())
-	// {
-	// 	EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType);
-	//
-	// 	if (UD1InventoryManagerComponent* FromInventoryManager = ItemDragDrop->FromInventoryManager)
-	// 	{
-	// 		ItemManager->Server_InventoryToEquipment(FromInventoryManager, ItemDragDrop->FromItemSlotPos, EquipmentManager, ToEquipmentSlotType);
-	// 	}
-	// 	else if (UD1EquipmentManagerComponent* FromEquipmentManager = ItemDragDrop->FromEquipmentManager)
-	// 	{
-	// 		ItemManager->Server_EquipmentToEquipment(FromEquipmentManager, ItemDragDrop->FromEquipmentSlotType, EquipmentManager, ToEquipmentSlotType);
-	// 	}
-	// }
-	// return true;
+	UD1ItemDragDrop* ItemDragDrop = Cast<UD1ItemDragDrop>(InOperation);
+	if (ItemDragDrop == nullptr)
+		return false;
+
+	if (UD1ItemEntryWidget* FromEntryWidget = ItemDragDrop->FromEntryWidget)
+	{
+		FromEntryWidget->RefreshWidgetOpacity(true);
+	}
+
+	UD1ItemInstance* FromItemInstance = ItemDragDrop->FromItemInstance;
+	if (FromItemInstance == nullptr)
+		return false;
+
+	UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
+	if (ItemManager == nullptr)
+		return false;
+	
+	if (FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Utility>())
+	{
+		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(UtilitySlotType);
+	
+		if (UD1InventoryManagerComponent* FromInventoryManager = ItemDragDrop->FromInventoryManager)
+		{
+			ItemManager->Server_InventoryToEquipment(FromInventoryManager, ItemDragDrop->FromItemSlotPos, EquipmentManager, ToEquipmentSlotType);
+		}
+		else if (UD1EquipmentManagerComponent* FromEquipmentManager = ItemDragDrop->FromEquipmentManager)
+		{
+			ItemManager->Server_EquipmentToEquipment(FromEquipmentManager, ItemDragDrop->FromEquipmentSlotType, EquipmentManager, ToEquipmentSlotType);
+		}
+	}
+	return true;
 }
 
-void UD1EquipmentSlotUtilityWidget::CleanUpDrag()
+void UD1EquipmentSlotUtilityWidget::FinishDrag()
 {
+	Super::FinishDrag();
+
 	ChangeHoverState(Image_Slot, ESlotState::Default);
-	bAlreadyHovered = false;
 }
 
-void UD1EquipmentSlotUtilityWidget::OnEquipmentEntryChanged(UD1ItemInstance* NewItemInstance, int32 NewItemCount)
+void UD1EquipmentSlotUtilityWidget::OnEquipmentEntryChanged(UD1ItemInstance* InItemInstance, int32 InItemCount)
 {
-	// if (EntryWidget)
-	// {
-	// 	Overlay_Root->RemoveChild(EntryWidget);
-	// 	EntryWidget = nullptr;
-	// }
-	//
-	// if (NewItemInstance)
-	// {
-	// 	EntryWidget = CreateWidget<UD1EquipmentEntryWidget>(GetOwningPlayer(), EntryWidgetClass);
-	// 	
-	// 	UOverlaySlot* OverlaySlot = Overlay_Root->AddChildToOverlay(EntryWidget);
-	// 	OverlaySlot->SetHorizontalAlignment(HAlign_Fill);
-	// 	OverlaySlot->SetVerticalAlignment(VAlign_Fill);
-	// 	
-	// 	EntryWidget->Init(NewItemInstance, UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType), EquipmentManager);
-	//
-	// 	Image_Icon->SetRenderOpacity(0.f);
-	// }
-	// else
-	// {
-	// 	Image_Icon->SetRenderOpacity(1.f);
-	// }
+	if (EntryWidget)
+	{
+		Overlay_Root->RemoveChild(EntryWidget);
+		EntryWidget = nullptr;
+	}
+	
+	if (InItemInstance)
+	{
+		EntryWidget = CreateWidget<UD1EquipmentEntryWidget>(GetOwningPlayer(), EntryWidgetClass);
+		
+		UOverlaySlot* OverlaySlot = Overlay_Root->AddChildToOverlay(EntryWidget);
+		OverlaySlot->SetHorizontalAlignment(HAlign_Fill);
+		OverlaySlot->SetVerticalAlignment(VAlign_Fill);
+		
+		EntryWidget->Init(InItemInstance, InItemCount, UD1EquipManagerComponent::ConvertToEquipmentSlotType(UtilitySlotType), EquipmentManager);
+
+		Image_Icon->SetRenderOpacity(0.f);
+	}
+	else
+	{
+		Image_Icon->SetRenderOpacity(1.f);
+	}
 }

@@ -34,12 +34,16 @@ public:
 	void RefreshWidgetOpacity(bool bClearlyVisible);
 
 public:
-	void SetItemInstance(UD1ItemInstance* NewItemInstance);
+	void RefreshUI(UD1ItemInstance* NewItemInstance, int32 NewItemCount);
+	void RefreshItemCount(int32 NewItemCount);
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
 
 protected:
 	UPROPERTY()
 	TObjectPtr<UD1ItemInstance> ItemInstance;
+
+	UPROPERTY()
+	int32 ItemCount = 0;
 
 protected:
 	UPROPERTY()

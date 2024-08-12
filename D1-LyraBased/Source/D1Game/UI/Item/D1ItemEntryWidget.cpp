@@ -115,13 +115,24 @@ void UD1ItemEntryWidget::RefreshWidgetOpacity(bool bClearlyVisible)
 	SetRenderOpacity(bClearlyVisible ? 1.f : 0.5f);
 }
 
-void UD1ItemEntryWidget::SetItemInstance(UD1ItemInstance* NewItemInstance)
+void UD1ItemEntryWidget::RefreshUI(UD1ItemInstance* NewItemInstance, int32 NewItemCount)
 {
+	if (NewItemInstance == nullptr || NewItemCount < 1)
+		return;
+	
 	ItemInstance = NewItemInstance;
-	check(ItemInstance);
+	ItemCount = NewItemCount;
 
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
 	Image_Icon->SetBrushFromTexture(ItemTemplate.IconTexture, true);
+	Text_Count->SetText(ItemCount <= 1 ? FText::GetEmpty() : FText::AsNumber(ItemCount));
+}
 
-	// Text_Count->SetText()
+void UD1ItemEntryWidget::RefreshItemCount(int32 NewItemCount)
+{
+	if (NewItemCount < 1)
+		return;
+	
+	ItemCount = NewItemCount;
+	Text_Count->SetText(ItemCount <= 1 ? FText::GetEmpty() : FText::AsNumber(ItemCount));
 }

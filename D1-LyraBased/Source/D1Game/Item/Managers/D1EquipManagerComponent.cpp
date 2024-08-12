@@ -14,7 +14,6 @@
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/LyraCombatSet.h"
 #include "Character/LyraCharacter.h"
-#include "GameFramework/GameplayMessageSubsystem.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/LyraPlayerController.h"
 #include "PocketWorld/D1PocketStage.h"
@@ -86,7 +85,7 @@ void FD1EquipEntry::Equip()
 			BaseStatHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 		}
 		
-		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
+		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon || EquippableFragment->EquipmentType == EEquipmentType::Utility)
 		{
 			// Despawn Previous Real Weapon
 			if (IsValid(SpawnedWeaponActor))
@@ -95,8 +94,8 @@ void FD1EquipEntry::Equip()
 			}
 
 			// Spawn Current Real Weapon
-			const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
-			const FD1WeaponAttachInfo& AttachInfo = WeaponFragment->WeaponAttachInfo;
+			const UD1ItemFragment_Equippable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Attachment>();
+			const FD1WeaponAttachInfo& AttachInfo = AttachmentFragment->WeaponAttachInfo;
 			if (AttachInfo.SpawnWeaponClass)
 			{
 				UWorld* World = EquipManager->GetWorld();
@@ -104,18 +103,14 @@ void FD1EquipEntry::Equip()
 				NewWeaponActor->Init(ItemInstance->GetItemTemplateID(), EquipmentSlotType);
 				NewWeaponActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 				NewWeaponActor->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
-				NewWeaponActor->SetActorHiddenInGame(EquipManager->ShouldHiddenWeapons());
+				NewWeaponActor->SetActorHiddenInGame(EquipManager->ShouldHiddenEquipments());
 				NewWeaponActor->FinishSpawning(FTransform::Identity, true);
 			}
-		}
-		else if (EquippableFragment->EquipmentType == EEquipmentType::Utility)
-		{
-			// TODO : Real Actor
 		}
 	}
 	else
 	{
-		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
+		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon || EquippableFragment->EquipmentType == EEquipmentType::Utility)
 		{
 			if (Character->IsLocallyControlled())
 			{
@@ -126,18 +121,18 @@ void FD1EquipEntry::Equip()
 				}
 
 				// Spawn Current Pocket Weapon
-				const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+				const UD1ItemFragment_Equippable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Attachment>();
 				if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 				{
 					if (APlayerController* PC = Character->GetLyraPlayerController())
 					{
 						PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
-							FGetPocketStageDelegate::CreateLambda([this, WeaponFragment](AD1PocketStage* PocketStage)
+							FGetPocketStageDelegate::CreateLambda([this, AttachmentFragment](AD1PocketStage* PocketStage)
 							{
 								if (IsValid(PocketStage))
 								{
 									ACharacter* Character = PocketStage->GetCharacter();
-									const FD1WeaponAttachInfo& AttachInfo = WeaponFragment->WeaponAttachInfo;
+									const FD1WeaponAttachInfo& AttachInfo = AttachmentFragment->WeaponAttachInfo;
 									const AD1WeaponBase* WeaponCDO = AttachInfo.SpawnWeaponClass->GetDefaultObject<AD1WeaponBase>();
 									
 									UWorld* World = EquipManager->GetWorld();
@@ -154,7 +149,7 @@ void FD1EquipEntry::Equip()
 									
 									if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
 									{
-										UAnimSequence* PocketWorldAnim = ULyraAssetManager::GetAssetByPath<UAnimSequence>(WeaponFragment->PocketWorldAnim);
+										UAnimSequence* PocketWorldAnim = ULyraAssetManager::GetAssetByPath<UAnimSequence>(AttachmentFragment->PocketWorldAnim);
 										MeshComponent->PlayAnimation(PocketWorldAnim, true);
 									}
 								}
@@ -196,26 +191,22 @@ void FD1EquipEntry::Equip()
 				}
 			}
 		}
-		else if (EquippableFragment->EquipmentType == EEquipmentType::Utility)
-		{
-			// TODO : Pocket World
-		}
 	}
 
-	if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
+	if (EquippableFragment->EquipmentType == EEquipmentType::Weapon || EquippableFragment->EquipmentType == EEquipmentType::Utility)
 	{
-		const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+		const UD1ItemFragment_Equippable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Attachment>();
 		if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
 		{
-			if (WeaponFragment->AnimInstanceClass)
+			if (AttachmentFragment->AnimInstanceClass)
 			{
-				MeshComponent->LinkAnimClassLayers(WeaponFragment->AnimInstanceClass);
+				MeshComponent->LinkAnimClassLayers(AttachmentFragment->AnimInstanceClass);
 			}
 
 			UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent();
 			if (ASC && ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Interact) == false)
 			{
-				UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->EquipMontage);
+				UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->EquipMontage);
 				if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
 				{
 					if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
@@ -225,10 +216,6 @@ void FD1EquipEntry::Equip()
 				}
 			}
 		}
-	}
-	else if (EquippableFragment->EquipmentType == EEquipmentType::Utility)
-	{
-		// TODO : Animation
 	}
 }
 
@@ -247,7 +234,7 @@ void FD1EquipEntry::Unequip()
 		}
 		
 		// Despawn Real Weapon
-		if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType))
+		if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType) || UD1EquipmentManagerComponent::IsUtilitySlot(EquipmentSlotType))
 		{
 			if (IsValid(SpawnedWeaponActor))
 			{
@@ -259,7 +246,7 @@ void FD1EquipEntry::Unequip()
 	{
 		if (ALyraCharacter* Character = EquipManager->GetCharacter())
 		{
-			if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType))
+			if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType) || UD1EquipmentManagerComponent::IsUtilitySlot(EquipmentSlotType))
 			{
 				// Despawn Pocket Weapon
 				if (Character->IsLocallyControlled())
@@ -410,7 +397,7 @@ void UD1EquipManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 	DOREPLIFETIME(ThisClass, EquipList);
 	DOREPLIFETIME(ThisClass, CurrentEquipState);
-	DOREPLIFETIME(ThisClass, bShouldHiddenWeapons);
+	DOREPLIFETIME(ThisClass, bShouldHiddenEquipments);
 }
 
 bool UD1EquipManagerComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
@@ -542,49 +529,70 @@ bool UD1EquipManagerComponent::CanChangeEquipState(EEquipState NewEquipState) co
 	return (EquipmentManager->IsAllEmpty(NewEquipState) == false);
 }
 
-AD1WeaponBase* UD1EquipManagerComponent::GetEquippedWeaponActor(EWeaponHandType WeaponHandType) const
+AD1WeaponBase* UD1EquipManagerComponent::GetEquippedActor(EWeaponHandType WeaponHandType) const
 {
-	if (WeaponHandType == EWeaponHandType::Count)
-		return nullptr;
-
 	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
 	int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType, CurrentEquipState);
 	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].SpawnedWeaponActor : nullptr;
 }
 
-void UD1EquipManagerComponent::GetAllEquippedWeaponActors(TArray<AD1WeaponBase*>& OutEquippedWeaponActors) const
+void UD1EquipManagerComponent::GetAllEquippedActors(TArray<AD1WeaponBase*>& OutEquippedActors) const
 {
-	OutEquippedWeaponActors.Reset();
+	OutEquippedActors.Reset();
 
 	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
-	for (int32 i = 0; i < (int32)EWeaponHandType::Count; i++)
+	
+	if (IsWeaponEquipState(CurrentEquipState))
 	{
-		int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentEquipState);
+		for (int32 i = 0; i < (int32)EWeaponHandType::Count; i++)
+		{
+			int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentEquipState);
+			if (Entries.IsValidIndex(EntryIndex) && Entries[EntryIndex].SpawnedWeaponActor)
+			{
+				OutEquippedActors.Add(Entries[EntryIndex].SpawnedWeaponActor);
+			}
+		}
+	}
+	else if (IsUtilityEquipState(CurrentEquipState))
+	{
+		int32 EntryIndex = (int32)ConvertToEquipmentSlotType(EWeaponHandType::Count, CurrentEquipState);
 		if (Entries.IsValidIndex(EntryIndex) && Entries[EntryIndex].SpawnedWeaponActor)
 		{
-			OutEquippedWeaponActors.Add(Entries[EntryIndex].SpawnedWeaponActor);
+			OutEquippedActors.Add(Entries[EntryIndex].SpawnedWeaponActor);
 		}
 	}
 }
 
-UD1ItemInstance* UD1EquipManagerComponent::GetEquippedWeaponItemInstance(EWeaponHandType WeaponHandType) const
+UD1ItemInstance* UD1EquipManagerComponent::GetEquippedItemInstance(EWeaponHandType WeaponHandType) const
 {
-	if (WeaponHandType == EWeaponHandType::Count)
-		return nullptr;
-
 	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
 	int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType, CurrentEquipState);
 	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].GetItemInstance() : nullptr;
 }
 
-void UD1EquipManagerComponent::GetAllEquippedWeaponItemInstances(TArray<UD1ItemInstance*>& OutItemInstances) const
+void UD1EquipManagerComponent::GetAllEquippedItemInstances(TArray<UD1ItemInstance*>& OutItemInstances) const
 {
 	OutItemInstances.Reset();
 
 	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
-	for (int32 i = 0; i < (int32)EWeaponHandType::Count; i++)
+
+	if (IsWeaponEquipState(CurrentEquipState))
 	{
-		int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentEquipState);
+		for (int32 i = 0; i < (int32)EWeaponHandType::Count; i++)
+		{
+			int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentEquipState);
+			if (Entries.IsValidIndex(EntryIndex))
+			{
+				if (UD1ItemInstance* ItemInstance = Entries[EntryIndex].GetItemInstance())
+				{
+					OutItemInstances.Add(ItemInstance);
+				}
+			}
+		}
+	}
+	else if (IsUtilityEquipState(CurrentEquipState))
+	{
+		int32 EntryIndex = (int32)ConvertToEquipmentSlotType(EWeaponHandType::Count, CurrentEquipState);
 		if (Entries.IsValidIndex(EntryIndex))
 		{
 			if (UD1ItemInstance* ItemInstance = Entries[EntryIndex].GetItemInstance())
@@ -595,21 +603,34 @@ void UD1EquipManagerComponent::GetAllEquippedWeaponItemInstances(TArray<UD1ItemI
 	}
 }
 
-AD1WeaponBase* UD1EquipManagerComponent::GetFirstEquippedWeaponActor() const
+AD1WeaponBase* UD1EquipManagerComponent::GetFirstEquippedActor() const
 {
 	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
 	
 	AD1WeaponBase* WeaponActor = nullptr;
-	for (int i = 0; i < (int32)EWeaponHandType::Count; i++)
-	{
-		int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentEquipState);
-		if (Entries.IsValidIndex(EntryIndex) == false)
-			continue;
 
-		WeaponActor = Entries[EntryIndex].SpawnedWeaponActor;
-		if (WeaponActor)
-			break;
+	if (IsWeaponEquipState(CurrentEquipState))
+	{
+		for (int i = 0; i < (int32)EWeaponHandType::Count; i++)
+		{
+			int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentEquipState);
+			if (Entries.IsValidIndex(EntryIndex) == false)
+				continue;
+
+			WeaponActor = Entries[EntryIndex].SpawnedWeaponActor;
+			if (WeaponActor)
+				break;
+		}
 	}
+	else if (IsUtilityEquipState(CurrentEquipState))
+	{
+		int32 EntryIndex = (int32)ConvertToEquipmentSlotType(EWeaponHandType::Count, CurrentEquipState);
+		if (Entries.IsValidIndex(EntryIndex))
+		{
+			WeaponActor = Entries[EntryIndex].SpawnedWeaponActor;
+		}
+	}
+	
 	return WeaponActor;
 }
 
@@ -620,10 +641,10 @@ void UD1EquipManagerComponent::OnRep_CurrentEquipState()
 
 void UD1EquipManagerComponent::BroadcastChangedMessage(EEquipState NewEquipState)
 {
-	FD1EquipStateChangedMessage Message;
-	Message.EquipState = NewEquipState;
-	
-	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
+	// FD1EquipStateChangedMessage Message;
+	// Message.EquipState = NewEquipState;
+	//
+	// UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
 	// MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Item_WeaponEquipStateChanged, Message);
 }
 
@@ -660,11 +681,11 @@ UD1EquipmentManagerComponent* UD1EquipManagerComponent::GetEquipmentManager() co
 	return nullptr;
 }
 
-EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EEquipState WeaponEquipState)
+EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EEquipState EquipState)
 {
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 
-	if (WeaponEquipState == EEquipState::Unarmed)
+	if (EquipState == EEquipState::Unarmed)
 	{
 		switch (WeaponHandType)
 		{
@@ -672,7 +693,7 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Unarmed_RightHand; break;
 		}
 	}
-	else if (WeaponEquipState == EEquipState::Primary)
+	else if (EquipState == EEquipState::Weapon_Primary)
 	{
 		switch (WeaponHandType)
 		{
@@ -681,7 +702,7 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Primary_TwoHand;   break;
 		}
 	}
-	else if (WeaponEquipState == EEquipState::Secondary)
+	else if (EquipState == EEquipState::Weapon_Secondary)
 	{
 		switch (WeaponHandType)
 		{
@@ -689,6 +710,14 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 		case EWeaponHandType::RightHand: EquipmentSlotType = EEquipmentSlotType::Secondary_RightHand; break;
 		case EWeaponHandType::TwoHand:   EquipmentSlotType = EEquipmentSlotType::Secondary_TwoHand;   break;
 		}
+	}
+	else if (EquipState == EEquipState::Utility_Primary)
+	{
+		EquipmentSlotType = EEquipmentSlotType::Utility_Primary;
+	}
+	else if (EquipState == EEquipState::Utility_Secondary)
+	{
+		EquipmentSlotType = EEquipmentSlotType::Utility_Secondary;
 	}
 	
 	return EquipmentSlotType;
@@ -790,17 +819,40 @@ EArmorType UD1EquipManagerComponent::ConvertToArmorType(EEquipmentSlotType Equip
 	return ArmorType;
 }
 
+EUtilitySlotType UD1EquipManagerComponent::ConvertToUtilitySlotType(EEquipmentSlotType EquipmentSlotType)
+{
+	EUtilitySlotType UtilitySlotType = EUtilitySlotType::Count;
+
+	switch (EquipmentSlotType)
+	{
+	case EEquipmentSlotType::Utility_Primary:	UtilitySlotType = EUtilitySlotType::Primary;	break;
+	case EEquipmentSlotType::Utility_Secondary:	UtilitySlotType = EUtilitySlotType::Secondary;	break;
+	}
+
+	return UtilitySlotType;
+}
+
 EEquipState UD1EquipManagerComponent::ConvertToEquipState(EWeaponSlotType WeaponSlotType)
 {
 	EEquipState EquipState = EEquipState::Count;
 
 	switch (WeaponSlotType)
 	{
-	case EWeaponSlotType::Primary:		EquipState = EEquipState::Primary;		break;
-	case EWeaponSlotType::Secondary:	EquipState = EEquipState::Secondary;	break;
+	case EWeaponSlotType::Primary:		EquipState = EEquipState::Weapon_Primary;		break;
+	case EWeaponSlotType::Secondary:	EquipState = EEquipState::Weapon_Secondary;		break;
 	}
 
 	return EquipState;
+}
+
+bool UD1EquipManagerComponent::IsWeaponEquipState(EEquipState EquipState)
+{
+	return (EEquipState::Weapon_Primary <= EquipState && EquipState <= EEquipState::Weapon_Secondary);
+}
+
+bool UD1EquipManagerComponent::IsUtilityEquipState(EEquipState EquipState)
+{
+	return (EEquipState::Utility_Primary <= EquipState && EquipState <= EEquipState::Utility_Secondary);
 }
 
 EWeaponSlotType UD1EquipManagerComponent::ConvertToWeaponSlotType(EEquipmentSlotType EquipmentSlotType)
@@ -824,18 +876,18 @@ EWeaponSlotType UD1EquipManagerComponent::ConvertToWeaponSlotType(EEquipmentSlot
 	return WeaponSlotType;
 }
 
-void UD1EquipManagerComponent::ChangeShouldHiddenWeapons(bool bNewShouldHiddenWeapons)
+void UD1EquipManagerComponent::ChangeShouldHiddenEquipments(bool bNewShouldHiddenEquipments)
 {
-	bShouldHiddenWeapons = bNewShouldHiddenWeapons;
+	bShouldHiddenEquipments = bNewShouldHiddenEquipments;
 
-	TArray<AD1WeaponBase*> OutEquippedWeaponActors;
-	GetAllEquippedWeaponActors(OutEquippedWeaponActors);
+	TArray<AD1WeaponBase*> OutEquippedActors;
+	GetAllEquippedActors(OutEquippedActors);
 
-	for (AD1WeaponBase* WeaponActor : OutEquippedWeaponActors)
+	for (AD1WeaponBase* WeaponActor : OutEquippedActors)
 	{
 		if (IsValid(WeaponActor))
 		{
-			WeaponActor->SetActorHiddenInGame(bShouldHiddenWeapons);
+			WeaponActor->SetActorHiddenInGame(bShouldHiddenEquipments);
 		}
 	}
 }

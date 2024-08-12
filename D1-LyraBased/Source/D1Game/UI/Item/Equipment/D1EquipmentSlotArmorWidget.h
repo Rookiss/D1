@@ -23,16 +23,14 @@ public:
 	
 protected:
 	virtual void NativePreConstruct() override;
-	
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
-private:
-	void CleanUpDrag();
+protected:
+	virtual void FinishDrag() override;
 
 public:
-	void OnEquipmentEntryChanged(UD1ItemInstance* NewItemInstance, int32 NewItemCount);
+	void OnEquipmentEntryChanged(UD1ItemInstance* InItemInstance, int32 InItemCount);
 
 public:
 	UPROPERTY(EditAnywhere)

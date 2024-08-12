@@ -6,11 +6,11 @@
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "D1EquipmentSlotsWidget.generated.h"
 
-class UD1EquipmentSlotUtilityWidget;
 class UD1ItemInstance;
 class UD1ItemSlotWidget;
 class UD1EquipmentSlotWeaponWidget;
 class UD1EquipmentSlotArmorWidget;
+class UD1EquipmentSlotUtilityWidget;
 class UD1EquipmentManagerComponent;
 
 USTRUCT(BlueprintType)
@@ -48,13 +48,13 @@ protected:
 	
 private:
 	UPROPERTY()
-	TArray<TObjectPtr<UD1EquipmentSlotWeaponWidget>> SlotWeaponWidgets;
+	TArray<TObjectPtr<UD1EquipmentSlotWeaponWidget>> WeaponSlotWidgets;
 
 	UPROPERTY()
-	TArray<TObjectPtr<UD1EquipmentSlotArmorWidget>> SlotArmorWidgets;
+	TArray<TObjectPtr<UD1EquipmentSlotArmorWidget>> ArmorSlotWidgets;
 
 	UPROPERTY()
-	TArray<TObjectPtr<UD1EquipmentSlotUtilityWidget>> SlotUtilityWidgets;
+	TArray<TObjectPtr<UD1EquipmentSlotUtilityWidget>> UtilitySlotWidgets;
 	
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;

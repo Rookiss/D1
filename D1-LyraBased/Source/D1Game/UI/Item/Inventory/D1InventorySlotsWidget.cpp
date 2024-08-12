@@ -110,14 +110,14 @@ void UD1InventorySlotsWidget::NativeOnDragLeave(const FDragDropEvent& InDragDrop
 {
 	Super::NativeOnDragLeave(InDragDropEvent, InOperation);
 
-	CleanUpDrag();
+	FinishDrag();
 }
 
 bool UD1InventorySlotsWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
-	CleanUpDrag();
+	FinishDrag();
 	
 	UD1ItemDragDrop* DragDrop = Cast<UD1ItemDragDrop>(InOperation);
 	check(DragDrop);
@@ -201,13 +201,13 @@ void UD1InventorySlotsWidget::UnhoverSlots()
 	HoveredSlotWidgets.Reset();
 }
 
-void UD1InventorySlotsWidget::CleanUpDrag()
+void UD1InventorySlotsWidget::FinishDrag()
 {
 	UnhoverSlots();
 	PrevDragOverSlotPos = FIntPoint(-1, -1);
 }
 
-void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlotPos, UD1ItemInstance* InItemInstance, int32 NewItemCount)
+void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlotPos, UD1ItemInstance* InItemInstance, int32 InItemCount)
 {
 	const FIntPoint& InventorySlotCount = InventoryManager->GetInventorySlotCount();
 	int32 SlotIndex = InItemSlotPos.Y * InventorySlotCount.X + InItemSlotPos.X;
@@ -218,7 +218,7 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlo
 		{
 			if (ItemInstance == InItemInstance)
 			{
-				EntryWidget->RefreshItemCount(NewItemCount);
+				EntryWidget->RefreshItemCount(InItemCount);
 				return;
 			}
 			else
@@ -256,7 +256,7 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlo
 		CanvasPanelSlot->SetAutoSize(true);
 		CanvasPanelSlot->SetPosition(FVector2D(InItemSlotPos.X * Item::UnitInventorySlotSize.X, InItemSlotPos.Y * Item::UnitInventorySlotSize.Y));
 		
-		EntryWidget->Init(this, InItemInstance, NewItemCount);
+		EntryWidget->Init(this, InItemInstance, InItemCount);
 		
 		const FIntPoint StartSlotPos = InItemSlotPos;
 		const FIntPoint EndSlotPos = InItemSlotPos + ItemTemplate.SlotCount;
