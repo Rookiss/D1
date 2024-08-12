@@ -22,7 +22,7 @@ void UD1GameplayAbility_Weapon::ActivateAbility(const FGameplayAbilitySpecHandle
 	{
 		if (UD1EquipManagerComponent* EquipManager = PlayerCharacter->FindComponentByClass<UD1EquipManagerComponent>())
 		{
-			WeaponActor = EquipManager->GetEquippedWeaponActor(WeaponHandType);
+			WeaponActor = EquipManager->GetEquippedActor(WeaponHandType);
 		}
 	}
 	
@@ -39,7 +39,7 @@ int32 UD1GameplayAbility_Weapon::GetWeaponStatValue(FGameplayTag StatTag) const
 	int32 StatValue = 0;
 	if (UD1EquipManagerComponent* EquipManager = GetLyraCharacterFromActorInfo()->FindComponentByClass<UD1EquipManagerComponent>())
 	{
-		if (const UD1ItemInstance* ItemInstance = EquipManager->GetEquippedWeaponItemInstance(WeaponHandType))
+		if (const UD1ItemInstance* ItemInstance = EquipManager->GetEquippedItemInstance(WeaponHandType))
 		{
 			StatValue = ItemInstance->GetStackCountByTag(StatTag);
 		}

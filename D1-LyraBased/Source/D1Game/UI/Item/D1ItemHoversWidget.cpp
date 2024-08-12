@@ -39,45 +39,49 @@ void UD1ItemHoversWidget::RefreshUI(const UD1ItemInstance* HoveredItemInstance)
 					UD1ItemInstance* BestPickItemInstance = nullptr;
 					UD1ItemInstance* SecondPickItemInstance = nullptr;
 					
-					TArray<UD1ItemInstance*> WeaponItemInstances;
-					EquipManager->GetAllEquippedWeaponItemInstances(WeaponItemInstances);
+					TArray<UD1ItemInstance*> ItemInstances;
+					EquipManager->GetAllEquippedItemInstances(ItemInstances);
 
-					for (UD1ItemInstance* WeaponItemInstance : WeaponItemInstances)
+					for (UD1ItemInstance* ItemInstance : ItemInstances)
 					{
-						const UD1ItemFragment_Equippable_Weapon* EquippedWeaponFragment = WeaponItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
-						if (HoveredWeaponFragment->WeaponType == EquippedWeaponFragment->WeaponType)
+						if (const UD1ItemFragment_Equippable_Weapon* EquippedWeaponFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 						{
-							if (HoveredWeaponFragment->WeaponHandType == EquippedWeaponFragment->WeaponHandType)
+							if (HoveredWeaponFragment->WeaponType == EquippedWeaponFragment->WeaponType)
 							{
-								BestPickItemInstance = WeaponItemInstance;
-								break;
-							}
+								if (HoveredWeaponFragment->WeaponHandType == EquippedWeaponFragment->WeaponHandType)
+								{
+									BestPickItemInstance = ItemInstance;
+									break;
+								}
 
-							if (SecondPickItemInstance == nullptr)
-							{
-								SecondPickItemInstance = WeaponItemInstance;
+								if (SecondPickItemInstance == nullptr)
+								{
+									SecondPickItemInstance = ItemInstance;
+								}
 							}
 						}
 					}
 
 					if (BestPickItemInstance == nullptr)
 					{
-						EquipmentManager->GetAllWeaponItemInstances(WeaponItemInstances);
+						EquipmentManager->GetAllWeaponItemInstances(ItemInstances);
 
-						for (UD1ItemInstance* WeaponItemInstance : WeaponItemInstances)
+						for (UD1ItemInstance* WeaponItemInstance : ItemInstances)
 						{
-							const UD1ItemFragment_Equippable_Weapon* EquippedWeaponFragment = WeaponItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
-							if (HoveredWeaponFragment->WeaponType == EquippedWeaponFragment->WeaponType)
+							if (const UD1ItemFragment_Equippable_Weapon* EquippedWeaponFragment = WeaponItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 							{
-								if (HoveredWeaponFragment->WeaponHandType == EquippedWeaponFragment->WeaponHandType)
+								if (HoveredWeaponFragment->WeaponType == EquippedWeaponFragment->WeaponType)
 								{
-									BestPickItemInstance = WeaponItemInstance;
-									break;
-								}
+									if (HoveredWeaponFragment->WeaponHandType == EquippedWeaponFragment->WeaponHandType)
+									{
+										BestPickItemInstance = WeaponItemInstance;
+										break;
+									}
 							
-								if (SecondPickItemInstance == nullptr)
-								{
-									SecondPickItemInstance = WeaponItemInstance;
+									if (SecondPickItemInstance == nullptr)
+									{
+										SecondPickItemInstance = WeaponItemInstance;
+									}
 								}
 							}
 						}

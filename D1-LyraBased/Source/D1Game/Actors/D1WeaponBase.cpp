@@ -5,6 +5,7 @@
 #include "Character/LyraCharacter.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SplineComponent.h"
 #include "Data/D1ItemData.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
@@ -154,9 +155,9 @@ UAnimMontage* AD1WeaponBase::GetEquipMontage()
 	if (TemplateID > 0)
 	{
 		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-		if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
+		if (const UD1ItemFragment_Equippable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Attachment>())
 		{
-			EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->EquipMontage);
+			EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->EquipMontage);
 		}
 	}
 	
@@ -170,11 +171,11 @@ UAnimMontage* AD1WeaponBase::GetHitMontage(AActor* InstigatorActor, const FVecto
 	if (InstigatorActor && TemplateID > 0)
 	{
 		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-		if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
+		if (const UD1ItemFragment_Equippable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Attachment>())
 		{
 			if (IsBlocked)
 			{
-				SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->BlockHitMontage);
+				SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->BlockHitMontage);
 			}
 			else
 			{
@@ -190,19 +191,19 @@ UAnimMontage* AD1WeaponBase::GetHitMontage(AActor* InstigatorActor, const FVecto
 
 				if (YawAbs < 60.f)
 				{
-					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->FrontHitMontage);
+					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->FrontHitMontage);
 				}
 				else if (YawAbs > 120.f)
 				{
-					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->BackHitMontage);
+					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->BackHitMontage);
 				}
 				else if (DeltaRotator.Yaw < 0.f)
 				{
-					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->LeftHitMontage);
+					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->LeftHitMontage);
 				}
 				else
 				{
-					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(WeaponFragment->RightHitMontage);
+					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->RightHitMontage);
 				}
 			}
 		}

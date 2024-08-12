@@ -10,7 +10,6 @@
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
-#include "System/LyraAssetManager.h"
 #include "UI/Item/D1ItemDragDrop.h"
 #include "UI/Item/Inventory/D1InventoryEntryWidget.h"
 
@@ -24,8 +23,7 @@ UD1EquipmentSlotWeaponWidget::UD1EquipmentSlotWeaponWidget(const FObjectInitiali
 
 void UD1EquipmentSlotWeaponWidget::Init(EWeaponSlotType InWeaponSlotType, UD1EquipmentManagerComponent* InEquipmentManager)
 {
-	if (InWeaponSlotType == EWeaponSlotType::Count)
-		return;
+	check(InWeaponSlotType != EWeaponSlotType::Count && InEquipmentManager != nullptr);
 	
 	WeaponSlotType = InWeaponSlotType;
 	EquipmentManager = InEquipmentManager;
@@ -46,11 +44,6 @@ void UD1EquipmentSlotWeaponWidget::NativeOnInitialized()
 	EntryWidgets.SetNum((int32)EWeaponHandType::Count);
 	SlotImages   = { Image_Slot_LeftHand, Image_Slot_RightHand, Image_Slot_TwoHand };
 	SlotOverlays = { Overlay_Slot_LeftHand, Overlay_Slot_RightHand, Overlay_Slot_TwoHand };
-	
-	EquipmentManager = GetOwningPlayerPawn()->GetComponentByClass<UD1EquipmentManagerComponent>();
-	check(EquipmentManager);
-	
-	EntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1EquipmentEntryWidget>("EquipmentEntryWidgetClass");
 }
 
 bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -62,11 +55,13 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry,
 	
 	bAlreadyHovered = true;
 	
-	UD1ItemDragDrop* DragDrop = Cast<UD1ItemDragDrop>(InOperation);
-	check(DragDrop);
+	UD1ItemDragDrop* ItemDragDrop = Cast<UD1ItemDragDrop>(InOperation);
+	if (ItemDragDrop == nullptr)
+		return false;
 	
-	UD1ItemInstance* FromItemInstance = DragDrop->FromItemInstance;
-	check(FromItemInstance);
+	UD1ItemInstance* FromItemInstance = ItemDragDrop->FromItemInstance;
+	if (FromItemInstance == nullptr)
+		return false;
 	
 	bool bIsValid = false;
 	UImage* TargetImage = Image_Slot_TwoHand;
@@ -76,25 +71,33 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry,
 		TargetImage = SlotImages[(int32)FromWeaponFragment->WeaponHandType];
 		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, WeaponSlotType);
 	
-		if (UD1InventoryManagerComponent* FromInventoryManager = DragDrop->FromInventoryManager)
+		if (UD1InventoryManagerComponent* FromInventoryManager = ItemDragDrop->FromInventoryManager)
 		{
-			bIsValid = EquipmentManager->CanMoveOrMergeEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, ToEquipmentSlotType) > 0;
+			if (EquipmentManager->GetItemInstance(ToEquipmentSlotType))
+			{
+				FIntPoint OutToItemSlotPos;
+				bIsValid = EquipmentManager->CanSwapEquipment(FromInventoryManager, ItemDragDrop->FromItemSlotPos, ToEquipmentSlotType, OutToItemSlotPos);
+			}
+			else
+			{
+				bIsValid = EquipmentManager->CanMoveOrMergeEquipment(FromInventoryManager, ItemDragDrop->FromItemSlotPos, ToEquipmentSlotType) > 0;
+			}
 		}
-		else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
+		else if (UD1EquipmentManagerComponent* FromEquipmentManager = ItemDragDrop->FromEquipmentManager)
 		{
-			bIsValid = EquipmentManager->CanMoveOrMergeEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, ToEquipmentSlotType) > 0;
+			if (EquipmentManager->GetItemInstance(ToEquipmentSlotType))
+			{
+				bIsValid = EquipmentManager->CanSwapEquipment(FromEquipmentManager, ItemDragDrop->FromEquipmentSlotType, ToEquipmentSlotType);
+			}
+			else
+			{
+				bIsValid = EquipmentManager->CanMoveOrMergeEquipment(FromEquipmentManager, ItemDragDrop->FromEquipmentSlotType, ToEquipmentSlotType) > 0;
+			}
 		}
 	}
 	
 	ChangeHoverState(TargetImage, bIsValid ? ESlotState::Valid : ESlotState::Invalid);
 	return true;
-}
-
-void UD1EquipmentSlotWeaponWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
-{
-	Super::NativeOnDragLeave(InDragDropEvent, InOperation);
-
-	FinishDrag();
 }
 
 bool UD1EquipmentSlotWeaponWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -103,29 +106,34 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDrop(const FGeometry& InGeometry, con
 
 	FinishDrag();
 	
-	UD1ItemDragDrop* DragDrop = Cast<UD1ItemDragDrop>(InOperation);
-	check(DragDrop);
+	UD1ItemDragDrop* ItemDragDrop = Cast<UD1ItemDragDrop>(InOperation);
+	if (ItemDragDrop == nullptr)
+		return false;
 	
-	UD1ItemEntryWidget* FromEntryWidget = DragDrop->FromEntryWidget;
-	FromEntryWidget->RefreshWidgetOpacity(true);
+	if (UD1ItemEntryWidget* FromEntryWidget = ItemDragDrop->FromEntryWidget)
+	{
+		FromEntryWidget->RefreshWidgetOpacity(true);
+	}
 	
-	UD1ItemInstance* FromItemInstance = DragDrop->FromItemInstance;
-	check(FromItemInstance);
+	UD1ItemInstance* FromItemInstance = ItemDragDrop->FromItemInstance;
+	if (FromItemInstance == nullptr)
+		return false;
 
 	UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
-	check(ItemManager);
+	if (ItemManager == nullptr)
+		return false;
 	
 	if (const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 	{
 		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, WeaponSlotType);
 	
-		if (UD1InventoryManagerComponent* FromInventoryManager = DragDrop->FromInventoryManager)
+		if (UD1InventoryManagerComponent* FromInventoryManager = ItemDragDrop->FromInventoryManager)
 		{
-			ItemManager->Server_InventoryToEquipment(FromInventoryManager, DragDrop->FromItemSlotPos, EquipmentManager, ToEquipmentSlotType);
+			ItemManager->Server_InventoryToEquipment(FromInventoryManager, ItemDragDrop->FromItemSlotPos, EquipmentManager, ToEquipmentSlotType);
 		}
-		else if (UD1EquipmentManagerComponent* FromEquipmentManager = DragDrop->FromEquipmentManager)
+		else if (UD1EquipmentManagerComponent* FromEquipmentManager = ItemDragDrop->FromEquipmentManager)
 		{
-			ItemManager->Server_EquipmentToEquipment(FromEquipmentManager, DragDrop->FromEquipmentSlotType, EquipmentManager, ToEquipmentSlotType);
+			ItemManager->Server_EquipmentToEquipment(FromEquipmentManager, ItemDragDrop->FromEquipmentSlotType, EquipmentManager, ToEquipmentSlotType);
 		}
 	}
 	return true;
@@ -133,15 +141,15 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDrop(const FGeometry& InGeometry, con
 
 void UD1EquipmentSlotWeaponWidget::FinishDrag()
 {
+	Super::FinishDrag();
+	
 	for (UImage* TargetImage : SlotImages)
 	{
 		ChangeHoverState(TargetImage, ESlotState::Default);
 	}
-
-	bAlreadyHovered = false;
 }
 
-void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWeaponHandType, UD1ItemInstance* NewItemInstance)
+void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWeaponHandType, UD1ItemInstance* InItemInstance, int32 InItemCount)
 {
 	if (InWeaponHandType == EWeaponHandType::Count)
 		return;
@@ -151,11 +159,20 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 
 	if (UD1EquipmentEntryWidget* EntryWidget = EntryWidgets[WeaponHandIndex])
 	{
+		if (UD1ItemInstance* ItemInstance = EntryWidget->GetItemInstance())
+		{
+			if (ItemInstance == InItemInstance)
+			{
+				EntryWidget->RefreshItemCount(InItemCount);
+				return;
+			}
+		}
+		
 		TargetOverlay->RemoveChild(EntryWidget);
 		EntryWidgets[WeaponHandIndex] = nullptr;
 	}
 	
-	if (NewItemInstance)
+	if (InItemInstance)
 	{
 		UD1EquipmentEntryWidget* EntryWidget = CreateWidget<UD1EquipmentEntryWidget>(GetOwningPlayer(), EntryWidgetClass);
 		EntryWidgets[WeaponHandIndex] = EntryWidget;
@@ -164,7 +181,7 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 		OverlaySlot->SetHorizontalAlignment(HAlign_Fill);
 		OverlaySlot->SetVerticalAlignment(VAlign_Fill);
 		
-		EntryWidget->Init(NewItemInstance, UD1EquipManagerComponent::ConvertToEquipmentSlotType(InWeaponHandType, WeaponSlotType), EquipmentManager);
+		EntryWidget->Init(InItemInstance, InItemCount, UD1EquipManagerComponent::ConvertToEquipmentSlotType(InWeaponHandType, WeaponSlotType), EquipmentManager);
 	}
 
 	FSlateBrush LeftBrush, RightBrush;
@@ -172,7 +189,7 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 	switch (InWeaponHandType)
 	{
 	case EWeaponHandType::LeftHand:
-		if (NewItemInstance)
+		if (InItemInstance)
 		{
 			Image_Icon_Left->SetRenderOpacity(0.f);
 		}
@@ -182,7 +199,7 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 		}
 		break;
 	case EWeaponHandType::RightHand:
-		if (NewItemInstance)
+		if (InItemInstance)
 		{
 			Image_Icon_Right->SetRenderOpacity(0.f);
 		}
@@ -192,7 +209,7 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 		}
 		break;
 	case EWeaponHandType::TwoHand:
-		if (NewItemInstance)
+		if (InItemInstance)
 		{
 			Image_Icon_Left->SetRenderOpacity(0.f);
 			Image_Icon_Right->SetRenderOpacity(0.f);

@@ -68,7 +68,7 @@ protected:
 public:
 	UPROPERTY(ReplicatedUsing=OnRep_CanBlock)
 	bool bCanBlock = false;
-
+	
 private:
 	FLyraAbilitySet_GrantedHandles SkillAbilitySetHandles;
 };

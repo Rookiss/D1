@@ -4,7 +4,6 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Image.h"
 #include "Components/SizeBox.h"
-#include "Components/TextBlock.h"
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
@@ -24,21 +23,13 @@ UD1InventoryEntryWidget::UD1InventoryEntryWidget(const FObjectInitializer& Objec
 void UD1InventoryEntryWidget::Init(UD1InventorySlotsWidget* InSlotsWidget, UD1ItemInstance* InItemInstance, int32 InItemCount)
 {
 	SlotsWidget = InSlotsWidget;
-	SetItemInstance(InItemInstance);
+	RefreshUI(InItemInstance, InItemCount);
 	
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
 
 	FVector2D WidgetSize = FVector2D(ItemTemplate.SlotCount.X * Item::UnitInventorySlotSize.X, ItemTemplate.SlotCount.Y * Item::UnitInventorySlotSize.Y);
 	SizeBox_Root->SetWidthOverride(WidgetSize.X);
 	SizeBox_Root->SetHeightOverride(WidgetSize.Y);
-	
-	RefreshItemCount(InItemCount);
-}
-
-void UD1InventoryEntryWidget::RefreshItemCount(int32 NewItemCount)
-{
-	ItemCount = NewItemCount;
-	Text_Count->SetText((ItemCount >= 2) ? FText::AsNumber(ItemCount) : FText::GetEmpty());
 }
 
 FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)

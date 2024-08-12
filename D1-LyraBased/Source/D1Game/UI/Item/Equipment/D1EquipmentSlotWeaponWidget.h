@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "D1Define.h"
-#include "UI/Item/D1ItemSlotWidget.h"
+#include "D1EquipmentSlotWidget.h"
 #include "D1EquipmentSlotWeaponWidget.generated.h"
 
 class UImage;
@@ -11,7 +11,7 @@ class UD1EquipmentEntryWidget;
 class UD1EquipmentManagerComponent;
 
 UCLASS()
-class UD1EquipmentSlotWeaponWidget : public UD1ItemSlotWidget
+class UD1EquipmentSlotWeaponWidget : public UD1EquipmentSlotWidget
 {
 	GENERATED_BODY()
 	
@@ -24,23 +24,14 @@ public:
 protected:
 	virtual void NativePreConstruct() override;
 	virtual void NativeOnInitialized() override;
-	
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
-private:
-	void FinishDrag();
+protected:
+	virtual void FinishDrag() override;
 
 public:
-	void OnEquipmentEntryChanged(EWeaponHandType InWeaponHandType, UD1ItemInstance* NewItemInstance);
-	
-private:
-	UPROPERTY()
-	TSubclassOf<UD1EquipmentEntryWidget> EntryWidgetClass;
-
-	UPROPERTY()
-	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
+	void OnEquipmentEntryChanged(EWeaponHandType InWeaponHandType, UD1ItemInstance* InItemInstance, int32 InItemCount);
 	
 private:
 	UPROPERTY()
@@ -91,6 +82,5 @@ private:
 	TObjectPtr<UImage> Image_Frame_Right;
 
 private:
-	bool bAlreadyHovered = false;
 	EWeaponSlotType WeaponSlotType = EWeaponSlotType::Count;
 };

@@ -4,7 +4,6 @@
 #include "D1InventoryEntryWidget.generated.h"
 
 class USizeBox;
-class UTextBlock;
 class UD1ItemInstance;
 class UD1InventorySlotsWidget;
 
@@ -18,7 +17,6 @@ public:
 
 public:
 	void Init(UD1InventorySlotsWidget* InSlotsWidget, UD1ItemInstance* InItemInstance, int32 InItemCount);
-	void RefreshItemCount(int32 NewItemCount);
 
 protected:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
@@ -30,8 +28,6 @@ private:
 
 	FIntPoint CachedFromSlotPos = FIntPoint::ZeroValue;
 	FVector2D CachedDeltaWidgetPos = FVector2D::ZeroVector;
-
-	int32 ItemCount = 0;
 	
 private:
 	UPROPERTY(meta=(BindWidget))
