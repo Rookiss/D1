@@ -441,16 +441,27 @@ bool UD1ItemManagerComponent::TryDropItem(UD1ItemInstance* FromItemInstance, int
 	UNavigationSystemV1* NavigationSystem = UNavigationSystemV1::GetNavigationSystem(GetWorld());
 	if (NavigationSystem == nullptr)
 		return false;
-	
-	FNavLocation NavLocation;
-	if (NavigationSystem->GetRandomReachablePointInRadius(Pawn->GetActorLocation(), 150.f, NavLocation) == false)
-		return false;
-	
-	FVector SpawnLocation = NavLocation.Location;
-	FRotator SpawnRotation = Pawn->GetActorForwardVector().Rotation();
 
+	FVector Location;
+	FNavLocation NavLocation;
+	if (NavigationSystem->GetRandomReachablePointInRadius(Pawn->GetActorLocation() + Pawn->GetActorForwardVector() * 200.f, 100.f, NavLocation))
+	{
+		Location = NavLocation.Location;
+	}
+	else if (NavigationSystem->GetRandomReachablePointInRadius(Pawn->GetActorLocation(), 200.f, NavLocation))
+	{
+		Location = NavLocation.Location;
+	}
+	else
+	{
+		Location = Pawn->GetActorLocation();
+	}
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	
 	TSubclassOf<AD1PickupableItemBase> PickupableItemClass = ULyraAssetManager::Get().GetSubclassByName<AD1PickupableItemBase>("PickupableItemClass");
-	AD1PickupableItemBase* PickupableItemActor = GetWorld()->SpawnActor<AD1PickupableItemBase>(PickupableItemClass, SpawnLocation, SpawnRotation);
+	AD1PickupableItemBase* PickupableItemActor = GetWorld()->SpawnActor<AD1PickupableItemBase>(PickupableItemClass, Location, FRotator::ZeroRotator, SpawnParameters);
 
 	FD1PickupInfo PickupInfo;
 	PickupInfo.PickupInstance.ItemInstance = FromItemInstance;
