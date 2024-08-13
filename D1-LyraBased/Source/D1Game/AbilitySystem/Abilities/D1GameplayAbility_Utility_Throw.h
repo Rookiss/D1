@@ -10,4 +10,13 @@ class UD1GameplayAbility_Utility_Throw : public UD1GameplayAbility_Weapon
 	
 public:
 	UD1GameplayAbility_Utility_Throw(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+protected:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FVector GetSpawnLocation();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FRotator GetSpawnRotation();
+
+protected:
 };
