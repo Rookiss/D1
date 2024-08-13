@@ -139,22 +139,17 @@ void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AA
 				SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, SourceCueParams);
 			}
 
-			if (TargetASC)
+			if (TargetASC && bIsBlockHit == false && DamageEffectSpecHandle.Data.IsValid())
 			{
-				TSubclassOf<UGameplayAbility> HitReactAbilityClass = ULyraAssetManager::GetSubclassByName<UGameplayAbility>("HitReactAbilityClass");
-				if (FGameplayAbilitySpec* AbilitySpec = TargetASC->FindAbilitySpecFromClass(HitReactAbilityClass))
-				{
-					FGameplayEventData Payload;
-					Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromHitResult(HitResult);
-					Payload.Instigator = GetInstigator();
-					Payload.EventMagnitude = bIsBlockHit;
-					TargetASC->TriggerAbilityFromGameplayEvent(AbilitySpec->Handle, TargetASC->AbilityActorInfo.Get(), D1GameplayTags::GameplayEvent_HitReact, &Payload, *TargetASC);
-				}
-
-				if (bIsBlockHit == false && DamageEffectSpecHandle.Data.IsValid())
-				{
-					TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
-				}
+				FHitResult HitResultCopy = HitResult;
+					
+				FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
+				HitResultCopy.bBlockingHit = bIsBlockHit;
+				EffectContextHandle.AddHitResult(HitResultCopy);
+				EffectContextHandle.AddInstigator(GetInstigator(), this);
+				DamageEffectSpecHandle.Data->SetContext(EffectContextHandle);
+					
+				TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
 			}
 		}
 	}

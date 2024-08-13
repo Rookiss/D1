@@ -18,6 +18,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Look_Stick,								"InputTag.Look.Stick");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Jump,									"InputTag.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Dash,									"InputTag.Dash");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Sprint,									"InputTag.Sprint");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Crouch,									"InputTag.Crouch");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Interact,								"InputTag.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Primary,					"InputTag.ChangeEquip.Primary");
@@ -45,6 +46,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,									"Ability.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Dash_Check,								"Ability.Dash.Check");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Dash_Active,								"Ability.Dash.Active");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Sprint_Check,							"Ability.Sprint.Check");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Sprint_Active,							"Ability.Sprint.Active");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ChangeEquip,								"Ability.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack,									"Ability.Attack");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_1,								"Ability.Attack.1");
@@ -73,6 +76,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_ChangeEquip,								"Status.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS,										"Status.ADS");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Dash,										"Status.Dash");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Sprint,									"Status.Sprint");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Succeeded,								"Status.Succeeded");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Failed,									"Status.Failed");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Interact,									"Status.Interact");
@@ -87,7 +91,6 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Trace,								"GameplayEvent.Trace");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ChangeEquip,						"GameplayEvent.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ArrowVisibility,					"GameplayEvent.ArrowVisibility");
-	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_HitReact,							"GameplayEvent.HitReact");
 	
 	// Cheat
 	UE_DEFINE_GAMEPLAY_TAG(Cheat_GodMode,									"Cheat.GodMode");
