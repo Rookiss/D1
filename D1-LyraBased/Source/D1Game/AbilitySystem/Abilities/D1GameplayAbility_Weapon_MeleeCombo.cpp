@@ -101,22 +101,12 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 
 		if (BlockHitIndex != INDEX_NONE)
 		{
-			const FHitResult& HitResult = *(LocalTargetDataHandle.Data[BlockHitIndex]->GetHitResult());
+			FHitResult HitResult = *(LocalTargetDataHandle.Data[BlockHitIndex]->GetHitResult());
 			
 			FGameplayCueParameters SourceCueParams;
 			SourceCueParams.Location = HitResult.ImpactPoint;
 			SourceCueParams.Normal = HitResult.ImpactNormal;
 			SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, SourceCueParams);
-
-			UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(HitResult.GetActor());
-			if (TargetASC)
-			{
-				FGameplayCueParameters TargetCueParams;
-				TargetCueParams.Location = HitResult.ImpactPoint;
-				TargetCueParams.Instigator = SourceASC->AbilityActorInfo->OwnerActor.Get();
-				TargetCueParams.RawMagnitude = true;
-				TargetASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_HitReact, TargetCueParams);
-			}
 			
 			SourceASC->BlockAnimMontageForSeconds(BackwardMontage);
 			
@@ -129,14 +119,18 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 				UAnimInstance* AnimInstance = SourceASC->AbilityActorInfo->GetAnimInstance();
 				AnimInstance->Montage_SetEndDelegate(MontageEnded, BackwardMontage);
 
-				if (TargetASC)
-				{
-					FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
-					const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
-					FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
-					EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_PhysicalWeaponDamage, GetWeaponStatValue(D1GameplayTags::SetByCaller_PhysicalWeaponDamage) / 2.f);
-					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
-				}
+				FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
+				const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
+				FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
+
+				FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
+				HitResult.bBlockingHit = true;
+				EffectContextHandle.AddHitResult(HitResult);
+				EffectContextHandle.AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), WeaponActor);
+				EffectSpecHandle.Data->SetContext(EffectContextHandle);
+					
+				EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_PhysicalWeaponDamage, GetWeaponStatValue(D1GameplayTags::SetByCaller_PhysicalWeaponDamage) / 3.f);
+				ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
 			}
 			
 			bBlocked = true;
@@ -146,28 +140,26 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 		{
 			for (int32 AttackHitIndex : AttackHitIndexes)
 			{
-				const FHitResult& HitResult = *LocalTargetDataHandle.Data[AttackHitIndex]->GetHitResult();
+				FHitResult HitResult = *LocalTargetDataHandle.Data[AttackHitIndex]->GetHitResult();
 				
 				FGameplayCueParameters SourceCueParams;
 				SourceCueParams.Location = HitResult.ImpactPoint;
 				SourceCueParams.Normal = HitResult.ImpactNormal;
 				SourceCueParams.PhysicalMaterial = HitResult.PhysMaterial;
 				SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, SourceCueParams);
-
-				if (UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(HitResult.GetActor()))
-				{
-					FGameplayCueParameters TargetCueParams;
-					TargetCueParams.Location = HitResult.ImpactPoint;
-					TargetCueParams.Instigator = SourceASC->AbilityActorInfo->OwnerActor.Get();
-					TargetCueParams.RawMagnitude = false;
-					TargetASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_HitReact, TargetCueParams);
-				}
 				
 				if (HasAuthority(&CurrentActivationInfo))
 				{
 					FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
 					const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
 					FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
+
+					FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
+					HitResult.bBlockingHit = false;
+					EffectContextHandle.AddHitResult(HitResult);
+					EffectContextHandle.AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), WeaponActor);
+					EffectSpecHandle.Data->SetContext(EffectContextHandle);
+
 					EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_PhysicalWeaponDamage, GetWeaponStatValue(D1GameplayTags::SetByCaller_PhysicalWeaponDamage));
 					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
 				}

@@ -9,6 +9,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ProjectileBase)
 
@@ -140,11 +141,15 @@ void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AA
 
 			if (TargetASC)
 			{
-				FGameplayCueParameters TargetCueParams;
-				TargetCueParams.Location = HitResult.ImpactPoint;
-				TargetCueParams.Instigator = GetInstigator();
-				TargetCueParams.RawMagnitude = bIsBlockHit;
-				TargetASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_HitReact, TargetCueParams);
+				TSubclassOf<UGameplayAbility> HitReactAbilityClass = ULyraAssetManager::GetSubclassByName<UGameplayAbility>("HitReactAbilityClass");
+				if (FGameplayAbilitySpec* AbilitySpec = TargetASC->FindAbilitySpecFromClass(HitReactAbilityClass))
+				{
+					FGameplayEventData Payload;
+					Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromHitResult(HitResult);
+					Payload.Instigator = GetInstigator();
+					Payload.EventMagnitude = bIsBlockHit;
+					TargetASC->TriggerAbilityFromGameplayEvent(AbilitySpec->Handle, TargetASC->AbilityActorInfo.Get(), D1GameplayTags::GameplayEvent_HitReact, &Payload, *TargetASC);
+				}
 
 				if (bIsBlockHit == false && DamageEffectSpecHandle.Data.IsValid())
 				{
