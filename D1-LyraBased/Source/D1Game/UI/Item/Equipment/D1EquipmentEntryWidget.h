@@ -16,7 +16,7 @@ public:
 	UD1EquipmentEntryWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void Init(UD1ItemInstance* InItemInstance, EEquipmentSlotType InEquipmentSlotType, UD1EquipmentManagerComponent* InEquipmentManager);
+	void Init(UD1ItemInstance* InItemInstance, int32 InItemCount, EEquipmentSlotType InEquipmentSlotType, UD1EquipmentManagerComponent* InEquipmentManager);
 	
 protected:
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;

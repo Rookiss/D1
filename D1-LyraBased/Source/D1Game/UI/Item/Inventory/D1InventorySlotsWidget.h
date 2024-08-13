@@ -43,8 +43,8 @@ private:
 	void DestructUI();
 	
 	void UnhoverSlots();
-	void CleanUpDrag();
-	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 NewItemCount);
+	void FinishDrag();
+	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 InItemCount);
 
 public:
 	UD1InventoryManagerComponent* GetInventoryManagerComponent() const { return InventoryManager; }

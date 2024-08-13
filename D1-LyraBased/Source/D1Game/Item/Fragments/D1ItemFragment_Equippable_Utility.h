@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include "D1ItemFragment_Equippable.h"
+#include "D1ItemFragment_Equippable_Attachment.h"
 #include "D1ItemFragment_Equippable_Utility.generated.h"
 
 UCLASS()
-class UD1ItemFragment_Equippable_Utility : public UD1ItemFragment_Equippable
+class UD1ItemFragment_Equippable_Utility : public UD1ItemFragment_Equippable_Attachment
 {
 	GENERATED_BODY()
 

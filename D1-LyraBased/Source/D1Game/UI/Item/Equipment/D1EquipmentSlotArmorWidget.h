@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "D1Define.h"
-#include "UI/Item/D1ItemSlotWidget.h"
+#include "D1EquipmentSlotWidget.h"
 #include "D1EquipmentSlotArmorWidget.generated.h"
 
 class UImage;
@@ -11,7 +11,7 @@ class UD1EquipmentEntryWidget;
 class UD1EquipmentManagerComponent;
 
 UCLASS()
-class UD1EquipmentSlotArmorWidget : public UD1ItemSlotWidget
+class UD1EquipmentSlotArmorWidget : public UD1EquipmentSlotWidget
 {
 	GENERATED_BODY()
 	
@@ -23,17 +23,14 @@ public:
 	
 protected:
 	virtual void NativePreConstruct() override;
-	virtual void NativeOnInitialized() override;
-	
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
-private:
-	void CleanUpDrag();
+protected:
+	virtual void FinishDrag() override;
 
 public:
-	void OnEquipmentEntryChanged(UD1ItemInstance* NewItemInstance);
+	void OnEquipmentEntryChanged(UD1ItemInstance* InItemInstance, int32 InItemCount);
 
 public:
 	UPROPERTY(EditAnywhere)
@@ -42,12 +39,6 @@ public:
 private:
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentEntryWidget> EntryWidget;
-	
-	UPROPERTY()
-	TSubclassOf<UD1EquipmentEntryWidget> EntryWidgetClass;
-
-	UPROPERTY()
-	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
 
 private:
 	UPROPERTY(meta=(BindWidget))
@@ -60,6 +51,5 @@ private:
 	TObjectPtr<UImage> Image_Icon;
 
 private:
-	bool bAlreadyHovered = false;
 	EArmorType ArmorType = EArmorType::Count;
 };

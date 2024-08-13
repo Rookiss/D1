@@ -291,10 +291,10 @@ void ULyraHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputCompo
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Crouch, ETriggerEvent::Started, this, &ThisClass::Input_Crouch, /*bLogIfNotFound=*/ false);
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Crouch, ETriggerEvent::Completed, this, &ThisClass::Input_Crouch, /*bLogIfNotFound=*/ false);
 
-					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Primary, /*bLogIfNotFound=*/ false);
-					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Secondary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Secondary, /*bLogIfNotFound=*/ false);
-					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Tertiary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Tertiary, /*bLogIfNotFound=*/ false);
-					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Quaternary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Quaternary, /*bLogIfNotFound=*/ false);
+					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Weapon_Primary, /*bLogIfNotFound=*/ false);
+					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Secondary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Weapon_Secondary, /*bLogIfNotFound=*/ false);
+					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Tertiary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Utility_Primary, /*bLogIfNotFound=*/ false);
+					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Quaternary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Utility_Secondary, /*bLogIfNotFound=*/ false);
 					
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Ability_Confirm, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputConfirm, /*bLogIfNotFound=*/ false);
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Ability_Cancel, ETriggerEvent::Triggered, this, &ThisClass::Input_LocalInputCancel, /*bLogIfNotFound=*/ false);
@@ -475,31 +475,31 @@ void ULyraHeroComponent::Input_Crouch(const FInputActionValue& InputActionValue)
 	}
 }
 
-void ULyraHeroComponent::Input_ChangeEquip_Primary()
+void ULyraHeroComponent::Input_ChangeEquip_Weapon_Primary()
 {
 	FGameplayEventData Payload;
-	Payload.EventMagnitude = (int32)EEquipState::Primary;
+	Payload.EventMagnitude = (int32)EEquipState::Weapon_Primary;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), D1GameplayTags::GameplayEvent_ChangeEquip, Payload);
 }
 
-void ULyraHeroComponent::Input_ChangeEquip_Secondary()
+void ULyraHeroComponent::Input_ChangeEquip_Weapon_Secondary()
 {
 	FGameplayEventData Payload;
-	Payload.EventMagnitude = (int32)EEquipState::Secondary;
+	Payload.EventMagnitude = (int32)EEquipState::Weapon_Secondary;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), D1GameplayTags::GameplayEvent_ChangeEquip, Payload);
 }
 
-void ULyraHeroComponent::Input_ChangeEquip_Tertiary()
+void ULyraHeroComponent::Input_ChangeEquip_Utility_Primary()
 {
 	FGameplayEventData Payload;
-	// Payload.EventMagnitude = (int32)EWeaponEquipState::Tertiary;
+	Payload.EventMagnitude = (int32)EEquipState::Utility_Primary;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), D1GameplayTags::GameplayEvent_ChangeEquip, Payload);
 }
 
-void ULyraHeroComponent::Input_ChangeEquip_Quaternary()
+void ULyraHeroComponent::Input_ChangeEquip_Utility_Secondary()
 {
 	FGameplayEventData Payload;
-	// Payload.EventMagnitude = (int32)EWeaponEquipState::Quaternary;
+	Payload.EventMagnitude = (int32)EEquipState::Utility_Secondary;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), D1GameplayTags::GameplayEvent_ChangeEquip, Payload);
 }
 

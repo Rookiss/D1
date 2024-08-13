@@ -151,39 +151,43 @@ public:
 	UAbilitySystemComponent* GetAbilitySystemComponent() const;
 	UD1EquipmentManagerComponent* GetEquipmentManager() const;
 
-	static EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EEquipState WeaponEquipState);
+	static EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EEquipState EquipState);
 	static EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EWeaponSlotType WeaponSlotType);
 	static EEquipmentSlotType ConvertToEquipmentSlotType(EArmorType ArmorType);
 	static EEquipmentSlotType ConvertToEquipmentSlotType(EUtilitySlotType UtilitySlotType);
 	
+	static EWeaponSlotType ConvertToWeaponSlotType(EEquipmentSlotType EquipmentSlotType);
 	static EWeaponHandType ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType);
 	static EArmorType ConvertToArmorType(EEquipmentSlotType EquipmentSlotType);
+	static EUtilitySlotType ConvertToUtilitySlotType(EEquipmentSlotType EquipmentSlotType);
 	static EEquipState ConvertToEquipState(EWeaponSlotType WeaponSlotType);
-	static EWeaponSlotType ConvertToWeaponSlotType(EEquipmentSlotType EquipmentSlotType);
+
+	static bool IsWeaponEquipState(EEquipState EquipState);
+	static bool IsUtilityEquipState(EEquipState EquipState);
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeShouldHiddenWeapons(bool bNewShouldHiddenWeapons);
+	void ChangeShouldHiddenEquipments(bool bNewShouldHiddenEquipments);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool ShouldHiddenWeapons() const { return bShouldHiddenWeapons; }
+	bool ShouldHiddenEquipments() const { return bShouldHiddenEquipments; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EEquipState GetCurrentEquipState() const { return CurrentEquipState; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	AD1WeaponBase* GetEquippedWeaponActor(EWeaponHandType WeaponHandType) const;
+	AD1WeaponBase* GetEquippedActor(EWeaponHandType WeaponHandType) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	void GetAllEquippedWeaponActors(TArray<AD1WeaponBase*>& OutEquippedWeaponActors) const;
+	void GetAllEquippedActors(TArray<AD1WeaponBase*>& OutEquippedActors) const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UD1ItemInstance* GetEquippedWeaponItemInstance(EWeaponHandType WeaponHandType) const;
+	UD1ItemInstance* GetEquippedItemInstance(EWeaponHandType WeaponHandType) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	void GetAllEquippedWeaponItemInstances(TArray<UD1ItemInstance*>& OutItemInstances) const;
+	void GetAllEquippedItemInstances(TArray<UD1ItemInstance*>& OutItemInstances) const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	AD1WeaponBase* GetFirstEquippedWeaponActor() const;
+	AD1WeaponBase* GetFirstEquippedActor() const;
 	
 private:
 	UPROPERTY(Replicated)
@@ -193,5 +197,5 @@ private:
 	EEquipState CurrentEquipState = EEquipState::Count;
 
 	UPROPERTY(Replicated)
-	bool bShouldHiddenWeapons = false;
+	bool bShouldHiddenEquipments = false;
 };

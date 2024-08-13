@@ -38,7 +38,7 @@ USkeletalMeshComponent* UD1AnimNotifyState_WeaponTimedNiagaraEffect::GetWeaponMe
 	{
 		if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
 		{
-			if (AD1WeaponBase* WeaponActor = EquipManager->GetEquippedWeaponActor(WeaponHandType))
+			if (AD1WeaponBase* WeaponActor = EquipManager->GetEquippedActor(WeaponHandType))
 			{
 				WeaponMeshComponent = WeaponActor->WeaponMeshComponent;
 			}
