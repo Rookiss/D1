@@ -36,7 +36,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly)
 	bool bShowDebug = false;
-	
+
 protected:
 	UPROPERTY(BlueprintReadWrite)
 	bool bInputPressed = false;

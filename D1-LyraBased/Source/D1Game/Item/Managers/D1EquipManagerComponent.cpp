@@ -847,7 +847,7 @@ EEquipState UD1EquipManagerComponent::ConvertToEquipState(EWeaponSlotType Weapon
 
 bool UD1EquipManagerComponent::IsWeaponEquipState(EEquipState EquipState)
 {
-	return (EEquipState::Weapon_Primary <= EquipState && EquipState <= EEquipState::Weapon_Secondary);
+	return (EEquipState::Unarmed <= EquipState && EquipState <= EEquipState::Weapon_Secondary);
 }
 
 bool UD1EquipManagerComponent::IsUtilityEquipState(EEquipState EquipState)
