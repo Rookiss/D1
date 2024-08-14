@@ -107,24 +107,6 @@ void ALyraCharacter::BeginPlay()
 	}
 }
 
-void ALyraCharacter::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	if (UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
-	{
-		if (ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Interact))
-		{
-			bWantToCrouch = false;
-		}
-	
-		if (GetCharacterMovement()->IsFalling() == false && ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Sprint) == false)
-		{
-			bWantToCrouch ? Crouch() : UnCrouch();
-		}
-	}
-}
-
 void ALyraCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);

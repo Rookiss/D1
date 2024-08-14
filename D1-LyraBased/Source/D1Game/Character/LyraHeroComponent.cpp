@@ -288,8 +288,6 @@ void ULyraHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputCompo
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move, /*bLogIfNotFound=*/ false);
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Look_Mouse, ETriggerEvent::Triggered, this, &ThisClass::Input_LookMouse, /*bLogIfNotFound=*/ false);
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Look_Stick, ETriggerEvent::Triggered, this, &ThisClass::Input_LookStick, /*bLogIfNotFound=*/ false);
-					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Crouch, ETriggerEvent::Started, this, &ThisClass::Input_Crouch, /*bLogIfNotFound=*/ false);
-					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_Crouch, ETriggerEvent::Completed, this, &ThisClass::Input_Crouch, /*bLogIfNotFound=*/ false);
 
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Weapon_Primary, /*bLogIfNotFound=*/ false);
 					LyraIC->BindNativeAction(InputConfig, D1GameplayTags::InputTag_ChangeEquip_Secondary, ETriggerEvent::Triggered, this, &ThisClass::Input_ChangeEquip_Weapon_Secondary, /*bLogIfNotFound=*/ false);
@@ -464,14 +462,6 @@ void ULyraHeroComponent::Input_LookStick(const FInputActionValue& InputActionVal
 	if (Value.Y != 0.0f)
 	{
 		Pawn->AddControllerPitchInput(Value.Y * LyraHero::LookPitchRate * World->GetDeltaSeconds());
-	}
-}
-
-void ULyraHeroComponent::Input_Crouch(const FInputActionValue& InputActionValue)
-{
-	if (ALyraCharacter* Character = GetPawn<ALyraCharacter>())
-	{
-		Character->bWantToCrouch = InputActionValue.Get<bool>();
 	}
 }
 

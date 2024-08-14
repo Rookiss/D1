@@ -162,7 +162,7 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 				float ADSCheck = (IsADS || IsBlock) ? CrouchCheck * ADSMovePercent : CrouchCheck;
 				float SprintCheck = IsSprint ? ADSCheck * 1.5f : ADSCheck;
 
-				// GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, FString::Printf(TEXT("MaxSpeed: %f"), SprintCheck));
+				GEngine->AddOnScreenDebugMessage(1, 0.1f, FColor::Red, FString::Printf(TEXT("MaxSpeed: %f"), SprintCheck));
 				return SprintCheck;
 			}
 			case MOVE_Falling:
