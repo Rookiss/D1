@@ -89,4 +89,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float ADSMovePercent = 0.7f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float SprintMovePercent = 1.5f;
 };

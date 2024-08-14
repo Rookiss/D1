@@ -111,15 +111,17 @@ void ALyraCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
-	if (ASC && ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Interact))
+	if (UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
 	{
-		bWantToCrouch = false;
-	}
+		if (ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Interact))
+		{
+			bWantToCrouch = false;
+		}
 	
-	if (GetCharacterMovement()->IsFalling() == false)
-	{
-		bWantToCrouch ? Crouch() : UnCrouch();
+		if (GetCharacterMovement()->IsFalling() == false && ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Sprint) == false)
+		{
+			bWantToCrouch ? Crouch() : UnCrouch();
+		}
 	}
 }
 
