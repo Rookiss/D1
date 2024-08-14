@@ -106,7 +106,7 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 			FGameplayCueParameters SourceCueParams;
 			SourceCueParams.Location = HitResult.ImpactPoint;
 			SourceCueParams.Normal = HitResult.ImpactNormal;
-			SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, SourceCueParams);
+			SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
 			
 			SourceASC->BlockAnimMontageForSeconds(BackwardMontage);
 			
@@ -146,7 +146,7 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 				SourceCueParams.Location = HitResult.ImpactPoint;
 				SourceCueParams.Normal = HitResult.ImpactNormal;
 				SourceCueParams.PhysicalMaterial = HitResult.PhysMaterial;
-				SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, SourceCueParams);
+				SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
 				
 				if (HasAuthority(&CurrentActivationInfo))
 				{

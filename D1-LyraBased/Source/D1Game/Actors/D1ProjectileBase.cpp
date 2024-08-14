@@ -136,7 +136,7 @@ void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AA
 				SourceCueParams.Location = HitResult.ImpactPoint;
 				SourceCueParams.Normal = HitResult.ImpactNormal;
 				SourceCueParams.PhysicalMaterial = bIsBlockHit ? nullptr : HitResult.PhysMaterial;
-				SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Impact_Weapon, SourceCueParams);
+				SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
 			}
 
 			if (TargetASC && bIsBlockHit == false && DamageEffectSpecHandle.Data.IsValid())

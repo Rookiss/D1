@@ -42,6 +42,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ActivateFail_ActivationGroup,			"Ability.ActivateFail.ActivationGroup");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Behavior_SurvivesDeath,					"Ability.Behavior.SurvivesDeath");
 	
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Crouch,									"Ability.Crouch");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Death,									"Ability.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,									"Ability.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Dash_Check,								"Ability.Dash.Check");
@@ -125,7 +126,11 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Resourcefulness,						"SetByCaller.Resourcefulness");
 	
 	// GameplayCue
-	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Impact_Weapon,						"GameplayCue.Impact.Weapon");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Attack,						"GameplayCue.Weapon.Attack");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Attack_OneHandSword,			"GameplayCue.Weapon.Attack.OneHandSword");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Attack_TwoHandSword,			"GameplayCue.Weapon.Attack.TwoHandSword");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Attack_GreatSword,			"GameplayCue.Weapon.Attack.GreatSword");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Impact,						"GameplayCue.Weapon.Impact");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_HitReact,							"GameplayCue.HitReact");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Loop,							"GameplayCue.Statue.Loop");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Success,						"GameplayCue.Statue.Success");
