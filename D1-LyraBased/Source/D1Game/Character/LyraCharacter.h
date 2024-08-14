@@ -123,7 +123,6 @@ public:
 	//~AActor interface
 	virtual void PreInitializeComponents() override;
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaSeconds) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Reset() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -241,6 +240,5 @@ protected:
 	FD1InteractionInfo InteractionInfo;
 	
 public:
-	bool bWantToCrouch = false;
 	float BaseUnscaledCapsuleHalfHeight = 0.f;
 };
