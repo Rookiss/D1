@@ -142,6 +142,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Jump,									"Cooldown.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Dash,									"Cooldown.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Statue,									"Cooldown.Statue");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Sprint,									"Cooldown.Sprint");
 
 	// GamePhase
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_WaitForPlayers,					    "GamePhase.WaitForPlayers");
