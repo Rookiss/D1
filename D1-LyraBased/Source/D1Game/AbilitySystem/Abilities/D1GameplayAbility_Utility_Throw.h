@@ -3,6 +3,8 @@
 #include "D1GameplayAbility_Weapon.h"
 #include "D1GameplayAbility_Utility_Throw.generated.h"
 
+class AD1PickupableItemBase;
+
 UCLASS()
 class UD1GameplayAbility_Utility_Throw : public UD1GameplayAbility_Weapon
 {
@@ -13,10 +15,12 @@ public:
 
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FVector GetSpawnLocation();
+	FTransform GetSpawnTransform();
 
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FRotator GetSpawnRotation();
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void SpawnThrowableItem();
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<AD1PickupableItemBase> ThrowableItemClass;
 };

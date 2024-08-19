@@ -58,6 +58,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Throw,									"Ability.Throw");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Block,									"Ability.Block");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS,										"Ability.ADS");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS_Bow,									"Ability.ADS.Bow");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS_Throw,								"Ability.ADS.Throw");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact,								"Ability.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact_Active,							"Ability.Interact.Active");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact_Object,							"Ability.Interact.Object");
@@ -76,6 +78,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_Block,									"Status.Block");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ChangeEquip,								"Status.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS,										"Status.ADS");
+	UE_DEFINE_GAMEPLAY_TAG(Status_ADS_Bow,									"Status.ADS.Bow");
+	UE_DEFINE_GAMEPLAY_TAG(Status_ADS_Throw,								"Status.ADS.Throw");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Dash,										"Status.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Sprint,									"Status.Sprint");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Succeeded,								"Status.Succeeded");

@@ -12,6 +12,8 @@ AD1PickupableItemBase::AD1PickupableItemBase(const FObjectInitializer& ObjectIni
 	: Super(ObjectInitializer)
 {
 	bReplicates = true;
+	bAlwaysRelevant = true;
+	AActor::SetReplicateMovement(true);
 	
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>("ArrowComponent");
 	SetRootComponent(ArrowComponent);
@@ -19,6 +21,7 @@ AD1PickupableItemBase::AD1PickupableItemBase(const FObjectInitializer& ObjectIni
     MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("MeshComponent");
 	MeshComponent->SetupAttachment(GetRootComponent());
 	MeshComponent->SetCollisionProfileName(TEXT("Pickupable"));
+	MeshComponent->SetSimulatePhysics(true);
 	MeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 }
 
