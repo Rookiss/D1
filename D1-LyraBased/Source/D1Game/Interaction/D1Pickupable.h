@@ -61,5 +61,5 @@ class ID1Pickupable
 
 public:
 	UFUNCTION(BlueprintCallable)
-	virtual FD1PickupInfo GetPickupInfo() const abstract;
+	virtual FD1PickupInfo GetPickupInfo() const = 0;
 };

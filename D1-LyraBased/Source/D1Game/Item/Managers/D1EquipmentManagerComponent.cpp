@@ -8,7 +8,6 @@
 #include "Engine/ActorChannel.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Utility.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/LyraPlayerController.h"
@@ -292,9 +291,31 @@ int32 UD1EquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(int32 FromItem
 	}
 	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Utility)
 	{
+		TArray<EEquipmentSlotType> ToEquipmentSlotTypesFirstPick;
+		TArray<EEquipmentSlotType> ToEquipmentSlotTypesSecondPick;
+		
 		for (int32 i = 0; i < (int32)EUtilitySlotType::Count; i++)
 		{
 			EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType((EUtilitySlotType)i);
+			UD1ItemInstance* ToItemInstance = GetItemInstance(ToEquipmentSlotType);
+			if (ToItemInstance == nullptr)
+			{
+				ToEquipmentSlotTypesSecondPick.Add(ToEquipmentSlotType);
+			}
+			else
+			{
+				const UD1ItemTemplate& ToItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ToItemInstance->GetItemTemplateID());
+				if (ToItemTemplate.MaxStackCount > 1 && ToItemInstance->GetItemRarity() == FromItemRarity && ToItemInstance->GetItemTemplateID() == FromItemTemplateID)
+				{
+					ToEquipmentSlotTypesFirstPick.Add(ToEquipmentSlotType);
+				}
+			}
+		}
+
+		ToEquipmentSlotTypesFirstPick.Append(ToEquipmentSlotTypesSecondPick);
+
+		for (EEquipmentSlotType ToEquipmentSlotType : ToEquipmentSlotTypesFirstPick)
+		{
 			int32 MovableCount = CanAddEquipment(FromItemTemplateID,FromItemRarity, FromItemCount, ToEquipmentSlotType);
 			if (MovableCount > 0)
 			{
@@ -713,16 +734,16 @@ bool UD1EquipmentManagerComponent::IsSameEquipState(EEquipmentSlotType Equipment
 
 bool UD1EquipmentManagerComponent::IsSameWeaponHandType(EEquipmentSlotType EquipmentSlotType, EWeaponHandType WeaponHandType)
 {
-	return ((EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand)  && WeaponHandType == EWeaponHandType::LeftHand  ||
-			(EquipmentSlotType == EEquipmentSlotType::Primary_RightHand || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand) && WeaponHandType == EWeaponHandType::RightHand ||
-			(EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand   || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand)   && WeaponHandType == EWeaponHandType::TwoHand);
+	return (((EquipmentSlotType == EEquipmentSlotType::Primary_LeftHand  || EquipmentSlotType == EEquipmentSlotType::Secondary_LeftHand)  && WeaponHandType == EWeaponHandType::LeftHand)  ||
+			((EquipmentSlotType == EEquipmentSlotType::Primary_RightHand || EquipmentSlotType == EEquipmentSlotType::Secondary_RightHand) && WeaponHandType == EWeaponHandType::RightHand) ||
+			((EquipmentSlotType == EEquipmentSlotType::Primary_TwoHand   || EquipmentSlotType == EEquipmentSlotType::Secondary_TwoHand)   && WeaponHandType == EWeaponHandType::TwoHand));
 }
 
 bool UD1EquipmentManagerComponent::IsSameArmorType(EEquipmentSlotType EquipmentSlotType, EArmorType ArmorType)
 {
-	return (EquipmentSlotType == EEquipmentSlotType::Helmet && ArmorType == EArmorType::Helmet || EquipmentSlotType == EEquipmentSlotType::Chest && ArmorType == EArmorType::Chest ||
-			EquipmentSlotType == EEquipmentSlotType::Legs   && ArmorType == EArmorType::Legs   || EquipmentSlotType == EEquipmentSlotType::Hands && ArmorType == EArmorType::Hands ||
-			EquipmentSlotType == EEquipmentSlotType::Foot   && ArmorType == EArmorType::Foot);
+	return ((EquipmentSlotType == EEquipmentSlotType::Helmet && ArmorType == EArmorType::Helmet) || (EquipmentSlotType == EEquipmentSlotType::Chest && ArmorType == EArmorType::Chest) ||
+			(EquipmentSlotType == EEquipmentSlotType::Legs   && ArmorType == EArmorType::Legs)   || (EquipmentSlotType == EEquipmentSlotType::Hands && ArmorType == EArmorType::Hands) ||
+			(EquipmentSlotType == EEquipmentSlotType::Foot   && ArmorType == EArmorType::Foot));
 }
 
 bool UD1EquipmentManagerComponent::IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType)

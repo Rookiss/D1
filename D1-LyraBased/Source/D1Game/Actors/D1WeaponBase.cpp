@@ -40,6 +40,9 @@ void AD1WeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (bOnlyUseVisual)
+		return;
+	
 	if (HasAuthority())
 	{
 		OnRep_EquipmentSlotType();
@@ -50,6 +53,9 @@ void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	if (bOnlyUseVisual)
+		return;
+	
 	DOREPLIFETIME(ThisClass, TemplateID);
 	DOREPLIFETIME(ThisClass, EquipmentSlotType);
 	DOREPLIFETIME(ThisClass, bCanBlock);
@@ -57,6 +63,9 @@ void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 void AD1WeaponBase::Destroyed()
 {
+	if (bOnlyUseVisual)
+		return;
+	
 	if (ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner()))
 	{
 		if (ULyraAbilitySystemComponent* ASC = Cast<ULyraAbilitySystemComponent>(Character->GetAbilitySystemComponent()))
@@ -79,12 +88,18 @@ void AD1WeaponBase::Destroyed()
 
 void AD1WeaponBase::Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSlotType)
 {
+	if (bOnlyUseVisual)
+		return;
+	
 	TemplateID = InTemplateID;
 	EquipmentSlotType = InEquipmentSlotType;
 }
 
 void AD1WeaponBase::ChangeSkill(int32 AbilitySetIndex)
 {
+	if (bOnlyUseVisual)
+		return;
+	
 	if (HasAuthority() == false)
 		return;
 	
@@ -111,6 +126,9 @@ void AD1WeaponBase::ChangeSkill(int32 AbilitySetIndex)
 
 void AD1WeaponBase::ChangeBlockState(bool bShouldBlock)
 {
+	if (bOnlyUseVisual)
+		return;
+	
 	if (HasAuthority())
 	{
 		bCanBlock = bShouldBlock;
@@ -120,12 +138,18 @@ void AD1WeaponBase::ChangeBlockState(bool bShouldBlock)
 
 void AD1WeaponBase::OnRep_CanBlock()
 {
+	if (bOnlyUseVisual)
+		return;
+	
 	WeaponMeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Weapon, bCanBlock ? ECR_Overlap : ECR_Ignore);
 	WeaponMeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Projectile, bCanBlock ? ECR_Block : ECR_Ignore);
 }
 
 void AD1WeaponBase::OnRep_EquipmentSlotType()
 {
+	if (bOnlyUseVisual)
+		return;
+	
 	if (GetOwner() && GetOwner()->FindComponentByClass<UD1EquipManagerComponent>())
 	{
 		if (ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner()))
@@ -145,7 +169,12 @@ void AD1WeaponBase::OnRep_EquipmentSlotType()
 
 UAbilitySystemComponent* AD1WeaponBase::GetAbilitySystemComponent() const
 {
-	return Cast<ALyraCharacter>(GetOwner())->GetAbilitySystemComponent();
+	UAbilitySystemComponent* ASC = nullptr;
+	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetOwner()))
+	{
+		ASC = LyraCharacter->GetAbilitySystemComponent();
+	}
+	return ASC;
 }
 
 UAnimMontage* AD1WeaponBase::GetEquipMontage()

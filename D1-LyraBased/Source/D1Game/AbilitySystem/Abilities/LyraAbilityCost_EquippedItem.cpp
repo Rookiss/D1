@@ -47,7 +47,6 @@ bool ULyraAbilityCost_EquippedItem::CheckCost(const ULyraGameplayAbility* Abilit
 		return false;
 	
 	int32 ItemCount = EquipmentManager->GetItemCount(EquipmentSlotType);
-	
 	const int32 AbilityLevel = Ability->GetAbilityLevel(Handle, ActorInfo);
 	const float NumItemsToConsumeReal = Quantity.GetValueAtLevel(AbilityLevel);
 	const int32 NumItemsToConsume = FMath::TruncToInt(NumItemsToConsumeReal);
@@ -84,6 +83,7 @@ void ULyraAbilityCost_EquippedItem::ApplyCost(const ULyraGameplayAbility* Abilit
 		const int32 AbilityLevel = Ability->GetAbilityLevel(Handle, ActorInfo);
 		const float NumItemsToConsumeReal = Quantity.GetValueAtLevel(AbilityLevel);
 		const int32 NumItemsToConsume = FMath::TruncToInt(NumItemsToConsumeReal);
+		
 		EquipmentManager->RemoveEquipment_Unsafe(EquipmentSlotType, NumItemsToConsume);
 	}
 }

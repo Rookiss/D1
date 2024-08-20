@@ -58,6 +58,8 @@ void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const U
 	if (ArmorType == EArmorType::Count)
 		return;
 
+	Initialize();
+	
 	if (ArmorFragment)
 	{
 		if (ArmorFragment == nullptr || ArmorFragment->ArmorType != ArmorType)
@@ -115,6 +117,11 @@ void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const U
 
 void UD1CosmeticManagerComponent::SetPrimaryArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr)
 {
+	if (ArmorType == EArmorType::Count)
+		return;
+	
+	Initialize();
+	
 	if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)ArmorType])
 	{
 		if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
