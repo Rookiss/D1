@@ -39,6 +39,8 @@ void UD1AnimNotify_WeaponTrailNiagaraEffect::NotifyEnd(class USkeletalMeshCompon
 {
 	USkeletalMeshComponent* WeaponMeshComponent = GetWeaponMeshComponent(MeshComponent);
 	Super::NotifyEnd(WeaponMeshComponent ? WeaponMeshComponent : MeshComponent, Animation, EventReference);
+	
+	UpdateNiagaraParameters(WeaponMeshComponent);
 }
 
 void UD1AnimNotify_WeaponTrailNiagaraEffect::UpdateNiagaraParameters(USkeletalMeshComponent* WeaponMeshComponent)
