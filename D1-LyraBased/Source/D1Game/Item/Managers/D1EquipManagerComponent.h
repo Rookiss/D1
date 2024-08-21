@@ -53,7 +53,7 @@ public:
 	TObjectPtr<AD1WeaponBase> SpawnedWeaponActor;
 
 	UPROPERTY(NotReplicated)
-	TObjectPtr<AD1PocketWorldAttachment> SpawnedPocketWorldAttachment;
+	TObjectPtr<AD1WeaponBase> SpawnedPocketWorldWeaponActor;
 
 private:
 	UPROPERTY(NotReplicated)

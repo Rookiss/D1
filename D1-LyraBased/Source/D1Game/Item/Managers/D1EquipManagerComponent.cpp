@@ -17,7 +17,6 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/LyraPlayerController.h"
 #include "PocketWorld/D1PocketStage.h"
-#include "PocketWorld/D1PocketWorldAttachment.h"
 #include "PocketWorld/D1PocketWorldSubsystem.h"
 #include "System/D1GameplayTagStack.h"
 #include "System/LyraAssetManager.h"
@@ -115,9 +114,9 @@ void FD1EquipEntry::Equip()
 			if (Character->IsLocallyControlled())
 			{
 				// Despawn Previous Pocket Weapon
-				if (IsValid(SpawnedPocketWorldAttachment))
+				if (IsValid(SpawnedPocketWorldWeaponActor))
 				{
-					SpawnedPocketWorldAttachment->Destroy();
+					SpawnedPocketWorldWeaponActor->Destroy();
 				}
 
 				// Spawn Current Pocket Weapon
@@ -133,17 +132,13 @@ void FD1EquipEntry::Equip()
 								{
 									ACharacter* Character = PocketStage->GetCharacter();
 									const FD1WeaponAttachInfo& AttachInfo = AttachmentFragment->WeaponAttachInfo;
-									const AD1WeaponBase* WeaponCDO = AttachInfo.SpawnWeaponClass->GetDefaultObject<AD1WeaponBase>();
 									
 									UWorld* World = EquipManager->GetWorld();
-									SpawnedPocketWorldAttachment = World->SpawnActorDeferred<AD1PocketWorldAttachment>(AD1PocketWorldAttachment::StaticClass(), FTransform::Identity, Character);
-									
-									FTransform ComposedTransform = UKismetMathLibrary::ComposeTransforms(WeaponCDO->WeaponMeshComponent->GetRelativeTransform(), AttachInfo.AttachTransform);
-									SpawnedPocketWorldAttachment->SetActorRelativeTransform(ComposedTransform);
-									SpawnedPocketWorldAttachment->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
-									
-									SpawnedPocketWorldAttachment->MeshComponent->SetSkeletalMesh(WeaponCDO->WeaponMeshComponent->GetSkeletalMeshAsset());
-									SpawnedPocketWorldAttachment->FinishSpawning(FTransform::Identity, true);
+									SpawnedPocketWorldWeaponActor = World->SpawnActorDeferred<AD1WeaponBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
+									SpawnedPocketWorldWeaponActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
+									SpawnedPocketWorldWeaponActor->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
+									SpawnedPocketWorldWeaponActor->bOnlyUseVisual = true;
+									SpawnedPocketWorldWeaponActor->FinishSpawning(FTransform::Identity, true);
 
 									PocketStage->RefreshAlphaMaskActors();
 									
@@ -260,9 +255,9 @@ void FD1EquipEntry::Unequip()
 								{
 									if (IsValid(PocketStage))
 									{
-										if (IsValid(SpawnedPocketWorldAttachment))
+										if (IsValid(SpawnedPocketWorldWeaponActor))
 										{
-											SpawnedPocketWorldAttachment->Destroy();
+											SpawnedPocketWorldWeaponActor->Destroy();
 										}
 									}
 								})

@@ -67,6 +67,6 @@ void UD1GameplayAbility_Utility_Throw::SpawnThrowableItem()
 	
 	FD1PickupInfo PickupInfo;
 	PickupInfo.PickupInstance.ItemInstance = EquipmentManager->GetItemInstance(EquipmentSlotType);
-	PickupInfo.PickupInstance.ItemCount = EquipmentManager->GetItemCount(EquipmentSlotType);
+	PickupInfo.PickupInstance.ItemCount = 1;
 	PickupableItemActor->SetPickupInfo(PickupInfo);
 }
