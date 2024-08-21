@@ -56,6 +56,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_3,								"Ability.Attack.3");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_Bow,								"Ability.Attack.Bow");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Throw,									"Ability.Throw");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Drink,									"Ability.Drink");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Block,									"Ability.Block");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS,										"Ability.ADS");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS_Bow,									"Ability.ADS.Bow");
@@ -75,6 +76,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_Death_Dead,								"Status.Death.Dead");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Attack,									"Status.Attack");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Throw,									"Status.Throw");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Drink,									"Status.Drink");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Block,									"Status.Block");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ChangeEquip,								"Status.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS,										"Status.ADS");

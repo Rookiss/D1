@@ -3,6 +3,8 @@
 #include "D1ItemFragment_Equippable_Attachment.h"
 #include "D1ItemFragment_Equippable_Utility.generated.h"
 
+class UGameplayEffect;
+
 UCLASS()
 class UD1ItemFragment_Equippable_Utility : public UD1ItemFragment_Equippable_Attachment
 {
@@ -17,6 +19,9 @@ public:
 public:
 	UPROPERTY(EditDefaultsOnly)
 	EUtilityType UtilityType = EUtilityType::Count;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> UtilityEffectClass;
 	
 	UPROPERTY(EditDefaultsOnly, meta=(ForceInlineRow))
 	TArray<FRarityStatSet> RarityStatSets;
