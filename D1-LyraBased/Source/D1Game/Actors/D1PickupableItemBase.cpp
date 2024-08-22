@@ -1,7 +1,9 @@
 ﻿#include "D1PickupableItemBase.h"
 
 #include "Components/ArrowComponent.h"
+#include "Components/BoxComponent.h"
 #include "Data/D1ItemData.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
 #include "System/LyraAssetManager.h"
@@ -15,14 +17,16 @@ AD1PickupableItemBase::AD1PickupableItemBase(const FObjectInitializer& ObjectIni
 	bAlwaysRelevant = true;
 	AActor::SetReplicateMovement(true);
 	
-	ArrowComponent = CreateDefaultSubobject<UArrowComponent>("ArrowComponent");
-	SetRootComponent(ArrowComponent);
+	BoxCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
+	SetRootComponent(BoxCollision);
 	
     MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("MeshComponent");
 	MeshComponent->SetupAttachment(GetRootComponent());
 	MeshComponent->SetCollisionProfileName(TEXT("Pickupable"));
 	MeshComponent->SetSimulatePhysics(true);
 	MeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
 }
 
 void AD1PickupableItemBase::OnRep_PickupInfo()
