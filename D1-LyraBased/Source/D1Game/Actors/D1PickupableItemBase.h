@@ -4,7 +4,6 @@
 #include "D1PickupableItemBase.generated.h"
 
 class UBoxComponent;
-class UArrowComponent;
 class UProjectileMovementComponent;
 
 UCLASS()
@@ -21,8 +20,11 @@ protected:
 	
 protected:
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UArrowComponent> ArrowComponent;
+	TObjectPtr<UBoxComponent> BoxCollision;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> MeshComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 };
