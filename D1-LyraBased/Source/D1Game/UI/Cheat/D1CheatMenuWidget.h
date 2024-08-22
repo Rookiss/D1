@@ -33,6 +33,9 @@ protected:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UD1CheatListWidget> CheatList_SecondaryWeapon;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UD1CheatListWidget> CheatList_Utility;
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UD1CheatListWidget> CheatList_Armor;

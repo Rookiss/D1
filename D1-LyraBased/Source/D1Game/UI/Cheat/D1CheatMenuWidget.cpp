@@ -53,6 +53,12 @@ void UD1CheatMenuWidget::NativeConstruct()
 				CheatEntryWidget->InitializeUI(ED1CheatEntryType::SecondaryWeapon, ItemTemplateClass, nullptr);
 				CheatList_SecondaryWeapon->AddEntry(CheatEntryWidget);
 			}
+			else if (EquippableFragment->EquipmentType == EEquipmentType::Utility)
+			{
+				UD1CheatEntryWidget* CheatEntryWidget = CreateWidget<UD1CheatEntryWidget>(GetOwningPlayer(), CheatEntryWidgetClass);
+				CheatEntryWidget->InitializeUI(ED1CheatEntryType::Utility, ItemTemplateClass, nullptr);
+				CheatList_Utility->AddEntry(CheatEntryWidget);
+			}
 			else if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
 			{
 				UD1CheatEntryWidget* CheatEntryWidget = CreateWidget<UD1CheatEntryWidget>(GetOwningPlayer(), CheatEntryWidgetClass);

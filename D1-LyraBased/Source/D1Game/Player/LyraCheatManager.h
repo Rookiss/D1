@@ -97,9 +97,12 @@ public:
 
 	UFUNCTION(Exec)
 	virtual void ShowDebugWidget();
+	
+	UFUNCTION(BlueprintAuthorityOnly)
+	void EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass);
 
 	UFUNCTION(BlueprintAuthorityOnly)
-	virtual void EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass);
+	void EquipUtility(EUtilitySlotType UtilitySlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass);
 	
 	UFUNCTION(BlueprintAuthorityOnly)
 	virtual void EquipArmor(TSubclassOf<UD1ItemTemplate> ItemTemplateClass);

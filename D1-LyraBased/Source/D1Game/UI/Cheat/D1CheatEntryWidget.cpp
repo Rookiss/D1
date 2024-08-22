@@ -32,6 +32,7 @@ void UD1CheatEntryWidget::InitializeUI(ED1CheatEntryType InCheatEntryType, TSubc
 	case ED1CheatEntryType::PrimaryWeapon:
 	case ED1CheatEntryType::SecondaryWeapon:
 	case ED1CheatEntryType::Armor:
+	case ED1CheatEntryType::Utility:
 		ItemTemplateClass = InItemTemplateClass;
 		if (ItemTemplateClass)
 		{
@@ -58,24 +59,26 @@ void UD1CheatEntryWidget::OnButtonClicked()
 	ALyraPlayerController* LyraPlayerController = GetOwningPlayer<ALyraPlayerController>();
 	if (LyraPlayerController == nullptr)
 		return;
-	
-	if (CheatEntryType == ED1CheatEntryType::PrimaryWeapon)
+
+	switch (CheatEntryType)
 	{
+	case ED1CheatEntryType::PrimaryWeapon:
 		LyraPlayerController->Server_EquipWeapon(EWeaponSlotType::Primary, ItemTemplateClass);
-	}
-	else if (CheatEntryType == ED1CheatEntryType::SecondaryWeapon)
-	{
+		break;
+	case ED1CheatEntryType::SecondaryWeapon:
 		LyraPlayerController->Server_EquipWeapon(EWeaponSlotType::Secondary, ItemTemplateClass);
-	}
-	else if (CheatEntryType == ED1CheatEntryType::Armor)
-	{
+		break;
+	case ED1CheatEntryType::Armor:
 		LyraPlayerController->Server_EquipArmor(ItemTemplateClass);
-	}
-	else if (CheatEntryType == ED1CheatEntryType::Animation)
-	{
+		break;
+	case ED1CheatEntryType::Utility:
+		LyraPlayerController->Server_EquipUtility(EUtilitySlotType::Primary, ItemTemplateClass);
+		break;
+	case ED1CheatEntryType::Animation:
 		if (ULyraCheatManager* LyraCheatManager = Cast<ULyraCheatManager>(LyraPlayerController->CheatManager))
 		{
 			LyraCheatManager->SelectedMontage = AnimMontage;
 		}
+		break;
 	}
 }

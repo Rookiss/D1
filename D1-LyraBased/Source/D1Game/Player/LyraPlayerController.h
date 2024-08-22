@@ -74,6 +74,9 @@ public:
 	void Server_EquipWeapon(EWeaponSlotType InWeaponSlotType, TSubclassOf<UD1ItemTemplate> InItemTemplateClass);
 
 	UFUNCTION(Server, Reliable)
+	void Server_EquipUtility(EUtilitySlotType InUtilitySlotType, TSubclassOf<UD1ItemTemplate> InItemTemplateClass);
+	
+	UFUNCTION(Server, Reliable)
 	void Server_EquipArmor(TSubclassOf<UD1ItemTemplate> InItemTemplateClass);
 
 	UFUNCTION(Server, Reliable)

@@ -12,5 +12,6 @@ public:
 	UD1GameplayAbility_Utility_Drink(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	TSubclassOf<UGameplayEffect> GetUtilityEffectClass() const;
+	UFUNCTION(BlueprintCallable)
+	void ApplyUtilityGameplayEffect();
 };

@@ -16,6 +16,7 @@ enum class ED1CheatEntryType : uint8
 	PrimaryWeapon,
 	SecondaryWeapon,
 	Armor,
+	Utility,
 	Animation
 };
 

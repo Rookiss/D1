@@ -339,6 +339,19 @@ void ALyraPlayerController::Server_EquipWeapon_Implementation(EWeaponSlotType In
 #endif // #if USING_CHEAT_MANAGER
 }
 
+void ALyraPlayerController::Server_EquipUtility_Implementation(EUtilitySlotType InUtilitySlotType, TSubclassOf<UD1ItemTemplate> InItemTemplateClass)
+{
+#if USING_CHEAT_MANAGER
+	if (InItemTemplateClass == nullptr)
+		return;
+
+	if (ULyraCheatManager* LyraCheatManager = Cast<ULyraCheatManager>(CheatManager))
+	{
+		LyraCheatManager->EquipUtility(InUtilitySlotType, InItemTemplateClass);
+	}
+#endif // #if USING_CHEAT_MANAGER
+}
+
 void ALyraPlayerController::Server_EquipArmor_Implementation(TSubclassOf<UD1ItemTemplate> InItemTemplateClass)
 {
 #if USING_CHEAT_MANAGER

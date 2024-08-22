@@ -840,6 +840,19 @@ EEquipState UD1EquipManagerComponent::ConvertToEquipState(EWeaponSlotType Weapon
 	return EquipState;
 }
 
+EEquipState UD1EquipManagerComponent::ConvertToEquipState(EUtilitySlotType UtilitySlotType)
+{
+	EEquipState EquipState = EEquipState::Count;
+
+	switch (UtilitySlotType)
+	{
+	case EUtilitySlotType::Primary:		EquipState = EEquipState::Utility_Primary;		break;
+	case EUtilitySlotType::Secondary:	EquipState = EEquipState::Utility_Secondary;	break;
+	}
+
+	return EquipState;
+}
+
 bool UD1EquipManagerComponent::IsWeaponEquipState(EEquipState EquipState)
 {
 	return (EEquipState::Unarmed <= EquipState && EquipState <= EEquipState::Weapon_Secondary);

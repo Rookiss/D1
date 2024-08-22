@@ -447,6 +447,18 @@ void ULyraCheatManager::EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<
 	if (WeaponSlotType == EWeaponSlotType::Count || ItemTemplateClass == nullptr)
 		return;
 	
+	ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController());
+	if (LyraPC == nullptr)
+		return;
+	
+	ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(LyraPC->GetPawn());
+	if (LyraCharacter == nullptr)
+		return;
+
+	UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>();
+	if (EquipmentManager == nullptr)
+		return;
+	
 	const UD1ItemTemplate* ItemTemplate = ItemTemplateClass.GetDefaultObject();
 	if (ItemTemplate == nullptr)
 		return;
@@ -455,38 +467,67 @@ void ULyraCheatManager::EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<
 	if (WeaponFragment == nullptr)
 		return;
 	
-	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
+	EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponFragment->WeaponHandType, WeaponSlotType), 1);
+				
+	if (WeaponFragment->WeaponHandType == EWeaponHandType::LeftHand || WeaponFragment->WeaponHandType == EWeaponHandType::RightHand)
 	{
-		if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(LyraPC->GetPawn()))
-		{
-			if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>())
-			{
-				EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponFragment->WeaponHandType, WeaponSlotType), 1);
-				
-				if (WeaponFragment->WeaponHandType == EWeaponHandType::LeftHand || WeaponFragment->WeaponHandType == EWeaponHandType::RightHand)
-				{
-					EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::TwoHand, WeaponSlotType), 1);
-				}
-				else if (WeaponFragment->WeaponHandType == EWeaponHandType::TwoHand)
-				{
-					EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::LeftHand, WeaponSlotType), 1);
-					EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::RightHand, WeaponSlotType), 1);
-				}
+		EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::TwoHand, WeaponSlotType), 1);
+	}
+	else if (WeaponFragment->WeaponHandType == EWeaponHandType::TwoHand)
+	{
+		EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::LeftHand, WeaponSlotType), 1);
+		EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType::RightHand, WeaponSlotType), 1);
+	}
 
-				UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-				int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
-				ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
-				EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponFragment->WeaponHandType, WeaponSlotType), ItemInstance, 1);
+	UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+	int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
+	ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
+	EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponFragment->WeaponHandType, WeaponSlotType), ItemInstance, 1);
 				
-				if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
-				{
-					EEquipState TargetWeaponEquipState = UD1EquipManagerComponent::ConvertToEquipState(WeaponSlotType);
-					if (EquipManager->GetCurrentEquipState() == EEquipState::Unarmed)
-					{
-						EquipManager->ChangeEquipState(TargetWeaponEquipState);
-					}
-				}
-			}
+	if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
+	{
+		EEquipState TargetWeaponEquipState = UD1EquipManagerComponent::ConvertToEquipState(WeaponSlotType);
+		if (EquipManager->GetCurrentEquipState() == EEquipState::Unarmed)
+		{
+			EquipManager->ChangeEquipState(TargetWeaponEquipState);
+		}
+	}
+}
+
+void ULyraCheatManager::EquipUtility(EUtilitySlotType UtilitySlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass)
+{
+	if (UtilitySlotType == EUtilitySlotType::Count || ItemTemplateClass == nullptr)
+		return;
+
+	ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController());
+	if (LyraPC == nullptr)
+		return;
+	
+	ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(LyraPC->GetPawn());
+	if (LyraCharacter == nullptr)
+		return;
+	
+	UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>();
+	if (EquipmentManager == nullptr)
+		return;
+	
+	const UD1ItemTemplate* ItemTemplate = ItemTemplateClass.GetDefaultObject();
+	if (ItemTemplate == nullptr)
+		return;
+
+	EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(UtilitySlotType), 1);
+
+	UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+	int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
+	ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
+	EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(UtilitySlotType), ItemInstance, 1);
+	
+	if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
+	{
+		EEquipState TargetWeaponEquipState = UD1EquipManagerComponent::ConvertToEquipState(UtilitySlotType);
+		if (EquipManager->GetCurrentEquipState() == EEquipState::Unarmed)
+		{
+			EquipManager->ChangeEquipState(TargetWeaponEquipState);
 		}
 	}
 }
@@ -494,6 +535,18 @@ void ULyraCheatManager::EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<
 void ULyraCheatManager::EquipArmor(TSubclassOf<UD1ItemTemplate> ItemTemplateClass)
 {
 	if (ItemTemplateClass == nullptr)
+		return;
+
+	ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController());
+	if (LyraPC == nullptr)
+		return;
+	
+	ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(LyraPC->GetPawn());
+	if (LyraCharacter == nullptr)
+		return;
+	
+	UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>();
+	if (EquipmentManager == nullptr)
 		return;
 	
 	const UD1ItemTemplate* ItemTemplate = ItemTemplateClass.GetDefaultObject();
@@ -504,21 +557,12 @@ void ULyraCheatManager::EquipArmor(TSubclassOf<UD1ItemTemplate> ItemTemplateClas
 	if (ArmorFragment == nullptr)
 		return;
 
-	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
-	{
-		if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(LyraPC->GetPawn()))
-		{
-			if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>())
-			{
-				EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorFragment->ArmorType), 1);
+	EquipmentManager->RemoveEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorFragment->ArmorType), 1);
 
-				UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
-				int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
-				ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
-				EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorFragment->ArmorType), ItemInstance, 1);
-			}
-		}
-	}
+	UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
+	int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
+	ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
+	EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorFragment->ArmorType), ItemInstance, 1);
 }
 
 void ULyraCheatManager::DecreaseAnimationSpeed()

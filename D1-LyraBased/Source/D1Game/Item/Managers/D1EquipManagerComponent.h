@@ -161,6 +161,7 @@ public:
 	static EArmorType ConvertToArmorType(EEquipmentSlotType EquipmentSlotType);
 	static EUtilitySlotType ConvertToUtilitySlotType(EEquipmentSlotType EquipmentSlotType);
 	static EEquipState ConvertToEquipState(EWeaponSlotType WeaponSlotType);
+	static EEquipState ConvertToEquipState(EUtilitySlotType UtilitySlotType);
 
 	static bool IsWeaponEquipState(EEquipState EquipState);
 	static bool IsUtilityEquipState(EEquipState EquipState);
