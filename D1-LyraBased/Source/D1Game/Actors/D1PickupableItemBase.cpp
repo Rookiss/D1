@@ -6,6 +6,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1PickupableItemBase)
@@ -18,12 +19,13 @@ AD1PickupableItemBase::AD1PickupableItemBase(const FObjectInitializer& ObjectIni
 	AActor::SetReplicateMovement(true);
 	
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
+	BoxCollision->SetCollisionProfileName(TEXT("Pickupable"));
 	SetRootComponent(BoxCollision);
 	
     MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("MeshComponent");
+	MeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
 	MeshComponent->SetupAttachment(GetRootComponent());
-	MeshComponent->SetCollisionProfileName(TEXT("Pickupable"));
-	MeshComponent->SetSimulatePhysics(true);
+	
 	MeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
@@ -51,6 +53,12 @@ void AD1PickupableItemBase::OnRep_PickupInfo()
 		if (UStaticMesh* PickupableMesh = ULyraAssetManager::GetAssetByPath(PickupableMeshPath))
 		{
 			MeshComponent->SetStaticMesh(PickupableMesh);
+			FVector Origin, BoxExtent;
+			float Radius;
+			UKismetSystemLibrary::GetComponentBounds(MeshComponent, Origin, BoxExtent, Radius);
+			BoxExtent.X = FMath::Max(15.f, BoxExtent.X);
+			BoxExtent.Y = FMath::Max(15.f, BoxExtent.Y);
+			BoxCollision->SetBoxExtent(BoxExtent);
 		}
 	}
 }
