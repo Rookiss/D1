@@ -17,9 +17,13 @@ public:
 protected:
 	virtual void OnRep_PickupInfo() override;
 	virtual void GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const override;
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	bool bAutoCollisionResize = true;
 	
 protected:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UBoxComponent> BoxCollision;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

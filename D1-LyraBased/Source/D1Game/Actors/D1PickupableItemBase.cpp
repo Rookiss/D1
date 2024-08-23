@@ -53,12 +53,16 @@ void AD1PickupableItemBase::OnRep_PickupInfo()
 		if (UStaticMesh* PickupableMesh = ULyraAssetManager::GetAssetByPath(PickupableMeshPath))
 		{
 			MeshComponent->SetStaticMesh(PickupableMesh);
-			FVector Origin, BoxExtent;
-			float Radius;
-			UKismetSystemLibrary::GetComponentBounds(MeshComponent, Origin, BoxExtent, Radius);
-			BoxExtent.X = FMath::Max(15.f, BoxExtent.X);
-			BoxExtent.Y = FMath::Max(15.f, BoxExtent.Y);
-			BoxCollision->SetBoxExtent(BoxExtent);
+
+			if (bAutoCollisionResize)
+			{
+				FVector Origin, BoxExtent;
+				float Radius;
+				UKismetSystemLibrary::GetComponentBounds(MeshComponent, Origin, BoxExtent, Radius);
+				BoxExtent.X = FMath::Max(15.f, BoxExtent.X);
+				BoxExtent.Y = FMath::Max(15.f, BoxExtent.Y);
+				BoxCollision->SetBoxExtent(BoxExtent);
+			}
 		}
 	}
 }
