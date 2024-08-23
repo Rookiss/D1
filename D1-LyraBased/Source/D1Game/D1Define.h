@@ -77,6 +77,7 @@ enum class EWeaponType : uint8
 	Sword,
 	Shield,
 	Bow,
+	Staff,
 
 	Count	UMETA(Hidden)
 };
@@ -135,6 +136,7 @@ enum class EItemRarity : uint8
 UENUM(BlueprintType)
 enum class ESpellType : uint8
 {
+	None,
 	Projectile,
 	AOE,
 

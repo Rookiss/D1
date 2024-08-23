@@ -122,6 +122,7 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			case EWeaponType::Sword:		    WeaponTypeString = TEXT("Sword");			break;
 			case EWeaponType::Shield:		    WeaponTypeString = TEXT("Shield");			break;
 			case EWeaponType::Bow:				WeaponTypeString = TEXT("Bow");				break;
+			case EWeaponType::Staff:			WeaponTypeString = TEXT("Staff");			break;
 			}
 			Text_WeaponType->SetText(FText::FromString(WeaponTypeString));
 			HorizontalBox_WeaponType->SetVisibility(ESlateVisibility::Visible);
