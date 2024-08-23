@@ -36,6 +36,10 @@ FTransform UD1GameplayAbility_Utility_Throw::GetSpawnTransform()
 			SpawnTransform = UtilityFragment->WeaponAttachInfo.AttachTransform;
 			const FTransform& SocketTransform = LyraCharacter->GetMesh()->GetSocketTransform(UtilityFragment->WeaponAttachInfo.AttachSocket);
 			SpawnTransform *= SocketTransform;
+
+			
+			FRotator LocalRotation = FRotator(0.f, 180.f, 90.f);
+			SpawnTransform.SetRotation(UKismetMathLibrary::TransformRotation(LyraCharacter->GetTransform(), LocalRotation).Quaternion()); // Only for Torch
 		}
 	}
 
