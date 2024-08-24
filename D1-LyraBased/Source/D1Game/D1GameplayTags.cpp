@@ -29,6 +29,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Ability_Cancel,							"InputTag.Ability.Cancel");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_MainHand,						"InputTag.Attack.MainHand");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_OffHand,							"InputTag.Attack.OffHand");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_Skill_1,							"InputTag.Attack.Skill.1");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_Skill_2,							"InputTag.Attack.Skill.2");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Widget_Inventory,						"InputTag.Widget.Inventory");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Widget_WorldMap,						"InputTag.Widget.WorldMap");
 	
@@ -138,6 +140,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Attack_TwoHandSword,			"GameplayCue.Weapon.Attack.TwoHandSword");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Attack_GreatSword,			"GameplayCue.Weapon.Attack.GreatSword");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Impact,						"GameplayCue.Weapon.Impact");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Cast_Lighting,				"GameplayCue.Weapon.Cast.Lighting");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_HitReact,							"GameplayCue.HitReact");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Loop,							"GameplayCue.Statue.Loop");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Success,						"GameplayCue.Statue.Success");
