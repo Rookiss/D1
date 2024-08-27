@@ -101,6 +101,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Trace,								"GameplayEvent.Trace");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ChangeEquip,						"GameplayEvent.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ArrowVisibility,					"GameplayEvent.ArrowVisibility");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Potion_Drink,						"GameplayEvent.Potion.Drink");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Potion_Fill,						"GameplayEvent.Potion.Fill");
 	
 	// Cheat
 	UE_DEFINE_GAMEPLAY_TAG(Cheat_GodMode,									"Cheat.GodMode");

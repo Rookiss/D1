@@ -1,6 +1,7 @@
 ﻿#include "D1ItemHoverWidget.h"
 
 #include "D1ItemEntryWidget.h"
+#include "GameplayEffect.h"
 #include "Components/HorizontalBox.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -10,6 +11,7 @@
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Utility.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
+#include "Kismet/KismetStringLibrary.h"
 #include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemHoverWidget)
@@ -142,7 +144,48 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			const UD1ItemFragment_Equippable_Utility* UtilityFragment = Cast<UD1ItemFragment_Equippable_Utility>(EquippableFragment);
 			Text_ItemType->SetText(FText::FromString(TEXT("Utility")));
 
-			Text_Description->SetText(FText::FromString(TEXT("Description")));
+			FString DescriptionString = UtilityFragment->Description.ToString();
+			if (UtilityFragment->UtilityType == EUtilityType::Drink)
+			{
+				if (TSubclassOf<UGameplayEffect> UtilityEffectClass = UtilityFragment->UtilityEffectClass)
+				{
+					UGameplayEffect* UtilityEffect = UtilityEffectClass->GetDefaultObject<UGameplayEffect>();
+					{
+						FString A = TEXT("{Period}");
+						FString B = FString::SanitizeFloat(UtilityEffect->Period.GetValue());
+						DescriptionString = UKismetStringLibrary::Replace(DescriptionString, A, B);
+					}
+					{
+						float Duration = 0.f;
+						if (UtilityEffect->DurationMagnitude.GetStaticMagnitudeIfPossible(0.f, Duration))
+						{
+							FString A = TEXT("{Duration}");
+							FString B = FString::SanitizeFloat(Duration);
+							DescriptionString = UKismetStringLibrary::Replace(DescriptionString, A, B);
+						}
+					}
+					{
+						if (UtilityEffect->Executions.IsValidIndex(0))
+						{
+							const FGameplayEffectExecutionDefinition& ExecutionDefinitions = UtilityEffect->Executions[0];
+							if (ExecutionDefinitions.CalculationModifiers.IsValidIndex(0))
+							{
+								const FGameplayEffectExecutionScopedModifierInfo& ScopedModifierInfo = ExecutionDefinitions.CalculationModifiers[0];
+
+								float Value = 0.f;
+								if (ScopedModifierInfo.ModifierMagnitude.GetStaticMagnitudeIfPossible(0.f, Value))
+								{
+									FString A = TEXT("{Value}");
+									FString B = FString::SanitizeFloat(Value);
+									DescriptionString = UKismetStringLibrary::Replace(DescriptionString, A, B);
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			Text_Description->SetText(FText::FromString(DescriptionString));
 			Text_Description->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
