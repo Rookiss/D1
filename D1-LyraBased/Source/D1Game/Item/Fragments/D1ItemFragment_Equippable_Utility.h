@@ -22,9 +22,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UGameplayEffect> UtilityEffectClass;
-
-	UPROPERTY(EditDefaultsOnly)
-	FText Description;
 	
 	UPROPERTY(EditDefaultsOnly, meta=(ForceInlineRow))
 	TArray<FRarityStatSet> RarityStatSets;

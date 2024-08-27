@@ -56,7 +56,13 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	Image_DIsplayName_Background->SetColorAndOpacity(Item::ItemRarityBackgroundColors[(int32)ItemRarity]);
 	
 	Text_AttributeModifiers->SetVisibility(ESlateVisibility::Collapsed);
+
 	Text_Description->SetVisibility(ESlateVisibility::Collapsed);
+	if (ItemTemplate.Description.IsEmpty() == false)
+	{
+		Text_Description->SetText(ItemTemplate.Description);
+		Text_Description->SetVisibility(ESlateVisibility::Visible);
+	}
 	
 	HorizontalBox_WeaponType->SetVisibility(ESlateVisibility::Collapsed);
 	HorizontalBox_WeaponHandType->SetVisibility(ESlateVisibility::Collapsed);
@@ -144,7 +150,7 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			const UD1ItemFragment_Equippable_Utility* UtilityFragment = Cast<UD1ItemFragment_Equippable_Utility>(EquippableFragment);
 			Text_ItemType->SetText(FText::FromString(TEXT("Utility")));
 
-			FString DescriptionString = UtilityFragment->Description.ToString();
+			FString DescriptionString = ItemTemplate.Description.ToString();
 			if (UtilityFragment->UtilityType == EUtilityType::Drink)
 			{
 				if (TSubclassOf<UGameplayEffect> UtilityEffectClass = UtilityFragment->UtilityEffectClass)
@@ -189,10 +195,11 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			Text_Description->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
-
-	if (ItemTemplate.MaxStackCount > 1)
+	else
 	{
-		Text_MaxStackCount->SetText(FText::AsNumber(ItemTemplate.MaxStackCount));
-		HorizontalBox_MaxStackCount->SetVisibility(ESlateVisibility::Visible);
+		Text_ItemType->SetText(FText::FromString(TEXT("")));
 	}
+
+	Text_MaxStackCount->SetText(FText::AsNumber(ItemTemplate.MaxStackCount));
+	HorizontalBox_MaxStackCount->SetVisibility(ESlateVisibility::Visible);
 }

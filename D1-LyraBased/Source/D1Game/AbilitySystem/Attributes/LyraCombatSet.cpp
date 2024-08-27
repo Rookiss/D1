@@ -91,8 +91,12 @@ void ULyraCombatSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BaseDamage, COND_OwnerOnly, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BaseHeal, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BaseHealHealth, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BaseHealMana, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BaseHealStamina, COND_OwnerOnly, REPNOTIFY_Always);
+	
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeed, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeedPercent, COND_OwnerOnly, REPNOTIFY_Always);
 	
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Mana, COND_OwnerOnly, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxMana, COND_OwnerOnly, REPNOTIFY_Always);
@@ -111,14 +115,29 @@ void ULyraCombatSet::OnRep_BaseDamage(const FGameplayAttributeData& OldValue)
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseDamage, OldValue);
 }
 
-void ULyraCombatSet::OnRep_BaseHeal(const FGameplayAttributeData& OldValue)
+void ULyraCombatSet::OnRep_BaseHealHealth(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseHeal, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseHealHealth, OldValue);
+}
+
+void ULyraCombatSet::OnRep_BaseHealMana(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseHealMana, OldValue);
+}
+
+void ULyraCombatSet::OnRep_BaseHealStamina(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, BaseHealStamina, OldValue);
 }
 
 void ULyraCombatSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MoveSpeed, OldValue);
+}
+
+void ULyraCombatSet::OnRep_MoveSpeedPercent(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MoveSpeedPercent, OldValue);
 }
 
 void ULyraCombatSet::OnRep_Mana(const FGameplayAttributeData& OldValue)

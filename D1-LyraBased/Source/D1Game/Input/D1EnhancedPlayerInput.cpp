@@ -17,6 +17,23 @@ void UD1EnhancedPlayerInput::FlushPressedInput(UInputAction* InputAction)
 	{
 		if (KeyMapping.Action == InputAction)
 		{
+			APlayerController* PlayerController = GetOuterAPlayerController();
+			ULocalPlayer* LocalPlayer = PlayerController ? Cast<ULocalPlayer>(PlayerController->Player) : nullptr;
+			if (LocalPlayer != nullptr)
+			{
+				if (FKeyState* KeyState = GetKeyStateMap().Find(KeyMapping.Key))
+				{
+					if (KeyState->bDown)
+					{
+						FInputKeyParams Params(KeyMapping.Key, IE_Released, 0.f);
+						Params.NumSamples = 1;
+						InputKey(Params);
+					}
+				}
+			}
+
+			// bExecutingBindCommand = true;
+			
 			UWorld* World = GetWorld();
 			check(World);
 			float TimeSeconds = World->GetRealTimeSeconds();
@@ -28,6 +45,8 @@ void UD1EnhancedPlayerInput::FlushPressedInput(UInputAction* InputAction)
 				KeyState->bDownPrevious = false;
 				KeyState->LastUpDownTransitionTime = TimeSeconds;
 			}
+			
+			bIsFlushingInputThisFrame = true;
 		}
 	}
 }

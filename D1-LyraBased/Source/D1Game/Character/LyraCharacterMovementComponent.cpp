@@ -126,15 +126,17 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 	{
 		if (ASC->HasMatchingGameplayTag(TAG_Gameplay_MovementStopped))
 			return 0;
-
-		bool IsADS = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_ADS);
-		bool IsBlock = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Block);
-		bool IsSprint = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Sprint);
 		
 		const UAttributeSet* AttributeSet = ASC->GetAttributeSet(ULyraCombatSet::StaticClass());
 		if (const ULyraCombatSet* CombatSet = Cast<ULyraCombatSet>(AttributeSet))
 		{
-			float MaxSpeed = FMath::Max(0.f, CombatSet->GetMoveSpeed() + CombatSet->GetAgility());
+			float MoveSpeed = CombatSet->GetMoveSpeed();
+			float Agility = CombatSet->GetAgility();
+			float MoveSpeedPercent = CombatSet->GetMoveSpeedPercent();
+			
+			float MaxMoveSpeed = FMath::Max(0.f, MoveSpeed + Agility);
+			MaxMoveSpeed = FMath::Max(0.f, MaxMoveSpeed + MaxMoveSpeed * (MoveSpeedPercent / 100.f));
+			
 			switch(MovementMode)
 			{
 			case MOVE_Walking:
@@ -146,17 +148,21 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 				{
 					if (DirectionDot > -0.25f)
 					{
-						DirectionCheck = MaxSpeed * LeftRightMovePercent;
+						DirectionCheck = MaxMoveSpeed * LeftRightMovePercent;
 					}
 					else
 					{
-						DirectionCheck = MaxSpeed * BackwardMovePercent;
+						DirectionCheck = MaxMoveSpeed * BackwardMovePercent;
 					}
 				}
 				else
 				{
-					DirectionCheck = MaxSpeed;
+					DirectionCheck = MaxMoveSpeed;
 				}
+
+				bool IsADS = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_ADS);
+				bool IsBlock = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Block);
+				bool IsSprint = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Sprint);
 					
 				float CrouchCheck = IsCrouching() ? DirectionCheck * CrouchMovePercent : DirectionCheck;
 				float ADSCheck = (IsADS || IsBlock) ? CrouchCheck * ADSMovePercent : CrouchCheck;
@@ -166,7 +172,7 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 				return SprintCheck;
 			}
 			case MOVE_Falling:
-				return MaxSpeed;
+				return MaxMoveSpeed;
 			case MOVE_Swimming:
 				return MaxSwimSpeed;
 			case MOVE_Flying:

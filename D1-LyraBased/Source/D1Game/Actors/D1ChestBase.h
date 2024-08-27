@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Item/D1ItemInstance.h"
+#include "D1Define.h"
 #include "Interaction/D1WorldInteractable.h"
 #include "D1ChestBase.generated.h"
 
@@ -9,10 +9,12 @@ class UArrowComponent;
 class UD1InventoryManagerComponent;
 
 UENUM(BlueprintType)
-enum class EChestState : uint8
+enum class EItemAddType : uint8
 {
-	Open,
-	Close
+	None,
+	Weapon,
+	Armor,
+	Custom
 };
 
 USTRUCT(BlueprintType)
@@ -21,17 +23,24 @@ struct FItemAddRule
 	GENERATED_BODY()
 
 public:
-	FItemAddRule();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EItemAddType ItemAddType = EItemAddType::None;
 	
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UD1ItemTemplate> ItemTemplateClass;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="ItemAddType == EItemAddType::Custom", EditConditionHides))
+	TArray<TSubclassOf<UD1ItemTemplate>> CustomItemTemplateClasses;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float ItemAddTypeRate = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FD1ItemRarityProbability> ItemRarityProbabilities;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<EItemRarity> ItemRarities;
+};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 ItemCount = 1;
+UENUM(BlueprintType)
+enum class EChestState : uint8
+{
+	Open,
+	Close
 };
 
 UCLASS()
@@ -74,8 +83,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Info")
 	TObjectPtr<UAnimMontage> CloseMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Info")
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="Info")
 	TArray<FItemAddRule> ItemAddRules;
+
+	UPROPERTY(EditDefaultsOnly, Category="Info")
+	bool bShouldFallback = false;
+
+	UPROPERTY(EditDefaultsOnly, Category="Info", meta=(EditCondition="bShouldFallback", EditConditionHides))
+	TSubclassOf<UD1ItemTemplate> FallbackItemTemplateClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Info", meta=(EditCondition="bShouldFallback", EditConditionHides))
+	EItemRarity FallbackItemItemRarity = EItemRarity::Junk;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

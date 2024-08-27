@@ -84,12 +84,8 @@ void UD1GameplayAbility_Weapon_Spell::SpawnAOE()
 			{
 				const FHitResult& HitResult = *HitResultPtr;
 
-				FTransform SpawnTransform;
+				FTransform SpawnTransform = FTransform::Identity;
 				SpawnTransform.SetLocation(HitResult.Location);
-				if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetAvatarActorFromActorInfo()))
-				{
-					SpawnTransform.SetRotation(LyraCharacter->GetController()->GetControlRotation().Quaternion());
-				}
 				
 				AD1AOEBase* AOE = GetWorld()->SpawnActorDeferred<AD1AOEBase>(
 					AOESpawnerClass,
@@ -98,15 +94,7 @@ void UD1GameplayAbility_Weapon_Spell::SpawnAOE()
 					Cast<APawn>(GetAvatarActorFromActorInfo()),
 					ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 				);
-				
-				FGameplayEffectContextHandle EffectContextHandle = ASC->MakeEffectContext();
-				EffectContextHandle.SetAbility(this);
-				EffectContextHandle.AddSourceObject(AOE);
-
-				const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
-				const FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
 	
-				AOE->Init(EffectSpecHandle);
 				AOE->FinishSpawning(SpawnTransform);
 			}
 		}

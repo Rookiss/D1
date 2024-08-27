@@ -5,6 +5,7 @@
 #include "Character/LyraCharacter.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AOEBase)
 
@@ -12,28 +13,29 @@ AD1AOEBase::AD1AOEBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
-	bReplicates = false;
+	bReplicates = true;
+	bAlwaysRelevant = true;
 
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>("ArrowComponent");
 	SetRootComponent(ArrowComponent);
 
-	HitBoxComponent = CreateDefaultSubobject<UBoxComponent>("HitBoxComponent");
-	HitBoxComponent->SetupAttachment(GetRootComponent());
-
-	HitBoxComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
-	HitBoxComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>("BoxComponent");
+	BoxComponent->SetCollisionProfileName("OverlapOnlyPawn");
+	BoxComponent->SetupAttachment(ArrowComponent);
 }
 
 void AD1AOEBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AttackIntervalTime = AttackTotalTime / TargetAttackCount;
+	if (AttackIntervalTime <= 0)
+	{
+		Destroy();
+		return;
+	}
+	
 	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::BeginAOE);
-}
-
-void AD1AOEBase::Init(const FGameplayEffectSpecHandle& InDamageEffectSpecHandle)
-{
-	DamageEffectSpecHandle = InDamageEffectSpecHandle;
 }
 
 void AD1AOEBase::BeginAOE()
@@ -46,41 +48,16 @@ void AD1AOEBase::BeginAOE()
 
 void AD1AOEBase::TickAOE()
 {
-	FGameplayCueParameters CueParameters;
-	CueParameters.Location = GetActorLocation();
-	UGameplayCueFunctionLibrary::ExecuteGameplayCueOnActor(GetOwner(), GameplayCueTag, CueParameters);
-
-	TArray<AActor*> OverlappingActors;
-	HitBoxComponent->GetOverlappingActors(OverlappingActors, ALyraCharacter::StaticClass());
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.Owner = GetOwner();
+	SpawnParameters.Instigator = Cast<APawn>(GetOwner());
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
-	for (AActor* OverlappingActor : OverlappingActors)
-	{
-		if (GetOwner() == OverlappingActor)
-			continue;
-		
-		ALyraCharacter* OverlappingCharacter = Cast<ALyraCharacter>(OverlappingActor);
-		check(OverlappingCharacter);
-
-		UAbilitySystemComponent* TargetASC = OverlappingCharacter->GetAbilitySystemComponent();
-		check(TargetASC);
-
-		TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
-
-		if (HitActors.Contains(OverlappingCharacter) == false)
-		{
-			HitActors.Add(OverlappingCharacter);
-			
-			if (FirstHitGameplayEffectClass)
-			{
-				const UGameplayEffect* GameplayEffectCDO = FirstHitGameplayEffectClass->GetDefaultObject<UGameplayEffect>();
-				TargetASC->ApplyGameplayEffectToSelf(GameplayEffectCDO, 1.f, TargetASC->MakeEffectContext());
-			}
-		}
-	}
-
-	CurrAttackCount++;
+	FVector SpawnLocation = UKismetMathLibrary::RandomPointInBoundingBox(BoxComponent->Bounds.Origin, BoxComponent->Bounds.BoxExtent);
+	GetWorld()->SpawnActor<AActor>(AOEElementClass, SpawnLocation, FRotator::ZeroRotator, SpawnParameters);
+	CurrentAttackCount++;
 	
-	if (CurrAttackCount == TargetAttackCount)
+	if (CurrentAttackCount == TargetAttackCount)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(AOETimerHandle);
 		Destroy();

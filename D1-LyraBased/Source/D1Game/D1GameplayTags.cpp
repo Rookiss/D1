@@ -57,6 +57,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_2,								"Ability.Attack.2");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_3,								"Ability.Attack.3");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_Bow,								"Ability.Attack.Bow");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_Skill,							"Ability.Attack.Skill");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Throw,									"Ability.Throw");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Drink,									"Ability.Drink");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Block,									"Ability.Block");
@@ -130,6 +131,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingDamage,						"SetByCaller.IncomingDamage");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_PhysicalWeaponDamage,				"SetByCaller.PhysicalWeaponDamage");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_MoveSpeed,							"SetByCaller.MoveSpeed");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_MoveSpeedPercent,					"SetByCaller.MoveSpeedPercent");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Strength,						    "SetByCaller.Strength");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Defense,								"SetByCaller.Defense");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Vigor,								"SetByCaller.Vigor");
@@ -154,6 +156,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Dash,									"Cooldown.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Statue,									"Cooldown.Statue");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Sprint,									"Cooldown.Sprint");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Skill_1,								"Cooldown.Skill.1");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Skill_2,								"Cooldown.Skill.2");
 
 	// GamePhase
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_WaitForPlayers,					    "GamePhase.WaitForPlayers");

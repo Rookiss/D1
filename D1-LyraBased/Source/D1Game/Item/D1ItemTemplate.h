@@ -45,7 +45,10 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText DisplayName;
-
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText Description;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UTexture2D> IconTexture;
 
