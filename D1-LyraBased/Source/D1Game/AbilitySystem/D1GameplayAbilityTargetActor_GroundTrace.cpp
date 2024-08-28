@@ -1,9 +1,12 @@
 ﻿#include "D1GameplayAbilityTargetActor_GroundTrace.h"
 
+#include "NavigationSystem.h"
+#include "AI/NavigationSystemBase.h"
+
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbilityTargetActor_GroundTrace)
 
 AD1GameplayAbilityTargetActor_GroundTrace::AD1GameplayAbilityTargetActor_GroundTrace(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+: Super(ObjectInitializer)
 {
 	CollisionHeightOffset = 0.0f;
 }
@@ -32,11 +35,6 @@ void AD1GameplayAbilityTargetActor_GroundTrace::StartTargeting(UGameplayAbility*
 		CollisionRadius = CollisionHeight = 0.0f;
 	}
 	Super::StartTargeting(InAbility);
-}
-
-bool AD1GameplayAbilityTargetActor_GroundTrace::IsConfirmTargetingAllowed()
-{
-	return bLastTraceWasGood;
 }
 
 bool AD1GameplayAbilityTargetActor_GroundTrace::AdjustCollisionResultForShape(const FVector OriginalStartPoint, const FVector OriginalEndPoint, const FCollisionQueryParams Params, FHitResult& OutHitResult) const
@@ -135,6 +133,11 @@ bool AD1GameplayAbilityTargetActor_GroundTrace::AdjustCollisionResultForShape(co
 	return false;
 }
 
+bool AD1GameplayAbilityTargetActor_GroundTrace::IsConfirmTargetingAllowed()
+{
+	return bLastTraceWasGood;
+}
+
 FHitResult AD1GameplayAbilityTargetActor_GroundTrace::PerformTrace(AActor* InSourceActor)
 {
 	bool bTraceComplex = false;
@@ -147,8 +150,6 @@ FHitResult AD1GameplayAbilityTargetActor_GroundTrace::PerformTrace(AActor* InSou
 	FVector TraceEnd;
 	AimWithPlayerController(InSourceActor, Params, TraceStart, TraceEnd);		//Effective on server and launching client only
 
-	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
-	
 	// ------------------------------------------------------
 
 	FHitResult ReturnHitResult;
@@ -160,41 +161,43 @@ FHitResult AD1GameplayAbilityTargetActor_GroundTrace::PerformTrace(AActor* InSou
 		ReturnHitResult.Location = TraceEnd;
 	}
 
-	//Second trace, straight down. Consider using InSourceActor->GetWorld()->NavigationSystem->ProjectPointToNavigation() instead of just going straight down in the case of movement abilities (flag/bool).
-	TraceStart = ReturnHitResult.Location - (TraceEnd - TraceStart).GetSafeNormal();		//Pull back very slightly to avoid scraping down walls
-	TraceEnd = TraceStart;
-	TraceStart.Z += CollisionHeightOffset;
-	TraceEnd.Z -= 99999.0f;
-	LineTraceWithFilter(ReturnHitResult, InSourceActor->GetWorld(), Filter, TraceStart, TraceEnd, TraceProfile.Name, Params);
-	//if (!ReturnHitResult.bBlockingHit) then our endpoint may be off the map. Hopefully this is only possible in debug maps.
-
-	bLastTraceWasGood = true;		//So far, we're good. If we need a ground spot and can't find one, we'll come back.
-
-	//Use collision shape to find a valid ground spot, if appropriate
+	// DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 0.1f, 0, 0.1f);
+	
+	FNavLocation NavLocation;
+	if (UNavigationSystemV1::GetNavigationSystem(GetWorld())->ProjectPointToNavigation(ReturnHitResult.Location, NavLocation, FVector(88.0f, 88.0f, 2000.0f)))
+	{
+		ReturnHitResult.Location = NavLocation.Location;
+		// DrawDebugSphere(GetWorld(), ReturnHitResult.Location, 8.0f, 8, FColor::Blue, false, 0.1f, 0, 0.1f);
+	}
+	
+	// TraceStart = ReturnHitResult.Location - (TraceEnd - TraceStart).GetSafeNormal();
+	// TraceEnd = TraceStart;
+	// TraceStart.Z += CollisionHeightOffset;
+	// TraceEnd.Z -= 99999.0f;
+	// LineTraceWithFilter(ReturnHitResult, InSourceActor->GetWorld(), Filter, TraceStart, TraceEnd, TraceProfile.Name, Params);
+	
+	bLastTraceWasGood = true;
+	
 	if (CollisionShape.ShapeType != ECollisionShape::Line)
 	{
-		ReturnHitResult.Location.Z += CollisionHeightOffset;		//Rise up out of the ground
+		ReturnHitResult.Location.Z += CollisionHeightOffset;
 		TraceStart = InSourceActor->GetActorLocation();
 		TraceEnd = ReturnHitResult.Location;
 		TraceStart.Z += CollisionHeightOffset;
 		bLastTraceWasGood = AdjustCollisionResultForShape(TraceStart, TraceEnd, Params, ReturnHitResult);
 		if (bLastTraceWasGood)
 		{
-			ReturnHitResult.Location.Z -= CollisionHeightOffset;	//Undo the artificial height adjustment
+			ReturnHitResult.Location.Z -= CollisionHeightOffset;
 		}
 	}
-
-	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
 
 	if (AGameplayAbilityWorldReticle* LocalReticleActor = ReticleActor.Get())
 	{
 		LocalReticleActor->SetIsTargetValid(bLastTraceWasGood);
 		LocalReticleActor->SetActorLocation(ReturnHitResult.Location);
 	}
-
-	// Reset the trace start so the target data uses the correct origin
+	
 	ReturnHitResult.TraceStart = StartLocation.GetTargetingTransform().GetLocation();
 
 	return ReturnHitResult;
 }
-
