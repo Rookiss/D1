@@ -17,7 +17,7 @@ UD1GameplayAbility_Weapon_Projectile::UD1GameplayAbility_Weapon_Projectile(const
 
 void UD1GameplayAbility_Weapon_Projectile::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	bCastTimePassed = false;
+	CurrentIndex = 0;
 	
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
@@ -44,6 +44,9 @@ void UD1GameplayAbility_Weapon_Projectile::SpawnProjectile()
 	
 	if (WeaponMeshComponent->DoesSocketExist(ProjectileSocketName) == false)
 		return;
+
+	if (ProjectileClasses.IsValidIndex(CurrentIndex) == false)
+		return;
 	
 	FTransform SpawnTransform = WeaponMeshComponent->GetSocketTransform(ProjectileSocketName);
 	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetAvatarActorFromActorInfo()))
@@ -52,7 +55,7 @@ void UD1GameplayAbility_Weapon_Projectile::SpawnProjectile()
 	}
 	
 	AD1ProjectileBase* Projectile = GetWorld()->SpawnActorDeferred<AD1ProjectileBase>(
-		ProjectileClass,
+		ProjectileClasses[CurrentIndex],
 		SpawnTransform,
 		GetAvatarActorFromActorInfo(),
 		Cast<APawn>(GetAvatarActorFromActorInfo()),

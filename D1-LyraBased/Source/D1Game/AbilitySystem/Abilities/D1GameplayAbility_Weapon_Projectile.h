@@ -35,12 +35,18 @@ protected:
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Spell Type")
-	TSubclassOf<AD1ProjectileBase> ProjectileClass;
+	TArray<TSubclassOf<AD1ProjectileBase>> ProjectileClasses;
 
 	UPROPERTY(EditDefaultsOnly, Category="Spell Type")
 	FName ProjectileSocketName;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Spell Type")
+	TArray<float> PhaseTimes;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Spell Type")
+	TArray<FLinearColor> PhaseColors;
+	
 private:
 	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
-	bool bCastTimePassed = false;
+	int32 CurrentIndex = 0;
 };

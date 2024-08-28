@@ -126,8 +126,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_OtherInventory,				"Message.Initialize.OtherInventory");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_MyEquipment,					"Message.Initialize.MyEquipment");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_OtherEquipment,				"Message.Initialize.OtherEquipment");
-	UE_DEFINE_GAMEPLAY_TAG(Message_HUD_SpellInput,							"Message.HUD.SpellInput");
-	UE_DEFINE_GAMEPLAY_TAG(Message_HUD_SpellProgress,						"Message.HUD.SpellProgress");
+	UE_DEFINE_GAMEPLAY_TAG(Message_HUD_Spell_Input,							"Message.HUD.Spell.Input");
+	UE_DEFINE_GAMEPLAY_TAG(Message_HUD_Spell_Progress_Construct,			"Message.HUD.Spell.Progress.Construct");
+	UE_DEFINE_GAMEPLAY_TAG(Message_HUD_Spell_Progress_Refresh,				"Message.HUD.Spell.Progress.Refresh");
 
 	// SetByCaller
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingHeal,						"SetByCaller.IncomingHeal");
@@ -148,6 +149,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Attack_GreatSword,			"GameplayCue.Weapon.Attack.GreatSword");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Impact,						"GameplayCue.Weapon.Impact");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Cast_Lighting,				"GameplayCue.Weapon.Cast.Lighting");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Cast_Fireball,				"GameplayCue.Weapon.Cast.Fireball");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Overlay,						"GameplayCue.Weapon.Overlay");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_HitReact,							"GameplayCue.HitReact");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Loop,							"GameplayCue.Statue.Loop");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Success,						"GameplayCue.Statue.Success");

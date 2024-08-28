@@ -21,7 +21,20 @@ public:
 	FText DisplayName;
 
 	UPROPERTY(BlueprintReadWrite)
-	float CastTime;
+	FLinearColor PhaseColor;
+
+	UPROPERTY(BlueprintReadWrite)
+	float TotalCastTime = 0.f;
+};
+
+USTRUCT(BlueprintType)
+struct FSpellProgressRefreshMessage
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	FLinearColor PhaseColor;
 };
 
 UCLASS()
@@ -33,15 +46,13 @@ public:
 	UD1SpellProgressWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 protected:
-	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 private:
 	void ConstructUI(FGameplayTag Channel, const FSpellProgressInitializeMessage& Message);
-	void ShowWidget(const FText& DisplayName, float CastTime);
-	void HideWidget();
+	void RefreshUI(FGameplayTag Channel, const FSpellProgressRefreshMessage& Message);
 	
 protected:
 	UPROPERTY(meta=(BindWidget))
@@ -51,14 +62,15 @@ protected:
 	TObjectPtr<UProgressBar> ProgressBar_SpellProgress;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FLinearColor DefaultColor;
-	
 	UPROPERTY(EditAnywhere, meta=(Categories="Message"))
-	FGameplayTag MessageChannelTag;
+	FGameplayTag ConstructMessageChannelTag;
+
+	UPROPERTY(EditAnywhere, meta=(Categories="Message"))
+	FGameplayTag RefreshMessageChannelTag;
 	
 private:
 	float PassedCastTime = 0.f;
 	float TargetCastTime = 0.f;
-	FGameplayMessageListenerHandle ListenerHandle;
+	FGameplayMessageListenerHandle ConstructListenerHandle;
+	FGameplayMessageListenerHandle RefreshListenerHandle;
 };

@@ -13,27 +13,22 @@ UD1SpellProgressWidget::UD1SpellProgressWidget(const FObjectInitializer& ObjectI
     
 }
 
-void UD1SpellProgressWidget::NativePreConstruct()
-{
-	Super::NativePreConstruct();
-
-	ProgressBar_SpellProgress->SetFillColorAndOpacity(DefaultColor);
-}
-
 void UD1SpellProgressWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	HideWidget();
+	SetVisibility(ESlateVisibility::Collapsed);
 	
 	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	ListenerHandle = MessageSubsystem.RegisterListener(MessageChannelTag, this, &ThisClass::ConstructUI);
+	ConstructListenerHandle = MessageSubsystem.RegisterListener(ConstructMessageChannelTag, this, &ThisClass::ConstructUI);
+	RefreshListenerHandle = MessageSubsystem.RegisterListener(RefreshMessageChannelTag, this, &ThisClass::RefreshUI);
 }
 
 void UD1SpellProgressWidget::NativeDestruct()
 {
 	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	MessageSubsystem.UnregisterListener(ListenerHandle);
+	MessageSubsystem.UnregisterListener(ConstructListenerHandle);
+	MessageSubsystem.UnregisterListener(RefreshListenerHandle);
 	
 	Super::NativeDestruct();
 }
@@ -42,7 +37,7 @@ void UD1SpellProgressWidget::NativeTick(const FGeometry& MyGeometry, float InDel
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 	
-	if (GetVisibility() == ESlateVisibility::Visible && PassedCastTime < TargetCastTime)
+	if (GetVisibility() == ESlateVisibility::Visible)
 	{
 		PassedCastTime = FMath::Min(PassedCastTime + InDeltaTime, TargetCastTime);
 		ProgressBar_SpellProgress->SetPercent(UKismetMathLibrary::SafeDivide(PassedCastTime, TargetCastTime));
@@ -51,22 +46,26 @@ void UD1SpellProgressWidget::NativeTick(const FGeometry& MyGeometry, float InDel
 
 void UD1SpellProgressWidget::ConstructUI(FGameplayTag Channel, const FSpellProgressInitializeMessage& Message)
 {
-	Message.bShouldShow ? ShowWidget(Message.DisplayName, Message.CastTime) : HideWidget();
+	if (Message.bShouldShow)
+	{
+		PassedCastTime = 0.f;
+		TargetCastTime = Message.TotalCastTime;
+
+		Text_SpellName->SetText(Message.DisplayName);
+		ProgressBar_SpellProgress->SetPercent(0.f);
+		ProgressBar_SpellProgress->SetFillColorAndOpacity(Message.PhaseColor);
+		SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
-void UD1SpellProgressWidget::ShowWidget(const FText& DisplayName, float CastTime)
+void UD1SpellProgressWidget::RefreshUI(FGameplayTag Channel, const FSpellProgressRefreshMessage& Message)
 {
-	PassedCastTime = 0.f;
-	TargetCastTime = CastTime;
-	
-	Text_SpellName->SetText(DisplayName);
-	ProgressBar_SpellProgress->SetPercent(0.f);
-	
-	ProgressBar_SpellProgress->SetFillColorAndOpacity(DefaultColor);
-	SetVisibility(ESlateVisibility::Visible);
-}
-
-void UD1SpellProgressWidget::HideWidget()
-{
-	SetVisibility(ESlateVisibility::Collapsed);
+	if (GetVisibility() == ESlateVisibility::Visible)
+	{
+		ProgressBar_SpellProgress->SetFillColorAndOpacity(Message.PhaseColor);
+	}
 }
