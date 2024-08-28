@@ -1,28 +1,28 @@
-﻿#include "D1GameplayAbility_Weapon_Spell.h"
+﻿#include "D1GameplayAbility_Weapon_Projectile.h"
 
-#include "Actors/D1AOEBase.h"
+#include "AbilitySystemComponent.h"
 #include "Actors/D1ProjectileBase.h"
 #include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
 #include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_Spell)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_Projectile)
 
-UD1GameplayAbility_Weapon_Spell::UD1GameplayAbility_Weapon_Spell(const FObjectInitializer& ObjectInitializer)
+UD1GameplayAbility_Weapon_Projectile::UD1GameplayAbility_Weapon_Projectile(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1GameplayAbility_Weapon_Spell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UD1GameplayAbility_Weapon_Projectile::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	bCastTimePassed = false;
 	
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UD1GameplayAbility_Weapon_Spell::SpawnProjectile()
+void UD1GameplayAbility_Weapon_Projectile::SpawnProjectile()
 {
 	if (HasAuthority(&CurrentActivationInfo) == false)
 		return;
@@ -68,37 +68,4 @@ void UD1GameplayAbility_Weapon_Spell::SpawnProjectile()
 	
 	Projectile->Init(EffectSpecHandle);
 	Projectile->FinishSpawning(SpawnTransform);
-}
-
-void UD1GameplayAbility_Weapon_Spell::SpawnAOE()
-{
-	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
-	if (ASC == nullptr)
-		return;
-	
-	if (TargetDataHandle.Data.IsValidIndex(0))
-	{
-		if (FGameplayAbilityTargetData* TargetData = TargetDataHandle.Data[0].Get())
-		{
-			if (const FHitResult* HitResultPtr = TargetData->GetHitResult())
-			{
-				const FHitResult& HitResult = *HitResultPtr;
-
-				FTransform SpawnTransform = FTransform::Identity;
-				SpawnTransform.SetLocation(HitResult.Location);
-				
-				AD1AOEBase* AOE = GetWorld()->SpawnActorDeferred<AD1AOEBase>(
-					AOESpawnerClass,
-					SpawnTransform,
-					GetAvatarActorFromActorInfo(),
-					Cast<APawn>(GetAvatarActorFromActorInfo()),
-					ESpawnActorCollisionHandlingMethod::AlwaysSpawn
-				);
-	
-				AOE->FinishSpawning(SpawnTransform);
-			}
-		}
-	}
-
-	TargetDataHandle.Clear();
 }

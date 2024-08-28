@@ -99,6 +99,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Begin,						"GameplayEvent.Montage.Begin");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Tick,						"GameplayEvent.Montage.Tick");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_End,						"GameplayEvent.Montage.End");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Spell,						"GameplayEvent.Montage.Spell");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Trace,								"GameplayEvent.Trace");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ChangeEquip,						"GameplayEvent.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ArrowVisibility,					"GameplayEvent.ArrowVisibility");
@@ -125,6 +126,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_OtherInventory,				"Message.Initialize.OtherInventory");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_MyEquipment,					"Message.Initialize.MyEquipment");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_OtherEquipment,				"Message.Initialize.OtherEquipment");
+	UE_DEFINE_GAMEPLAY_TAG(Message_HUD_SpellInput,							"Message.HUD.SpellInput");
+	UE_DEFINE_GAMEPLAY_TAG(Message_HUD_SpellProgress,						"Message.HUD.SpellProgress");
 
 	// SetByCaller
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingHeal,						"SetByCaller.IncomingHeal");
