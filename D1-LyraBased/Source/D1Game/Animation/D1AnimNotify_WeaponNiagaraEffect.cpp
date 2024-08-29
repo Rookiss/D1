@@ -1,0 +1,39 @@
+﻿#include "D1AnimNotify_WeaponNiagaraEffect.h"
+
+#include "Actors/D1WeaponBase.h"
+#include "Character/LyraCharacter.h"
+#include "Item/Managers/D1EquipManagerComponent.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1AnimNotify_WeaponNiagaraEffect)
+
+UD1AnimNotify_WeaponNiagaraEffect::UD1AnimNotify_WeaponNiagaraEffect()
+	: Super()
+{
+#if WITH_EDITORONLY_DATA
+	bShouldFireInEditor = false;
+#endif
+}
+
+void UD1AnimNotify_WeaponNiagaraEffect::Notify(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
+{
+	USkeletalMeshComponent* WeaponMeshComponent = GetWeaponMeshComponent(MeshComponent);
+	Super::Notify(WeaponMeshComponent ? WeaponMeshComponent : MeshComponent, Animation, EventReference);
+}
+
+USkeletalMeshComponent* UD1AnimNotify_WeaponNiagaraEffect::GetWeaponMeshComponent(USkeletalMeshComponent* CharacterMeshComponent) const
+{
+	USkeletalMeshComponent* WeaponMeshComponent = nullptr;
+	
+	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(CharacterMeshComponent->GetOwner()))
+	{
+		if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
+		{
+			if (AD1WeaponBase* WeaponActor = EquipManager->GetEquippedActor(WeaponHandType))
+			{
+				WeaponMeshComponent = WeaponActor->WeaponMeshComponent;
+			}
+		}
+	}
+
+	return WeaponMeshComponent;
+}
