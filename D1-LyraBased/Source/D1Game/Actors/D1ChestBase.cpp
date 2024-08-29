@@ -1,19 +1,12 @@
 ﻿#include "D1ChestBase.h"
 
 #include "Components/ArrowComponent.h"
+#include "Data/D1ItemData.h"
+#include "Item/D1ItemTemplate.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Net/UnrealNetwork.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ChestBase)
-
-FItemAddRule::FItemAddRule()
-{
-	ItemRarityProbabilities.SetNum((int32)EItemRarity::Count);
-	for (int32 i = 0; i < ItemRarityProbabilities.Num(); i++)
-	{
-		ItemRarityProbabilities[i].Rarity = (EItemRarity)i;
-	}
-}
 
 AD1ChestBase::AD1ChestBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -33,19 +26,48 @@ AD1ChestBase::AD1ChestBase(const FObjectInitializer& ObjectInitializer)
 void AD1ChestBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (HasAuthority())
-	{
-		for (int32 i = 0; i < 5; i++)
-		{
-			for (FItemAddRule& ItemAddRule : ItemAddRules)
-			{
-				InventoryManager->TryAddItemByProbability(ItemAddRule.ItemTemplateClass, 1, ItemAddRule.ItemRarityProbabilities);
-			}
 
-			if (InventoryManager->IsAllEmpty() == false)
-				break;
+	if (HasAuthority() == false)
+		return;
+
+	const TArray<TSubclassOf<UD1ItemTemplate>>& WeaponItemTemplateClasses = UD1ItemData::Get().GetWeaponItemTemplateClasses();
+	const TArray<TSubclassOf<UD1ItemTemplate>>& ArmorItemTemplateClasses = UD1ItemData::Get().GetArmorItemTemplateClasses();
+
+	bool bItemAdded = false;
+	
+	for (const FItemAddRule& ItemAddRule : ItemAddRules)
+	{
+		if (ItemAddRule.ItemAddType == EItemAddType::None)
+			continue;
+
+		if (FMath::RandRange(0.f, 100.f) > ItemAddRule.ItemAddTypeRate)
+			continue;
+
+		const TArray<TSubclassOf<UD1ItemTemplate>>* SelectedItemTemplateClasses = nullptr;
+		
+		switch (ItemAddRule.ItemAddType)
+		{
+		case EItemAddType::Weapon:	SelectedItemTemplateClasses = &WeaponItemTemplateClasses;				break;
+		case EItemAddType::Armor:	SelectedItemTemplateClasses = &ArmorItemTemplateClasses;				break;
+		case EItemAddType::Custom:	SelectedItemTemplateClasses = &ItemAddRule.CustomItemTemplateClasses;	break;
 		}
+
+		if (SelectedItemTemplateClasses)
+		{
+			int32 SelectedItemTemplateIndex = FMath::RandRange(0, SelectedItemTemplateClasses->Num() - 1);
+			TSubclassOf<UD1ItemTemplate> SelectedItemTemplateClass = (*SelectedItemTemplateClasses)[SelectedItemTemplateIndex];
+			
+			int32 SelectedItemRarityIndex = FMath::RandRange(0, ItemAddRule.ItemRarities.Num() - 1);
+			EItemRarity SelectedItemRarity = ItemAddRule.ItemRarities[SelectedItemRarityIndex];
+			
+			InventoryManager->TryAddItemByRarity(SelectedItemTemplateClass, SelectedItemRarity, 1);
+			bItemAdded = true;
+		}
+	}
+
+	if (bShouldFallback && FallbackItemTemplateClass && bItemAdded == false)
+	{
+		InventoryManager->TryAddItemByRarity(FallbackItemTemplateClass, FallbackItemItemRarity, 1);
 	}
 }
 

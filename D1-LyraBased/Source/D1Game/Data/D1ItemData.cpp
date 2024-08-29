@@ -5,6 +5,8 @@
 #endif // WITH_EDITOR
 
 #include "Item/D1ItemTemplate.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "System/LyraAssetManager.h"
 #include "UObject/ObjectSaveContext.h"
 
@@ -29,6 +31,19 @@ void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 	for (const auto& Pair : ItemTemplateIDToClass)
 	{
 		ItemTemplateClassToID.Emplace(Pair.Value, Pair.Key);
+
+		const UD1ItemTemplate* ItemTemplate = Pair.Value.GetDefaultObject();
+		if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
+		{
+			if (WeaponFragment->WeaponType != EWeaponType::Unarmed)
+			{
+				WeaponItemTemplateClasses.Add(Pair.Value);
+			}
+		}
+		else if (ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>())
+		{
+			ArmorItemTemplateClasses.Add(Pair.Value);
+		}
 	}
 }
 #endif // WITH_EDITORONLY_DATA

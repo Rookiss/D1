@@ -6,11 +6,15 @@
 
 struct FHealStatics
 {
-	FGameplayEffectAttributeCaptureDefinition BaseHealDef;
+	FGameplayEffectAttributeCaptureDefinition BaseHealHealthDef;
+	FGameplayEffectAttributeCaptureDefinition BaseHealManaDef;
+	FGameplayEffectAttributeCaptureDefinition BaseHealStaminaDef;
 
 	FHealStatics()
 	{
-		BaseHealDef = FGameplayEffectAttributeCaptureDefinition(ULyraCombatSet::GetBaseHealAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		BaseHealHealthDef = FGameplayEffectAttributeCaptureDefinition(ULyraCombatSet::GetBaseHealHealthAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		BaseHealManaDef = FGameplayEffectAttributeCaptureDefinition(ULyraCombatSet::GetBaseHealManaAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		BaseHealStaminaDef = FGameplayEffectAttributeCaptureDefinition(ULyraCombatSet::GetBaseHealStaminaAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 	}
 };
 
@@ -22,7 +26,9 @@ static FHealStatics& HealStatics()
 
 ULyraHealExecution::ULyraHealExecution()
 {
-	RelevantAttributesToCapture.Add(HealStatics().BaseHealDef);
+	RelevantAttributesToCapture.Add(HealStatics().BaseHealHealthDef);
+	RelevantAttributesToCapture.Add(HealStatics().BaseHealManaDef);
+	RelevantAttributesToCapture.Add(HealStatics().BaseHealStaminaDef);
 }
 
 void ULyraHealExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
@@ -37,15 +43,32 @@ void ULyraHealExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 	EvaluateParameters.SourceTags = SourceTags;
 	EvaluateParameters.TargetTags = TargetTags;
 
-	float BaseHeal = 0.0f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(HealStatics().BaseHealDef, EvaluateParameters, BaseHeal);
+	float BaseHealHealth = 0.0f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(HealStatics().BaseHealHealthDef, EvaluateParameters, BaseHealHealth);
 
-	const float HealingDone = FMath::Max(0.0f, BaseHeal);
+	float BaseHealMana = 0.0f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(HealStatics().BaseHealManaDef, EvaluateParameters, BaseHealMana);
+	
+	float BaseHealStamina = 0.0f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(HealStatics().BaseHealStaminaDef, EvaluateParameters, BaseHealStamina);
 
-	if (HealingDone > 0.0f)
+	const float HealingHealthDone = FMath::Max(0.0f, BaseHealHealth);
+	const float HealingManaDone = FMath::Max(0.0f, BaseHealMana);
+	const float HealingStaminaDone = FMath::Max(0.0f, BaseHealStamina);
+
+	if (HealingHealthDone > 0.0f)
 	{
-		// Apply a healing modifier, this gets turned into + health on the target
-		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(ULyraHealthSet::GetIncomingHealAttribute(), EGameplayModOp::Additive, HealingDone));
+		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(ULyraHealthSet::GetIncomingHealAttribute(), EGameplayModOp::Additive, HealingHealthDone));
+	}
+
+	if (HealingManaDone > 0.0f)
+	{
+		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(ULyraCombatSet::GetManaAttribute(), EGameplayModOp::Additive, HealingManaDone));
+	}
+
+	if (HealingStaminaDone > 0.0f)
+	{
+		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(ULyraCombatSet::GetStaminaAttribute(), EGameplayModOp::Additive, HealingStaminaDone));
 	}
 #endif // #if WITH_SERVER_CODE
 }

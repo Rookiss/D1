@@ -24,14 +24,22 @@ public:
 public:
 	const UD1ItemTemplate& FindItemTemplateByID(int32 ItemTemplateID) const;
 	int32 FindItemTemplateIDByClass(TSubclassOf<UD1ItemTemplate> ItemTemplateClass) const;
-
-	UFUNCTION(BlueprintCallable)
+	
 	void GetAllItemTemplateClasses(TArray<TSubclassOf<UD1ItemTemplate>>& OutItemTemplateClasses) const;
-
+	const TArray<TSubclassOf<UD1ItemTemplate>>& GetWeaponItemTemplateClasses() const { return WeaponItemTemplateClasses; }
+	const TArray<TSubclassOf<UD1ItemTemplate>>& GetArmorItemTemplateClasses() const { return ArmorItemTemplateClasses; }
+	
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TMap<int32, TSubclassOf<UD1ItemTemplate>> ItemTemplateIDToClass;
 
 	UPROPERTY()
 	TMap<TSubclassOf<UD1ItemTemplate>, int32> ItemTemplateClassToID;
+
+private:
+	UPROPERTY()
+	TArray<TSubclassOf<UD1ItemTemplate>> WeaponItemTemplateClasses;
+
+	UPROPERTY()
+	TArray<TSubclassOf<UD1ItemTemplate>> ArmorItemTemplateClasses;
 };

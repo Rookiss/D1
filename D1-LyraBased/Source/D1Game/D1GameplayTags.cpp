@@ -57,6 +57,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_2,								"Ability.Attack.2");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_3,								"Ability.Attack.3");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_Bow,								"Ability.Attack.Bow");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_Skill,							"Ability.Attack.Skill");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Throw,									"Ability.Throw");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Drink,									"Ability.Drink");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Block,									"Ability.Block");
@@ -98,6 +99,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Begin,						"GameplayEvent.Montage.Begin");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Tick,						"GameplayEvent.Montage.Tick");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_End,						"GameplayEvent.Montage.End");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Spell,						"GameplayEvent.Montage.Spell");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Trace,								"GameplayEvent.Trace");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ChangeEquip,						"GameplayEvent.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ArrowVisibility,					"GameplayEvent.ArrowVisibility");
@@ -124,12 +126,16 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_OtherInventory,				"Message.Initialize.OtherInventory");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_MyEquipment,					"Message.Initialize.MyEquipment");
 	UE_DEFINE_GAMEPLAY_TAG(Message_Initialize_OtherEquipment,				"Message.Initialize.OtherEquipment");
+	UE_DEFINE_GAMEPLAY_TAG(Message_HUD_Spell_Input,							"Message.HUD.Spell.Input");
+	UE_DEFINE_GAMEPLAY_TAG(Message_HUD_Spell_Progress_Construct,			"Message.HUD.Spell.Progress.Construct");
+	UE_DEFINE_GAMEPLAY_TAG(Message_HUD_Spell_Progress_Refresh,				"Message.HUD.Spell.Progress.Refresh");
 
 	// SetByCaller
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingHeal,						"SetByCaller.IncomingHeal");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingDamage,						"SetByCaller.IncomingDamage");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_PhysicalWeaponDamage,				"SetByCaller.PhysicalWeaponDamage");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_MoveSpeed,							"SetByCaller.MoveSpeed");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_MoveSpeedPercent,					"SetByCaller.MoveSpeedPercent");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Strength,						    "SetByCaller.Strength");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Defense,								"SetByCaller.Defense");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Vigor,								"SetByCaller.Vigor");
@@ -143,6 +149,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Attack_GreatSword,			"GameplayCue.Weapon.Attack.GreatSword");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Impact,						"GameplayCue.Weapon.Impact");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Cast_Lighting,				"GameplayCue.Weapon.Cast.Lighting");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Cast_Fireball,				"GameplayCue.Weapon.Cast.Fireball");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Overlay,						"GameplayCue.Weapon.Overlay");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_HitReact,							"GameplayCue.HitReact");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Loop,							"GameplayCue.Statue.Loop");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Success,						"GameplayCue.Statue.Success");
@@ -154,6 +162,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Dash,									"Cooldown.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Statue,									"Cooldown.Statue");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Sprint,									"Cooldown.Sprint");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Skill_1,								"Cooldown.Skill.1");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Skill_2,								"Cooldown.Skill.2");
 
 	// GamePhase
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_WaitForPlayers,					    "GamePhase.WaitForPlayers");

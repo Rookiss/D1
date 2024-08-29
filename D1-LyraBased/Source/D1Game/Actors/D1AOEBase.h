@@ -3,7 +3,6 @@
 #include "GameplayEffectTypes.h"
 #include "D1AOEBase.generated.h"
 
-class UGameplayEffect;
 class UBoxComponent;
 class UArrowComponent;
 
@@ -18,9 +17,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:
-	void Init(const FGameplayEffectSpecHandle& InDamageEffectSpecHandle);
-
 private:
 	void BeginAOE();
 	void TickAOE();
@@ -30,24 +26,20 @@ protected:
 	TObjectPtr<UArrowComponent> ArrowComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UBoxComponent> HitBoxComponent;
+	TObjectPtr<UBoxComponent> BoxComponent;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="AOE")
-	FGameplayTag GameplayCueTag;
-	
-	UPROPERTY(EditDefaultsOnly, Category="AOE")
-	int32 TargetAttackCount = 0;
+	TSubclassOf<AActor> AOEElementClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="AOE")
-	float AttackIntervalTime = 0.f;
-
-	UPROPERTY(EditDefaultsOnly, Category="AOE")
-	TSubclassOf<UGameplayEffect> FirstHitGameplayEffectClass;
+	float AttackTotalTime = 10.f;
 	
+	UPROPERTY(EditDefaultsOnly, Category="AOE")
+	int32 TargetAttackCount = 5;
+
 private:
-	int32 CurrAttackCount = 0;
-	TSet<TObjectPtr<AActor>> HitActors;
+	int32 CurrentAttackCount = 0;
+	float AttackIntervalTime = 0.f;
 	FTimerHandle AOETimerHandle;
-	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 };
