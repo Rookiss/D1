@@ -1,44 +1,45 @@
 ﻿#pragma once
 
 #include "D1Define.h"
-#include "GameplayCueInterface.h"
-#include "GameplayCueManager.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "D1AnimNotifyState_WeaponGameplayCue.generated.h"
+#include "D1AnimNotifyState_OverlayEffect.generated.h"
 
-UCLASS(editinlinenew, Const, hideCategories = Object, collapseCategories, MinimalAPI, Meta = (DisplayName = "WeaponGameplayCue (Looping)"))
-class UD1AnimNotifyState_WeaponGameplayCue : public UAnimNotifyState
+UENUM(BlueprintType)
+enum class EOverlayTargetType : uint8
+{
+	None,
+	Weapon,
+	Character,
+	All,
+};
+
+UCLASS(editinlinenew, Const, hideCategories = Object, collapseCategories, MinimalAPI, Meta = (DisplayName = "Weapon Overlay Effect"))
+class UD1AnimNotifyState_OverlayEffect : public UAnimNotifyState
 {
 	GENERATED_BODY()
 	
 public:
-	UD1AnimNotifyState_WeaponGameplayCue();
+	UD1AnimNotifyState_OverlayEffect(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-public:
+protected:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
 	virtual void NotifyTick(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference) override;
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
-
-	FString GetNotifyName_Implementation() const override;
-
-#if WITH_EDITOR
-	virtual bool CanBePlaced(UAnimSequenceBase* Animation) const override;
-#endif // #if WITH_EDITOR
 
 private:
 	USkeletalMeshComponent* GetWeaponMeshComponent(USkeletalMeshComponent* CharacterMeshComponent) const;
 	
 protected:
 	UPROPERTY(EditAnywhere)
+	EOverlayTargetType OverlayTargetType = EOverlayTargetType::None;
+
+	UPROPERTY(EditAnywhere, meta=(EditCondition="OverlayTargetType == EOverlayTargetType::Weapon", EditConditionHides))
 	EWeaponHandType WeaponHandType = EWeaponHandType::LeftHand;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UCurveBase> TimelineCurve;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = GameplayCue, meta = (Categories = "GameplayCue"))
-	FGameplayCueTag GameplayCue;
+	TObjectPtr<UCurveLinearColor> LinearColorCurve;
 
-#if WITH_EDITORONLY_DATA
-	FGameplayCueProxyTick PreviewProxyTick;
-#endif // #if WITH_EDITORONLY_DATA
+private:
+	UPROPERTY()
+	TArray<TObjectPtr<UMaterialInstanceDynamic>> MaterialInstanceDynamics;
 };

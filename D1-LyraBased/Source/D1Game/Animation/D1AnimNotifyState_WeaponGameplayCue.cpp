@@ -9,18 +9,18 @@
 
 typedef void (*GameplayCueFunc)(AActor* Target, const FGameplayTag GameplayCueTag, const FGameplayCueParameters& Parameters);
 
-static void ProcessGameplayCue(GameplayCueFunc Func, USkeletalMeshComponent* MeshComp, FGameplayTag GameplayCue, UAnimSequenceBase* Animation)
+static void ProcessGameplayCue(GameplayCueFunc Func, USkeletalMeshComponent* MeshComponent, FGameplayTag GameplayCue, UAnimSequenceBase* Animation)
 {
-	if (MeshComp && GameplayCue.IsValid())
+	if (MeshComponent && GameplayCue.IsValid())
 	{
-		AActor* OwnerActor = MeshComp->GetOwner();
+		AActor* OwnerActor = MeshComponent->GetOwner();
 
 #if WITH_EDITOR
 		if (GIsEditor && (OwnerActor == nullptr))
 		{
 			// Make preview work in anim preview window
-			UGameplayCueManager::PreviewComponent = MeshComp;
-			UGameplayCueManager::PreviewWorld = MeshComp->GetWorld();
+			UGameplayCueManager::PreviewComponent = MeshComponent;
+			UGameplayCueManager::PreviewWorld = MeshComponent->GetWorld();
 
 			if (UGameplayCueManager* GCM = UAbilitySystemGlobals::Get().GetGameplayCueManager())
 			{
@@ -48,7 +48,7 @@ static void ProcessGameplayCue(GameplayCueFunc Func, USkeletalMeshComponent* Mes
 			Parameters.Instigator = ASC->GetOwner();
 		}
 
-		Parameters.TargetAttachComponent = MeshComp;
+		Parameters.TargetAttachComponent = MeshComponent;
 
 		(*Func)(OwnerActor, GameplayCue, Parameters);
 	}
