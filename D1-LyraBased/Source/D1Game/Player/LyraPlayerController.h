@@ -84,6 +84,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayMontage(FSoftObjectPath InAnimMontagePath, float InPlayRate);
+
+	UFUNCTION(Server, Reliable)
+	void Server_DestroyElectricField();
 	
 	//~AActor interface
 	virtual void PreInitializeComponents() override;

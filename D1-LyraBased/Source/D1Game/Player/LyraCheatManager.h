@@ -115,6 +115,9 @@ public:
 
 	UFUNCTION(Exec)
 	virtual void PlaySelectedAnimation();
+
+	UFUNCTION(Exec)
+	virtual void DestroyElectricField();
 	
 protected:
 	virtual void EnableDebugCamera() override;

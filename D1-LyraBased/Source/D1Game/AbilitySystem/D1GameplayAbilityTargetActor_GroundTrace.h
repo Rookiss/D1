@@ -4,8 +4,7 @@
 #include "D1GameplayAbilityTargetActor_GroundTrace.generated.h"
 
 // TODO: 엔진 소스 빌드를 사용하여 AGameplayAbilityTargetActor_GroundTrace를 상속 받아서 오버라이딩 할 수 있으면 좋을듯
-// TODO: 팀원들의 컴퓨터에서 직접 빌드를 하는게 아니라 엔진과 게임을 내 컴퓨터에서만 빌드하고 DLL 파일을 공유하는 방식으로 하면 되지 않을까?
-
+// TODO: 팀원들의 컴퓨터에서 직접 빌드를 하는게 아니라 엔진과 게임을 내 컴퓨터에서만 빌드하고 DLL과 같은 빌드 파일들을 공유하는 방식으로 하면 되지 않을까?
 UCLASS(Blueprintable)
 class AD1GameplayAbilityTargetActor_GroundTrace : public AGameplayAbilityTargetActor_Trace
 {

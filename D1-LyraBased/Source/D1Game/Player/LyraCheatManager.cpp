@@ -585,3 +585,11 @@ void ULyraCheatManager::PlaySelectedAnimation()
 		LyraPC->Server_PlayMontage(SelectedMontage.ToSoftObjectPath(), CurrentAnimationSpeed);
 	}
 }
+
+void ULyraCheatManager::DestroyElectricField()
+{
+	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
+	{
+		LyraPC->Server_DestroyElectricField();
+	}
+}

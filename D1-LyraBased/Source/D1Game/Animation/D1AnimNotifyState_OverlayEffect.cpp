@@ -4,62 +4,130 @@
 #include "Character/LyraCharacter.h"
 #include "Components/TimelineComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
+#include "Kismet/KismetMaterialLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AnimNotifyState_OverlayEffect)
 
 UD1AnimNotifyState_OverlayEffect::UD1AnimNotifyState_OverlayEffect(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	// TimelineComponent = CreateDefaultSubobject<UTimelineComponent>("TimelineComponent");
+#if WITH_EDITORONLY_DATA
+	bShouldFireInEditor = false;
+#endif
 }
 
 void UD1AnimNotifyState_OverlayEffect::NotifyBegin(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
+	Super::NotifyBegin(MeshComponent, Animation, TotalDuration, EventReference);
+	
 	if (OverlayTargetType == EOverlayTargetType::None)
 		return;
-	
-	Super::NotifyBegin(MeshComponent, Animation, TotalDuration, EventReference);
+                                      	
+	OverlayMaterialInstance = UKismetMaterialLibrary::CreateDynamicMaterialInstance(MeshComponent, OverlayMaterial, NAME_None, EMIDCreationFlags::Transient);
+
+	CachedMeshComponents.Reset();
 	
 	switch (OverlayTargetType)
 	{
 	case EOverlayTargetType::Weapon:
-		if (USkeletalMeshComponent* WeaponMeshComponent = GetWeaponMeshComponent(MeshComponent))
-		{
-			// WeaponMeshComponent->SetOverlayMaterial();
-		}
-		
+		ApplyWeaponMeshComponent(MeshComponent);
 		break;
+                                      		
 	case EOverlayTargetType::Character:
+		ApplyCharacterMeshComponents(MeshComponent);
 		break;
+                                      		
 	case EOverlayTargetType::All:
+		ApplyAllWeaponMeshComponents(MeshComponent);
+		ApplyCharacterMeshComponents(MeshComponent);
 		break;
 	}
+                                      
+	// OnTimelineCallback.BindDynamic(this, &UD1AnimNotifyState_OverlayEffect::TimelineCallback);
+	// OnTimelineFinishedCallback.BindUObject(this, &UD1AnimNotifyState_OverlayEffect::TimelineFinishedCallback);
+	//
+	// TimelineComponent->AddInterpLinearColor(LinearColorCurve, OnTimelineCallback);
+	// TimelineComponent->SetTimelineFinishedFunc(OnTimelineFinishedCallback);
+	// TimelineComponent->SetLooping(false);
+	// // TimelineComponent->SetTimelineLength(5.f);
+	// TimelineComponent->PlayFromStart();
 }
 
 void UD1AnimNotifyState_OverlayEffect::NotifyTick(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyTick(MeshComponent, Animation, FrameDeltaTime, EventReference);
+
+	if (OverlayMaterialInstance)
+	{
+		// OverlayMaterialInstance->SetVectorParameterValue(ParameterName, Value);
+	}
 }
 
 void UD1AnimNotifyState_OverlayEffect::NotifyEnd(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
+	for (TWeakObjectPtr<UMeshComponent> CachedMeshComponent : CachedMeshComponents)
+	{
+		if (CachedMeshComponent.IsValid())
+		{
+			if (CachedMeshComponent->GetOverlayMaterial() == OverlayMaterialInstance)
+			{
+				CachedMeshComponent->SetOverlayMaterial(nullptr);
+			}
+		}
+	}
+	
 	Super::NotifyEnd(MeshComponent, Animation, EventReference);
 }
 
-USkeletalMeshComponent* UD1AnimNotifyState_OverlayEffect::GetWeaponMeshComponent(USkeletalMeshComponent* CharacterMeshComponent) const
+void UD1AnimNotifyState_OverlayEffect::ApplyWeaponMeshComponent(USkeletalMeshComponent* MeshComponent)
 {
-	USkeletalMeshComponent* WeaponMeshComponent = nullptr;
+	if (WeaponHandType == EWeaponHandType::Count)
+		return;
 	
-	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(CharacterMeshComponent->GetOwner()))
+	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(MeshComponent->GetOwner()))
 	{
 		if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
 		{
 			if (AD1WeaponBase* WeaponActor = EquipManager->GetEquippedActor(WeaponHandType))
 			{
-				WeaponMeshComponent = WeaponActor->WeaponMeshComponent;
+				USkeletalMeshComponent* WeaponMeshComponent = WeaponActor->WeaponMeshComponent;
+				WeaponMeshComponent->SetOverlayMaterial(OverlayMaterialInstance);
+				CachedMeshComponents.Add(WeaponMeshComponent);
 			}
 		}
 	}
+}
 
-	return WeaponMeshComponent;
+void UD1AnimNotifyState_OverlayEffect::ApplyAllWeaponMeshComponents(USkeletalMeshComponent* MeshComponent)
+{
+	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(MeshComponent->GetOwner()))
+	{
+		if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
+		{
+			TArray<AD1WeaponBase*> WeaponActors;
+			EquipManager->GetAllEquippedActors(WeaponActors);
+
+			for (AD1WeaponBase* WeaponActor : WeaponActors)
+			{
+				USkeletalMeshComponent* WeaponMeshComponent = WeaponActor->WeaponMeshComponent;
+				WeaponMeshComponent->SetOverlayMaterial(OverlayMaterialInstance);
+				CachedMeshComponents.Add(WeaponMeshComponent);
+			}
+		}
+	}
+}
+
+void UD1AnimNotifyState_OverlayEffect::ApplyCharacterMeshComponents(USkeletalMeshComponent* MeshComponent)
+{
+	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(MeshComponent->GetOwner()))
+	{
+		TArray<UMeshComponent*> CharacterMeshComponents;
+		LyraCharacter->GetMeshComponents(CharacterMeshComponents);
+
+		for (UMeshComponent* CharacterMeshComponent : CharacterMeshComponents)
+		{
+			CharacterMeshComponent->SetOverlayMaterial(OverlayMaterialInstance);
+			CachedMeshComponents.Add(CharacterMeshComponent);
+		}
+	}
 }

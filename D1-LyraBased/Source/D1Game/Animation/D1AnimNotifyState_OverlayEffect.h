@@ -2,7 +2,10 @@
 
 #include "D1Define.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
+#include "Components/TimelineComponent.h"
 #include "D1AnimNotifyState_OverlayEffect.generated.h"
+
+class UTimelineComponent;
 
 UENUM(BlueprintType)
 enum class EOverlayTargetType : uint8
@@ -27,7 +30,9 @@ protected:
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 
 private:
-	USkeletalMeshComponent* GetWeaponMeshComponent(USkeletalMeshComponent* CharacterMeshComponent) const;
+	void ApplyWeaponMeshComponent(USkeletalMeshComponent* MeshComponent);
+	void ApplyAllWeaponMeshComponents(USkeletalMeshComponent* MeshComponent);
+	void ApplyCharacterMeshComponents(USkeletalMeshComponent* MeshComponent);
 	
 protected:
 	UPROPERTY(EditAnywhere)
@@ -39,7 +44,22 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UCurveLinearColor> LinearColorCurve;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> OverlayMaterial;
+
+	UPROPERTY(EditAnywhere)
+	FName ParameterName = "Color";
+	
 private:
 	UPROPERTY()
-	TArray<TObjectPtr<UMaterialInstanceDynamic>> MaterialInstanceDynamics;
+	TObjectPtr<UMaterialInstanceDynamic> OverlayMaterialInstance;
+
+	UPROPERTY()
+	TArray<TWeakObjectPtr<UMeshComponent>> CachedMeshComponents;
+
+	UPROPERTY()
+	TObjectPtr<UTimelineComponent> TimelineComponent;
+
+	FOnTimelineLinearColor OnTimelineCallback;
+	FOnTimelineEventStatic OnTimelineFinishedCallback;
 };

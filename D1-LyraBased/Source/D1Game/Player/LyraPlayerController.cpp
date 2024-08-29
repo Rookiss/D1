@@ -23,8 +23,10 @@
 #include "ReplaySubsystem.h"
 #include "Development/LyraDeveloperSettings.h"
 #include "GameMapsSettings.h"
+#include "Actors/D1ElectricField.h"
 #include "Character/LyraCharacter.h"
 #include "Item/D1ItemTemplate.h"
+#include "Kismet/GameplayStatics.h"
 #include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraPlayerController)
@@ -387,6 +389,16 @@ void ALyraPlayerController::Multicast_PlayMontage_Implementation(FSoftObjectPath
 				AnimInstance->Montage_Play(Cast<UAnimMontage>(InAnimMontagePath.TryLoad()), InPlayRate);
 			}
 		}
+	}
+#endif // #if USING_CHEAT_MANAGER
+}
+
+void ALyraPlayerController::Server_DestroyElectricField_Implementation()
+{
+#if USING_CHEAT_MANAGER
+	if (AActor* ElectricFieldActor = UGameplayStatics::GetActorOfClass(GetWorld(), AD1ElectricField::StaticClass()))
+	{
+		ElectricFieldActor->Destroy();
 	}
 #endif // #if USING_CHEAT_MANAGER
 }

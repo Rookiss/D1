@@ -21,7 +21,6 @@
 #include "ToolMenus.h"
 #include "UObject/UObjectIterator.h"
 #include "UnrealEdGlobals.h"
-#include "Utilities/D1CustomCommands.h"
 #include "Validation/EditorValidator.h"
 
 class SWidget;
@@ -232,8 +231,6 @@ class FD1EditorModule : public FDefaultGameModuleImpl
 			LyraContextEffectsLibraryAssetAction = AssetAction;
 			AssetTools.RegisterAssetTypeActions(AssetAction);
 		}
-
-		FD1CustomCommands::Register();
 	}
 
 	void OnBeginPIE(bool bIsSimulating)
@@ -271,8 +268,6 @@ class FD1EditorModule : public FDefaultGameModuleImpl
 		UnbindGameplayAbilitiesEditorDelegates();
 		FModuleManager::Get().OnModulesChanged().RemoveAll(this);
 		FGameEditorStyle::Shutdown();
-
-		FD1CustomCommands::Unregister();
 	}
 
 protected:
