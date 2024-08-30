@@ -2,10 +2,7 @@
 
 #include "D1Define.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "Components/TimelineComponent.h"
 #include "D1AnimNotifyState_OverlayEffect.generated.h"
-
-class UTimelineComponent;
 
 UENUM(BlueprintType)
 enum class EOverlayTargetType : uint8
@@ -57,9 +54,5 @@ private:
 	UPROPERTY()
 	TArray<TWeakObjectPtr<UMeshComponent>> CachedMeshComponents;
 
-	UPROPERTY()
-	TObjectPtr<UTimelineComponent> TimelineComponent;
-
-	FOnTimelineLinearColor OnTimelineCallback;
-	FOnTimelineEventStatic OnTimelineFinishedCallback;
+	float PassedTime = 0.f;
 };

@@ -71,9 +71,6 @@ void AD1ProjectileBase::Init(const FGameplayEffectSpecHandle& InDamageEffectSpec
 
 void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& HitResult)
 {
-	if (GetOwner() == OtherActor || GetOwner() == OtherComponent->GetOwner() || GetInstigator() == OtherActor)
-		return;
-	
 	if (bHit == false)
 	{
 		bHit = true;
@@ -139,17 +136,20 @@ void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AA
 				SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
 			}
 
-			if (TargetASC && bIsBlockHit == false && DamageEffectSpecHandle.Data.IsValid())
+			if (GetOwner() != OtherActor && GetOwner() != OtherComponent->GetOwner() && GetInstigator() != OtherActor)
 			{
-				FHitResult HitResultCopy = HitResult;
+				if (TargetASC && bIsBlockHit == false && DamageEffectSpecHandle.Data.IsValid())
+				{
+					FHitResult HitResultCopy = HitResult;
 					
-				FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
-				HitResultCopy.bBlockingHit = bIsBlockHit;
-				EffectContextHandle.AddHitResult(HitResultCopy);
-				EffectContextHandle.AddInstigator(GetInstigator(), this);
-				DamageEffectSpecHandle.Data->SetContext(EffectContextHandle);
+					FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
+					HitResultCopy.bBlockingHit = bIsBlockHit;
+					EffectContextHandle.AddHitResult(HitResultCopy);
+					EffectContextHandle.AddInstigator(GetInstigator(), this);
+					DamageEffectSpecHandle.Data->SetContext(EffectContextHandle);
 					
-				TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+					TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+				}
 			}
 		}
 	}

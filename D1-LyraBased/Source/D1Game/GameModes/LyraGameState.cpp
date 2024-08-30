@@ -76,6 +76,10 @@ void ALyraGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(ThisClass, ServerFPS);
 	DOREPLIFETIME_CONDITION(ThisClass, RecorderPlayerState, COND_ReplayOnly);
+	
+	DOREPLIFETIME(ThisClass, TargetPhaseRadius);
+	DOREPLIFETIME(ThisClass, TargetPhasePosition);
+	DOREPLIFETIME(ThisClass, bShouldShow);
 }
 
 void ALyraGameState::Tick(float DeltaSeconds)

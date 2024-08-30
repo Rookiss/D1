@@ -8,9 +8,9 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Image.h"
 #include "GameFramework/GameStateBase.h"
+#include "GameModes/LyraGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/LyraPlayerController.h"
-#include "System/D1ElectricFieldManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1WorldMapWidget)
 
@@ -95,9 +95,9 @@ void UD1WorldMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 		FVector2D InitialSize = FVector2D(WorldLengthToInitialWidgetLength(ElectricFieldActor->GetActorScale3D().X * 50.f * 2.f));
 		CurrCircleSlot->SetSize(InitialSize * GetCurrentWorldMapZoom());
 
-		if (UD1ElectricFieldManagerComponent* ElectricFieldManager = UGameplayStatics::GetGameState(GetOwningPlayer())->GetComponentByClass<UD1ElectricFieldManagerComponent>())
+		if (ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(GetOwningPlayer())))
 		{
-			if (ElectricFieldManager->bShouldShow)
+			if (LyraGameState->bShouldShow)
 			{
 				TargetCircleWidget->SetVisibility(ESlateVisibility::Visible);
 			}
@@ -106,10 +106,10 @@ void UD1WorldMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 				TargetCircleWidget->SetVisibility(ESlateVisibility::Hidden);
 			}
 			
-			InitialPos = WorldPosToInitialWidgetPos(ElectricFieldManager->TargetPhasePosition);
+			InitialPos = WorldPosToInitialWidgetPos(LyraGameState->TargetPhasePosition);
 			TargetCircleSlot->SetPosition(InitialPos * GetCurrentWorldMapZoom());
 			
-			InitialSize = InitialSize = FVector2D(WorldLengthToInitialWidgetLength(ElectricFieldManager->TargetPhaseRadius * 2.f));
+			InitialSize = InitialSize = FVector2D(WorldLengthToInitialWidgetLength(LyraGameState->TargetPhaseRadius * 2.f));
 			TargetCircleSlot->SetSize(InitialSize * GetCurrentWorldMapZoom());
 		}
 	}

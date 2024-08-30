@@ -372,22 +372,9 @@ void ALyraPlayerController::Server_PlayMontage_Implementation(FSoftObjectPath In
 #if USING_CHEAT_MANAGER
 	if (InAnimMontagePath.IsNull() == false)
 	{
-		Multicast_PlayMontage(InAnimMontagePath, InPlayRate);
-	}
-#endif // #if USING_CHEAT_MANAGER
-}
-
-void ALyraPlayerController::Multicast_PlayMontage_Implementation(FSoftObjectPath InAnimMontagePath, float InPlayRate)
-{
-#if USING_CHEAT_MANAGER
-	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetPawn()))
-	{
-		if (USkeletalMeshComponent* MeshComponent = LyraCharacter->GetMesh())
+		if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetPawn()))
 		{
-			if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
-			{
-				AnimInstance->Montage_Play(Cast<UAnimMontage>(InAnimMontagePath.TryLoad()), InPlayRate);
-			}
+			LyraCharacter->Multicast_PlayMontage(InAnimMontagePath, InPlayRate);
 		}
 	}
 #endif // #if USING_CHEAT_MANAGER

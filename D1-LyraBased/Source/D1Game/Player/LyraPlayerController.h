@@ -81,10 +81,7 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Server_PlayMontage(FSoftObjectPath InAnimMontagePath, float InPlayRate);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_PlayMontage(FSoftObjectPath InAnimMontagePath, float InPlayRate);
-
+	
 	UFUNCTION(Server, Reliable)
 	void Server_DestroyElectricField();
 	
