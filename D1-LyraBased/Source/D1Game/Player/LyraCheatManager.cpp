@@ -353,7 +353,7 @@ void ULyraCheatManager::ApplySetByCallerHeal(ULyraAbilitySystemComponent* LyraAS
 
 	if (SpecHandle.IsValid())
 	{
-		SpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_IncomingHeal, HealAmount);
+		SpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_IncomingHealth, HealAmount);
 		LyraASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	}
 }

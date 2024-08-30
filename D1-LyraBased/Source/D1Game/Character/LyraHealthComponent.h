@@ -9,7 +9,7 @@
 class ULyraHealthComponent;
 
 class ULyraAbilitySystemComponent;
-class ULyraHealthSet;
+class UD1VitalSet;
 class UObject;
 struct FFrame;
 struct FGameplayEffectSpec;
@@ -119,7 +119,7 @@ protected:
 
 	// Health set used by this component.
 	UPROPERTY()
-	TObjectPtr<const ULyraHealthSet> HealthSet;
+	TObjectPtr<const UD1VitalSet> HealthSet;
 
 	// Replicated state used to handle dying.
 	UPROPERTY(ReplicatedUsing = OnRep_DeathState)

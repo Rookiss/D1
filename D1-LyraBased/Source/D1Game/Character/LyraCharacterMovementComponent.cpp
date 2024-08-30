@@ -5,7 +5,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "D1GameplayTags.h"
-#include "AbilitySystem/Attributes/LyraCombatSet.h"
+#include "AbilitySystem/Attributes/D1CombatSet.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
@@ -127,8 +127,8 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 		if (ASC->HasMatchingGameplayTag(TAG_Gameplay_MovementStopped))
 			return 0;
 		
-		const UAttributeSet* AttributeSet = ASC->GetAttributeSet(ULyraCombatSet::StaticClass());
-		if (const ULyraCombatSet* CombatSet = Cast<ULyraCombatSet>(AttributeSet))
+		const UAttributeSet* AttributeSet = ASC->GetAttributeSet(UD1CombatSet::StaticClass());
+		if (const UD1CombatSet* CombatSet = Cast<UD1CombatSet>(AttributeSet))
 		{
 			float MoveSpeed = CombatSet->GetMoveSpeed();
 			float Agility = CombatSet->GetAgility();

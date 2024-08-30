@@ -131,9 +131,14 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Message_HUD_Spell_Progress_Refresh,				"Message.HUD.Spell.Progress.Refresh");
 
 	// SetByCaller
-	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingHeal,						"SetByCaller.IncomingHeal");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_BaseDamage,							"SetByCaller.BaseDamage");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_BaseHealth,							"SetByCaller.BaseHealth");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_BaseMana,							"SetByCaller.BaseMana");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_BaseStamina,							"SetByCaller.BaseStamina");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingDamage,						"SetByCaller.IncomingDamage");
-	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_PhysicalWeaponDamage,				"SetByCaller.PhysicalWeaponDamage");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingHealth,						"SetByCaller.IncomingHealth");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingMana,						"SetByCaller.IncomingMana");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_IncomingStamina,						"SetByCaller.IncomingStamina");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_MoveSpeed,							"SetByCaller.MoveSpeed");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_MoveSpeedPercent,					"SetByCaller.MoveSpeedPercent");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Strength,						    "SetByCaller.Strength");

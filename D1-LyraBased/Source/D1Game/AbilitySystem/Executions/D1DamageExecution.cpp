@@ -1,20 +1,20 @@
-#include "LyraDamageExecution.h"
+#include "D1DamageExecution.h"
 
-#include "AbilitySystem/Attributes/LyraHealthSet.h"
-#include "AbilitySystem/Attributes/LyraCombatSet.h"
+#include "AbilitySystem/Attributes/D1VitalSet.h"
+#include "AbilitySystem/Attributes/D1CombatSet.h"
 #include "AbilitySystem/LyraGameplayEffectContext.h"
 #include "Teams/LyraTeamSubsystem.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(LyraDamageExecution)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1DamageExecution)
 
 struct FDamageStatics
 {
 public:
 	FDamageStatics()
 	{
-		BaseDamageDef = FGameplayEffectAttributeCaptureDefinition(ULyraCombatSet::GetBaseDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
-		StrengthDef = FGameplayEffectAttributeCaptureDefinition(ULyraCombatSet::GetStrengthAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
-		DefenseDef = FGameplayEffectAttributeCaptureDefinition(ULyraCombatSet::GetDefenseAttribute(), EGameplayEffectAttributeCaptureSource::Target, true);
+		BaseDamageDef = FGameplayEffectAttributeCaptureDefinition(UD1CombatSet::GetBaseDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		StrengthDef = FGameplayEffectAttributeCaptureDefinition(UD1CombatSet::GetStrengthAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		DefenseDef = FGameplayEffectAttributeCaptureDefinition(UD1CombatSet::GetDefenseAttribute(), EGameplayEffectAttributeCaptureSource::Target, true);
 	}
 
 public:
@@ -29,14 +29,14 @@ static FDamageStatics& DamageStatics()
 	return Statics;
 }
 
-ULyraDamageExecution::ULyraDamageExecution()
+UD1DamageExecution::UD1DamageExecution()
 {
 	RelevantAttributesToCapture.Add(DamageStatics().BaseDamageDef);
 	RelevantAttributesToCapture.Add(DamageStatics().StrengthDef);
 	RelevantAttributesToCapture.Add(DamageStatics().DefenseDef);
 }
 
-void ULyraDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+void UD1DamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
 #if WITH_SERVER_CODE
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
@@ -63,7 +63,7 @@ void ULyraDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 
 	if (DamageDone > 0.0f)
 	{
-		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(ULyraHealthSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, DamageDone));
+		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UD1VitalSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, DamageDone));
 	}
 #endif // WITH_SERVER_CODE
 }

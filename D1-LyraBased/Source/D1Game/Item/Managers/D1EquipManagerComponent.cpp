@@ -12,7 +12,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Actors/D1WeaponBase.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
-#include "AbilitySystem/Attributes/LyraCombatSet.h"
+#include "AbilitySystem/Attributes/D1CombatSet.h"
 #include "Character/LyraCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/LyraPlayerController.h"

@@ -1,15 +1,16 @@
 #pragma once
 
 #include "GameplayEffectExecutionCalculation.h"
-#include "LyraHealExecution.generated.h"
+#include "D1DamageExecution.generated.h"
 
 UCLASS()
-class ULyraHealExecution : public UGameplayEffectExecutionCalculation
+class UD1DamageExecution : public UGameplayEffectExecutionCalculation
 {
 	GENERATED_BODY()
 
 public:
-	ULyraHealExecution();
+
+	UD1DamageExecution();
 
 protected:
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;

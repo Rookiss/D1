@@ -3,7 +3,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "D1InteractionInfo.h"
 #include "D1InteractionQuery.h"
-#include "AbilitySystem/Attributes/LyraCombatSet.h"
+#include "AbilitySystem/Attributes/D1CombatSet.h"
 #include "UObject/Interface.h"
 #include "D1Interactable.generated.h"
 
@@ -49,7 +49,7 @@ public:
 	
 		if (UAbilitySystemComponent* AbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InteractionQuery.RequestingAvatar.Get()))
 		{
-			float Resourcefulness = AbilitySystem->GetNumericAttribute(ULyraCombatSet::GetResourcefulnessAttribute());
+			float Resourcefulness = AbilitySystem->GetNumericAttribute(UD1CombatSet::GetResourcefulnessAttribute());
 			InteractionInfo.Duration = FMath::Max<float>(0.f, InteractionInfo.Duration - Resourcefulness * 0.01f);
 		}
 	

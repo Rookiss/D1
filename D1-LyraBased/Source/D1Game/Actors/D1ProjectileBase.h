@@ -1,8 +1,9 @@
 ﻿#pragma once
+#include "GameplayTagContainer.h"
 
-#include "GameplayEffectTypes.h"
 #include "D1ProjectileBase.generated.h"
 
+class UGameplayEffect;
 class UNiagaraComponent;
 class UNiagaraSystem;
 class USphereComponent;
@@ -16,20 +17,33 @@ class AD1ProjectileBase : public AActor
 public:
 	AD1ProjectileBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-private:
+protected:
 	virtual void BeginPlay() override;
 	virtual void Destroyed() override;
 
-public:
+protected:
 	UFUNCTION(BlueprintCallable)
-	void Init(const FGameplayEffectSpecHandle& InDamageEffectSpecHandle);
-
+	void SetSpeed(float Speed);
+	
 private:
 	UFUNCTION()
 	void HandleComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& HitResult);
 
 	UFUNCTION()
 	void HandleOtherComponentDeactivated(UActorComponent* OtherComponent);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Damage = 0.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="GameplayCue"))
+	FGameplayTag HitGameplayCueTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UNiagaraSystem> HitEffect;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bAttachToHitComponent = false;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -46,7 +60,6 @@ protected:
 
 private:
 	bool bHit = false;
-	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 
 	UPROPERTY()
 	TWeakObjectPtr<UActorComponent> OtherHitComponent;

@@ -62,13 +62,5 @@ void UD1GameplayAbility_Weapon_Projectile::SpawnProjectile()
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 	);
 	
-	FGameplayEffectContextHandle EffectContextHandle = ASC->MakeEffectContext();
-	EffectContextHandle.SetAbility(this);
-	EffectContextHandle.AddSourceObject(Projectile);
-
-	const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
-	const FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
-	
-	Projectile->Init(EffectSpecHandle);
 	Projectile->FinishSpawning(SpawnTransform);
 }
