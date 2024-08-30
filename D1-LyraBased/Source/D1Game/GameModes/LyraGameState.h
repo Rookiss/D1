@@ -91,4 +91,14 @@ protected:
 
 	UFUNCTION()
 	void OnRep_RecorderPlayerState();
+
+public:
+	UPROPERTY(Replicated)
+	bool bShouldShow = false;
+	
+	UPROPERTY(Replicated)
+	float TargetPhaseRadius = 0.f;
+	
+	UPROPERTY(Replicated)
+	FVector TargetPhasePosition = FVector::ZeroVector;
 };

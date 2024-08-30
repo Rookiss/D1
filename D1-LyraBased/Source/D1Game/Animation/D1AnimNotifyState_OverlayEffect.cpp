@@ -3,6 +3,7 @@
 #include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
 #include "Components/TimelineComponent.h"
+#include "Curves/CurveLinearColor.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Kismet/KismetMaterialLibrary.h"
 
@@ -24,8 +25,6 @@ void UD1AnimNotifyState_OverlayEffect::NotifyBegin(USkeletalMeshComponent* MeshC
 		return;
                                       	
 	OverlayMaterialInstance = UKismetMaterialLibrary::CreateDynamicMaterialInstance(MeshComponent, OverlayMaterial, NAME_None, EMIDCreationFlags::Transient);
-
-	CachedMeshComponents.Reset();
 	
 	switch (OverlayTargetType)
 	{
@@ -42,15 +41,6 @@ void UD1AnimNotifyState_OverlayEffect::NotifyBegin(USkeletalMeshComponent* MeshC
 		ApplyCharacterMeshComponents(MeshComponent);
 		break;
 	}
-                                      
-	// OnTimelineCallback.BindDynamic(this, &UD1AnimNotifyState_OverlayEffect::TimelineCallback);
-	// OnTimelineFinishedCallback.BindUObject(this, &UD1AnimNotifyState_OverlayEffect::TimelineFinishedCallback);
-	//
-	// TimelineComponent->AddInterpLinearColor(LinearColorCurve, OnTimelineCallback);
-	// TimelineComponent->SetTimelineFinishedFunc(OnTimelineFinishedCallback);
-	// TimelineComponent->SetLooping(false);
-	// // TimelineComponent->SetTimelineLength(5.f);
-	// TimelineComponent->PlayFromStart();
 }
 
 void UD1AnimNotifyState_OverlayEffect::NotifyTick(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
@@ -59,6 +49,8 @@ void UD1AnimNotifyState_OverlayEffect::NotifyTick(USkeletalMeshComponent* MeshCo
 
 	if (OverlayMaterialInstance)
 	{
+		PassedTime += FrameDeltaTime;
+		const FLinearColor& Value = LinearColorCurve->GetLinearColorValue(PassedTime / Animation->RateScale);
 		// OverlayMaterialInstance->SetVectorParameterValue(ParameterName, Value);
 	}
 }
@@ -69,10 +61,7 @@ void UD1AnimNotifyState_OverlayEffect::NotifyEnd(USkeletalMeshComponent* MeshCom
 	{
 		if (CachedMeshComponent.IsValid())
 		{
-			if (CachedMeshComponent->GetOverlayMaterial() == OverlayMaterialInstance)
-			{
-				CachedMeshComponent->SetOverlayMaterial(nullptr);
-			}
+			CachedMeshComponent->SetOverlayMaterial(nullptr);
 		}
 	}
 	

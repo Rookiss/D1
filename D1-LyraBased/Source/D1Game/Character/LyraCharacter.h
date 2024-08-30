@@ -229,6 +229,10 @@ private:
 
 	UFUNCTION()
 	void OnRep_MyTeamID(FGenericTeamId OldTeamID);
+
+public:
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayMontage(FSoftObjectPath InAnimMontagePath, float InPlayRate);
 	
 public:
 	virtual FD1InteractionInfo GetPreInteractionInfo(const FD1InteractionQuery& InteractionQuery) const override;

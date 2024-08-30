@@ -5,8 +5,8 @@
 #include "LyraAssetManager.h"
 #include "Character/LyraCharacter.h"
 #include "Data/D1ElectricFieldPhaseData.h"
+#include "GameModes/LyraGameState.h"
 #include "Messages/LyraVerbMessage.h"
-#include "Net/UnrealNetwork.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ElectricFieldManagerComponent)
 
@@ -24,13 +24,17 @@ void UD1ElectricFieldManagerComponent::Initialize()
 	TSubclassOf<AD1ElectricField> ElectricFieldClass = ULyraAssetManager::Get().GetSubclassByName<AD1ElectricField>("ElectricFieldClass");
 	check(ElectricFieldClass);
 
+	ALyraGameState* LyraGameState = GetGameState<ALyraGameState>();
+	if (LyraGameState == nullptr)
+		return;
+
 	ElectricFieldActor = GetWorld()->SpawnActor<AD1ElectricField>(ElectricFieldClass);
-	StartPhasePosition = TargetPhasePosition = FVector(0.f, 0.f, -50.f * ElectricFieldActor->GetActorScale3D().Z);
+	StartPhasePosition = LyraGameState->TargetPhasePosition = FVector(0.f, 0.f, -50.f * ElectricFieldActor->GetActorScale3D().Z);
 	ElectricFieldActor->SetActorLocation(StartPhasePosition);
 
 	const UD1ElectricFieldPhaseData& PhaseData = ULyraAssetManager::Get().GetElectricFieldPhaseData();
 	FD1ElectricFieldPhaseEntry PhaseEntry = PhaseData.GetPhaseEntry(CurrentPhaseIndex);
-	StartPhaseRadius = TargetPhaseRadius = PhaseEntry.TargetRadius;
+	StartPhaseRadius = LyraGameState->TargetPhaseRadius = PhaseEntry.TargetRadius;
 
 	float Scale = StartPhaseRadius / 50.f;
 	ElectricFieldActor->SetActorScale3D(FVector(Scale, Scale, ElectricFieldActor->GetActorScale3D().Z));
@@ -39,21 +43,16 @@ void UD1ElectricFieldManagerComponent::Initialize()
 #endif
 }
 
-void UD1ElectricFieldManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ThisClass, TargetPhaseRadius);
-	DOREPLIFETIME(ThisClass, TargetPhasePosition);
-	DOREPLIFETIME(ThisClass, bShouldShow);
-}
-
 void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 #if WITH_SERVER_CODE
-	if (ElectricFieldActor == nullptr)
+	if (IsValid(ElectricFieldActor) == false)
+		return;
+	
+	ALyraGameState* LyraGameState = GetGameState<ALyraGameState>();
+	if (LyraGameState == nullptr)
 		return;
 	
 	if (CurrentPhaseState == ED1ElectricFieldState::Break)
@@ -66,7 +65,7 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 	}
 	else if (CurrentPhaseState == ED1ElectricFieldState::Notice)
 	{
-		bShouldShow = true;
+		LyraGameState->bShouldShow = true;
 		CurrentPhaseEntry.NoticeTime -= DeltaTime;
 		if (CurrentPhaseEntry.NoticeTime < 0.f)
 		{
@@ -81,16 +80,16 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 		{
 			float Alpha = 1.f - (CurrentPhaseEntry.ShrinkTime / CachedPhaseEntry.ShrinkTime);
 			
-			FVector Position = FMath::Lerp(StartPhasePosition, TargetPhasePosition, Alpha);
+			FVector Position = FMath::Lerp(StartPhasePosition, LyraGameState->TargetPhasePosition, Alpha);
 			ElectricFieldActor->SetActorLocation(Position);
 
-			float Radius = FMath::Lerp(StartPhaseRadius, TargetPhaseRadius, Alpha);
+			float Radius = FMath::Lerp(StartPhaseRadius, LyraGameState->TargetPhaseRadius, Alpha);
 			float Scale = Radius / 50.f;
 			ElectricFieldActor->SetActorScale3D(FVector(Scale, Scale, ElectricFieldActor->GetActorScale3D().Z));
 		}
 		else
 		{
-			bShouldShow = false;
+			LyraGameState->bShouldShow = false;
 			if (SetupNextElectricFieldPhase())
 			{
 				CurrentPhaseState = ED1ElectricFieldState::Break;
@@ -146,6 +145,10 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 bool UD1ElectricFieldManagerComponent::SetupNextElectricFieldPhase()
 {
 #if WITH_SERVER_CODE
+	ALyraGameState* LyraGameState = GetGameState<ALyraGameState>();
+	if (LyraGameState == nullptr)
+		return false;
+	
 	CurrentPhaseIndex++;
 	
 	const UD1ElectricFieldPhaseData& ElectricFieldPhaseData = ULyraAssetManager::Get().GetElectricFieldPhaseData();
@@ -154,19 +157,19 @@ bool UD1ElectricFieldManagerComponent::SetupNextElectricFieldPhase()
 
 	CachedPhaseEntry = CurrentPhaseEntry = ElectricFieldPhaseData.GetPhaseEntry(CurrentPhaseIndex);
 
-	StartPhaseRadius = TargetPhaseRadius;
-	TargetPhaseRadius = CachedPhaseEntry.TargetRadius;
+	StartPhaseRadius = LyraGameState->TargetPhaseRadius;
+	LyraGameState->TargetPhaseRadius = CachedPhaseEntry.TargetRadius;
 
 	if (CurrentPhaseIndex > 1)
 	{
 		FVector RandDirection = FMath::VRand();
 		RandDirection = FVector(RandDirection.X, RandDirection.Y, 0.f).GetSafeNormal();
 	
-		float MaxLength = TargetPhaseRadius - StartPhaseRadius;
+		float MaxLength = LyraGameState->TargetPhaseRadius - StartPhaseRadius;
 		float RandLength = FMath::RandRange(0.f, MaxLength);
 
-		StartPhasePosition = TargetPhasePosition;
-		TargetPhasePosition = StartPhasePosition + (RandDirection * RandLength);
+		StartPhasePosition = LyraGameState->TargetPhasePosition;
+		LyraGameState->TargetPhasePosition = StartPhasePosition + (RandDirection * RandLength);
 	}
 #endif
 	

@@ -536,6 +536,17 @@ void ALyraCharacter::OnRep_MyTeamID(FGenericTeamId OldTeamID)
 	ConditionalBroadcastTeamChanged(this, OldTeamID, MyTeamID);
 }
 
+void ALyraCharacter::Multicast_PlayMontage_Implementation(FSoftObjectPath InAnimMontagePath, float InPlayRate)
+{
+	if (USkeletalMeshComponent* MeshComponent = GetMesh())
+	{
+		if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
+		{
+			AnimInstance->Montage_Play(Cast<UAnimMontage>(InAnimMontagePath.TryLoad()), InPlayRate);
+		}
+	}
+}
+
 bool ALyraCharacter::UpdateSharedReplication()
 {
 	if (GetLocalRole() == ROLE_Authority)
