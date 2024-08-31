@@ -3,7 +3,7 @@
 #include "GameplayEffectTypes.h"
 #include "D1AOEBase.generated.h"
 
-class UBoxComponent;
+class USphereComponent;
 class UArrowComponent;
 
 UCLASS(BlueprintType, Abstract)
@@ -26,7 +26,7 @@ protected:
 	TObjectPtr<UArrowComponent> ArrowComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UBoxComponent> BoxComponent;
+	TObjectPtr<USphereComponent> SphereComponent;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="AOE")

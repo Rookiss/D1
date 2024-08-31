@@ -58,6 +58,11 @@ void AD1ProjectileBase::BeginPlay()
 
 void AD1ProjectileBase::Destroyed()
 {
+	if (bHit == false && HitEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, HitEffect, GetActorLocation());
+	}
+	
 	if (HasAuthority() && OtherHitComponent.IsValid())
 	{
 		OtherHitComponent->OnComponentDeactivated.RemoveDynamic(this, &ThisClass::HandleOtherComponentDeactivated);
@@ -78,7 +83,9 @@ void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AA
 		return;
 	
 	bHit = true;
+	SphereCollisionComponent->Deactivate();
 	TrailNiagaraComponent->Deactivate();
+	ProjectileMovementComponent->Deactivate();
 
 	if (HasAuthority())
 	{
@@ -88,8 +95,6 @@ void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AA
 			OtherComponent->OnComponentDeactivated.AddUniqueDynamic(this, &ThisClass::HandleOtherComponentDeactivated);
 			AttachToComponent(OtherComponent, FAttachmentTransformRules::KeepWorldTransform, HitResult.BoneName);
 		}
-		
-		ProjectileMovementComponent->Deactivate();
 		
 		AD1WeaponBase* TargetWeapon = Cast<AD1WeaponBase>(OtherActor);
 		ALyraCharacter* TargetCharacter = Cast<ALyraCharacter>(OtherActor);

@@ -33,10 +33,6 @@ void UD1GameplayAbility_Weapon_Projectile::SpawnProjectile()
 	USkeletalMeshComponent* WeaponMeshComponent = WeaponActor->WeaponMeshComponent;
 	if (WeaponMeshComponent == nullptr)
 		return;
-	
-	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
-	if (ASC == nullptr)
-		return;
 
 #if UE_EDITOR
 	check(WeaponMeshComponent->DoesSocketExist(ProjectileSocketName));

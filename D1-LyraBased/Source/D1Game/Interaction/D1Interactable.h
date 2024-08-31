@@ -57,7 +57,7 @@ public:
 	}
 	
 	virtual void CustomizeInteractionEventData(const FGameplayTag& InteractionEventTag, FGameplayEventData& InOutEventData) const { }
-
+	
 	UFUNCTION(BlueprintCallable)
 	virtual void GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const { }
 	

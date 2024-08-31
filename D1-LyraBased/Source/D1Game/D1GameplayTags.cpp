@@ -155,6 +155,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Impact,						"GameplayCue.Weapon.Impact");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Cast_Lighting,				"GameplayCue.Weapon.Cast.Lighting");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Cast_Fireball,				"GameplayCue.Weapon.Cast.Fireball");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Skill_Target_Burst,			"GameplayCue.Weapon.Skill.Target.Burst");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Skill_Target_Loop,			"GameplayCue.Weapon.Skill.Target.Loop");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Overlay,						"GameplayCue.Weapon.Overlay");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_HitReact,							"GameplayCue.HitReact");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Loop,							"GameplayCue.Statue.Loop");

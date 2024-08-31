@@ -1,10 +1,7 @@
 ﻿#include "D1AOEBase.h"
 
-#include "AbilitySystemComponent.h"
-#include "GameplayCueFunctionLibrary.h"
-#include "Character/LyraCharacter.h"
 #include "Components/ArrowComponent.h"
-#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AOEBase)
@@ -19,9 +16,9 @@ AD1AOEBase::AD1AOEBase(const FObjectInitializer& ObjectInitializer)
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>("ArrowComponent");
 	SetRootComponent(ArrowComponent);
 
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>("BoxComponent");
-	BoxComponent->SetCollisionProfileName("OverlapOnlyPawn");
-	BoxComponent->SetupAttachment(ArrowComponent);
+	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
+	SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SphereComponent->SetupAttachment(ArrowComponent);
 }
 
 void AD1AOEBase::BeginPlay()
@@ -52,8 +49,15 @@ void AD1AOEBase::TickAOE()
 	SpawnParameters.Owner = GetOwner();
 	SpawnParameters.Instigator = Cast<APawn>(GetOwner());
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	FVector SphereLocation = SphereComponent->GetComponentLocation();
+	float SphereRadius = SphereComponent->GetScaledSphereRadius();
+
+	FVector RandDir = FMath::VRand();
+	RandDir.Z = 0.f;
+	RandDir = RandDir.GetSafeNormal();
 	
-	FVector SpawnLocation = UKismetMathLibrary::RandomPointInBoundingBox(BoxComponent->Bounds.Origin, BoxComponent->Bounds.BoxExtent);
+	FVector SpawnLocation = SphereLocation + (RandDir * FMath::RandRange(0.f, SphereRadius));
 	GetWorld()->SpawnActor<AActor>(AOEElementClass, SpawnLocation, FRotator::ZeroRotator, SpawnParameters);
 	CurrentAttackCount++;
 	

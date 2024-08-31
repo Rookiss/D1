@@ -1,7 +1,6 @@
 ﻿#include "D1GameplayAbility_Weapon_AOE.h"
 
 #include "Actors/D1AOEBase.h"
-#include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
 #include "System/LyraGameData.h"
 
@@ -15,10 +14,6 @@ UD1GameplayAbility_Weapon_AOE::UD1GameplayAbility_Weapon_AOE(const FObjectInitia
 
 void UD1GameplayAbility_Weapon_AOE::SpawnAOE()
 {
-	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
-	if (ASC == nullptr)
-		return;
-	
 	if (TargetDataHandle.Data.IsValidIndex(0))
 	{
 		if (FGameplayAbilityTargetData* TargetData = TargetDataHandle.Data[0].Get())

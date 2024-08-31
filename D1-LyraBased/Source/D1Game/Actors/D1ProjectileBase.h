@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "GameplayTagContainer.h"
 
+#include "GameplayTagContainer.h"
 #include "D1ProjectileBase.generated.h"
 
 class UGameplayEffect;
@@ -31,7 +31,7 @@ private:
 
 	UFUNCTION()
 	void HandleOtherComponentDeactivated(UActorComponent* OtherComponent);
-
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Damage = 0.f;
