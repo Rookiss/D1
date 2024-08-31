@@ -22,18 +22,10 @@ public:
 	
 protected:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	virtual void UninitializeComponent() override;
 	
 private:
 	bool SetupNextElectricFieldPhase();
-	void OnDamageTimer();
-
-protected:
-	UPROPERTY(EditDefaultsOnly)
-	float Damage = 1.5f;
-
-	UPROPERTY(EditDefaultsOnly)
-	float DamageInterval = 1.5f;
+	void RemoveAllDamageEffects();
 	
 private:
 	int32 CurrentPhaseIndex = 0;
@@ -43,8 +35,6 @@ private:
 
 	float StartPhaseRadius = 0.f;
 	FVector StartPhasePosition = FVector::ZeroVector;
-
-	FTimerHandle DamageTimerHandle;
 	
 private:
 	UPROPERTY()

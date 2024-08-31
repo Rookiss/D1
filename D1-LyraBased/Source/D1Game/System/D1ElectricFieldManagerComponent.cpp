@@ -2,9 +2,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "D1GameplayTags.h"
 #include "LyraAssetManager.h"
-#include "LyraGameData.h"
 #include "Character/LyraCharacter.h"
 #include "Data/D1ElectricFieldPhaseData.h"
 #include "GameModes/LyraGameState.h"
@@ -42,8 +40,6 @@ void UD1ElectricFieldManagerComponent::Initialize()
 	ElectricFieldActor->SetActorScale3D(FVector(Scale, Scale, ElectricFieldActor->GetActorScale3D().Z));
 	
 	SetupNextElectricFieldPhase();
-
-	GetWorldTimerManager().SetTimer(DamageTimerHandle, this, &ThisClass::OnDamageTimer, DamageInterval, true);
 #endif
 }
 
@@ -53,8 +49,12 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 
 #if WITH_SERVER_CODE
 	if (IsValid(ElectricFieldActor) == false)
+	{
+		RemoveAllDamageEffects();
 		return;
-	
+	}
+
+	// TODO: Use TimerManager & Interp instead of Tick
 	ALyraGameState* LyraGameState = GetGameState<ALyraGameState>();
 	if (LyraGameState == nullptr)
 		return;
@@ -119,10 +119,11 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 					{
 						if (OutSideCharacters.Contains(LyraCharacter) == false)
 						{
-							const TSubclassOf<UGameplayEffect> IncomingDamageGEClass = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().IncomingDamageGameplayEffect_SetByCaller);
-							FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(IncomingDamageGEClass, 1.0f, ASC->MakeEffectContext());
-							EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_IncomingDamage, 1.f);
-							FActiveGameplayEffectHandle Handle = ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+							TSubclassOf<UGameplayEffect> ElectricFieldDamageClass = ULyraAssetManager::GetSubclassByName<UGameplayEffect>("ElectricFieldDamageClass");
+							FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(ElectricFieldDamageClass, 1.0f, ASC->MakeEffectContext());
+							FGameplayEffectSpec* Spec = SpecHandle.Data.Get();
+							FActiveGameplayEffectHandle Handle = ASC->ApplyGameplayEffectSpecToSelf(*Spec);
+
 							OutSideCharacters.Add(LyraCharacter, Handle);
 						}
 					}
@@ -143,15 +144,6 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 		}
 	}
 #endif
-}
-
-void UD1ElectricFieldManagerComponent::UninitializeComponent()
-{
-#if WITH_SERVER_CODE
-	GetWorldTimerManager().ClearTimer(DamageTimerHandle);
-#endif
-	
-	Super::UninitializeComponent();
 }
 
 bool UD1ElectricFieldManagerComponent::SetupNextElectricFieldPhase()
@@ -188,30 +180,21 @@ bool UD1ElectricFieldManagerComponent::SetupNextElectricFieldPhase()
 	return true;
 }
 
-void UD1ElectricFieldManagerComponent::OnDamageTimer()
+void UD1ElectricFieldManagerComponent::RemoveAllDamageEffects()
 {
-#if WITH_SERVER_CODE
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	if (OutSideCharacters.Num() <= 0)
+		return;
+	
+	for (auto& OutSideCharacter : OutSideCharacters)
 	{
-		APlayerController* PlayerController = Iterator->Get();
-		if (PlayerController && PlayerController->PlayerState)
+		if (ALyraCharacter* LyraCharacter = OutSideCharacter.Key.Get())
 		{
-			if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(PlayerController->GetPawn()))
+			if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(LyraCharacter))
 			{
-				if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(LyraCharacter))
-				{
-					float Length = (FVector2D(LyraCharacter->GetActorLocation()) - FVector2D(ElectricFieldActor->GetActorLocation())).Length();
-					if (Length > ElectricFieldActor->GetActorScale3D().X * 50.f)
-					{
-						const TSubclassOf<UGameplayEffect> IncomingDamageGEClass = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().IncomingDamageGameplayEffect_SetByCaller);
-						FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(IncomingDamageGEClass, 1.0f, ASC->MakeEffectContext());
-						EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_IncomingDamage, Damage);
-						FActiveGameplayEffectHandle Handle = ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
-						OutSideCharacters.Add(LyraCharacter, Handle);
-					}
-				}
+				ASC->RemoveActiveGameplayEffect(OutSideCharacter.Value);
 			}
 		}
 	}
-#endif
+
+	OutSideCharacters.Reset();
 }
