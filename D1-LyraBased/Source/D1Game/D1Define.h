@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#define FORCE_DISABLE_DRAW_DEBUG 1
+#define FORCE_DISABLE_DRAW_DEBUG 0
 
 UENUM(BlueprintType)
 enum class ESlotState : uint8
@@ -141,6 +141,15 @@ enum class ESpellType : uint8
 	AOE,
 
 	Count	UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EOverlayTargetType : uint8
+{
+	None,
+	Weapon,
+	Character,
+	All,
 };
 
 namespace Item

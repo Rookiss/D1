@@ -4,13 +4,20 @@
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "D1AnimNotifyState_OverlayEffect.generated.h"
 
-UENUM(BlueprintType)
-enum class EOverlayTargetType : uint8
+USTRUCT()
+struct FOverlayEffectProgressInfo
 {
-	None,
-	Weapon,
-	Character,
-	All,
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	float ElapsedTime = 0.f;
+
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> OverlayMaterialInstance;
+	
+	UPROPERTY()
+	TArray<TWeakObjectPtr<UMeshComponent>> MeshComponents;
 };
 
 UCLASS(editinlinenew, Const, hideCategories = Object, collapseCategories, MinimalAPI, Meta = (DisplayName = "Weapon Overlay Effect"))
@@ -27,10 +34,9 @@ protected:
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 
 private:
-	void ApplyWeaponMeshComponent(USkeletalMeshComponent* MeshComponent);
-	void ApplyAllWeaponMeshComponents(USkeletalMeshComponent* MeshComponent);
-	void ApplyCharacterMeshComponents(USkeletalMeshComponent* MeshComponent);
-	void Clear();
+	void ApplyWeaponMeshComponent(FOverlayEffectProgressInfo& ProgressInfo, USkeletalMeshComponent* MeshComponent);
+	void ApplyAllWeaponMeshComponents(FOverlayEffectProgressInfo& ProgressInfo, USkeletalMeshComponent* MeshComponent);
+	void ApplyCharacterMeshComponents(FOverlayEffectProgressInfo& ProgressInfo, USkeletalMeshComponent* MeshComponent);
 	
 protected:
 	UPROPERTY(EditAnywhere)
@@ -47,13 +53,11 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	FName ParameterName = "Color";
+
+	UPROPERTY(EditAnywhere)
+	bool bApplyRateScaleToProgress = true;
 	
-private:
+protected:
 	UPROPERTY()
-	TObjectPtr<UMaterialInstanceDynamic> OverlayMaterialInstance;
-
-	UPROPERTY()
-	TArray<TWeakObjectPtr<UMeshComponent>> CachedMeshComponents;
-
-	float PassedTime = 0.f;
+	TMap<TWeakObjectPtr<UMeshComponent>, FOverlayEffectProgressInfo> ProgressInfoMap;
 };

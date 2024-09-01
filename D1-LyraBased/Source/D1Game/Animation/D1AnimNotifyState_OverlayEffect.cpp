@@ -2,7 +2,6 @@
 
 #include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
-#include "Components/TimelineComponent.h"
 #include "Curves/CurveLinearColor.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Kismet/KismetMaterialLibrary.h"
@@ -24,25 +23,22 @@ void UD1AnimNotifyState_OverlayEffect::NotifyBegin(USkeletalMeshComponent* MeshC
 	if (OverlayTargetType == EOverlayTargetType::None)
 		return;
 
-	if (MeshComponent->GetOwnerRole() == ROLE_Authority)
-		return;
-
-	Clear();
-	OverlayMaterialInstance = UKismetMaterialLibrary::CreateDynamicMaterialInstance(MeshComponent, OverlayMaterial);
+	FOverlayEffectProgressInfo& NewProgressInfo = ProgressInfoMap.Add(MeshComponent);
+	NewProgressInfo.OverlayMaterialInstance = UKismetMaterialLibrary::CreateDynamicMaterialInstance(MeshComponent, OverlayMaterial);
 	
 	switch (OverlayTargetType)
 	{
 	case EOverlayTargetType::Weapon:
-		ApplyWeaponMeshComponent(MeshComponent);
+		ApplyWeaponMeshComponent(NewProgressInfo, MeshComponent);
 		break;
                                       		
 	case EOverlayTargetType::Character:
-		ApplyCharacterMeshComponents(MeshComponent);
+		ApplyCharacterMeshComponents(NewProgressInfo, MeshComponent);
 		break;
                                       		
 	case EOverlayTargetType::All:
-		ApplyAllWeaponMeshComponents(MeshComponent);
-		ApplyCharacterMeshComponents(MeshComponent);
+		ApplyAllWeaponMeshComponents(NewProgressInfo, MeshComponent);
+		ApplyCharacterMeshComponents(NewProgressInfo, MeshComponent);
 		break;
 	}
 }
@@ -51,28 +47,38 @@ void UD1AnimNotifyState_OverlayEffect::NotifyTick(USkeletalMeshComponent* MeshCo
 {
 	Super::NotifyTick(MeshComponent, Animation, FrameDeltaTime, EventReference);
 
-	if (MeshComponent->GetOwnerRole() == ROLE_Authority)
-		return;
-	
-	if (OverlayMaterialInstance)
+	if (FOverlayEffectProgressInfo* ProgressInfo = ProgressInfoMap.Find(MeshComponent))
 	{
-		PassedTime += FrameDeltaTime;
-		const FLinearColor& Value = LinearColorCurve->GetLinearColorValue(PassedTime / Animation->RateScale);
-		OverlayMaterialInstance->SetVectorParameterValue(ParameterName, Value);
+		const float RateScale = bApplyRateScaleToProgress ? Animation->RateScale : 1.0f;
+		ProgressInfo->ElapsedTime += FrameDeltaTime * RateScale;
+
+		if (UMaterialInstanceDynamic* OverlayMaterialInstance = ProgressInfo->OverlayMaterialInstance)
+		{
+			const FLinearColor& Value = LinearColorCurve->GetLinearColorValue(ProgressInfo->ElapsedTime);
+			OverlayMaterialInstance->SetVectorParameterValue(ParameterName, Value);
+		}
 	}
 }
 
 void UD1AnimNotifyState_OverlayEffect::NotifyEnd(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
-	if (MeshComponent->GetOwnerRole() == ROLE_Authority)
-		return;
+	if (FOverlayEffectProgressInfo* ProgressInfo = ProgressInfoMap.Find(MeshComponent))
+	{
+		for (TWeakObjectPtr<UMeshComponent> CachedMeshComponent : ProgressInfo->MeshComponents)
+		{
+			if (CachedMeshComponent.IsValid())
+			{
+				CachedMeshComponent->SetOverlayMaterial(nullptr);
+			}
+		}
+	}
 	
-	Clear();
+	ProgressInfoMap.Remove(MeshComponent);
 	
 	Super::NotifyEnd(MeshComponent, Animation, EventReference);
 }
 
-void UD1AnimNotifyState_OverlayEffect::ApplyWeaponMeshComponent(USkeletalMeshComponent* MeshComponent)
+void UD1AnimNotifyState_OverlayEffect::ApplyWeaponMeshComponent(FOverlayEffectProgressInfo& ProgressInfo, USkeletalMeshComponent* MeshComponent)
 {
 	if (WeaponHandType == EWeaponHandType::Count)
 		return;
@@ -84,14 +90,14 @@ void UD1AnimNotifyState_OverlayEffect::ApplyWeaponMeshComponent(USkeletalMeshCom
 			if (AD1WeaponBase* WeaponActor = EquipManager->GetEquippedActor(WeaponHandType))
 			{
 				USkeletalMeshComponent* WeaponMeshComponent = WeaponActor->WeaponMeshComponent;
-				WeaponMeshComponent->SetOverlayMaterial(OverlayMaterialInstance);
-				CachedMeshComponents.Add(WeaponMeshComponent);
+				WeaponMeshComponent->SetOverlayMaterial(ProgressInfo.OverlayMaterialInstance);
+				ProgressInfo.MeshComponents.Add(WeaponMeshComponent);
 			}
 		}
 	}
 }
 
-void UD1AnimNotifyState_OverlayEffect::ApplyAllWeaponMeshComponents(USkeletalMeshComponent* MeshComponent)
+void UD1AnimNotifyState_OverlayEffect::ApplyAllWeaponMeshComponents(FOverlayEffectProgressInfo& ProgressInfo, USkeletalMeshComponent* MeshComponent)
 {
 	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(MeshComponent->GetOwner()))
 	{
@@ -103,14 +109,14 @@ void UD1AnimNotifyState_OverlayEffect::ApplyAllWeaponMeshComponents(USkeletalMes
 			for (AD1WeaponBase* WeaponActor : WeaponActors)
 			{
 				USkeletalMeshComponent* WeaponMeshComponent = WeaponActor->WeaponMeshComponent;
-				WeaponMeshComponent->SetOverlayMaterial(OverlayMaterialInstance);
-				CachedMeshComponents.Add(WeaponMeshComponent);
+				WeaponMeshComponent->SetOverlayMaterial(ProgressInfo.OverlayMaterialInstance);
+				ProgressInfo.MeshComponents.Add(WeaponMeshComponent);
 			}
 		}
 	}
 }
 
-void UD1AnimNotifyState_OverlayEffect::ApplyCharacterMeshComponents(USkeletalMeshComponent* MeshComponent)
+void UD1AnimNotifyState_OverlayEffect::ApplyCharacterMeshComponents(FOverlayEffectProgressInfo& ProgressInfo, USkeletalMeshComponent* MeshComponent)
 {
 	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(MeshComponent->GetOwner()))
 	{
@@ -119,24 +125,8 @@ void UD1AnimNotifyState_OverlayEffect::ApplyCharacterMeshComponents(USkeletalMes
 
 		for (UMeshComponent* CharacterMeshComponent : CharacterMeshComponents)
 		{
-			CharacterMeshComponent->SetOverlayMaterial(OverlayMaterialInstance);
-			CachedMeshComponents.Add(CharacterMeshComponent);
+			CharacterMeshComponent->SetOverlayMaterial(ProgressInfo.OverlayMaterialInstance);
+			ProgressInfo.MeshComponents.Add(CharacterMeshComponent);
 		}
 	}
-}
-
-void UD1AnimNotifyState_OverlayEffect::Clear()
-{
-	PassedTime = 0.f;
-	
-	for (TWeakObjectPtr<UMeshComponent> CachedMeshComponent : CachedMeshComponents)
-	{
-		if (CachedMeshComponent.IsValid())
-		{
-			CachedMeshComponent->SetOverlayMaterial(nullptr);
-		}
-	}
-
-	OverlayMaterialInstance = nullptr;
-	CachedMeshComponents.Reset();
 }

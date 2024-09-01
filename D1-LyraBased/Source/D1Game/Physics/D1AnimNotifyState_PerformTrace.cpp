@@ -21,7 +21,7 @@ UD1AnimNotifyState_PerformTrace::UD1AnimNotifyState_PerformTrace(const FObjectIn
 void UD1AnimNotifyState_PerformTrace::NotifyBegin(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyBegin(MeshComponent, Animation, TotalDuration, EventReference);
-
+	
 	if (MeshComponent->GetOwnerRole() != ExecuteNetRole)
 		return;
 	
