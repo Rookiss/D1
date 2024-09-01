@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Third Person", Meta = (EditCondition = "!bUseRuntimeFloatCurves"))
 	TObjectPtr<const UCurveVector> TargetOffsetCurve;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Third Person")
+	TObjectPtr<const UCurveVector> TargetRotationCurve;
+
 	// UE-103986: Live editing of RuntimeFloatCurves during PIE does not work (unlike curve assets).
 	// Once that is resolved this will become the default and TargetOffsetCurve will be removed.
 	UPROPERTY(EditDefaultsOnly, Category = "Third Person")
