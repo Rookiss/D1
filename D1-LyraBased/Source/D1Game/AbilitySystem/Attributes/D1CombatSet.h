@@ -12,6 +12,13 @@ class UD1CombatSet : public UD1AttributeSet
 public:
 	UD1CombatSet();
 
+protected:
+	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+
+private:
+	void ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const;
+	
 public:
 	ATTRIBUTE_ACCESSORS(ThisClass, BaseDamage);
 	ATTRIBUTE_ACCESSORS(ThisClass, BaseHealth);
@@ -47,6 +54,7 @@ private:
 public:
 	ATTRIBUTE_ACCESSORS(ThisClass, MoveSpeed);
 	ATTRIBUTE_ACCESSORS(ThisClass, MoveSpeedPercent);
+	ATTRIBUTE_ACCESSORS(ThisClass, AttackSpeedPercent);
 
 protected:
 	UFUNCTION()
@@ -55,12 +63,18 @@ protected:
 	UFUNCTION()
 	void OnRep_MoveSpeedPercent(const FGameplayAttributeData& OldValue);
 
+	UFUNCTION()
+	void OnRep_AttackSpeedPercent(const FGameplayAttributeData& OldValue);
+
 private:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MoveSpeed, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MoveSpeed;
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MoveSpeedPercent, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MoveSpeedPercent;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_AttackSpeedPercent, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData AttackSpeedPercent;
 	
 public:
 	ATTRIBUTE_ACCESSORS(ThisClass, Strength);
