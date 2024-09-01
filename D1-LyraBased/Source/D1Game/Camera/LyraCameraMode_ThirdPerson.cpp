@@ -51,7 +51,7 @@ void ULyraCameraMode_ThirdPerson::UpdateView(float DeltaTime)
 	View.FieldOfView = FieldOfView;
 
 	// Apply third person offset using pitch.
-	if (!bUseRuntimeFloatCurves)
+	if (bUseRuntimeFloatCurves == false)
 	{
 		if (TargetOffsetCurve)
 		{
@@ -364,7 +364,6 @@ void ULyraCameraMode_ThirdPerson::SetTargetCrouchOffset(FVector NewTargetOffset)
 	InitialCrouchOffset = CurrentCrouchOffset;
 	TargetCrouchOffset = NewTargetOffset;
 }
-
 
 void ULyraCameraMode_ThirdPerson::UpdateCrouchOffset(float DeltaTime)
 {
