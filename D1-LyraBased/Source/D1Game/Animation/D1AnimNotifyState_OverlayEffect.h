@@ -30,6 +30,7 @@ private:
 	void ApplyWeaponMeshComponent(USkeletalMeshComponent* MeshComponent);
 	void ApplyAllWeaponMeshComponents(USkeletalMeshComponent* MeshComponent);
 	void ApplyCharacterMeshComponents(USkeletalMeshComponent* MeshComponent);
+	void Clear();
 	
 protected:
 	UPROPERTY(EditAnywhere)

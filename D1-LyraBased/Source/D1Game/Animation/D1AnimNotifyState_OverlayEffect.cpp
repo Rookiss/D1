@@ -23,8 +23,12 @@ void UD1AnimNotifyState_OverlayEffect::NotifyBegin(USkeletalMeshComponent* MeshC
 	
 	if (OverlayTargetType == EOverlayTargetType::None)
 		return;
-                                      	
-	OverlayMaterialInstance = UKismetMaterialLibrary::CreateDynamicMaterialInstance(MeshComponent, OverlayMaterial, NAME_None, EMIDCreationFlags::Transient);
+
+	if (MeshComponent->GetOwnerRole() == ROLE_Authority)
+		return;
+
+	Clear();
+	OverlayMaterialInstance = UKismetMaterialLibrary::CreateDynamicMaterialInstance(MeshComponent, OverlayMaterial);
 	
 	switch (OverlayTargetType)
 	{
@@ -47,23 +51,23 @@ void UD1AnimNotifyState_OverlayEffect::NotifyTick(USkeletalMeshComponent* MeshCo
 {
 	Super::NotifyTick(MeshComponent, Animation, FrameDeltaTime, EventReference);
 
+	if (MeshComponent->GetOwnerRole() == ROLE_Authority)
+		return;
+	
 	if (OverlayMaterialInstance)
 	{
 		PassedTime += FrameDeltaTime;
 		const FLinearColor& Value = LinearColorCurve->GetLinearColorValue(PassedTime / Animation->RateScale);
-		// OverlayMaterialInstance->SetVectorParameterValue(ParameterName, Value);
+		OverlayMaterialInstance->SetVectorParameterValue(ParameterName, Value);
 	}
 }
 
 void UD1AnimNotifyState_OverlayEffect::NotifyEnd(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
-	for (TWeakObjectPtr<UMeshComponent> CachedMeshComponent : CachedMeshComponents)
-	{
-		if (CachedMeshComponent.IsValid())
-		{
-			CachedMeshComponent->SetOverlayMaterial(nullptr);
-		}
-	}
+	if (MeshComponent->GetOwnerRole() == ROLE_Authority)
+		return;
+	
+	Clear();
 	
 	Super::NotifyEnd(MeshComponent, Animation, EventReference);
 }
@@ -119,4 +123,20 @@ void UD1AnimNotifyState_OverlayEffect::ApplyCharacterMeshComponents(USkeletalMes
 			CachedMeshComponents.Add(CharacterMeshComponent);
 		}
 	}
+}
+
+void UD1AnimNotifyState_OverlayEffect::Clear()
+{
+	PassedTime = 0.f;
+	
+	for (TWeakObjectPtr<UMeshComponent> CachedMeshComponent : CachedMeshComponents)
+	{
+		if (CachedMeshComponent.IsValid())
+		{
+			CachedMeshComponent->SetOverlayMaterial(nullptr);
+		}
+	}
+
+	OverlayMaterialInstance = nullptr;
+	CachedMeshComponents.Reset();
 }
