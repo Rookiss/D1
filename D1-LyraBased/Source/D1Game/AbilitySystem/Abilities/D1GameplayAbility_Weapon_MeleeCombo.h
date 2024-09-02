@@ -21,9 +21,6 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void TryContinueToNextStage();
 
-private:
-	void DrawDebugHitPoint(const FHitResult& HitResult);
-	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TObjectPtr<UAnimMontage> AttackMontage;
@@ -33,9 +30,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<UD1GameplayAbility_Weapon_MeleeCombo> NextAbilityClass;
-	
-	UPROPERTY(EditDefaultsOnly)
-	bool bShowDebug = false;
 
 protected:
 	UPROPERTY(BlueprintReadWrite)
