@@ -21,7 +21,7 @@ FString GetClientServerContextString(UObject* ContextObject)
 
 	if (Role != ROLE_None)
 	{
-		return (Role == ROLE_Authority) ? TEXT("Server") : TEXT("Client");
+		return (Role == ROLE_Authority) ? TEXT("[Server]") : TEXT("[Client]");
 	}
 	else
 	{
@@ -34,5 +34,5 @@ FString GetClientServerContextString(UObject* ContextObject)
 #endif
 	}
 
-	return TEXT("[]");
+	return TEXT("[None]");
 }
