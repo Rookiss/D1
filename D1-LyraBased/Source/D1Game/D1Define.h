@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#define FORCE_DISABLE_DRAW_DEBUG 0
+#define FORCE_DISABLE_DRAW_DEBUG 1
 
 UENUM(BlueprintType)
 enum class ESlotState : uint8

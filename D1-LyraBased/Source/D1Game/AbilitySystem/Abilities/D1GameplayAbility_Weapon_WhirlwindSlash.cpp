@@ -2,7 +2,6 @@
 
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Character/LyraCharacter.h"
-#include "Actors/D1WeaponBase.h"
 #include "System/LyraGameData.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_WhirlwindSlash)
@@ -11,13 +10,6 @@ UD1GameplayAbility_Weapon_WhirlwindSlash::UD1GameplayAbility_Weapon_WhirlwindSla
 	: Super(ObjectInitializer)
 {
     
-}
-
-void UD1GameplayAbility_Weapon_WhirlwindSlash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
-{
-	HitActors.Reset();
-	
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void UD1GameplayAbility_Weapon_WhirlwindSlash::OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InTargetDataHandle)
@@ -37,13 +29,13 @@ void UD1GameplayAbility_Weapon_WhirlwindSlash::OnTargetDataReady(const FGameplay
 		for (int32 BlockHitIndex : BlockHitIndexes)
 		{
 			FHitResult HitResult = *(LocalTargetDataHandle.Data[BlockHitIndex]->GetHitResult());
-			ProcessHitResult(HitResult, true);
+			ProcessHitResult(HitResult, Damage, true, nullptr);
 		}
 
 		for (int32 AttackHitIndex : AttackHitIndexes)
 		{
 			FHitResult HitResult = *LocalTargetDataHandle.Data[AttackHitIndex]->GetHitResult();
-			ProcessHitResult(HitResult, false);
+			ProcessHitResult(HitResult, Damage, false, nullptr);
 		}
 	}
 }

@@ -2,6 +2,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "D1GameplayTags.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "System/LyraGameData.h"
@@ -16,7 +17,6 @@ UD1GameplayAbility_Weapon_MeleeCombo::UD1GameplayAbility_Weapon_MeleeCombo(const
 
 void UD1GameplayAbility_Weapon_MeleeCombo::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	HitActors.Reset();
 	bInputPressed = false;
 	bInputReleased = false;
 	bBlocked = false;
@@ -31,7 +31,7 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 	
 	ULyraAbilitySystemComponent* SourceASC = GetLyraAbilitySystemComponentFromActorInfo();
 	check(SourceASC);
-
+	
 	if (SourceASC->FindAbilitySpecFromHandle(CurrentSpecHandle))
 	{
 		FScopedPredictionWindow	ScopedPrediction(SourceASC, GetCurrentActivationInfo().GetActivationPredictionKey());
@@ -41,10 +41,12 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 		TArray<int32> BlockHitIndexes;
 		ParseTargetData(LocalTargetDataHandle, AttackHitIndexes, BlockHitIndexes);
 
+		float Damage = GetWeaponStatValue(D1GameplayTags::SetByCaller_BaseDamage);
+		
 		if (BlockHitIndexes.Num() > 0)
 		{
 			FHitResult HitResult = *(LocalTargetDataHandle.Data[BlockHitIndexes[0]]->GetHitResult());
-			ProcessHitResult(HitResult, true, BackwardMontage);
+			ProcessHitResult(HitResult, Damage, true, BackwardMontage);
 			bBlocked = true;
 		}
 		else
@@ -52,7 +54,7 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 			for (int32 AttackHitIndex : AttackHitIndexes)
 			{
 				FHitResult HitResult = *LocalTargetDataHandle.Data[AttackHitIndex]->GetHitResult();
-				ProcessHitResult(HitResult, false);
+				ProcessHitResult(HitResult, Damage, false, nullptr);
 			}
 		}
 	}

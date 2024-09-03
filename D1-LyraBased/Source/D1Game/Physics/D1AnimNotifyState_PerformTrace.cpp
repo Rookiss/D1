@@ -126,7 +126,7 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 		}
 #endif
 	}
-	
+
 	PreviousTraceTransform = CurrentTraceTransform;
 	PreviousDebugTransform = CurrentDebugTransform;
 	PreviousSocketTransform = CurrentSocketTransform;
