@@ -22,7 +22,7 @@ protected:
 	void ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutAttackHitIndexes, TArray<int32>& OutBlockHitIndexes);
 
 	UFUNCTION(BlueprintCallable)
-	void ProcessHitResult(FHitResult HitResult, bool bBlockingHit);
+	void ProcessHitResult(FHitResult HitResult, bool bBlockingHitt, UAnimMontage* BlockMontage = nullptr);
 	
 	UFUNCTION(BlueprintCallable)
 	void DrawDebugHitPoint(const FHitResult& HitResult);

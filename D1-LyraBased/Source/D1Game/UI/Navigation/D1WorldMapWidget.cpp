@@ -260,10 +260,12 @@ float UD1WorldMapWidget::WorldLengthToInitialWidgetLength(float WorldLength)
 
 AD1ElectricField* UD1WorldMapWidget::GetElectricFieldActor()
 {
-	if (CachedElectricFieldActor.IsValid() == false)
+	AD1ElectricField* ElectricFieldActor = nullptr;
+	
+	if (ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this)))
 	{
-		AD1ElectricField* ElectricFieldActor = Cast<AD1ElectricField>(UGameplayStatics::GetActorOfClass(GetOwningPlayer(), AD1ElectricField::StaticClass()));
-		CachedElectricFieldActor = TWeakObjectPtr<AD1ElectricField>(ElectricFieldActor);
+		ElectricFieldActor = LyraGameState->CachedElectricFieldActor.Get();
 	}
-	return CachedElectricFieldActor.Get();
+	
+	return ElectricFieldActor;
 }

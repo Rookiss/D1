@@ -2,14 +2,8 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystemGlobals.h"
-#include "D1GameplayTags.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
-#include "Actors/D1WeaponBase.h"
-#include "Character/LyraCharacter.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_MeleeCombo)
@@ -50,69 +44,15 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 		if (BlockHitIndexes.Num() > 0)
 		{
 			FHitResult HitResult = *(LocalTargetDataHandle.Data[BlockHitIndexes[0]]->GetHitResult());
-			
-			FGameplayCueParameters SourceCueParams;
-			SourceCueParams.Location = HitResult.ImpactPoint;
-			SourceCueParams.Normal = HitResult.ImpactNormal;
-			SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
-			
-			SourceASC->BlockAnimMontageForSeconds(BackwardMontage);
-			
-			if (HasAuthority(&CurrentActivationInfo))
-			{
-				FOnMontageEnded MontageEnded = FOnMontageEnded::CreateWeakLambda(this, [this](UAnimMontage* AnimMontage, bool bInterrupted)
-				{
-					EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
-				});
-				UAnimInstance* AnimInstance = SourceASC->AbilityActorInfo->GetAnimInstance();
-				AnimInstance->Montage_SetEndDelegate(MontageEnded, BackwardMontage);
-
-				FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
-				const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
-				FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
-
-				FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
-				HitResult.bBlockingHit = true;
-				EffectContextHandle.AddHitResult(HitResult);
-				EffectContextHandle.AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), WeaponActor);
-				EffectSpecHandle.Data->SetContext(EffectContextHandle);
-					
-				EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_BaseDamage, GetWeaponStatValue(D1GameplayTags::SetByCaller_BaseDamage) / 3.f);
-				ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
-			}
-			
+			ProcessHitResult(HitResult, true, BackwardMontage);
 			bBlocked = true;
-			DrawDebugHitPoint(HitResult);
 		}
 		else
 		{
 			for (int32 AttackHitIndex : AttackHitIndexes)
 			{
 				FHitResult HitResult = *LocalTargetDataHandle.Data[AttackHitIndex]->GetHitResult();
-				
-				FGameplayCueParameters SourceCueParams;
-				SourceCueParams.Location = HitResult.ImpactPoint;
-				SourceCueParams.Normal = HitResult.ImpactNormal;
-				SourceCueParams.PhysicalMaterial = HitResult.PhysMaterial;
-				SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
-				
-				if (HasAuthority(&CurrentActivationInfo))
-				{
-					FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
-					const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
-					FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
-
-					FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
-					HitResult.bBlockingHit = false;
-					EffectContextHandle.AddHitResult(HitResult);
-					EffectContextHandle.AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), WeaponActor);
-					EffectSpecHandle.Data->SetContext(EffectContextHandle);
-
-					EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_BaseDamage, GetWeaponStatValue(D1GameplayTags::SetByCaller_BaseDamage));
-					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
-				}
-
-				DrawDebugHitPoint(HitResult);
+				ProcessHitResult(HitResult, false);
 			}
 		}
 	}

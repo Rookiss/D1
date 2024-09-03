@@ -87,7 +87,7 @@ void UD1GameplayAbility_Weapon::ParseTargetData(const FGameplayAbilityTargetData
 	}
 }
 
-void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, bool bBlockingHit)
+void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, bool bBlockingHit, UAnimMontage* BlockMontage)
 {
 	ULyraAbilitySystemComponent* SourceASC = GetLyraAbilitySystemComponentFromActorInfo();
 	if (SourceASC == nullptr)
@@ -99,8 +99,23 @@ void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, bool bBlo
 	SourceCueParams.PhysicalMaterial = HitResult.PhysMaterial;
 	SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
 
+	if (BlockMontage)
+	{
+		SourceASC->BlockAnimMontageForSeconds(BlockMontage);
+	}
+	
 	if (HasAuthority(&CurrentActivationInfo))
 	{
+		if (BlockMontage)
+		{
+			FOnMontageEnded MontageEnded = FOnMontageEnded::CreateWeakLambda(this, [this](UAnimMontage* AnimMontage, bool bInterrupted)
+			{
+				EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+			});
+			UAnimInstance* AnimInstance = SourceASC->AbilityActorInfo->GetAnimInstance();
+			AnimInstance->Montage_SetEndDelegate(MontageEnded, BlockMontage);
+		}
+		
 		FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
 		const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
 		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
