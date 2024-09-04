@@ -6,7 +6,7 @@
 
 class AD1WeaponBase;
 
-UCLASS()
+UCLASS(meta=(DisplayName="Send Weapon Event"))
 class UD1AnimNotify_SendWeaponEvent : public UAnimNotify
 {
 	GENERATED_BODY()

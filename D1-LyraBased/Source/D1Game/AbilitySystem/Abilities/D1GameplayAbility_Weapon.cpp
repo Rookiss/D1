@@ -2,13 +2,17 @@
 
 #include "AbilitySystemGlobals.h"
 #include "D1GameplayTags.h"
-#include "D1LogChannels.h"
+#include "Abilities/GameplayAbilityTargetActor.h"
+#include "Abilities/Async/AbilityAsync_WaitGameplayEvent.h"
+#include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Actors/D1WeaponBase.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Character/LyraCharacter.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Player/LyraPlayerController.h"
+#include "Shakes/LegacyCameraShake.h"
 #include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
 

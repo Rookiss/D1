@@ -104,6 +104,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_End,						"GameplayEvent.Montage.End");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Spell,						"GameplayEvent.Montage.Spell");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Trace,								"GameplayEvent.Trace");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Reset,								"GameplayEvent.Reset");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_CameraShake,						"GameplayEvent.CameraShake");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ChangeEquip,						"GameplayEvent.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ArrowVisibility,					"GameplayEvent.ArrowVisibility");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Potion_Drink,						"GameplayEvent.Potion.Drink");
@@ -153,9 +155,7 @@ namespace D1GameplayTags
 	
 	// GameplayCue
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Attack,						"GameplayCue.Weapon.Attack");
-	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Attack_OneHandSword,			"GameplayCue.Weapon.Attack.OneHandSword");
-	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Attack_TwoHandSword,			"GameplayCue.Weapon.Attack.TwoHandSword");
-	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Attack_GreatSword,			"GameplayCue.Weapon.Attack.GreatSword");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Skill,						"GameplayCue.Weapon.Skill");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Impact,						"GameplayCue.Weapon.Impact");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Cast_Lighting,				"GameplayCue.Weapon.Cast.Lighting");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Cast_Fireball,				"GameplayCue.Weapon.Cast.Fireball");

@@ -19,6 +19,6 @@ void UD1AnimNotify_SendGameplayEvent::Notify(USkeletalMeshComponent* MeshComp, U
 
 	if (EventTag.IsValid())
 	{
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(MeshComp->GetOwner(), EventTag, FGameplayEventData());
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(MeshComp->GetOwner(), EventTag, EventData);
 	}
 }

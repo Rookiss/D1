@@ -16,7 +16,7 @@ public:
 	virtual void Notify(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 	
 private:
-	USkeletalMeshComponent* GetWeaponMeshComponent(USkeletalMeshComponent* CharacterMeshComponent) const;
+	USkeletalMeshComponent* GetWeaponMeshComponent(USkeletalMeshComponent* MeshComponent) const;
 
 protected:
 	UPROPERTY(EditAnywhere)

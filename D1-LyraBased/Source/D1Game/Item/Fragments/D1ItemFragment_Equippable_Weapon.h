@@ -18,6 +18,9 @@ public:
 public:
 	UPROPERTY(EditDefaultsOnly)
 	EWeaponType WeaponType = EWeaponType::Count;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USoundBase> AttackSwingSound;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TObjectPtr<const ULyraAbilitySet>> SkillAbilitySets;

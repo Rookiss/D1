@@ -69,7 +69,8 @@ public class D1Game : ModuleRules
 			"DTLSHandlerComponent", 
 			"PocketWorlds",
 			"NavigationSystem", 
-			"NiagaraAnimNotifies",
+			"NiagaraAnimNotifies", 
+			"GameplayCameras",
 		});
 		
 		PublicDefinitions.Add("SHIPPING_DRAW_DEBUG_ERROR=1");

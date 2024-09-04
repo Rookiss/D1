@@ -1,9 +1,10 @@
 ﻿#pragma once
 
 #include "GameplayTagContainer.h"
+#include "AbilitySystem/Abilities/LyraGameplayAbility_Death.h"
 #include "D1AnimNotify_SendGameplayEvent.generated.h"
 
-UCLASS()
+UCLASS(meta=(DisplayName="Send Gameplay Event"))
 class UD1AnimNotify_SendGameplayEvent : public UAnimNotify
 {
 	GENERATED_BODY()
@@ -17,4 +18,7 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere)
 	FGameplayTag EventTag;
+
+	UPROPERTY(EditAnywhere)
+	FGameplayEventData EventData;
 };

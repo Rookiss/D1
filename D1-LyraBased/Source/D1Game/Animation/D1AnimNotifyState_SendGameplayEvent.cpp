@@ -19,7 +19,7 @@ void UD1AnimNotifyState_SendGameplayEvent::NotifyBegin(USkeletalMeshComponent* M
 	
 	if (BeginEventTag.IsValid())
 	{
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(MeshComp->GetOwner(), BeginEventTag, FGameplayEventData());
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(MeshComp->GetOwner(), BeginEventTag, EventData);
 	}
 }
 
@@ -29,7 +29,7 @@ void UD1AnimNotifyState_SendGameplayEvent::NotifyTick(USkeletalMeshComponent* Me
 	
 	if (TickEventTag.IsValid())
 	{
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(MeshComp->GetOwner(), TickEventTag, FGameplayEventData());
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(MeshComp->GetOwner(), TickEventTag, EventData);
 	}
 }
 
@@ -39,6 +39,6 @@ void UD1AnimNotifyState_SendGameplayEvent::NotifyEnd(USkeletalMeshComponent* Mes
 
 	if (EndEventTag.IsValid())
 	{
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(MeshComp->GetOwner(), EndEventTag, FGameplayEventData());
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(MeshComp->GetOwner(), EndEventTag, EventData);
 	}
 }
