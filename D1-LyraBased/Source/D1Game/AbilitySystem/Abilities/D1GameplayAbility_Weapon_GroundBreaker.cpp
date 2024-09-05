@@ -1,5 +1,6 @@
 ﻿#include "D1GameplayAbility_Weapon_GroundBreaker.h"
 
+#include "D1GameplayTags.h"
 #include "D1LogChannels.h"
 #include "Character/LyraCharacter.h"
 #include "Components/CapsuleComponent.h"
@@ -72,9 +73,11 @@ void UD1GameplayAbility_Weapon_GroundBreaker::Execute()
 		{
 			const int32 HitResultIndex = HitInfo.Value.Key;
 			const FHitResult& HitResult = OutHitResults[HitResultIndex];
+			ProcessHitResult(HitResult, Damage, IsCharacterBlockingHit(Cast<ALyraCharacter>(HitResult.GetActor())), nullptr);
 
-			ALyraCharacter* TargetChacter = Cast<ALyraCharacter>(HitResult.GetActor());
-			ProcessHitResult(HitResult, Damage, IsBlockingHit(TargetChacter), nullptr);
+			FGameplayEventData EventData;
+			EventData.EventMagnitude = StunDruation;
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(HitResult.GetActor(), D1GameplayTags::GameplayEvent_Stun, EventData);
 		}
 	}
 }

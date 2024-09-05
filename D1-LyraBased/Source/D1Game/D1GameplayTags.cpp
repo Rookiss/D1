@@ -48,6 +48,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Death,									"Ability.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Jump,									"Ability.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Knockback,								"Ability.Knockback");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Stun,									"Ability.Stun");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Dash_Check,								"Ability.Dash.Check");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Dash_Active,								"Ability.Dash.Active");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Sprint_Check,							"Ability.Sprint.Check");
@@ -76,6 +77,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_Crouch,									"Status.Crouch");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Jump,										"Status.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Knockback,								"Status.Knockback");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Stun,										"Status.Stun");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Death,									"Status.Death");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Death_Dying,								"Status.Death.Dying");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Death_Dead,								"Status.Death.Dead");
@@ -111,6 +113,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Potion_Drink,						"GameplayEvent.Potion.Drink");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Potion_Fill,						"GameplayEvent.Potion.Fill");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Knockback,							"GameplayEvent.Knockback");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Stun,								"GameplayEvent.Stun");
 	
 	// Cheat
 	UE_DEFINE_GAMEPLAY_TAG(Cheat_GodMode,									"Cheat.GodMode");

@@ -33,7 +33,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsBlockingHit(ALyraCharacter* TargetCharacter);
+	bool IsCharacterBlockingHit(ALyraCharacter* TargetCharacter);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, meta=(GameplayTagFilter = "SetByCaller"))
 	int32 GetWeaponStatValue(FGameplayTag StatTag) const;
@@ -50,6 +50,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float BlockingAngle = 60.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float BlockHitDamageMultiplier = 0.3f;
 	
 	UPROPERTY(EditDefaultsOnly)
 	bool bShowDebug = false;
@@ -59,5 +62,5 @@ protected:
 	TObjectPtr<AD1WeaponBase> WeaponActor;
 
 	UPROPERTY()
-	TSet<TWeakObjectPtr<AActor>> HitActors;
+	TSet<TWeakObjectPtr<AActor>> CachedHitActors;
 };

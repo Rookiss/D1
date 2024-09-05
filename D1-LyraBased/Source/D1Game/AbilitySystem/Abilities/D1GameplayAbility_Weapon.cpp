@@ -59,17 +59,23 @@ void UD1GameplayAbility_Weapon::ParseTargetData(const FGameplayAbilityTargetData
 				if (TargetCharacter == nullptr)
 				{
 					TargetCharacter = Cast<ALyraCharacter>(HitActor->GetOwner());
-					HitActor = TargetCharacter;
 				}
 
-				if (HitActors.Contains(HitActor))
+				bool bIsCharacterBlockingHit = TargetCharacter ? IsCharacterBlockingHit(TargetCharacter) : false;
+				
+				AD1WeaponBase* HitWeaponActor = Cast<AD1WeaponBase>(HitActor);
+				if (HitWeaponActor && (HitWeaponActor->bCanBlock == false || bIsCharacterBlockingHit == false))
+					continue;
+				
+				AActor* SelectedActor = TargetCharacter ? TargetCharacter : HitActor;
+				if (CachedHitActors.Contains(SelectedActor))
 					continue;
 
-				HitActors.Add(HitActor);
-				
+				CachedHitActors.Add(SelectedActor);
+
 				if (TargetCharacter)
 				{
-					IsBlockingHit(TargetCharacter) ? OutBlockHitIndexes.Add(i) : OutCharacterHitIndexes.Add(i);
+					bIsCharacterBlockingHit ? OutBlockHitIndexes.Add(i) : OutCharacterHitIndexes.Add(i);
 				}
 				else
 				{
@@ -89,7 +95,7 @@ void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, float Dam
 	FGameplayCueParameters SourceCueParams;
 	SourceCueParams.Location = HitResult.ImpactPoint;
 	SourceCueParams.Normal = HitResult.ImpactNormal;
-	SourceCueParams.PhysicalMaterial = HitResult.PhysMaterial;
+	SourceCueParams.PhysicalMaterial = bBlockingHit ? nullptr : HitResult.PhysMaterial;
 	SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
 
 	if (BackwardMontage)
@@ -119,7 +125,7 @@ void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, float Dam
 		EffectContextHandle.AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), WeaponActor);
 		EffectSpecHandle.Data->SetContext(EffectContextHandle);
 		
-		Damage = bBlockingHit ? Damage / 3.f : Damage;
+		Damage = bBlockingHit ? Damage * BlockHitDamageMultiplier : Damage;
 		
 		EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_BaseDamage, Damage);
 		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
@@ -130,7 +136,7 @@ void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, float Dam
 
 void UD1GameplayAbility_Weapon::ResetHitActors()
 {
-	HitActors.Reset();
+	CachedHitActors.Reset();
 }
 
 void UD1GameplayAbility_Weapon::DrawDebugHitPoint(const FHitResult& HitResult)
@@ -148,7 +154,7 @@ void UD1GameplayAbility_Weapon::DrawDebugHitPoint(const FHitResult& HitResult)
 #endif // UE_EDITOR
 }
 
-bool UD1GameplayAbility_Weapon::IsBlockingHit(ALyraCharacter* TargetCharacter)
+bool UD1GameplayAbility_Weapon::IsCharacterBlockingHit(ALyraCharacter* TargetCharacter)
 {
 	UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(TargetCharacter);
 	if (TargetASC && TargetASC->HasMatchingGameplayTag(D1GameplayTags::Status_Block))

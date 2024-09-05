@@ -141,7 +141,6 @@ void AD1WeaponBase::OnRep_CanBlock()
 	if (bOnlyUseVisual)
 		return;
 	
-	WeaponMeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Weapon, bCanBlock ? ECR_Overlap : ECR_Ignore);
 	WeaponMeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Projectile, bCanBlock ? ECR_Block : ECR_Ignore);
 }
 

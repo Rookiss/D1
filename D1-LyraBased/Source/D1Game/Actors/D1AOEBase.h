@@ -33,6 +33,9 @@ protected:
 	TSubclassOf<AActor> AOEElementClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="AOE")
+	float StartDelay = 2.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="AOE")
 	float AttackTotalTime = 10.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category="AOE")

@@ -24,4 +24,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float Damage = 20.f;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float StunDruation = 3.f;
 };

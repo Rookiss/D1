@@ -1,5 +1,6 @@
 #include "D1DamageExecution.h"
 
+#include "D1LogChannels.h"
 #include "AbilitySystem/Attributes/D1VitalSet.h"
 #include "AbilitySystem/Attributes/D1CombatSet.h"
 #include "AbilitySystem/LyraGameplayEffectContext.h"
@@ -60,7 +61,7 @@ void UD1DamageExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DefenseDef, EvaluateParameters, Defense);
 	
 	const float DamageDone = FMath::Max((BaseDamage + Strength) / (FMath::Pow(Defense, 0.3f)), 0.0f);
-
+	
 	if (DamageDone > 0.0f)
 	{
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UD1VitalSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, DamageDone));

@@ -39,7 +39,7 @@ void AD1AOEBase::BeginAOE()
 {
 	if (HasAuthority())
 	{
-		GetWorld()->GetTimerManager().SetTimer(AOETimerHandle, this, &ThisClass::TickAOE, AttackIntervalTime, true, 0);
+		GetWorld()->GetTimerManager().SetTimer(AOETimerHandle, this, &ThisClass::TickAOE, AttackIntervalTime, true, StartDelay);
 	}
 }
 
