@@ -8,6 +8,8 @@
 #include "GameplayAbilitySpecHandle.h"
 #include "LyraHeroComponent.generated.h"
 
+class AD1ElectricField;
+
 namespace EEndPlayReason { enum Type : int; }
 struct FLoadedMappableConfigPair;
 struct FMappableConfigPair;
@@ -91,7 +93,7 @@ protected:
 	void Input_LocalInputCancel();
 
 	TSubclassOf<ULyraCameraMode> DetermineCameraMode() const;
-
+	
 protected:
 	/**
 	 * Input Configs that should be added to this player when initializing the input. These configs
@@ -118,4 +120,30 @@ protected:
 
 	/** True when player input bindings have been applied, will never be true for non - players */
 	bool bReadyToBindInputs;
+
+protected:
+	UFUNCTION()
+	void HandlePostProcess();
+
+	FVector2D BaseBright = FVector2D(1.f, 0.6f);
+	float CurrentBright = BaseBright.X;
+	float TargetBright = BaseBright.X;
+	
+	FVector2D BaseDesaturation = FVector2D(0.f, 1.f);
+	float CurrentDesaturation = BaseDesaturation.X;
+	float TargetDesaturation = BaseDesaturation.X;
+
+	FVector2D BaseTexturePow = FVector2D(2.f, 1.f);
+	float CurrentTexturePow = BaseTexturePow.X;
+	float TargetTexturePow = BaseTexturePow.X;
+
+	float PostProcessTimerRate = 0.03f;
+	float PostProcessInterpSpeed = 5.f;
+	FTimerHandle PostProcessTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> PostProcessMaterial;
+
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> PostProcessMaterialInstance;
 };

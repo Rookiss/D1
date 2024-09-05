@@ -28,6 +28,9 @@ void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 	});
 
 	ItemTemplateClassToID.Empty();
+	WeaponItemTemplateClasses.Empty();
+	ArmorItemTemplateClasses.Empty();
+	
 	for (const auto& Pair : ItemTemplateIDToClass)
 	{
 		ItemTemplateClassToID.Emplace(Pair.Value, Pair.Key);

@@ -39,9 +39,6 @@ protected:
 	bool bInputReleased = false;
 	
 private:
-	UPROPERTY()
-	TSet<TWeakObjectPtr<AActor>> HitActors;
-	
 	bool bBlocked = false;
 	FTimerHandle BlockMontageTimerHandle;
 };

@@ -24,6 +24,10 @@
 #include "Camera/LyraCameraMode.h"
 #include "UserSettings/EnhancedInputUserSettings.h"
 #include "InputMappingContext.h"
+#include "Actors/D1ElectricField.h"
+#include "GameModes/LyraGameState.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMaterialLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraHeroComponent)
 
@@ -216,10 +220,14 @@ void ULyraHeroComponent::BeginPlay()
 	// Notifies that we are done spawning, then try the rest of initialization
 	ensure(TryToChangeInitState(D1GameplayTags::InitState_Spawned));
 	CheckDefaultInitialization();
+
+	GetWorldTimerManager().SetTimer(PostProcessTimerHandle, this, &ThisClass::HandlePostProcess, PostProcessTimerRate, true);
 }
 
 void ULyraHeroComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	GetWorldTimerManager().ClearTimer(PostProcessTimerHandle);
+	
 	UnregisterInitStateFeature();
 
 	Super::EndPlay(EndPlayReason);
@@ -543,6 +551,51 @@ TSubclassOf<ULyraCameraMode> ULyraHeroComponent::DetermineCameraMode() const
 	}
 
 	return nullptr;
+}
+
+void ULyraHeroComponent::HandlePostProcess()
+{
+	ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this));
+	if (LyraGameState == nullptr)
+		return;
+
+	AD1ElectricField* ElectricFieldActor = LyraGameState->CachedElectricFieldActor.Get();
+	if (IsValid(ElectricFieldActor) == false)
+		return;
+
+	ALyraCharacter* LyraCharacter = GetPawn<ALyraCharacter>();
+	if (LyraCharacter == nullptr)
+		return;
+	
+	float Length = (FVector2D(LyraCharacter->GetActorLocation()) - FVector2D(ElectricFieldActor->GetActorLocation())).Length();
+	bool bOutOfField = (Length > ElectricFieldActor->GetActorScale3D().X * 50.f);
+
+	TargetBright = bOutOfField ? BaseBright.Y : BaseBright.X;
+	TargetDesaturation = bOutOfField ? BaseDesaturation.Y : BaseDesaturation.X;
+	TargetTexturePow = bOutOfField ? BaseTexturePow.Y : BaseTexturePow.X;
+	
+	CurrentBright = FMath::FInterpTo(CurrentBright, TargetBright, PostProcessTimerRate, PostProcessInterpSpeed);
+	CurrentDesaturation = FMath::FInterpTo(CurrentDesaturation, TargetDesaturation, PostProcessTimerRate, PostProcessInterpSpeed);
+	CurrentTexturePow = FMath::FInterpTo(CurrentTexturePow, TargetTexturePow, PostProcessTimerRate, PostProcessInterpSpeed);
+
+	ULyraCameraComponent* LyraCameraComponent = LyraCharacter->GetCameraComponent();
+	if (PostProcessMaterialInstance == nullptr && PostProcessMaterial)
+	{
+		PostProcessMaterialInstance = UKismetMaterialLibrary::CreateDynamicMaterialInstance(this, PostProcessMaterial);
+		
+		FWeightedBlendable Blendable;
+		Blendable.Weight = 1.f;
+		Blendable.Object = PostProcessMaterialInstance;
+
+		LyraCameraComponent->PostProcessSettings.WeightedBlendables.Array.Add(Blendable);
+	}
+	
+	if (PostProcessMaterialInstance)
+	{
+		PostProcessMaterialInstance->SetScalarParameterValue("Bright", CurrentBright);
+		PostProcessMaterialInstance->SetScalarParameterValue("Desaturation", CurrentDesaturation);
+		PostProcessMaterialInstance->SetScalarParameterValue("Tex_Pow", CurrentTexturePow);
+	}
 }
 
 void ULyraHeroComponent::SetAbilityCameraMode(TSubclassOf<ULyraCameraMode> CameraMode, const FGameplayAbilitySpecHandle& OwningSpecHandle)
