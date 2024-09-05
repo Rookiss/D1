@@ -6,7 +6,6 @@
 #include "ModularGameState.h"
 #include "LyraGameState.generated.h"
 
-class AD1ElectricField;
 class APlayerState;
 class UAbilitySystemComponent;
 class ULyraAbilitySystemComponent;
@@ -102,7 +101,4 @@ public:
 	
 	UPROPERTY(Replicated)
 	FVector TargetPhasePosition = FVector::ZeroVector;
-
-	UPROPERTY()
-	TWeakObjectPtr<AD1ElectricField> CachedElectricFieldActor;
 };

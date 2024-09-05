@@ -82,6 +82,10 @@ private:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UD1ElectricFieldCircleWidget> TargetCircleWidget;
+
+private:
+	UPROPERTY()
+	TWeakObjectPtr<AD1ElectricField> CachedElectricFieldActor;
 	
 private:
 	float MinWorldMapZoom = 1.f;

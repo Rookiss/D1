@@ -22,10 +22,7 @@ protected:
 	void ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutCharacterHitIndexes, TArray<int32>& OutBlockHitIndexes);
 
 	UFUNCTION(BlueprintCallable)
-	void ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BlockMontage);
-
-	UFUNCTION(BlueprintCallable)
-	void ResetHitActors();
+	void ProcessHitResult(FHitResult HitResult, bool bBlockingHit);
 	
 	UFUNCTION(BlueprintCallable)
 	void DrawDebugHitPoint(const FHitResult& HitResult);
@@ -50,7 +47,4 @@ protected:
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AD1WeaponBase> WeaponActor;
-
-	UPROPERTY()
-	TSet<TWeakObjectPtr<AActor>> HitActors;
 };

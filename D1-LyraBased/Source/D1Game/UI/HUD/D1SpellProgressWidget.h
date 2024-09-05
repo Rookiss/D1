@@ -18,10 +18,10 @@ public:
 	bool bShouldShow = false;
 
 	UPROPERTY(BlueprintReadWrite)
-	FText DisplayName = FText::GetEmpty();
+	FText DisplayName;
 
 	UPROPERTY(BlueprintReadWrite)
-	FLinearColor PhaseColor = FLinearColor::White;
+	FLinearColor PhaseColor;
 
 	UPROPERTY(BlueprintReadWrite)
 	float TotalCastTime = 0.f;
@@ -34,7 +34,7 @@ struct FSpellProgressRefreshMessage
 
 public:
 	UPROPERTY(BlueprintReadWrite)
-	FLinearColor PhaseColor = FLinearColor::White;
+	FLinearColor PhaseColor;
 };
 
 UCLASS()

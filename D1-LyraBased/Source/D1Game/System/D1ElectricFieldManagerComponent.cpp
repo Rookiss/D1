@@ -3,8 +3,6 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "LyraAssetManager.h"
-#include "Camera/CameraComponent.h"
-#include "Camera/LyraCameraComponent.h"
 #include "Character/LyraCharacter.h"
 #include "Data/D1ElectricFieldPhaseData.h"
 #include "GameModes/LyraGameState.h"

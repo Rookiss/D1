@@ -19,7 +19,7 @@ void UD1EnhancedPlayerInput::FlushPressedInput(UInputAction* InputAction)
 		{
 			APlayerController* PlayerController = GetOuterAPlayerController();
 			ULocalPlayer* LocalPlayer = PlayerController ? Cast<ULocalPlayer>(PlayerController->Player) : nullptr;
-			if (LocalPlayer)
+			if (LocalPlayer != nullptr)
 			{
 				if (FKeyState* KeyState = GetKeyStateMap().Find(KeyMapping.Key))
 				{
