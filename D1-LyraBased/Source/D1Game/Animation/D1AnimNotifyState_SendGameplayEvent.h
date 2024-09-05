@@ -1,10 +1,11 @@
 ﻿#pragma once
 
+#include "D1AnimNotify_SendGameplayEvent.h"
 #include "GameplayTagContainer.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "D1AnimNotifyState_SendGameplayEvent.generated.h"
 
-UCLASS()
+UCLASS(meta=(DisplayName="Send Gameplay Event State"))
 class UD1AnimNotifyState_SendGameplayEvent : public UAnimNotifyState
 {
 	GENERATED_BODY()
@@ -26,4 +27,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	FGameplayTag EndEventTag;
+
+	UPROPERTY(EditAnywhere)
+	FGameplayEventData EventData;
 };

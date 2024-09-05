@@ -2,12 +2,17 @@
 
 #include "AbilitySystemGlobals.h"
 #include "D1GameplayTags.h"
+#include "Abilities/GameplayAbilityTargetActor.h"
+#include "Abilities/Async/AbilityAsync_WaitGameplayEvent.h"
+#include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Actors/D1WeaponBase.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Character/LyraCharacter.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Player/LyraPlayerController.h"
+#include "Shakes/LegacyCameraShake.h"
 #include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
 
@@ -22,6 +27,7 @@ UD1GameplayAbility_Weapon::UD1GameplayAbility_Weapon(const FObjectInitializer& O
 
 void UD1GameplayAbility_Weapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+	ResetHitActors();
 	WeaponActor = nullptr;
 	
 	if (ALyraCharacter* PlayerCharacter = Cast<ALyraCharacter>(ActorInfo->AvatarActor.Get()))
@@ -57,6 +63,11 @@ void UD1GameplayAbility_Weapon::ParseTargetData(const FGameplayAbilityTargetData
 					HitActor = TargetCharacter;
 				}
 
+				if (HitActors.Contains(HitActor))
+					continue;
+
+				HitActors.Add(HitActor);
+
 				if (TargetCharacter)
 				{
 					UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(TargetCharacter);
@@ -87,7 +98,7 @@ void UD1GameplayAbility_Weapon::ParseTargetData(const FGameplayAbilityTargetData
 	}
 }
 
-void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, bool bBlockingHit)
+void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BlockMontage)
 {
 	ULyraAbilitySystemComponent* SourceASC = GetLyraAbilitySystemComponentFromActorInfo();
 	if (SourceASC == nullptr)
@@ -99,8 +110,23 @@ void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, bool bBlo
 	SourceCueParams.PhysicalMaterial = HitResult.PhysMaterial;
 	SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
 
+	if (BlockMontage)
+	{
+		SourceASC->BlockAnimMontageForSeconds(BlockMontage);
+	}
+	
 	if (HasAuthority(&CurrentActivationInfo))
 	{
+		if (BlockMontage)
+		{
+			FOnMontageEnded MontageEnded = FOnMontageEnded::CreateWeakLambda(this, [this](UAnimMontage* AnimMontage, bool bInterrupted)
+			{
+				EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+			});
+			UAnimInstance* AnimInstance = SourceASC->AbilityActorInfo->GetAnimInstance();
+			AnimInstance->Montage_SetEndDelegate(MontageEnded, BlockMontage);
+		}
+		
 		FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
 		const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
 		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
@@ -110,8 +136,7 @@ void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, bool bBlo
 		EffectContextHandle.AddHitResult(HitResult);
 		EffectContextHandle.AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), WeaponActor);
 		EffectSpecHandle.Data->SetContext(EffectContextHandle);
-
-		float Damage = GetWeaponStatValue(D1GameplayTags::SetByCaller_BaseDamage);
+		
 		Damage = bBlockingHit ? Damage / 3.f : Damage;
 		
 		EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_BaseDamage, Damage);
@@ -119,6 +144,11 @@ void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, bool bBlo
 	}
 	
 	DrawDebugHitPoint(HitResult);
+}
+
+void UD1GameplayAbility_Weapon::ResetHitActors()
+{
+	HitActors.Reset();
 }
 
 void UD1GameplayAbility_Weapon::DrawDebugHitPoint(const FHitResult& HitResult)

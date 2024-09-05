@@ -20,11 +20,11 @@ void UD1AnimNotify_WeaponNiagaraEffect::Notify(USkeletalMeshComponent* MeshCompo
 	Super::Notify(WeaponMeshComponent ? WeaponMeshComponent : MeshComponent, Animation, EventReference);
 }
 
-USkeletalMeshComponent* UD1AnimNotify_WeaponNiagaraEffect::GetWeaponMeshComponent(USkeletalMeshComponent* CharacterMeshComponent) const
+USkeletalMeshComponent* UD1AnimNotify_WeaponNiagaraEffect::GetWeaponMeshComponent(USkeletalMeshComponent* MeshComponent) const
 {
 	USkeletalMeshComponent* WeaponMeshComponent = nullptr;
 	
-	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(CharacterMeshComponent->GetOwner()))
+	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(MeshComponent->GetOwner()))
 	{
 		if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
 		{

@@ -43,7 +43,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	bool bShowDebug = false;
-	
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AD1WeaponBase> WeaponActor;
