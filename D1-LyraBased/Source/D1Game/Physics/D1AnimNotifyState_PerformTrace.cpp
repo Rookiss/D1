@@ -7,8 +7,11 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
+#include "Development/LyraDeveloperSettings.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AnimNotifyState_PerformTrace)
+
+class ULyraDeveloperSettings;
 
 UD1AnimNotifyState_PerformTrace::UD1AnimNotifyState_PerformTrace(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -114,15 +117,19 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 		}
 
 #if UE_EDITOR
-		if (FORCE_DISABLE_DRAW_DEBUG == false && TraceDebugParams.bDrawDebugShape)
+		if (GIsEditor)
 		{
-			FColor Color = (HitResults.Num() > 0) ? TraceDebugParams.HitColor : TraceDebugParams.TraceColor;
+			const ULyraDeveloperSettings* DeveloperSettings = GetDefault<ULyraDeveloperSettings>();
+			if (DeveloperSettings->bForceDisableDebugTrace == false && TraceDebugParams.bDrawDebugShape)
+			{
+				FColor Color = (HitResults.Num() > 0) ? TraceDebugParams.HitColor : TraceDebugParams.TraceColor;
 			
-			const FTransform& StartDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
-			const FTransform& EndDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
-			const FTransform& AverageDebugTransform = UKismetMathLibrary::TLerp(StartDebugTransform, EndDebugTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
+				const FTransform& StartDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
+				const FTransform& EndDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
+				const FTransform& AverageDebugTransform = UKismetMathLibrary::TLerp(StartDebugTransform, EndDebugTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
 			
-			DrawDebugSweptBox(MeshComponent->GetWorld(), StartDebugTransform.GetLocation(), EndDebugTransform.GetLocation(), AverageDebugTransform.GetRotation().Rotator(), WeaponActor->TraceDebugCollision->GetScaledBoxExtent(), Color, false, 2.f);
+				DrawDebugSweptBox(MeshComponent->GetWorld(), StartDebugTransform.GetLocation(), EndDebugTransform.GetLocation(), AverageDebugTransform.GetRotation().Rotator(), WeaponActor->TraceDebugCollision->GetScaledBoxExtent(), Color, false, 2.f);
+			}
 		}
 #endif
 	}

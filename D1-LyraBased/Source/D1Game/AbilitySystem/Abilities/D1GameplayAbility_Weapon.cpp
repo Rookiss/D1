@@ -8,6 +8,7 @@
 #include "Actors/D1WeaponBase.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Character/LyraCharacter.h"
+#include "Development/LyraDeveloperSettings.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -154,10 +155,14 @@ void UD1GameplayAbility_Weapon::ResetHitActors()
 void UD1GameplayAbility_Weapon::DrawDebugHitPoint(const FHitResult& HitResult)
 {
 #if UE_EDITOR
-	if (FORCE_DISABLE_DRAW_DEBUG == false && bShowDebug)
+	if (GIsEditor)
 	{
-		FColor Color = (HasAuthority(&CurrentActivationInfo)) ? FColor::Red : FColor::Green;
-		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 4, 32, Color, false, 5);
+		const ULyraDeveloperSettings* DeveloperSettings = GetDefault<ULyraDeveloperSettings>();
+		if (DeveloperSettings->bForceDisableDebugTrace == false && bShowDebug)
+		{
+			FColor Color = (HasAuthority(&CurrentActivationInfo)) ? FColor::Red : FColor::Green;
+			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 4, 32, Color, false, 5);
+		}
 	}
 #endif // UE_EDITOR
 }
