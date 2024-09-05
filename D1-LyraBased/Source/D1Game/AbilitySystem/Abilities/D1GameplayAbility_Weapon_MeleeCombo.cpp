@@ -37,9 +37,9 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 		FScopedPredictionWindow	ScopedPrediction(SourceASC, GetCurrentActivationInfo().GetActivationPredictionKey());
 		FGameplayAbilityTargetDataHandle LocalTargetDataHandle(MoveTemp(const_cast<FGameplayAbilityTargetDataHandle&>(InTargetDataHandle)));
 
-		TArray<int32> AttackHitIndexes;
+		TArray<int32> CharacterHitIndexes;
 		TArray<int32> BlockHitIndexes;
-		ParseTargetData(LocalTargetDataHandle, AttackHitIndexes, BlockHitIndexes);
+		ParseTargetData(LocalTargetDataHandle, CharacterHitIndexes, BlockHitIndexes);
 
 		float Damage = GetWeaponStatValue(D1GameplayTags::SetByCaller_BaseDamage);
 		
@@ -51,9 +51,9 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 		}
 		else
 		{
-			for (int32 AttackHitIndex : AttackHitIndexes)
+			for (int32 CharqacterHitIndex : CharacterHitIndexes)
 			{
-				FHitResult HitResult = *LocalTargetDataHandle.Data[AttackHitIndex]->GetHitResult();
+				FHitResult HitResult = *LocalTargetDataHandle.Data[CharqacterHitIndex]->GetHitResult();
 				ProcessHitResult(HitResult, Damage, false, nullptr);
 			}
 		}

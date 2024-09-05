@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "D1GameplayAbility_Weapon.h"
 
+#include "D1GameplayAbility_Weapon.h"
 #include "D1GameplayAbility_Weapon_WhirlwindSlash.generated.h"
 
 UCLASS()

@@ -46,7 +46,7 @@ void UD1GameplayAbility_Weapon::ActivateAbility(const FGameplayAbilitySpecHandle
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UD1GameplayAbility_Weapon::ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutAttackHitIndexes, TArray<int32>& OutBlockHitIndexes)
+void UD1GameplayAbility_Weapon::ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutCharacterHitIndexes, TArray<int32>& OutBlockHitIndexes)
 {
 	for (int32 i = 0; i < InTargetDataHandle.Data.Num(); i++)
 	{
@@ -87,7 +87,7 @@ void UD1GameplayAbility_Weapon::ParseTargetData(const FGameplayAbilityTargetData
 						}
 					}
 					
-					OutAttackHitIndexes.Add(i);
+					OutCharacterHitIndexes.Add(i);
 				}
 				else
 				{

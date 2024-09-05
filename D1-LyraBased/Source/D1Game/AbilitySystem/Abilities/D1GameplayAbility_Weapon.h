@@ -19,7 +19,7 @@ protected:
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	void ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutAttackHitIndexes, TArray<int32>& OutBlockHitIndexes);
+	void ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutCharacterHitIndexes, TArray<int32>& OutBlockHitIndexes);
 
 	UFUNCTION(BlueprintCallable)
 	void ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BlockMontage);

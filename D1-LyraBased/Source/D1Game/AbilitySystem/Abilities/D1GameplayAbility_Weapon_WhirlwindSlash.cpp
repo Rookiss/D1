@@ -22,9 +22,9 @@ void UD1GameplayAbility_Weapon_WhirlwindSlash::OnTargetDataReady(const FGameplay
 		FScopedPredictionWindow	ScopedPrediction(SourceASC, GetCurrentActivationInfo().GetActivationPredictionKey());
 		FGameplayAbilityTargetDataHandle LocalTargetDataHandle(MoveTemp(const_cast<FGameplayAbilityTargetDataHandle&>(InTargetDataHandle)));
 
-		TArray<int32> AttackHitIndexes;
+		TArray<int32> CharacterHitIndexes;
 		TArray<int32> BlockHitIndexes;
-		ParseTargetData(LocalTargetDataHandle, AttackHitIndexes, BlockHitIndexes);
+		ParseTargetData(LocalTargetDataHandle, CharacterHitIndexes, BlockHitIndexes);
 
 		for (int32 BlockHitIndex : BlockHitIndexes)
 		{
@@ -32,9 +32,9 @@ void UD1GameplayAbility_Weapon_WhirlwindSlash::OnTargetDataReady(const FGameplay
 			ProcessHitResult(HitResult, Damage, true, nullptr);
 		}
 
-		for (int32 AttackHitIndex : AttackHitIndexes)
+		for (int32 CharacterHitIndex : CharacterHitIndexes)
 		{
-			FHitResult HitResult = *LocalTargetDataHandle.Data[AttackHitIndex]->GetHitResult();
+			FHitResult HitResult = *LocalTargetDataHandle.Data[CharacterHitIndex]->GetHitResult();
 			ProcessHitResult(HitResult, Damage, false, nullptr);
 		}
 	}
