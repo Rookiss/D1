@@ -15,14 +15,13 @@ protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	
 protected:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void Execute();
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
-	float Distance = 150.f;
-	
-private:
-	UPROPERTY()
-	TSet<TWeakObjectPtr<ALyraCharacter>> CachedHitCharacters;
+	float DistanceOffset = 150.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float Damage = 20.f;
 };

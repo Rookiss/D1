@@ -16,13 +16,14 @@ UD1GameplayAbility_Weapon_GroundBreaker::UD1GameplayAbility_Weapon_GroundBreaker
 
 void UD1GameplayAbility_Weapon_GroundBreaker::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	CachedHitCharacters.Reset();
-	
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void UD1GameplayAbility_Weapon_GroundBreaker::Execute()
 {
+	if (HasAuthority(&CurrentActivationInfo) == false)
+		return;
+	
 	ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo();
 	if (LyraCharacter == nullptr)
 		return;
@@ -30,7 +31,7 @@ void UD1GameplayAbility_Weapon_GroundBreaker::Execute()
 	float ScaledCapsuleRadius = LyraCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	float ScaledCapsuleHalfHeight = LyraCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	
-	FVector Start = LyraCharacter->GetActorLocation() + (LyraCharacter->GetActorForwardVector() * Distance);
+	FVector Start = LyraCharacter->GetActorLocation() + (LyraCharacter->GetActorForwardVector() * DistanceOffset);
 	FVector End = Start;
 	FVector HalfSize = FVector(ScaledCapsuleRadius * 3.f, ScaledCapsuleRadius * 3.f, ScaledCapsuleHalfHeight);;
 	FRotator Orientation = UKismetMathLibrary::MakeRotFromX(LyraCharacter->GetActorForwardVector());
@@ -38,19 +39,42 @@ void UD1GameplayAbility_Weapon_GroundBreaker::Execute()
 	TArray<AActor*> ActorsToIgnore = { LyraCharacter };
 	
 	TArray<FHitResult> OutHitResults;
-	if (UKismetSystemLibrary::BoxTraceMultiForObjects(GetWorld(), Start, End, HalfSize, Orientation, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHitResults, true))
+	TMap<ALyraCharacter*, TPair<int32/*HitResult Index*/, float/*DistanceSq*/>> HitInfos;
+	
+	if (UKismetSystemLibrary::BoxTraceMultiForObjects(GetWorld(), Start, End, HalfSize, Orientation, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, OutHitResults, true))
 	{
-		for (const FHitResult& HitResult : OutHitResults)
+		for (int32 i = 0; i < OutHitResults.Num(); i++)
 		{
-			LOG_SCREEN(TEXT("Hit: %s"), *HitResult.GetActor()->GetName());
+			const FHitResult& HitResult = OutHitResults[i];
 			
 			ALyraCharacter* HitCharacter = Cast<ALyraCharacter>(HitResult.GetActor());
-			if (HitCharacter == nullptr || CachedHitCharacters.Contains(HitCharacter))
+			if (HitCharacter == nullptr)
 				continue;
 
-			CachedHitCharacters.Add(HitCharacter);
+			float DistanceSq = FVector::DistSquared(LyraCharacter->GetActorLocation(), HitResult.ImpactPoint);
+			
+			if (TPair<int32, float>* HitInfo = HitInfos.Find(HitCharacter))
+			{
+				float PrevDistanceSq = (*HitInfo).Value;
+				if (DistanceSq < PrevDistanceSq)
+				{
+					(*HitInfo).Key = i;
+					(*HitInfo).Value = DistanceSq;
+				}
+			}
+			else
+			{
+				HitInfos.Add(HitCharacter, {i, DistanceSq});
+			}
+		}
 
-			// MakeOutgoingGameplayEffectSpec()
+		for (const auto& HitInfo : HitInfos)
+		{
+			const int32 HitResultIndex = HitInfo.Value.Key;
+			const FHitResult& HitResult = OutHitResults[HitResultIndex];
+
+			ALyraCharacter* TargetChacter = Cast<ALyraCharacter>(HitResult.GetActor());
+			ProcessHitResult(HitResult, Damage, IsBlockingHit(TargetChacter), nullptr);
 		}
 	}
 }

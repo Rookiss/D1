@@ -12,8 +12,6 @@
 #include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Player/LyraPlayerController.h"
-#include "Shakes/LegacyCameraShake.h"
 #include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
 
@@ -68,27 +66,10 @@ void UD1GameplayAbility_Weapon::ParseTargetData(const FGameplayAbilityTargetData
 					continue;
 
 				HitActors.Add(HitActor);
-
+				
 				if (TargetCharacter)
 				{
-					UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(TargetCharacter);
-					if (TargetASC && TargetASC->HasMatchingGameplayTag(D1GameplayTags::Status_Block))
-					{
-						FVector TargetLocation = HitActor->GetActorLocation();
-						FVector TargetDirection = HitActor->GetActorForwardVector();
-								
-						FVector InstigatorLocation = GetAvatarActorFromActorInfo()->GetActorLocation();
-						FVector TargetToInstigator = InstigatorLocation - TargetLocation;
-								
-						float Degree = UKismetMathLibrary::DegAcos(TargetDirection.Dot(TargetToInstigator.GetSafeNormal()));
-						if (Degree <= 45.f)
-						{
-							OutBlockHitIndexes.Add(i);
-							continue;
-						}
-					}
-					
-					OutCharacterHitIndexes.Add(i);
+					IsBlockingHit(TargetCharacter) ? OutBlockHitIndexes.Add(i) : OutCharacterHitIndexes.Add(i);
 				}
 				else
 				{
@@ -99,7 +80,7 @@ void UD1GameplayAbility_Weapon::ParseTargetData(const FGameplayAbilityTargetData
 	}
 }
 
-void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BlockMontage)
+void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BackwardMontage)
 {
 	ULyraAbilitySystemComponent* SourceASC = GetLyraAbilitySystemComponentFromActorInfo();
 	if (SourceASC == nullptr)
@@ -111,21 +92,21 @@ void UD1GameplayAbility_Weapon::ProcessHitResult(FHitResult HitResult, float Dam
 	SourceCueParams.PhysicalMaterial = HitResult.PhysMaterial;
 	SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
 
-	if (BlockMontage)
+	if (BackwardMontage)
 	{
-		SourceASC->BlockAnimMontageForSeconds(BlockMontage);
+		SourceASC->BlockAnimMontageForSeconds(BackwardMontage);
 	}
 	
 	if (HasAuthority(&CurrentActivationInfo))
 	{
-		if (BlockMontage)
+		if (BackwardMontage)
 		{
 			FOnMontageEnded MontageEnded = FOnMontageEnded::CreateWeakLambda(this, [this](UAnimMontage* AnimMontage, bool bInterrupted)
 			{
 				EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 			});
 			UAnimInstance* AnimInstance = SourceASC->AbilityActorInfo->GetAnimInstance();
-			AnimInstance->Montage_SetEndDelegate(MontageEnded, BlockMontage);
+			AnimInstance->Montage_SetEndDelegate(MontageEnded, BackwardMontage);
 		}
 		
 		FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
@@ -165,6 +146,24 @@ void UD1GameplayAbility_Weapon::DrawDebugHitPoint(const FHitResult& HitResult)
 		}
 	}
 #endif // UE_EDITOR
+}
+
+bool UD1GameplayAbility_Weapon::IsBlockingHit(ALyraCharacter* TargetCharacter)
+{
+	UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(TargetCharacter);
+	if (TargetASC && TargetASC->HasMatchingGameplayTag(D1GameplayTags::Status_Block))
+	{
+		FVector TargetLocation = TargetCharacter->GetActorLocation();
+		FVector TargetDirection = TargetCharacter->GetActorForwardVector();
+								
+		FVector InstigatorLocation = GetAvatarActorFromActorInfo()->GetActorLocation();
+		FVector TargetToInstigator = InstigatorLocation - TargetLocation;
+								
+		float Degree = UKismetMathLibrary::DegAcos(TargetDirection.Dot(TargetToInstigator.GetSafeNormal()));
+		if (Degree <= BlockingAngle)
+			return true;
+	}
+	return false;
 }
 
 int32 UD1GameplayAbility_Weapon::GetWeaponStatValue(FGameplayTag StatTag) const
