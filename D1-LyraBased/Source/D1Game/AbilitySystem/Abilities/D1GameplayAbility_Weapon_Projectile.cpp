@@ -4,7 +4,7 @@
 #include "Actors/D1ProjectileBase.h"
 #include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
-#include "System/LyraAssetManager.h"
+#include "Player/LyraPlayerController.h"
 #include "System/LyraGameData.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_Projectile)
@@ -34,8 +34,12 @@ void UD1GameplayAbility_Weapon_Projectile::SpawnProjectile()
 	if (WeaponMeshComponent == nullptr)
 		return;
 
+	ALyraPlayerController* LyraPlayerController = GetLyraPlayerControllerFromActorInfo();
+	if (LyraPlayerController == nullptr)
+		return;
+
 #if UE_EDITOR
-	check(WeaponMeshComponent->DoesSocketExist(ProjectileSocketName));
+	ensure(WeaponMeshComponent->DoesSocketExist(ProjectileSocketName));
 #endif
 	
 	if (WeaponMeshComponent->DoesSocketExist(ProjectileSocketName) == false)
@@ -43,12 +47,18 @@ void UD1GameplayAbility_Weapon_Projectile::SpawnProjectile()
 
 	if (ProjectileClasses.IsValidIndex(CurrentIndex) == false)
 		return;
+
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	LyraPlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
 	
-	FTransform SpawnTransform = WeaponMeshComponent->GetSocketTransform(ProjectileSocketName);
-	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetAvatarActorFromActorInfo()))
-	{
-		SpawnTransform.SetRotation(LyraCharacter->GetController()->GetControlRotation().Quaternion());
-	}
+	FVector CameraForward = CameraRotation.Vector();
+	FVector WeaponSocketLocation = WeaponMeshComponent->GetSocketLocation(ProjectileSocketName);
+	float Distance = CameraForward.Dot(WeaponSocketLocation - CameraLocation);
+	
+	FTransform SpawnTransform;
+	SpawnTransform.SetLocation(CameraLocation + CameraForward * Distance);
+	SpawnTransform.SetRotation(CameraRotation.Quaternion());
 	
 	AD1ProjectileBase* Projectile = GetWorld()->SpawnActorDeferred<AD1ProjectileBase>(
 		ProjectileClasses[CurrentIndex],

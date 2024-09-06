@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include "D1GameplayAbility_Weapon.h"
+#include "D1GameplayAbility_Weapon_Melee.h"
 #include "D1GameplayAbility_Weapon_MeleeCombo.generated.h"
 
 UCLASS()
-class UD1GameplayAbility_Weapon_MeleeCombo : public UD1GameplayAbility_Weapon
+class UD1GameplayAbility_Weapon_MeleeCombo : public UD1GameplayAbility_Weapon_Melee
 {
 	GENERATED_BODY()
 	

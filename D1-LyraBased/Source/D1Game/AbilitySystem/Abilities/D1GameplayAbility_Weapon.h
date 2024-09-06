@@ -18,23 +18,7 @@ public:
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
-protected:
-	UFUNCTION(BlueprintCallable)
-	void ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutCharacterHitIndexes, TArray<int32>& OutBlockHitIndexes);
-
-	UFUNCTION(BlueprintCallable)
-	void ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BackwardMontage);
-
-	UFUNCTION(BlueprintCallable)
-	void ResetHitActors();
-	
-	UFUNCTION(BlueprintCallable)
-	void DrawDebugHitPoint(const FHitResult& HitResult);
-
 public:
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsCharacterBlockingHit(ALyraCharacter* TargetCharacter);
-	
 	UFUNCTION(BlueprintCallable, BlueprintPure, meta=(GameplayTagFilter = "SetByCaller"))
 	int32 GetWeaponStatValue(FGameplayTag StatTag) const;
 
@@ -47,20 +31,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float DefaultAttackRate = 1.f;
-
-	UPROPERTY(EditDefaultsOnly)
-	float BlockingAngle = 60.f;
-
-	UPROPERTY(EditDefaultsOnly)
-	float BlockHitDamageMultiplier = 0.3f;
 	
-	UPROPERTY(EditDefaultsOnly)
-	bool bShowDebug = false;
-
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AD1WeaponBase> WeaponActor;
-
-	UPROPERTY()
-	TSet<TWeakObjectPtr<AActor>> CachedHitActors;
 };

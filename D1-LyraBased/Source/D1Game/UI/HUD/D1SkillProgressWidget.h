@@ -3,13 +3,13 @@
 #include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
-#include "D1SpellProgressWidget.generated.h"
+#include "D1SkillProgressWidget.generated.h"
 
 class UTextBlock;
 class UProgressBar;
 
 USTRUCT(BlueprintType)
-struct FSpellProgressInitializeMessage
+struct FSkillProgressInitializeMessage
 {
 	GENERATED_BODY()
 
@@ -28,7 +28,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FSpellProgressRefreshMessage
+struct FSkillProgressRefreshMessage
 {
 	GENERATED_BODY()
 
@@ -38,12 +38,12 @@ public:
 };
 
 UCLASS()
-class UD1SpellProgressWidget : public UUserWidget
+class UD1SkillProgressWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
 public:
-	UD1SpellProgressWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UD1SkillProgressWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 protected:
 	virtual void NativeConstruct() override;
@@ -51,15 +51,15 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 private:
-	void ConstructUI(FGameplayTag Channel, const FSpellProgressInitializeMessage& Message);
-	void RefreshUI(FGameplayTag Channel, const FSpellProgressRefreshMessage& Message);
+	void ConstructUI(FGameplayTag Channel, const FSkillProgressInitializeMessage& Message);
+	void RefreshUI(FGameplayTag Channel, const FSkillProgressRefreshMessage& Message);
 	
 protected:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_SpellName;
+	TObjectPtr<UTextBlock> Text_SkillName;
 	
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
-	TObjectPtr<UProgressBar> ProgressBar_SpellProgress;
+	TObjectPtr<UProgressBar> ProgressBar_SkillProgress;
 
 protected:
 	UPROPERTY(EditAnywhere, meta=(Categories="Message"))

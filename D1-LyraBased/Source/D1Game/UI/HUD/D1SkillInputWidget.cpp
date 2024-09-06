@@ -1,14 +1,14 @@
-﻿#include "D1SpellInputWidget.h"
+﻿#include "D1SkillInputWidget.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1SpellInputWidget)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1SkillInputWidget)
 
-UD1SpellInputWidget::UD1SpellInputWidget(const FObjectInitializer& ObjectInitializer)
+UD1SkillInputWidget::UD1SkillInputWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1SpellInputWidget::NativeConstruct()
+void UD1SkillInputWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
@@ -18,7 +18,7 @@ void UD1SpellInputWidget::NativeConstruct()
 	ListenerHandle = MessageSubsystem.RegisterListener(MessageChannelTag, this, &ThisClass::ConstructUI);
 }
 
-void UD1SpellInputWidget::NativeDestruct()
+void UD1SkillInputWidget::NativeDestruct()
 {
 	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
 	MessageSubsystem.UnregisterListener(ListenerHandle);
@@ -26,7 +26,7 @@ void UD1SpellInputWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UD1SpellInputWidget::ConstructUI(FGameplayTag Channel, const FSpellInputInitializeMessage& Message)
+void UD1SkillInputWidget::ConstructUI(FGameplayTag Channel, const FSkillInputInitializeMessage& Message)
 {
 	Message.bShouldShow ? SetVisibility(ESlateVisibility::Visible) : SetVisibility(ESlateVisibility::Hidden);
 }

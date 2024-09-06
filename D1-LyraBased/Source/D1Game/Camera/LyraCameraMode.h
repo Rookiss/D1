@@ -112,7 +112,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Blending")
 	FGameplayTag CameraTypeTag;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	FName CameraSocketName;
 	
 	// View output produced by the camera mode.

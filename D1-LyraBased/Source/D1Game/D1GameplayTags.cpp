@@ -60,6 +60,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_3,								"Ability.Attack.3");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_Bow,								"Ability.Attack.Bow");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_Skill,							"Ability.Attack.Skill");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_Skill_1,							"Ability.Attack.Skill.1");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_Skill_2,							"Ability.Attack.Skill.2");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Throw,									"Ability.Throw");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Drink,									"Ability.Drink");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Block,									"Ability.Block");
