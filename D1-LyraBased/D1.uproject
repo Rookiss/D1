@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{00D08A0F-4C83-E17C-2309-C48A97E031FF}",
+	"EngineAssociation": "5.4",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -380,6 +380,10 @@
 		{
 			"Name": "LyraExtTool",
 			"Enabled": false
+		},
+		{
+			"Name": "WaveformEditor",
+			"Enabled": true
 		}
 	],
 	"EpicSampleNameHash": "451731683"
