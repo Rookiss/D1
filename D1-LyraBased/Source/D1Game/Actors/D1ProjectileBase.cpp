@@ -79,7 +79,7 @@ void AD1ProjectileBase::SetSpeed(float Speed)
 
 void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& HitResult)
 {
-	if (bMultiComponentHit == false && bHit)
+	if (bHit)
 		return;
 	
 	bHit = true;

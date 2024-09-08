@@ -92,6 +92,26 @@ void ULyraAbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AAc
 	}
 }
 
+void ULyraAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& AbilitySpec)
+{
+	Super::OnGiveAbility(AbilitySpec);
+
+	if (AbilityChangedDelegate.IsBound())
+	{
+		AbilityChangedDelegate.Broadcast(AbilitySpec.Ability, true);
+	}
+}
+
+void ULyraAbilitySystemComponent::OnRemoveAbility(FGameplayAbilitySpec& AbilitySpec)
+{
+	if (AbilityChangedDelegate.IsBound())
+	{
+		AbilityChangedDelegate.Broadcast(AbilitySpec.Ability, false);
+	}
+	
+	Super::OnRemoveAbility(AbilitySpec);
+}
+
 void ULyraAbilitySystemComponent::TryActivateAbilitiesOnSpawn()
 {
 	ABILITYLIST_SCOPE_LOCK();

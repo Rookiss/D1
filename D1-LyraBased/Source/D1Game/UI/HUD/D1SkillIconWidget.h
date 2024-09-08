@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "GameplayTagContainer.h"
+#include "Abilities/GameplayAbility.h"
 #include "Blueprint/UserWidget.h"
 #include "D1SkillIconWidget.generated.h"
 
@@ -16,11 +18,20 @@ public:
 
 protected:
 	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+private:
+	UFUNCTION()
+	void OnAbilitySystemInitialized();
+	
+	UFUNCTION()
+	void OnAbilityChanged(UGameplayAbility* GameplayAbility, bool bGiven);
 	
 protected:
-    UFUNCTION()
-    void OnSkillIconClicked();
+	UPROPERTY(EditAnywhere)
+	FGameplayTag SkillSlotTag;
 	
 protected:
 	UPROPERTY(meta=(BindWidget))
@@ -28,4 +39,8 @@ protected:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_Cooldown;
+
+private:
+	FGameplayAbilitySpecHandle AbilitySpecHandle;
+	FDelegateHandle AbilityDelegateHandle;
 };

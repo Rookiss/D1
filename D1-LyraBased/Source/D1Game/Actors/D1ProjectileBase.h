@@ -45,9 +45,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bAttachToHitComponent = false;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bMultiComponentHit = false;
-
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> SphereCollisionComponent;

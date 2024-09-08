@@ -16,6 +16,7 @@ struct FFrame;
 struct FGameplayAbilityTargetDataHandle;
 
 D1GAME_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Gameplay_AbilityInputBlocked);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FAbilityChangedDelegate, UGameplayAbility*, bool/*bGiven*/);
 
 /**
  * ULyraAbilitySystemComponent
@@ -36,6 +37,9 @@ public:
 
 	virtual void InitAbilityActorInfo(AActor* InOwnerActor, AActor* InAvatarActor) override;
 
+	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec) override;
+	virtual void OnRemoveAbility(FGameplayAbilitySpec& AbilitySpec) override;
+	
 	typedef TFunctionRef<bool(const ULyraGameplayAbility* LyraAbility, FGameplayAbilitySpecHandle Handle)> TShouldCancelAbilityFunc;
 	void CancelAbilitiesByFunc(TShouldCancelAbilityFunc ShouldCancelFunc, bool bReplicateCancelAbility);
 
@@ -122,4 +126,5 @@ private:
 
 public:
 	FTimerHandle BlockAnimMontageTimerHandle;
+	FAbilityChangedDelegate AbilityChangedDelegate;
 };
