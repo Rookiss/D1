@@ -162,11 +162,13 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 
 				bool IsADS = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_ADS);
 				bool IsBlock = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Block);
+				bool IsDrink = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Drink);
 				bool IsSprint = ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Sprint);
 					
 				float CrouchCheck = IsCrouching() ? DirectionCheck * CrouchMovePercent : DirectionCheck;
 				float ADSCheck = (IsADS || IsBlock) ? CrouchCheck * ADSMovePercent : CrouchCheck;
-				float SprintCheck = IsSprint ? ADSCheck * 1.5f : ADSCheck;
+				float DrinkCheck = IsDrink ? ADSCheck * DrinkMovePercent : ADSCheck;
+				float SprintCheck = IsSprint ? DrinkCheck * 1.5f : DrinkCheck;
 
 				GEngine->AddOnScreenDebugMessage(1, 0.1f, FColor::Red, FString::Printf(TEXT("MaxSpeed: %f"), SprintCheck));
 				return SprintCheck;

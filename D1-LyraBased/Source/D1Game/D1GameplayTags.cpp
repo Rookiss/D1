@@ -91,6 +91,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_ChangeEquip,								"Status.ChangeEquip");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS,										"Status.ADS");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS_Bow,									"Status.ADS.Bow");
+	UE_DEFINE_GAMEPLAY_TAG(Status_ADS_Ready,								"Status.ADS.Ready");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS_Throw,								"Status.ADS.Throw");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Dash,										"Status.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Sprint,									"Status.Sprint");
@@ -100,6 +101,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_HitReact,									"Status.HitReact");
 	UE_DEFINE_GAMEPLAY_TAG(Status_RejectHitReact,							"Status.RejectHitReact");
 	UE_DEFINE_GAMEPLAY_TAG(Status_StaminaRecoveryBlock,						"Status.StaminaRecoveryBlock");
+	UE_DEFINE_GAMEPLAY_TAG(Status_PiercingShot,								"Status.PiercingShot");
 	
 	// Gameplay Event
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Death,								"GameplayEvent.Death");
@@ -107,6 +109,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Tick,						"GameplayEvent.Montage.Tick");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_End,						"GameplayEvent.Montage.End");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Spell,						"GameplayEvent.Montage.Spell");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Play,						"GameplayEvent.Montage.Play");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Trace,								"GameplayEvent.Trace");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Reset,								"GameplayEvent.Reset");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_CameraShake,						"GameplayEvent.CameraShake");
@@ -116,6 +119,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Potion_Fill,						"GameplayEvent.Potion.Fill");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Knockback,							"GameplayEvent.Knockback");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Stun,								"GameplayEvent.Stun");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Bow_ADS,							"GameplayEvent.Bow.ADS");
 	
 	// Cheat
 	UE_DEFINE_GAMEPLAY_TAG(Cheat_GodMode,									"Cheat.GodMode");

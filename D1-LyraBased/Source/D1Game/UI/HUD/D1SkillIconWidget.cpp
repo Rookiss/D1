@@ -39,3 +39,8 @@ void UD1SkillIconWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTi
 
 	// TODO: Temp
 }
+
+void UD1SkillIconWidget::OnSkillIconClicked()
+{
+	
+}

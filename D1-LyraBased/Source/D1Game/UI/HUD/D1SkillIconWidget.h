@@ -19,12 +19,13 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 protected:
+    UFUNCTION()
+    void OnSkillIconClicked();
+	
+protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_SkillIcon;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_Cooldown;
-
-private:
-	
 };

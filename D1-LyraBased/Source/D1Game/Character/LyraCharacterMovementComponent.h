@@ -91,5 +91,8 @@ protected:
 	float ADSMovePercent = 0.7f;
 
 	UPROPERTY(EditDefaultsOnly)
+	float DrinkMovePercent = 0.5f;
+	
+	UPROPERTY(EditDefaultsOnly)
 	float SprintMovePercent = 1.5f;
 };

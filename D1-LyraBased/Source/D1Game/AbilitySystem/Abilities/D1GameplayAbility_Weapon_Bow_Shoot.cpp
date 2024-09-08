@@ -18,14 +18,42 @@ UD1GameplayAbility_Weapon_Bow_Shoot::UD1GameplayAbility_Weapon_Bow_Shoot(const F
 
 void UD1GameplayAbility_Weapon_Bow_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	if (K2_CheckAbilityCost() == false || K2_CheckAbilityCooldown() == false)
-	{
-		K2_EndAbility();
-		return;
-	}
+	// if (K2_CheckAbilityCost() == false || K2_CheckAbilityCooldown() == false)
+	// {
+	// 	K2_EndAbility();
+	// 	return;
+	// }
+	//
+	// CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+	//
+	// SpawnProjectile();
+	//
+	// ReleaseMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, ReleaseMontage, GetAttackRate(), NAME_None, true);
+	// ReleaseMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
+	// ReleaseMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
+	// ReleaseMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
+	// ReleaseMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
+	// ReleaseMontageTask->ReadyForActivation();
+	
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
 
-	CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+void UD1GameplayAbility_Weapon_Bow_Shoot::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	// if (IsValid(ReleaseMontageTask))
+	// {
+	// 	ReleaseMontageTask->EndTask();
+	// }
+	//
+	// FGameplayEventData EventData;
+	// EventData.EventMagnitude = 1.f;
+	// SendGameplayEvent(D1GameplayTags::GameplayEvent_ArrowVisibility, EventData);
+	
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
 
+void UD1GameplayAbility_Weapon_Bow_Shoot::SpawnProjectile()
+{
 	if (K2_HasAuthority())
 	{
 		ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo();
@@ -54,8 +82,6 @@ void UD1GameplayAbility_Weapon_Bow_Shoot::ActivateAbility(const FGameplayAbility
 			FTransform SpawnTransform;
 			SpawnTransform.SetLocation(SpawnLocation);
 			SpawnTransform.SetRotation(SpawnRotation.Quaternion());
-
-			// DrawDebugLine(GetWorld(), SpawnTransform.GetLocation(), SpawnTransform.GetLocation() + SpawnTransform.GetRotation().Vector() * 1000.f, FColor::Red, false, 5.f, 0, 0.5f);
 			
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -65,29 +91,6 @@ void UD1GameplayAbility_Weapon_Bow_Shoot::ActivateAbility(const FGameplayAbility
 			GetWorld()->SpawnActor<AD1ProjectileBase>(ProjectileClass, SpawnTransform, SpawnParams);
 		}
 	}
-
-	ReleaseMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, ReleaseMontage, GetAttackRate(), NAME_None, true);
-	ReleaseMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
-	ReleaseMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
-	ReleaseMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
-	ReleaseMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
-	ReleaseMontageTask->ReadyForActivation();
-	
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-}
-
-void UD1GameplayAbility_Weapon_Bow_Shoot::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
-{
-	if (IsValid(ReleaseMontageTask))
-	{
-		ReleaseMontageTask->EndTask();
-	}
-
-	FGameplayEventData EventData;
-	EventData.EventMagnitude = 1.f;
-	SendGameplayEvent(D1GameplayTags::GameplayEvent_ArrowVisibility, EventData);
-	
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UD1GameplayAbility_Weapon_Bow_Shoot::OnMontageFinished()

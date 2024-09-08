@@ -120,7 +120,7 @@ protected:
 
 	/** True when player input bindings have been applied, will never be true for non - players */
 	bool bReadyToBindInputs;
-
+	
 protected:
 	UFUNCTION()
 	void HandlePostProcess();
