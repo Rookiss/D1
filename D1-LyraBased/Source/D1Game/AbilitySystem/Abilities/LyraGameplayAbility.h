@@ -234,4 +234,14 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UInputMappingContext> InputMappingContext;
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UTexture2D> Icon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText Name;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText Description;
 };

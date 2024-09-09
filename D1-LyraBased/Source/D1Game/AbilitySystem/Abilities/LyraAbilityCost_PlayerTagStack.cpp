@@ -48,4 +48,3 @@ void ULyraAbilityCost_PlayerTagStack::ApplyCost(const ULyraGameplayAbility* Abil
 		}
 	}
 }
-

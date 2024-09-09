@@ -3,6 +3,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "D1GameplayTags.h"
+#include "D1LogChannels.h"
 #include "D1WeaponBase.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
@@ -48,25 +49,32 @@ void AD1ProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (ACharacter* Character = Cast<ACharacter>(GetInstigator()))
+	SphereCollisionComponent->IgnoreActorWhenMoving(GetInstigator(), true);
+
+	switch (CollisionDetectionType)
 	{
-		SphereCollisionComponent->IgnoreActorWhenMoving(Character, true);
+	case ECollisionDetectionType::Hit:
+		SphereCollisionComponent->SetGenerateOverlapEvents(false);
+		SphereCollisionComponent->OnComponentHit.AddUniqueDynamic(this, &ThisClass::HandleComponentHit);
+		break;
+	case ECollisionDetectionType::Overlap:
+		SphereCollisionComponent->SetGenerateOverlapEvents(true);
+		SphereCollisionComponent->OnComponentBeginOverlap.AddUniqueDynamic(this, &ThisClass::HandleComponentOverlap);
+		break;
 	}
-	
-	SphereCollisionComponent->OnComponentHit.AddUniqueDynamic(this, &ThisClass::HandleComponentHit);
 }
 
 void AD1ProjectileBase::Destroyed()
 {
-	if (bHit == false && HitEffect)
+	if (bHitSomething == false && HitEffect)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, HitEffect, GetActorLocation());
 	}
 	
-	if (HasAuthority() && OtherHitComponent.IsValid())
+	if (HasAuthority() && bAttachToHitComponent && AttachingComponent.IsValid())
 	{
-		OtherHitComponent->OnComponentDeactivated.RemoveDynamic(this, &ThisClass::HandleOtherComponentDeactivated);
-		OtherHitComponent = nullptr;
+		AttachingComponent->OnComponentDeactivated.RemoveDynamic(this, &ThisClass::HandleOtherComponentDeactivated);
+		AttachingComponent = nullptr;
 	}
 	
 	Super::Destroyed();
@@ -79,23 +87,45 @@ void AD1ProjectileBase::SetSpeed(float Speed)
 
 void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& HitResult)
 {
-	if (bHit)
+	if (HitActors.Num() > 0)
 		return;
 	
-	bHit = true;
+	HitActors.Add(OtherActor);
 	SphereCollisionComponent->Deactivate();
 	TrailNiagaraComponent->Deactivate();
 	ProjectileMovementComponent->Deactivate();
 
+	if (HasAuthority() && bAttachToHitComponent)
+	{
+		AttachingComponent = OtherComponent;
+		OtherComponent->OnComponentDeactivated.AddUniqueDynamic(this, &ThisClass::HandleOtherComponentDeactivated);
+		AttachToComponent(OtherComponent, FAttachmentTransformRules::KeepWorldTransform, HitResult.BoneName);
+	}
+	
+	HandleCollisionDetection(OtherActor, OtherComponent, HitResult);
+}
+
+void AD1ProjectileBase::HandleComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (HitActors.Contains(OtherActor))
+		return;
+
+	HitActors.Add(OtherActor);
+	HandleCollisionDetection(OtherActor, OtherComponent, SweepResult);
+}
+
+void AD1ProjectileBase::HandleOtherComponentDeactivated(UActorComponent* OtherComponent)
+{
 	if (HasAuthority())
 	{
-		if (bAttachToHitComponent)
-		{
-			OtherHitComponent = OtherComponent;
-			OtherComponent->OnComponentDeactivated.AddUniqueDynamic(this, &ThisClass::HandleOtherComponentDeactivated);
-			AttachToComponent(OtherComponent, FAttachmentTransformRules::KeepWorldTransform, HitResult.BoneName);
-		}
-		
+		Destroy();
+	}
+}
+
+void AD1ProjectileBase::HandleCollisionDetection(AActor* OtherActor, UPrimitiveComponent* OtherComponent, const FHitResult& HitResult)
+{
+	if (HasAuthority())
+	{
 		AD1WeaponBase* TargetWeapon = Cast<AD1WeaponBase>(OtherActor);
 		ALyraCharacter* TargetCharacter = Cast<ALyraCharacter>(OtherActor);
 		if (TargetCharacter == nullptr)
@@ -162,13 +192,5 @@ void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AA
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, HitEffect, HitResult.ImpactPoint);
 		}
-	}
-}
-
-void AD1ProjectileBase::HandleOtherComponentDeactivated(UActorComponent* OtherComponent)
-{
-	if (HasAuthority())
-	{
-		Destroy();
 	}
 }

@@ -45,6 +45,30 @@ void FGameplayTagStackContainer::AddStack(FGameplayTag Tag, int32 StackCount)
 	}
 }
 
+void FGameplayTagStackContainer::SetStack(FGameplayTag Tag, int32 StackCount)
+{
+	if (!Tag.IsValid())
+	{
+		FFrame::KismetExecutionMessage(TEXT("An invalid tag was passed to AddStack"), ELogVerbosity::Warning);
+		return;
+	}
+
+	for (FGameplayTagStack& Stack : Stacks)
+	{
+		if (Stack.Tag == Tag)
+		{
+			Stack.StackCount = StackCount;
+			TagToCountMap[Tag] = StackCount;
+			MarkItemDirty(Stack);
+			return;
+		}
+	}
+
+	FGameplayTagStack& NewStack = Stacks.Emplace_GetRef(Tag, StackCount);
+	MarkItemDirty(NewStack);
+	TagToCountMap.Add(Tag, StackCount);
+}
+
 void FGameplayTagStackContainer::RemoveStack(FGameplayTag Tag, int32 StackCount)
 {
 	if (!Tag.IsValid())
@@ -76,6 +100,27 @@ void FGameplayTagStackContainer::RemoveStack(FGameplayTag Tag, int32 StackCount)
 				}
 				return;
 			}
+		}
+	}
+}
+
+void FGameplayTagStackContainer::RemoveStack(FGameplayTag Tag)
+{
+	if (!Tag.IsValid())
+	{
+		FFrame::KismetExecutionMessage(TEXT("An invalid tag was passed to RemoveStack"), ELogVerbosity::Warning);
+		return;
+	}
+	
+	for (auto It = Stacks.CreateIterator(); It; ++It)
+	{
+		FGameplayTagStack& Stack = *It;
+		if (Stack.Tag == Tag)
+		{
+			It.RemoveCurrent();
+			TagToCountMap.Remove(Tag);
+			MarkArrayDirty();
+			return;
 		}
 	}
 }

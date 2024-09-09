@@ -56,9 +56,11 @@ struct FGameplayTagStackContainer : public FFastArraySerializer
 public:
 	// Adds a specified number of stacks to the tag (does nothing if StackCount is below 1)
 	void AddStack(FGameplayTag Tag, int32 StackCount);
+	void SetStack(FGameplayTag Tag, int32 StackCount);
 
 	// Removes a specified number of stacks from the tag (does nothing if StackCount is below 1)
 	void RemoveStack(FGameplayTag Tag, int32 StackCount);
+	void RemoveStack(FGameplayTag Tag);
 
 	const TArray<FGameplayTagStack>& GetStacks() const { return Stacks; }
 	
