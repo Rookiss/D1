@@ -121,10 +121,11 @@ public:
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void AddUnarmedEquipments(TSubclassOf<UD1ItemTemplate> LeftHandClass, TSubclassOf<UD1ItemTemplate> RightHandClass);
-
+	
 public:
 	void AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount);
 	UD1ItemInstance* RemoveEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, int32 ItemCount);
+	void SetEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass, EItemRarity ItemRarity, int32 ItemCount);
 	
 public:
 	static bool IsWeaponSlot(EEquipmentSlotType EquipmentSlotType);

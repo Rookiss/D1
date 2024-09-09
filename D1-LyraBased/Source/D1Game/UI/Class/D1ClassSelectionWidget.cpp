@@ -30,7 +30,7 @@ void UD1ClassSelectionWidget::NativeConstruct()
 	for (const FClassEntry& ClassEntry : ClassEntries)
 	{
 		UD1ClassEntryWidget* ClassEntryWidget = CreateWidget<UD1ClassEntryWidget>(this, ClassEntryWidgetClass);
-		ClassEntryWidget->InitializeUI(ClassEntry);
+		ClassEntryWidget->InitializeUI(this, ClassEntry);
 		VerticalBox_ClassElements->AddChild(ClassEntryWidget);
 	}
 }

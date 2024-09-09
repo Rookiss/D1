@@ -4,6 +4,7 @@
 
 #include "AbilitySystemInterface.h"
 #include "ModularPlayerState.h"
+#include "AbilitySystem/LyraAbilitySet.h"
 #include "System/GameplayTagStack.h"
 #include "Teams/LyraTeamAgentInterface.h"
 
@@ -182,4 +183,12 @@ private:
 
 	UFUNCTION()
 	void OnRep_MySquadID();
+
+public:
+	// TODO: Temp
+	UFUNCTION(Server, Reliable)
+	void Server_SelectClass(const FClassEntry& ClassEntry);
+	
+public:
+	FLyraAbilitySet_GrantedHandles AbilitySetGrantedHandles;
 };

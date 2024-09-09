@@ -72,6 +72,7 @@ namespace D1GameplayTags
 	D1GAME_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Interact_Object);
 	D1GAME_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Widget_Inventory);
 	D1GAME_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Widget_WorldMap);
+	D1GAME_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Widget_ClassSelection);
 	D1GAME_API  UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_HitReact);
 
 	// Status

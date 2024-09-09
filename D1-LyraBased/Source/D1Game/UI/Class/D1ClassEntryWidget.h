@@ -4,6 +4,7 @@
 #include "Data/D1ClassData.h"
 #include "D1ClassEntryWidget.generated.h"
 
+class UD1ClassSelectionWidget;
 class UImage;
 class UButton;
 class UTextBlock;
@@ -20,7 +21,7 @@ public:
 
 public:
 	UFUNCTION()
-	void InitializeUI(const FClassEntry& ClassEntry);
+	void InitializeUI(UD1ClassSelectionWidget* OwnerWidget, const FClassEntry& ClassEntry);
 
 private:
 	UFUNCTION()
@@ -46,4 +47,7 @@ protected:
 private:
 	UPROPERTY()
 	FClassEntry CachedClassEntry;
+
+	UPROPERTY()
+	TWeakObjectPtr<UD1ClassSelectionWidget> CachedOwnerWidget;
 };

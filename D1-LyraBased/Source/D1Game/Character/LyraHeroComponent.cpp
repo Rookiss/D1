@@ -559,16 +559,18 @@ void ULyraHeroComponent::HandlePostProcess()
 	if (LyraGameState == nullptr)
 		return;
 
-	AD1ElectricField* ElectricFieldActor = LyraGameState->CachedElectricFieldActor.Get();
-	if (IsValid(ElectricFieldActor) == false)
-		return;
-
 	ALyraCharacter* LyraCharacter = GetPawn<ALyraCharacter>();
 	if (LyraCharacter == nullptr)
 		return;
+
+	bool bOutOfField = false;
 	
-	float Length = (FVector2D(LyraCharacter->GetActorLocation()) - FVector2D(ElectricFieldActor->GetActorLocation())).Length();
-	bool bOutOfField = (Length > ElectricFieldActor->GetActorScale3D().X * 50.f);
+	AD1ElectricField* ElectricFieldActor = LyraGameState->CachedElectricFieldActor.Get();
+	if (IsValid(ElectricFieldActor))
+	{
+		float Length = (FVector2D(LyraCharacter->GetActorLocation()) - FVector2D(ElectricFieldActor->GetActorLocation())).Length();
+		bOutOfField = (Length > ElectricFieldActor->GetActorScale3D().X * 50.f);
+	}
 
 	TargetBright = bOutOfField ? BaseBright.Y : BaseBright.X;
 	TargetDesaturation = bOutOfField ? BaseDesaturation.Y : BaseDesaturation.X;

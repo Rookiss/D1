@@ -626,42 +626,16 @@ void UD1EquipmentManagerComponent::AddUnarmedEquipments(TSubclassOf<UD1ItemTempl
 {
 	check(HasAuthority());
 
-	{
-		const int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(LeftHandClass);
-		FD1EquipmentEntry& Entry = EquipmentList.Entries[(int32)EEquipmentSlotType::Unarmed_LeftHand];
-
-		UD1ItemInstance* AddedItemInstance = NewObject<UD1ItemInstance>();
-		AddedItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
-		Entry.Init(AddedItemInstance, 1);
-
-		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && AddedItemInstance)
-		{
-			AddReplicatedSubObject(AddedItemInstance);
-		}
-		
-		EquipmentList.MarkItemDirty(Entry);
-	}
-
-	{
-		const int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(RightHandClass);
-		FD1EquipmentEntry& Entry = EquipmentList.Entries[(int32)EEquipmentSlotType::Unarmed_RightHand];
-
-		UD1ItemInstance* AddedItemInstance = NewObject<UD1ItemInstance>();
-		AddedItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
-		Entry.Init(AddedItemInstance, 1);
-
-		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && AddedItemInstance)
-		{
-			AddReplicatedSubObject(AddedItemInstance);
-		}
-		
-		EquipmentList.MarkItemDirty(Entry);
-	}
+	SetEquipment(EEquipmentSlotType::Unarmed_LeftHand, LeftHandClass, EItemRarity::Junk, 1);
+	SetEquipment(EEquipmentSlotType::Unarmed_RightHand, RightHandClass, EItemRarity::Junk, 1);
 }
 
 void UD1EquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount)
 {
 	check(HasAuthority());
+
+	if (EquipmentSlotType == EEquipmentSlotType::Count || ItemCount <= 0)
+		return;
 	
 	FD1EquipmentEntry& Entry = EquipmentList.Entries[(int32)EquipmentSlotType];
 
@@ -684,6 +658,81 @@ void UD1EquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType Equipm
 		}
 		
 		EquipmentList.MarkItemDirty(Entry);
+	}
+}
+
+void UD1EquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass, EItemRarity ItemRarity, int32 ItemCount)
+{
+	check(HasAuthority());
+
+	if (EquipmentSlotType == EEquipmentSlotType::Count || ItemTemplateClass == nullptr || ItemRarity == EItemRarity::Count || ItemCount <= 0)
+		return;
+	
+	const int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
+
+	ItemCount = FMath::Clamp(ItemCount, 1, ItemTemplate.MaxStackCount);
+	
+	const UD1ItemFragment_Equippable* EquippableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable>();
+	if (EquippableFragment == nullptr)
+		return;
+
+	FD1EquipmentEntry& Entry = EquipmentList.Entries[(int32)EquipmentSlotType];
+	Entry.Reset();
+	
+	if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
+	{
+		const UD1ItemFragment_Equippable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(EquippableFragment);
+		EWeaponHandType WeaponHandType = WeaponFragment->WeaponHandType;
+
+		if (IsPrimaryWeaponSlot(EquipmentSlotType))
+		{
+			if (WeaponHandType == EWeaponHandType::LeftHand || WeaponHandType == EWeaponHandType::RightHand)
+			{
+				RemoveEquipment_Unsafe(EEquipmentSlotType::Primary_TwoHand, 1);
+			}
+			else if (WeaponHandType == EWeaponHandType::TwoHand)
+			{
+				RemoveEquipment_Unsafe(EEquipmentSlotType::Primary_LeftHand, 1);
+				RemoveEquipment_Unsafe(EEquipmentSlotType::Primary_RightHand, 1);
+			}
+		}
+		else if (IsSecondaryWeaponSlot(EquipmentSlotType))
+		{
+			if (WeaponHandType == EWeaponHandType::LeftHand || WeaponHandType == EWeaponHandType::RightHand)
+			{
+				RemoveEquipment_Unsafe(EEquipmentSlotType::Secondary_TwoHand, 1);
+			}
+			else if (WeaponHandType == EWeaponHandType::TwoHand)
+			{
+				RemoveEquipment_Unsafe(EEquipmentSlotType::Secondary_LeftHand, 1);
+				RemoveEquipment_Unsafe(EEquipmentSlotType::Secondary_RightHand, 1);
+			}
+		}
+	}
+
+	UD1ItemInstance* AddedItemInstance = NewObject<UD1ItemInstance>();
+	AddedItemInstance->Init(ItemTemplateID, ItemRarity);
+	Entry.Init(AddedItemInstance, ItemCount);
+
+	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && AddedItemInstance)
+	{
+		AddReplicatedSubObject(AddedItemInstance);
+	}
+	
+	EquipmentList.MarkItemDirty(Entry);
+
+	if (IsWeaponSlot(EquipmentSlotType))
+	{
+		if (UD1EquipManagerComponent* EquipManager = GetEquipManager())
+		{
+			EWeaponSlotType WeaponSlotType = UD1EquipManagerComponent::ConvertToWeaponSlotType(EquipmentSlotType);
+			EEquipState EquipState = UD1EquipManagerComponent::ConvertToEquipState(WeaponSlotType);
+			if (EquipManager->GetCurrentEquipState() != EquipState)
+			{
+				EquipManager->ChangeEquipState(EquipState);
+			}
+		}
 	}
 }
 

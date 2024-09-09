@@ -17,6 +17,9 @@
 #include "GameModes/LyraGameMode.h"
 #include "D1LogChannels.h"
 #include "LyraPlayerController.h"
+#include "Character/LyraCharacter.h"
+#include "Data/D1ClassData.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Messages/LyraNotificationMessage.h"
 #include "Messages/LyraVerbMessage.h"
 #include "Net/UnrealNetwork.h"
@@ -271,6 +274,26 @@ void ALyraPlayerState::OnRep_MyTeamID(FGenericTeamId OldTeamID)
 void ALyraPlayerState::OnRep_MySquadID()
 {
 	//@TODO: Let the squad subsystem know (once that exists)
+}
+
+void ALyraPlayerState::Server_SelectClass_Implementation(const FClassEntry& ClassEntry)
+{
+	if (ALyraCharacter* LyraCharacter = GetPawn<ALyraCharacter>())
+	{
+		if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->GetComponentByClass<UD1EquipmentManagerComponent>())
+		{
+			for (const FDefaultItemEntry& DefaultItemEntry : ClassEntry.DefaultItemEntries)
+			{
+				EquipmentManager->SetEquipment(DefaultItemEntry.EquipmentSlotType, DefaultItemEntry.ItemTemplateClass, DefaultItemEntry.ItemRarity, DefaultItemEntry.ItemCount);
+			}
+		}
+	}
+	
+	AbilitySetGrantedHandles.TakeFromAbilitySystem(AbilitySystemComponent);
+	if (ULyraAbilitySet* AbilitySet = ClassEntry.ClassAbilitySet)
+	{
+		AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, &AbilitySetGrantedHandles, this);
+	}
 }
 
 void ALyraPlayerState::AddStatTagStack(FGameplayTag Tag, int32 StackCount)

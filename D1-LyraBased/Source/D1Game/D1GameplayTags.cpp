@@ -74,6 +74,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact_Object,							"Ability.Interact.Object");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Widget_Inventory,						"Ability.Widget.Inventory");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Widget_WorldMap,							"Ability.Widget.WorldMap");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Widget_ClassSelection,					"Ability.Widget.ClassSelection");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_HitReact,								"Ability.HitReact");
 
 	// Status
