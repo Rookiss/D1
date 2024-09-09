@@ -4,7 +4,10 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Character/LyraPawnExtensionComponent.h"
+#include "Components/HorizontalBox.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Kismet/KismetTextLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1SkillIconWidget)
 
@@ -17,19 +20,20 @@ UD1SkillIconWidget::UD1SkillIconWidget(const FObjectInitializer& ObjectInitializ
 void UD1SkillIconWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-
-	SetVisibility(ESlateVisibility::Hidden);
 	
-	if (ULyraAbilitySystemComponent* LyraASC = Cast<ULyraAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn())))
+	SetVisibility(ESlateVisibility::Hidden);
+
+	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
+	if (ASC == nullptr)
+		return;
+	
+	for (const FGameplayAbilitySpec& AbilitySpec : ASC->GetActivatableAbilities())
 	{
-		for (const FGameplayAbilitySpec& AbilitySpec : LyraASC->GetActivatableAbilities())
+		if (AbilitySpec.Ability->AbilityTags.HasTagExact(SkillSlotTag))
 		{
-			if (AbilitySpec.Ability->AbilityTags.HasTagExact(SkillSlotTag))
-			{
-				AbilitySpecHandle = AbilitySpec.Handle;
-				SetVisibility(ESlateVisibility::Visible);
-				break;
-			}
+			CachedAbilitySpecHandle = AbilitySpec.Handle;
+			SetVisibility(ESlateVisibility::Visible);
+			break;
 		}
 	}
 }
@@ -49,6 +53,7 @@ void UD1SkillIconWidget::NativeDestruct()
 	if (ULyraAbilitySystemComponent* LyraASC = Cast<ULyraAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn())))
 	{
 		LyraASC->AbilityChangedDelegate.Remove(AbilityDelegateHandle);
+		AbilityDelegateHandle.Reset();
 	}
 	
 	Super::NativeDestruct();
@@ -57,15 +62,31 @@ void UD1SkillIconWidget::NativeDestruct()
 void UD1SkillIconWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	RefreshUI();
+}
+
+void UD1SkillIconWidget::RefreshUI()
+{
+	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
+	if (ASC == nullptr)
+		return;
+
+	FGameplayAbilitySpec* AbilitySpec = ASC->FindAbilitySpecFromHandle(CachedAbilitySpecHandle);
+	if (AbilitySpec == nullptr)
+		return;
 	
-	if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn()))
+	float CooldownTime = AbilitySpec->Ability->GetCooldownTimeRemaining(ASC->AbilityActorInfo.Get());
+	if (CooldownTime > 0.f)
 	{
-		if (FGameplayAbilitySpec* AbilitySpec = ASC->FindAbilitySpecFromHandle(AbilitySpecHandle))
-		{
-			float CooldownTime = AbilitySpec->Ability->GetCooldownTimeRemaining();
-			Text_Cooldown->SetVisibility(CooldownTime > 0.f ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
-			Text_Cooldown->SetText(FText::AsNumber(CooldownTime));
-		}
+		Image_SkillIcon->SetColorAndOpacity(FLinearColor::Gray);
+		Text_Cooldown->SetText(UKismetTextLibrary::Conv_DoubleToText(CooldownTime, HalfFromZero, false, true, 1, 2, 1, 1));
+		HorizontalBox_Cooldown->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		Image_SkillIcon->SetColorAndOpacity(FLinearColor::White);
+		HorizontalBox_Cooldown->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
@@ -77,19 +98,27 @@ void UD1SkillIconWidget::OnAbilitySystemInitialized()
 	}
 }
 
-void UD1SkillIconWidget::OnAbilityChanged(UGameplayAbility* GameplayAbility, bool bGiven)
+void UD1SkillIconWidget::OnAbilityChanged(FGameplayAbilitySpecHandle AbilitySpecHandle, bool bGiven)
 {
-	if (GameplayAbility && GameplayAbility->AbilityTags.HasTagExact(SkillSlotTag))
+	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
+	if (ASC == nullptr)
+		return;
+
+	FGameplayAbilitySpec* AbilitySpec = ASC->FindAbilitySpecFromHandle(AbilitySpecHandle);
+	if (AbilitySpec == nullptr)
+		return;
+	
+	if (AbilitySpec->Ability->AbilityTags.HasTagExact(SkillSlotTag))
 	{
 		if (bGiven)
 		{
+			CachedAbilitySpecHandle = AbilitySpec->Handle;
 			SetVisibility(ESlateVisibility::Visible);
-			AbilitySpecHandle = GameplayAbility->GetCurrentAbilitySpecHandle();
 		}
 		else
 		{
+			CachedAbilitySpecHandle = FGameplayAbilitySpecHandle();
 			SetVisibility(ESlateVisibility::Hidden);
-			AbilitySpecHandle = FGameplayAbilitySpecHandle();
 		}
 	}
 }

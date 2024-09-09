@@ -5,6 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "D1SkillIconWidget.generated.h"
 
+class UHorizontalBox;
 class UImage;
 class UTextBlock;
 
@@ -27,7 +28,9 @@ private:
 	void OnAbilitySystemInitialized();
 	
 	UFUNCTION()
-	void OnAbilityChanged(UGameplayAbility* GameplayAbility, bool bGiven);
+	void OnAbilityChanged(FGameplayAbilitySpecHandle AbilitySpecHandle, bool bGiven);
+	
+	void RefreshUI();
 	
 protected:
 	UPROPERTY(EditAnywhere)
@@ -38,9 +41,12 @@ protected:
 	TObjectPtr<UImage> Image_SkillIcon;
 
 	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UHorizontalBox> HorizontalBox_Cooldown;
+	
+	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_Cooldown;
 
 private:
-	FGameplayAbilitySpecHandle AbilitySpecHandle;
+	FGameplayAbilitySpecHandle CachedAbilitySpecHandle;
 	FDelegateHandle AbilityDelegateHandle;
 };

@@ -98,7 +98,7 @@ void ULyraAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& AbilitySpe
 
 	if (AbilityChangedDelegate.IsBound())
 	{
-		AbilityChangedDelegate.Broadcast(AbilitySpec.Ability, true);
+		AbilityChangedDelegate.Broadcast(AbilitySpec.Handle, true);
 	}
 }
 
@@ -106,7 +106,7 @@ void ULyraAbilitySystemComponent::OnRemoveAbility(FGameplayAbilitySpec& AbilityS
 {
 	if (AbilityChangedDelegate.IsBound())
 	{
-		AbilityChangedDelegate.Broadcast(AbilitySpec.Ability, false);
+		AbilityChangedDelegate.Broadcast(AbilitySpec.Handle, false);
 	}
 	
 	Super::OnRemoveAbility(AbilitySpec);
