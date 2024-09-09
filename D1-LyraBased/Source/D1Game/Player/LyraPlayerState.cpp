@@ -278,9 +278,19 @@ void ALyraPlayerState::AddStatTagStack(FGameplayTag Tag, int32 StackCount)
 	StatTags.AddStack(Tag, StackCount);
 }
 
+void ALyraPlayerState::SetStatTagStack(FGameplayTag Tag, int32 StackCount)
+{
+	StatTags.SetStack(Tag, StackCount);
+}
+
 void ALyraPlayerState::RemoveStatTagStack(FGameplayTag Tag, int32 StackCount)
 {
 	StatTags.RemoveStack(Tag, StackCount);
+}
+
+void ALyraPlayerState::RemoveStatTag(FGameplayTag Tag)
+{
+	StatTags.RemoveStack(Tag);
 }
 
 int32 ALyraPlayerState::GetStatTagStackCount(FGameplayTag Tag) const

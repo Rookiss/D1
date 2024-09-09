@@ -3,6 +3,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
+#include "AbilitySystem/Abilities/D1GameplayAbility_Weapon.h"
 #include "Character/LyraPawnExtensionComponent.h"
 #include "Components/HorizontalBox.h"
 #include "Components/Image.h"
@@ -22,25 +23,6 @@ void UD1SkillIconWidget::NativeOnInitialized()
 	Super::NativeOnInitialized();
 	
 	SetVisibility(ESlateVisibility::Hidden);
-
-	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
-	if (ASC == nullptr)
-		return;
-	
-	for (const FGameplayAbilitySpec& AbilitySpec : ASC->GetActivatableAbilities())
-	{
-		if (AbilitySpec.Ability->AbilityTags.HasTagExact(SkillSlotTag))
-		{
-			CachedAbilitySpecHandle = AbilitySpec.Handle;
-			SetVisibility(ESlateVisibility::Visible);
-			break;
-		}
-	}
-}
-
-void UD1SkillIconWidget::NativeConstruct()
-{
-	Super::NativeConstruct();
 
 	if (ULyraPawnExtensionComponent* PawnExtensionComponent = ULyraPawnExtensionComponent::FindPawnExtensionComponent(GetOwningPlayerPawn()))
 	{
@@ -90,35 +72,59 @@ void UD1SkillIconWidget::RefreshUI()
 	}
 }
 
+FGameplayAbilitySpec* UD1SkillIconWidget::FindAbilitySpecFromHandle(FGameplayAbilitySpecHandle AbilitySpecHandle)
+{
+	if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn()))
+	{
+		if (FGameplayAbilitySpec* AbilitySpec = ASC->FindAbilitySpecFromHandle(AbilitySpecHandle))
+		{
+			return AbilitySpec;
+		}
+	}
+	return nullptr;
+}
+
 void UD1SkillIconWidget::OnAbilitySystemInitialized()
 {
 	if (ULyraAbilitySystemComponent* LyraASC = Cast<ULyraAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn())))
 	{
+		for (const FGameplayAbilitySpec& AbilitySpec : LyraASC->GetActivatableAbilities())
+		{
+			if (AbilitySpec.Ability->AbilityTags.HasTagExact(SkillSlotTag))
+			{
+				CachedAbilitySpecHandle = AbilitySpec.Handle;
+				InitializeUI();
+				break;
+			}
+		}
+		
 		AbilityDelegateHandle = LyraASC->AbilityChangedDelegate.AddUObject(this, &ThisClass::OnAbilityChanged);
 	}
 }
 
 void UD1SkillIconWidget::OnAbilityChanged(FGameplayAbilitySpecHandle AbilitySpecHandle, bool bGiven)
 {
-	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
-	if (ASC == nullptr)
-		return;
-
-	FGameplayAbilitySpec* AbilitySpec = ASC->FindAbilitySpecFromHandle(AbilitySpecHandle);
-	if (AbilitySpec == nullptr)
-		return;
-	
-	if (AbilitySpec->Ability->AbilityTags.HasTagExact(SkillSlotTag))
+	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(AbilitySpecHandle);
+	if (AbilitySpec && AbilitySpec->Ability->AbilityTags.HasTagExact(SkillSlotTag))
 	{
-		if (bGiven)
+		CachedAbilitySpecHandle = bGiven ? AbilitySpec->Handle : FGameplayAbilitySpecHandle();
+		InitializeUI();
+	}
+}
+
+void UD1SkillIconWidget::InitializeUI()
+{
+	if (FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(CachedAbilitySpecHandle))
+	{
+		if (ULyraGameplayAbility* Ability = Cast<ULyraGameplayAbility>(AbilitySpec->Ability))
 		{
-			CachedAbilitySpecHandle = AbilitySpec->Handle;
-			SetVisibility(ESlateVisibility::Visible);
+			Image_SkillIcon->SetBrushFromTexture(Ability->Icon);
 		}
-		else
-		{
-			CachedAbilitySpecHandle = FGameplayAbilitySpecHandle();
-			SetVisibility(ESlateVisibility::Hidden);
-		}
+		
+		SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		SetVisibility(ESlateVisibility::Hidden);
 	}
 }

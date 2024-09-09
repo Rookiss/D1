@@ -9,6 +9,14 @@ class UNiagaraSystem;
 class USphereComponent;
 class UProjectileMovementComponent;
 
+UENUM(BlueprintType)
+enum class ECollisionDetectionType : uint8
+{
+	None,
+	Hit,
+	Overlap
+};
+
 UCLASS(BlueprintType, Abstract)
 class AD1ProjectileBase : public AActor
 {
@@ -30,7 +38,13 @@ private:
 	void HandleComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& HitResult);
 
 	UFUNCTION()
+	void HandleComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
 	void HandleOtherComponentDeactivated(UActorComponent* OtherComponent);
+
+	UFUNCTION()
+	void HandleCollisionDetection(AActor* OtherActor, UPrimitiveComponent* OtherComponent, const FHitResult& HitResult);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -45,6 +59,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bAttachToHitComponent = false;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	ECollisionDetectionType CollisionDetectionType = ECollisionDetectionType::None;
+	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> SphereCollisionComponent;
@@ -59,8 +76,11 @@ protected:
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
 
 private:
-	bool bHit = false;
+	bool bHitSomething = false;
 
 	UPROPERTY()
-	TWeakObjectPtr<UActorComponent> OtherHitComponent;
+	TWeakObjectPtr<UActorComponent> AttachingComponent;
+
+	UPROPERTY()
+	TSet<TWeakObjectPtr<AActor>> HitActors;
 };

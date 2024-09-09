@@ -109,10 +109,16 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category=Teams)
 	void AddStatTagStack(FGameplayTag Tag, int32 StackCount);
 
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category=Teams)
+	void SetStatTagStack(FGameplayTag Tag, int32 StackCount);
+	
 	// Removes a specified number of stacks from the tag (does nothing if StackCount is below 1)
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category=Teams)
 	void RemoveStatTagStack(FGameplayTag Tag, int32 StackCount);
 
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category=Teams)
+	void RemoveStatTag(FGameplayTag Tag);
+	
 	// Returns the stack count of the specified tag (or 0 if the tag is not present)
 	UFUNCTION(BlueprintCallable, Category=Teams)
 	int32 GetStatTagStackCount(FGameplayTag Tag) const;
