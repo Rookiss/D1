@@ -72,10 +72,12 @@ UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
 	Unarmed,
-	Sword,
+	OneHandSword,
+	TwoHandSword,
+	GreatSword,
 	Shield,
-	Bow,
 	Staff,
+	Bow,
 
 	Count	UMETA(Hidden)
 };

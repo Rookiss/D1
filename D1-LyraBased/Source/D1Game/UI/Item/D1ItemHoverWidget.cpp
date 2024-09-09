@@ -127,7 +127,9 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			FString WeaponTypeString;
 			switch (WeaponFragment->WeaponType)
 			{
-			case EWeaponType::Sword:		    WeaponTypeString = TEXT("Sword");			break;
+			case EWeaponType::OneHandSword:		WeaponTypeString = TEXT("One-Hand Sword");	break;
+			case EWeaponType::TwoHandSword:		WeaponTypeString = TEXT("Two-Hand Sword");	break;
+			case EWeaponType::GreatSword:		WeaponTypeString = TEXT("Great Sword");		break;
 			case EWeaponType::Shield:		    WeaponTypeString = TEXT("Shield");			break;
 			case EWeaponType::Bow:				WeaponTypeString = TEXT("Bow");				break;
 			case EWeaponType::Staff:			WeaponTypeString = TEXT("Staff");			break;

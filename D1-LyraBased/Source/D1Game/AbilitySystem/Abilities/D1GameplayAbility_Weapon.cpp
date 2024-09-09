@@ -6,6 +6,7 @@
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Character/LyraCharacter.h"
 #include "Item/D1ItemInstance.h"
+#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "System/LyraGameData.h"
 
@@ -33,9 +34,34 @@ void UD1GameplayAbility_Weapon::ActivateAbility(const FGameplayAbilitySpecHandle
 	if (WeaponActor == nullptr)
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
 	}
 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
+bool UD1GameplayAbility_Weapon::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
+{
+	if (Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags) == false)
+		return false;
+
+	ALyraCharacter* PlayerCharacter = Cast<ALyraCharacter>(ActorInfo->AvatarActor.Get());
+	if (PlayerCharacter == nullptr)
+		return false;
+
+	UD1EquipManagerComponent* EquipManager = PlayerCharacter->FindComponentByClass<UD1EquipManagerComponent>();
+	if (EquipManager == nullptr)
+		return false;
+
+	UD1ItemInstance* ItemInstance = EquipManager->GetEquippedItemInstance(WeaponHandType);
+	if (ItemInstance == nullptr)
+		return false;
+
+	const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+	if (WeaponFragment == nullptr)
+		return false;
+	
+	return (WeaponFragment->WeaponType == RequiredWeaponType);
 }
 
 int32 UD1GameplayAbility_Weapon::GetWeaponStatValue(FGameplayTag StatTag) const

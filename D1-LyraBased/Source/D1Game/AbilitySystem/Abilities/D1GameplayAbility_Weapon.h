@@ -17,6 +17,7 @@ public:
 
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const override;
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, meta=(GameplayTagFilter = "SetByCaller"))
@@ -29,6 +30,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	EWeaponHandType WeaponHandType = EWeaponHandType::Count;
 
+	UPROPERTY(EditDefaultsOnly)
+	EWeaponType RequiredWeaponType = EWeaponType::Count;
+	
 	UPROPERTY(EditDefaultsOnly)
 	float DefaultAttackRate = 1.f;
 	

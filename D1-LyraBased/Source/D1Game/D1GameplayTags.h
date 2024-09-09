@@ -31,6 +31,7 @@ namespace D1GameplayTags
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Attack_Skill_2);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Widget_Inventory);
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Widget_WorldMap);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Widget_ClassSelection);
 	
 	// Ability
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_ActivateFail_IsDead);

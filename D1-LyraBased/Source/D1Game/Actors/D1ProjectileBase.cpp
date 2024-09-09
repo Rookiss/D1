@@ -3,7 +3,6 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "D1GameplayTags.h"
-#include "D1LogChannels.h"
 #include "D1WeaponBase.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
@@ -66,7 +65,7 @@ void AD1ProjectileBase::BeginPlay()
 
 void AD1ProjectileBase::Destroyed()
 {
-	if (bHitSomething == false && HitEffect)
+	if (HitActors.Num() <= 0 && HitEffect)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, HitEffect, GetActorLocation());
 	}

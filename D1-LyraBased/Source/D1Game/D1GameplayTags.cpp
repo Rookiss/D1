@@ -33,6 +33,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_Skill_2,							"InputTag.Attack.Skill.2");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Widget_Inventory,						"InputTag.Widget.Inventory");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Widget_WorldMap,						"InputTag.Widget.WorldMap");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Widget_ClassSelection,					"InputTag.Widget.ClassSelection");
 	
 	// Ability
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ActivateFail_IsDead,						"Ability.ActivateFail.IsDead");

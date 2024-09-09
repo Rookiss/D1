@@ -13,10 +13,6 @@ class UD1GameplayAbility_Weapon_Bow_Shoot : public UD1GameplayAbility_Weapon
 	
 public:
 	UD1GameplayAbility_Weapon_Bow_Shoot(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-	
-protected:
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
@@ -37,9 +33,12 @@ protected:
 	FName SpawnSocketName;
 
 	UPROPERTY(EditDefaultsOnly, Category="Asset")
+	bool bApplyAimAssist = true;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Asset", meta=(EditCondition="bApplyAnimAssist"))
 	float AimAssistMinDistance = 100.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Asset")
+	UPROPERTY(EditDefaultsOnly, Category="Asset", meta=(EditCondition="bApplyAnimAssist"))
 	float AimAssistMaxDistance = 10000.f;
 	
 private:

@@ -133,6 +133,10 @@ public:
 	// The returned handles can be used later to take away anything that was granted.
 	void GiveToAbilitySystem(ULyraAbilitySystemComponent* LyraASC, FLyraAbilitySet_GrantedHandles* OutGrantedHandles, UObject* SourceObject = nullptr) const;
 
+public:
+	const TArray<FLyraAbilitySet_GameplayAbility>& GetGrantedGameplayAbilities() const { return GrantedGameplayAbilities; }
+	const TArray<FLyraAbilitySet_GameplayEffect>& GetGrantedGameplayEffects() const { return GrantedGameplayEffects; }
+	
 protected:
 
 	// Gameplay abilities to grant when this ability set is granted.

@@ -76,8 +76,6 @@ protected:
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
 
 private:
-	bool bHitSomething = false;
-
 	UPROPERTY()
 	TWeakObjectPtr<UActorComponent> AttachingComponent;
 

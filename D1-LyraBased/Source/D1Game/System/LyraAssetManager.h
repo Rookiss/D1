@@ -9,6 +9,7 @@
 #include "Templates/SubclassOf.h"
 #include "LyraAssetManager.generated.h"
 
+class UD1ClassData;
 class UD1CheatData;
 class UD1ElectricFieldPhaseData;
 class UPrimaryDataAsset;
@@ -16,6 +17,7 @@ class UD1AssetData;
 class UD1ItemData;
 class ULyraGameData;
 class ULyraPawnData;
+class UD1ClassData;
 
 struct FLyraBundles
 {
@@ -58,10 +60,11 @@ public:
 	static void DumpLoadedAssets();
 
 	const UD1AssetData& GetAssetData();
+	const UD1ClassData& GetClassData();
 	const UD1ItemData& GetItemData();
 	const ULyraGameData& GetGameData();
-	const UD1ElectricFieldPhaseData& GetElectricFieldPhaseData();
 	const UD1CheatData& GetCheatData();
+	const UD1ElectricFieldPhaseData& GetElectricFieldPhaseData();
 	const ULyraPawnData* GetDefaultPawnData() const;
 
 protected:
@@ -94,10 +97,12 @@ protected:
 	UPrimaryDataAsset* LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataClassPath, FPrimaryAssetType PrimaryAssetType);
 
 protected:
-
 	UPROPERTY(Config)
 	TSoftObjectPtr<UD1AssetData> AssetDataPath;
 
+	UPROPERTY(Config)
+	TSoftObjectPtr<UD1ClassData> ClassDataPath;
+	
 	UPROPERTY(Config)
 	TSoftObjectPtr<UD1ItemData> ItemDataPath;
 

@@ -1,13 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "LyraAssetManager.h"
+
 #include "D1LogChannels.h"
 #include "LyraGameData.h"
 #include "Data/D1ElectricFieldPhaseData.h"
-#include "Character/LyraPawnData.h"
 #include "Data/D1CheatData.h"
+#include "Data/D1ClassData.h"
 #include "Data/D1ItemData.h"
 #include "Data/D1AssetData.h"
+#include "Character/LyraPawnData.h"
 #include "Misc/App.h"
 #include "Stats/StatsMisc.h"
 #include "Engine/Engine.h"
@@ -118,6 +120,11 @@ const UD1ItemData& ULyraAssetManager::GetItemData()
 const UD1ElectricFieldPhaseData& ULyraAssetManager::GetElectricFieldPhaseData()
 {
 	return GetOrLoadTypedGameData<UD1ElectricFieldPhaseData>(ElectricFieldPhaseDataPath);
+}
+
+const UD1ClassData& ULyraAssetManager::GetClassData()
+{
+	return GetOrLoadTypedGameData<UD1ClassData>(ClassDataPath);
 }
 
 const UD1CheatData& ULyraAssetManager::GetCheatData()
