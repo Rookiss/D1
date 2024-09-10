@@ -133,4 +133,11 @@ private:
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Resourcefulness, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData Resourcefulness;
+
+public:
+	ATTRIBUTE_ACCESSORS(ThisClass, ActiveEffectDuration);
+
+private:
+	UPROPERTY(BlueprintReadOnly, meta=(HideFromModifiers, AllowPrivateAccess="true"))
+	FGameplayAttributeData ActiveEffectDuration;
 };

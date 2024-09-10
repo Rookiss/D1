@@ -125,6 +125,12 @@ private:
 	void InvokeBlockAnimMontageForSeconds(UAnimMontage* BackwardMontage);
 
 public:
+	void MarkActiveGameplayEffectDirty(FActiveGameplayEffect* ActiveGameplayEffect);
+	void CheckActiveEffectDuration(const FActiveGameplayEffectHandle& Handle);
+	FActiveGameplayEffect* GetActiveGameplayEffect_Mutable(const FActiveGameplayEffectHandle Handle);
+	TArray<FActiveGameplayEffectHandle> GetAllActiveEffectHandles() const;
+	
+public:
 	FTimerHandle BlockAnimMontageTimerHandle;
 	FAbilityChangedDelegate AbilityChangedDelegate;
 };

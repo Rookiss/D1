@@ -525,6 +525,29 @@ void ULyraAbilitySystemComponent::InvokeBlockAnimMontageForSeconds(UAnimMontage*
 	}, 0.25f, false);
 }
 
+void ULyraAbilitySystemComponent::MarkActiveGameplayEffectDirty(FActiveGameplayEffect* ActiveGameplayEffect)
+{
+	if (ActiveGameplayEffect)
+	{
+		ActiveGameplayEffects.MarkItemDirty(*ActiveGameplayEffect);
+	}
+}
+
+void ULyraAbilitySystemComponent::CheckActiveEffectDuration(const FActiveGameplayEffectHandle& Handle)
+{
+	ActiveGameplayEffects.CheckDuration(Handle);
+}
+
+FActiveGameplayEffect* ULyraAbilitySystemComponent::GetActiveGameplayEffect_Mutable(const FActiveGameplayEffectHandle Handle)
+{
+	return ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
+}
+
+TArray<FActiveGameplayEffectHandle> ULyraAbilitySystemComponent::GetAllActiveEffectHandles() const
+{
+	return ActiveGameplayEffects.GetAllActiveEffectHandles();
+}
+
 bool ULyraAbilitySystemComponent::IsActivationGroupBlocked(ELyraAbilityActivationGroup Group) const
 {
 	bool bBlocked = false;

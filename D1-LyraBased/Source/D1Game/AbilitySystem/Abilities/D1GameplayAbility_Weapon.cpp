@@ -37,6 +37,16 @@ void UD1GameplayAbility_Weapon::ActivateAbility(const FGameplayAbilitySpecHandle
 		return;
 	}
 
+	SnapshottedAttackRate = DefaultAttackRate;
+	if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo())
+	{
+		if (const UD1CombatSet* CombatSet = Cast<UD1CombatSet>(ASC->GetAttributeSet(UD1CombatSet::StaticClass())))
+		{
+			float AttackSpeedPercent = CombatSet->GetAttackSpeedPercent();
+			SnapshottedAttackRate = DefaultAttackRate + (DefaultAttackRate * (AttackSpeedPercent / 100.f));
+		}
+	}
+
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
@@ -82,16 +92,5 @@ int32 UD1GameplayAbility_Weapon::GetWeaponStatValue(FGameplayTag StatTag) const
 
 float UD1GameplayAbility_Weapon::GetAttackRate() const
 {
-	float AttackRate = DefaultAttackRate;
-	
-	if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo())
-	{
-		if (const UD1CombatSet* CombatSet = Cast<UD1CombatSet>(ASC->GetAttributeSet(UD1CombatSet::StaticClass())))
-		{
-			float AttackSpeedPercent = CombatSet->GetAttackSpeedPercent();
-			AttackRate = DefaultAttackRate + (DefaultAttackRate * (AttackSpeedPercent / 100.f));
-		}
-	}
-	
-	return AttackRate;
+	return SnapshottedAttackRate;
 }

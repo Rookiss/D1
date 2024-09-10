@@ -42,4 +42,7 @@ protected:
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AD1WeaponBase> WeaponActor;
+
+private:
+	float SnapshottedAttackRate = 0.f;
 };
