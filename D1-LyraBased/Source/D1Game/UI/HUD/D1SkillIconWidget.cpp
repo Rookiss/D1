@@ -57,17 +57,24 @@ void UD1SkillIconWidget::RefreshUI()
 	FGameplayAbilitySpec* AbilitySpec = ASC->FindAbilitySpecFromHandle(CachedAbilitySpecHandle);
 	if (AbilitySpec == nullptr)
 		return;
+
+	if (AbilitySpec->Ability->CanActivateAbility(AbilitySpec->Handle, ASC->AbilityActorInfo.Get()))
+	{
+		Image_SkillIcon->SetColorAndOpacity(FLinearColor::White);
+	}
+	else
+	{
+		Image_SkillIcon->SetColorAndOpacity(FLinearColor(0.3f, 0.3f, 0.3f));
+	}
 	
 	float CooldownTime = AbilitySpec->Ability->GetCooldownTimeRemaining(ASC->AbilityActorInfo.Get());
 	if (CooldownTime > 0.f)
 	{
-		Image_SkillIcon->SetColorAndOpacity(FLinearColor::Gray);
 		Text_Cooldown->SetText(UKismetTextLibrary::Conv_DoubleToText(CooldownTime, HalfFromZero, false, true, 1, 2, 1, 1));
 		HorizontalBox_Cooldown->SetVisibility(ESlateVisibility::Visible);
 	}
 	else
 	{
-		Image_SkillIcon->SetColorAndOpacity(FLinearColor::White);
 		HorizontalBox_Cooldown->SetVisibility(ESlateVisibility::Hidden);
 	}
 }

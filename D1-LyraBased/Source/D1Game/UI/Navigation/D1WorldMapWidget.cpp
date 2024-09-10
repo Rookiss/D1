@@ -113,6 +113,11 @@ void UD1WorldMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 			TargetCircleSlot->SetSize(InitialSize * GetCurrentWorldMapZoom());
 		}
 	}
+	else
+	{
+		CurrentCircleWidget->SetVisibility(ESlateVisibility::Hidden);
+		TargetCircleWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 FReply UD1WorldMapWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)

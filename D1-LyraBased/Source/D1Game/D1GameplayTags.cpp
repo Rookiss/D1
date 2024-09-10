@@ -122,6 +122,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Knockback,							"GameplayEvent.Knockback");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Stun,								"GameplayEvent.Stun");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Bow_ADS,							"GameplayEvent.Bow.ADS");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Bow_ADS_Start,						"GameplayEvent.Bow.ADS.Start");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Bow_ADS_End,						"GameplayEvent.Bow.ADS.End");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Bow_Release,						"GameplayEvent.Bow.Release");
 	
 	// Cheat
 	UE_DEFINE_GAMEPLAY_TAG(Cheat_GodMode,									"Cheat.GodMode");

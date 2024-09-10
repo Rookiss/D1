@@ -90,6 +90,7 @@ void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AA
 		return;
 	
 	HitActors.Add(OtherActor);
+
 	SphereCollisionComponent->Deactivate();
 	TrailNiagaraComponent->Deactivate();
 	ProjectileMovementComponent->Deactivate();
