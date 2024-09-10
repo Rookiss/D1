@@ -31,6 +31,9 @@ protected:
 	EWeaponHandType WeaponHandType = EWeaponHandType::Count;
 
 	UPROPERTY(EditDefaultsOnly)
+	bool bShouldCheckWeaponType = true;
+	
+	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bShouldCheckWeaponType", EditConditionHides))
 	EWeaponType RequiredWeaponType = EWeaponType::Count;
 	
 	UPROPERTY(EditDefaultsOnly)

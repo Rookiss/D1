@@ -35,6 +35,10 @@ void UD1CombatSet::ClampAttribute(const FGameplayAttribute& Attribute, float& Ne
 	{
 		NewValue = FMath::Max(0.f, NewValue);
 	}
+	else if (Attribute == GetDamageReductionPercentAttribute())
+	{
+		NewValue = FMath::Max(0.f, NewValue);
+	}
 }
 
 void UD1CombatSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -50,6 +54,7 @@ void UD1CombatSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeedPercent, COND_OwnerOnly, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, AttackSpeedPercent, COND_OwnerOnly, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, DrainLifePercent, COND_OwnerOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, DamageReductionPercent, COND_OwnerOnly, REPNOTIFY_Always);
 	
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Strength, COND_OwnerOnly, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Defense, COND_OwnerOnly, REPNOTIFY_Always);
@@ -96,6 +101,11 @@ void UD1CombatSet::OnRep_AttackSpeedPercent(const FGameplayAttributeData& OldVal
 void UD1CombatSet::OnRep_DrainLifePercent(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, DrainLifePercent, OldValue);
+}
+
+void UD1CombatSet::OnRep_DamageReductionPercent(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, DamageReductionPercent, OldValue);
 }
 
 void UD1CombatSet::OnRep_Strength(const FGameplayAttributeData& OldValue)

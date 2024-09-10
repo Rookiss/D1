@@ -56,6 +56,7 @@ public:
 	ATTRIBUTE_ACCESSORS(ThisClass, MoveSpeedPercent);
 	ATTRIBUTE_ACCESSORS(ThisClass, AttackSpeedPercent);
 	ATTRIBUTE_ACCESSORS(ThisClass, DrainLifePercent);
+	ATTRIBUTE_ACCESSORS(ThisClass, DamageReductionPercent);
 
 protected:
 	UFUNCTION()
@@ -70,6 +71,9 @@ protected:
 	UFUNCTION()
 	void OnRep_DrainLifePercent(const FGameplayAttributeData& OldValue);
 
+	UFUNCTION()
+	void OnRep_DamageReductionPercent(const FGameplayAttributeData& OldValue);
+
 private:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MoveSpeed, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData MoveSpeed;
@@ -82,6 +86,9 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_DrainLifePercent, meta=(AllowPrivateAccess="true"))
 	FGameplayAttributeData DrainLifePercent;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_DrainLifePercent, meta=(AllowPrivateAccess="true"))
+	FGameplayAttributeData DamageReductionPercent;
 	
 public:
 	ATTRIBUTE_ACCESSORS(ThisClass, Strength);

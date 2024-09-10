@@ -17,6 +17,7 @@ public:
 		StrengthDef = FGameplayEffectAttributeCaptureDefinition(UD1CombatSet::GetStrengthAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 		DefenseDef = FGameplayEffectAttributeCaptureDefinition(UD1CombatSet::GetDefenseAttribute(), EGameplayEffectAttributeCaptureSource::Target, true);
 		DrainLifePercentDef = FGameplayEffectAttributeCaptureDefinition(UD1CombatSet::GetDrainLifePercentAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		DamageReductionPercentDef = FGameplayEffectAttributeCaptureDefinition(UD1CombatSet::GetDamageReductionPercentAttribute(), EGameplayEffectAttributeCaptureSource::Target, true);
 	}
 
 public:
@@ -24,6 +25,7 @@ public:
 	FGameplayEffectAttributeCaptureDefinition StrengthDef;
 	FGameplayEffectAttributeCaptureDefinition DefenseDef;
 	FGameplayEffectAttributeCaptureDefinition DrainLifePercentDef;
+	FGameplayEffectAttributeCaptureDefinition DamageReductionPercentDef;
 };
 
 static FDamageStatics& DamageStatics()
@@ -38,6 +40,7 @@ UD1DamageExecution::UD1DamageExecution()
 	RelevantAttributesToCapture.Add(DamageStatics().StrengthDef);
 	RelevantAttributesToCapture.Add(DamageStatics().DefenseDef);
 	RelevantAttributesToCapture.Add(DamageStatics().DrainLifePercentDef);
+	RelevantAttributesToCapture.Add(DamageStatics().DamageReductionPercentDef);
 }
 
 void UD1DamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
@@ -65,8 +68,12 @@ void UD1DamageExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 
 	float DrainLifePercent = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DrainLifePercentDef, EvaluateParameters, DrainLifePercent);
+
+	float DamageReductionPercent = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageReductionPercentDef, EvaluateParameters, DamageReductionPercent);
 	
-	const float DamageDone = FMath::Max((BaseDamage + Strength) / (FMath::Pow(Defense, 0.3f)), 0.0f);
+	float DamageDone = FMath::Max((BaseDamage + Strength) / (FMath::Pow(Defense, 0.3f)), 0.0f);
+	DamageDone -= DamageDone * (DamageReductionPercent / 100.f);
 	
 	if (DamageDone > 0.0f)
 	{

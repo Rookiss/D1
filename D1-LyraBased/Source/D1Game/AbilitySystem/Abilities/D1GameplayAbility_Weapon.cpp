@@ -45,6 +45,9 @@ bool UD1GameplayAbility_Weapon::CanActivateAbility(const FGameplayAbilitySpecHan
 	if (Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags) == false)
 		return false;
 
+	if (bShouldCheckWeaponType == false)
+		return true;
+
 	ALyraCharacter* PlayerCharacter = Cast<ALyraCharacter>(ActorInfo->AvatarActor.Get());
 	if (PlayerCharacter == nullptr)
 		return false;
