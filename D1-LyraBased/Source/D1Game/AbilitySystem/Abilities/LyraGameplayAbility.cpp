@@ -20,6 +20,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Physics/PhysicalMaterialWithTags.h"
 #include "Camera/LyraCameraMode.h"
+#include "Development/LyraDeveloperSettings.h"
 #include "Input/D1EnhancedPlayerInput.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/LyraLocalPlayer.h"
@@ -261,8 +262,11 @@ bool ULyraGameplayAbility::CheckCost(const FGameplayAbilitySpecHandle Handle, co
 
 void ULyraGameplayAbility::ApplyCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
 {
-	Super::ApplyCost(Handle, ActorInfo, ActivationInfo);
-
+	if (GIsEditor == false || GetDefault<ULyraDeveloperSettings>()->bForceDisableCost == false)
+	{
+		Super::ApplyCost(Handle, ActorInfo, ActivationInfo);
+	}
+	
 	check(ActorInfo);
 
 	// Used to determine if the ability actually hit a target (as some costs are only spent on successful attempts)
@@ -311,6 +315,18 @@ void ULyraGameplayAbility::ApplyCost(const FGameplayAbilitySpecHandle Handle, co
 			AdditionalCost->ApplyCost(this, Handle, ActorInfo, ActivationInfo);
 		}
 	}
+}
+
+void ULyraGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
+{
+	if (GIsEditor)
+	{
+		const ULyraDeveloperSettings* DeveloperSettings = GetDefault<ULyraDeveloperSettings>();
+		if (DeveloperSettings->bForceDisableCooldown)
+			return;
+	}
+	
+	Super::ApplyCooldown(Handle, ActorInfo, ActivationInfo);
 }
 
 FGameplayEffectContextHandle ULyraGameplayAbility::MakeEffectContext(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo) const
