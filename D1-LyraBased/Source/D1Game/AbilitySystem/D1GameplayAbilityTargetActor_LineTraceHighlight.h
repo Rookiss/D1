@@ -14,6 +14,7 @@ public:
 protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual FHitResult PerformTrace(AActor* InSourceActor) override;
+	virtual void Tick(float DeltaSeconds) override;
 
 private:
 	void HighlightActor(bool bShouldHighlight, AActor* ActorToHighlight);

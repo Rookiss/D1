@@ -23,7 +23,7 @@ AD1ProjectileBase::AD1ProjectileBase(const FObjectInitializer& ObjectInitializer
 	bNetLoadOnClient = false;
 	bReplicates = true;
 
-	AActor::SetLifeSpan(10.f);
+	AActor::SetLifeSpan(5.f);
 	
 	SphereCollisionComponent = CreateDefaultSubobject<USphereComponent>("SphereCollisionComponent");
 	SphereCollisionComponent->SetCollisionProfileName("Projectile");
@@ -94,12 +94,19 @@ void AD1ProjectileBase::HandleComponentHit(UPrimitiveComponent* HitComponent, AA
 	SphereCollisionComponent->Deactivate();
 	TrailNiagaraComponent->Deactivate();
 	ProjectileMovementComponent->Deactivate();
-
-	if (HasAuthority() && bAttachToHitComponent)
+	
+	if (HasAuthority())
 	{
-		AttachingComponent = OtherComponent;
-		OtherComponent->OnComponentDeactivated.AddUniqueDynamic(this, &ThisClass::HandleOtherComponentDeactivated);
-		AttachToComponent(OtherComponent, FAttachmentTransformRules::KeepWorldTransform, HitResult.BoneName);
+		if (bAttachToHitComponent)
+		{
+			AttachingComponent = OtherComponent;
+			OtherComponent->OnComponentDeactivated.AddUniqueDynamic(this, &ThisClass::HandleOtherComponentDeactivated);
+			AttachToComponent(OtherComponent, FAttachmentTransformRules::KeepWorldTransform, HitResult.BoneName);
+		}
+		else
+		{
+			SetLifeSpan(2.f);
+		}
 	}
 	
 	HandleCollisionDetection(OtherActor, OtherComponent, HitResult);
@@ -111,7 +118,10 @@ void AD1ProjectileBase::HandleComponentOverlap(UPrimitiveComponent* OverlappedCo
 		return;
 
 	HitActors.Add(OtherActor);
-	HandleCollisionDetection(OtherActor, OtherComponent, SweepResult);
+	
+	FHitResult HitResult = SweepResult;
+	HitResult.bBlockingHit = bFromSweep;
+	HandleCollisionDetection(OtherActor, OtherComponent, HitResult);
 }
 
 void AD1ProjectileBase::HandleOtherComponentDeactivated(UActorComponent* OtherComponent)
@@ -161,7 +171,7 @@ void AD1ProjectileBase::HandleCollisionDetection(AActor* OtherActor, UPrimitiveC
 			}
 		}
 		
-		if (SourceASC && HitGameplayCueTag.IsValid())
+		if (SourceASC && HitGameplayCueTag.IsValid() && HitResult.bBlockingHit)
 		{
 			FGameplayCueParameters SourceCueParams;
 			SourceCueParams.Location = HitResult.ImpactPoint;

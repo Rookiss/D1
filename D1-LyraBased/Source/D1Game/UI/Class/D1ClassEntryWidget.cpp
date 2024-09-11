@@ -25,7 +25,6 @@ void UD1ClassEntryWidget::InitializeUI(UD1ClassSelectionWidget* OwnerWidget, con
 	CachedClassEntry = ClassEntry;
 	CachedOwnerWidget = OwnerWidget;
 	
-	Image_Class->SetBrushFromTexture(ClassEntry.ClassIcon.LoadSynchronous());
 	Text_ClassName->SetText(ClassEntry.ClassName);
 
 	VerticalBox_SkillElements->ClearChildren();

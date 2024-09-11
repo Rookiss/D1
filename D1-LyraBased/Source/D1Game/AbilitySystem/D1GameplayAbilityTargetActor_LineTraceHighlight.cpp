@@ -1,5 +1,6 @@
 ﻿#include "D1GameplayAbilityTargetActor_LineTraceHighlight.h"
 
+#include "Character/LyraCharacter.h"
 #include "Interaction/D1Interactable.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbilityTargetActor_LineTraceHighlight)
@@ -59,6 +60,25 @@ FHitResult AD1GameplayAbilityTargetActor_LineTraceHighlight::PerformTrace(AActor
 #endif // ENABLE_DRAW_DEBUG
 	
 	return ReturnHitResult;
+}
+
+void AD1GameplayAbilityTargetActor_LineTraceHighlight::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (AGameplayAbilityWorldReticle* LocalReticleActor = ReticleActor.Get())
+	{
+		if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(SourceActor))
+		{
+			LocalReticleActor->SetActorLocation(LyraCharacter->GetMesh()->GetComponentLocation());
+		}
+		else
+		{
+			LocalReticleActor->SetActorLocation(SourceActor ? SourceActor->GetActorLocation() : FVector::ZeroVector);
+		}
+
+		LocalReticleActor->SetActorRotation(FRotator::ZeroRotator);
+	}
 }
 
 void AD1GameplayAbilityTargetActor_LineTraceHighlight::HighlightActor(bool bShouldHighlight, AActor* ActorToHighlight)

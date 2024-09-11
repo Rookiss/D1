@@ -36,9 +36,6 @@ protected:
 	TObjectPtr<UButton> Button_Class;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Class;
-
-	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_ClassName;
 
 	UPROPERTY(meta=(BindWidget))

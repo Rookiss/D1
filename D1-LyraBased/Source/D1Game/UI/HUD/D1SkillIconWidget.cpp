@@ -64,7 +64,7 @@ void UD1SkillIconWidget::RefreshUI()
 	}
 	else
 	{
-		Image_SkillIcon->SetColorAndOpacity(FLinearColor(0.3f, 0.3f, 0.3f));
+		Image_SkillIcon->SetColorAndOpacity(FLinearColor(0.15f, 0.15f, 0.15f));
 	}
 	
 	float CooldownTime = AbilitySpec->Ability->GetCooldownTimeRemaining(ASC->AbilityActorInfo.Get());

@@ -35,7 +35,13 @@ protected:
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Spell Type")
-	TArray<TSubclassOf<AD1ProjectileBase>> ProjectileClasses;
+	TSubclassOf<AD1ProjectileBase> Phase1_ProjectileClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Spell Type")
+	TArray<TSubclassOf<AD1ProjectileBase>> Phase2_ProjectileClasses;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Spell Type")
+	TArray<TSubclassOf<AD1ProjectileBase>> Phase3_ProjectileClasses;
 
 	UPROPERTY(EditDefaultsOnly, Category="Spell Type")
 	FName ProjectileSocketName;
@@ -45,6 +51,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Spell Type")
 	TArray<FLinearColor> PhaseColors;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Spell Type")
+	float DeltaDegree = 5.0f;
 	
 private:
 	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
