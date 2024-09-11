@@ -26,14 +26,17 @@ void UD1GameplayAbility_Weapon_Target::ApplyTarget()
 			{
 				const FHitResult& HitResult = *HitResultPtr;
 
-				if (GameplayEffectClass)
+				for (TSubclassOf<UGameplayEffect> GameplayEffectClass : GameplayEffectClasses)
 				{
-					FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(GameplayEffectClass);
-					FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
-					EffectContextHandle.AddHitResult(HitResult);
-					EffectContextHandle.AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), WeaponActor);
-					EffectSpecHandle.Data->SetContext(EffectContextHandle);
-					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
+					if (GameplayEffectClass)
+					{
+						FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(GameplayEffectClass);
+						FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
+						EffectContextHandle.AddHitResult(HitResult);
+						EffectContextHandle.AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), WeaponActor);
+						EffectSpecHandle.Data->SetContext(EffectContextHandle);
+						ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
+					}
 				}
 
 				UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());

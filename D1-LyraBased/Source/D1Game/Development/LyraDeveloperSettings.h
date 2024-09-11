@@ -52,6 +52,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, config, Category=D1)
 	bool bForceDisableDebugTrace = true;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, config, Category=D1)
+	bool bForceDisableCooldown = true;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, config, Category=D1)
+	bool bForceDisableCost = true;
+	
 	// The experience override to use for Play in Editor (if not set, the default for the world settings of the open map will be used)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, config, Category=Lyra, meta=(AllowedTypes="LyraExperienceDefinition"))
 	FPrimaryAssetId ExperienceOverride;

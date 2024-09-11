@@ -35,8 +35,8 @@ protected:
 	FGameplayTag BurstGameplayCueTag;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UGameplayEffect> GameplayEffectClass;
-	
+	TArray<TSubclassOf<UGameplayEffect>> GameplayEffectClasses;
+
 private:
 	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
 	FGameplayAbilityTargetDataHandle TargetDataHandle;
