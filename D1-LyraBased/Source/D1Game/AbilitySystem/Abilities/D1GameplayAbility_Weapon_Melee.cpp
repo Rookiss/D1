@@ -70,13 +70,20 @@ void UD1GameplayAbility_Weapon_Melee::ProcessHitResult(FHitResult HitResult, flo
 	ULyraAbilitySystemComponent* SourceASC = GetLyraAbilitySystemComponentFromActorInfo();
 	if (SourceASC == nullptr)
 		return;
-	
-	FGameplayCueParameters SourceCueParams;
-	SourceCueParams.Location = HitResult.ImpactPoint;
-	SourceCueParams.Normal = HitResult.ImpactNormal;
-	SourceCueParams.PhysicalMaterial = bBlockingHit ? nullptr : HitResult.PhysMaterial;
-	SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
 
+	if (HasAuthority(&CurrentActivationInfo))
+	{
+		FScopedPredictionWindow	ScopedPrediction(SourceASC, false);
+		
+		FGameplayCueParameters SourceCueParams;
+		SourceCueParams.Location = HitResult.ImpactPoint;
+		SourceCueParams.Normal = HitResult.ImpactNormal;
+		SourceCueParams.PhysicalMaterial = bBlockingHit ? nullptr : HitResult.PhysMaterial;
+		SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
+	}
+	
+	FScopedPredictionWindow	ScopedPrediction(SourceASC, GetCurrentActivationInfo().GetActivationPredictionKey());
+	
 	if (BackwardMontage)
 	{
 		SourceASC->BlockAnimMontageForSeconds(BackwardMontage);

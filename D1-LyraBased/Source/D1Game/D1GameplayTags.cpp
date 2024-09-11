@@ -180,6 +180,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Loop,							"GameplayCue.Statue.Loop");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Success,						"GameplayCue.Statue.Success");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Fail,							"GameplayCue.Statue.Fail");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Skill_Buff,							"GameplayCue.Skill.Buff");
 
 	// Cooldown
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Bow_Fire,								"Cooldown.Bow.Fire");
