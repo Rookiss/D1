@@ -34,7 +34,6 @@ void UD1GameplayAbility_Weapon_MeleeCombo::OnTargetDataReady(const FGameplayAbil
 	
 	if (SourceASC->FindAbilitySpecFromHandle(CurrentSpecHandle))
 	{
-		FScopedPredictionWindow	ScopedPrediction(SourceASC, GetCurrentActivationInfo().GetActivationPredictionKey());
 		FGameplayAbilityTargetDataHandle LocalTargetDataHandle(MoveTemp(const_cast<FGameplayAbilityTargetDataHandle&>(InTargetDataHandle)));
 
 		TArray<int32> CharacterHitIndexes;
