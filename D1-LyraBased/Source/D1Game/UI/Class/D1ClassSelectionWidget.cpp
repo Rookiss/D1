@@ -13,13 +13,6 @@ UD1ClassSelectionWidget::UD1ClassSelectionWidget(const FObjectInitializer& Objec
     
 }
 
-void UD1ClassSelectionWidget::NativeOnInitialized()
-{
-	Super::NativeOnInitialized();
-
-	Button_Exit->OnClicked.AddUniqueDynamic(this, &ThisClass::OnExitButtonClicked);
-}
-
 void UD1ClassSelectionWidget::NativeConstruct()
 {
 	Super::NativeConstruct();

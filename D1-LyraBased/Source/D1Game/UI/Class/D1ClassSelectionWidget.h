@@ -16,7 +16,6 @@ public:
 	UD1ClassSelectionWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 
 private:
@@ -28,9 +27,6 @@ protected:
 	TSubclassOf<UD1ClassEntryWidget> ClassEntryWidgetClass;
 	
 protected:
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UButton> Button_Exit;
-
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UVerticalBox> VerticalBox_ClassElements;
 };

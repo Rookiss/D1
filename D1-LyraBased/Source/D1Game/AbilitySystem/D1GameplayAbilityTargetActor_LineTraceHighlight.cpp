@@ -2,6 +2,7 @@
 
 #include "Character/LyraCharacter.h"
 #include "Interaction/D1Interactable.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbilityTargetActor_LineTraceHighlight)
 
@@ -35,7 +36,7 @@ FHitResult AD1GameplayAbilityTargetActor_LineTraceHighlight::PerformTrace(AActor
 
 	FHitResult ReturnHitResult;
 	LineTraceWithFilter(ReturnHitResult, InSourceActor->GetWorld(), Filter, TraceStart, TraceEnd, TraceProfile.Name, Params);
-
+	
 	if (CachedTracedActor.IsValid())
 	{
 		HighlightActor(false, CachedTracedActor.Get());
@@ -54,8 +55,7 @@ FHitResult AD1GameplayAbilityTargetActor_LineTraceHighlight::PerformTrace(AActor
 #if ENABLE_DRAW_DEBUG
 	if (bDebug)
 	{
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Green);
-		DrawDebugSphere(GetWorld(), TraceEnd, 100.0f, 16, FColor::Green);
+		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red);
 	}
 #endif // ENABLE_DRAW_DEBUG
 	
