@@ -21,7 +21,7 @@ public:
 
 public:
 	UFUNCTION()
-	void InitializeUI(UD1ClassSelectionWidget* OwnerWidget, const FClassEntry& ClassEntry);
+	void InitializeUI(UD1ClassSelectionWidget* OwnerWidget, int32 ClassIndex);
 
 private:
 	UFUNCTION()
@@ -43,7 +43,7 @@ protected:
 
 private:
 	UPROPERTY()
-	FClassEntry CachedClassEntry;
+	int32 CachedClassIndex = INDEX_NONE;
 
 	UPROPERTY()
 	TWeakObjectPtr<UD1ClassSelectionWidget> CachedOwnerWidget;

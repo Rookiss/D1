@@ -34,7 +34,7 @@ void UD1GameplayAbility_Weapon_GroundBreaker::Execute()
 	
 	FVector Start = LyraCharacter->GetActorLocation() + (LyraCharacter->GetActorForwardVector() * DistanceOffset);
 	FVector End = Start;
-	FVector HalfSize = FVector(ScaledCapsuleRadius * 3.f, ScaledCapsuleRadius * 3.f, ScaledCapsuleHalfHeight);;
+	FVector HalfSize = FVector(ScaledCapsuleRadius * 3.f, ScaledCapsuleRadius * 3.f, ScaledCapsuleHalfHeight);
 	FRotator Orientation = UKismetMathLibrary::MakeRotFromX(LyraCharacter->GetActorForwardVector());
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes = { UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn) };
 	TArray<AActor*> ActorsToIgnore = { LyraCharacter };

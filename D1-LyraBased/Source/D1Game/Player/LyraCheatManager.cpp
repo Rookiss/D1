@@ -483,7 +483,7 @@ void ULyraCheatManager::EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<
 	int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
 	ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
 	EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponFragment->WeaponHandType, WeaponSlotType), ItemInstance, 1);
-				
+	
 	if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
 	{
 		EEquipState TargetWeaponEquipState = UD1EquipManagerComponent::ConvertToEquipState(WeaponSlotType);
@@ -519,7 +519,7 @@ void ULyraCheatManager::EquipUtility(EUtilitySlotType UtilitySlotType, TSubclass
 
 	UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
 	int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
-	ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
+	ItemInstance->Init(ItemTemplateID, EItemRarity::Junk);
 	EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(UtilitySlotType), ItemInstance, 1);
 	
 	if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())

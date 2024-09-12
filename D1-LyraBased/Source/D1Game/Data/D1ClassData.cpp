@@ -8,3 +8,14 @@ const UD1ClassData& UD1ClassData::Get()
 {
 	return ULyraAssetManager::Get().GetClassData();
 }
+
+const FClassEntry& UD1ClassData::GetClassEntry(int32 ClassIndex) const
+{
+	if (ClassIndex < 0 || ClassIndex >= ClassEntries.Num())
+	{
+		static FClassEntry EmptyEntry;
+		return EmptyEntry;
+	}
+
+	return ClassEntries[ClassIndex];
+}

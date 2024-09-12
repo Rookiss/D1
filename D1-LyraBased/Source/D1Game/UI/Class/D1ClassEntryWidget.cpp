@@ -20,14 +20,16 @@ UD1ClassEntryWidget::UD1ClassEntryWidget(const FObjectInitializer& ObjectInitial
     
 }
 
-void UD1ClassEntryWidget::InitializeUI(UD1ClassSelectionWidget* OwnerWidget, const FClassEntry& ClassEntry)
+void UD1ClassEntryWidget::InitializeUI(UD1ClassSelectionWidget* OwnerWidget, int32 ClassIndex)
 {
-	CachedClassEntry = ClassEntry;
+	CachedClassIndex = ClassIndex;
 	CachedOwnerWidget = OwnerWidget;
+
+	const FClassEntry& ClassEntry = UD1ClassData::Get().GetClassEntry(ClassIndex);
 	
 	Text_ClassName->SetText(ClassEntry.ClassName);
-
 	VerticalBox_SkillElements->ClearChildren();
+	
 	if (ULyraAbilitySet* AbilitySet = ClassEntry.ClassAbilitySet)
 	{
 		const TArray<FLyraAbilitySet_GameplayAbility>& AbilitySetAbilities = AbilitySet->GetGrantedGameplayAbilities();
@@ -50,7 +52,7 @@ void UD1ClassEntryWidget::OnButtonClicked()
 {
 	if (ALyraPlayerState* LyraPlayerState = Cast<ALyraPlayerState>(GetOwningPlayerState()))
 	{
-		LyraPlayerState->Server_SelectClass(CachedClassEntry);
+		LyraPlayerState->Server_SelectClass(CachedClassIndex);
 	}
 
 	if (UD1ClassSelectionWidget* ClassSelectionWidget = CachedOwnerWidget.Get())
