@@ -56,6 +56,7 @@ public:
 
 public:
 	const TArray<FClassEntry>& GetClassEntries() const { return ClassEntries; }
+	const FClassEntry& GetClassEntry(int32 ClassIndex) const;
 	
 private:
 	UPROPERTY(EditDefaultsOnly)

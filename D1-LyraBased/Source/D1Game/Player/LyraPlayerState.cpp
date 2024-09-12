@@ -276,23 +276,30 @@ void ALyraPlayerState::OnRep_MySquadID()
 	//@TODO: Let the squad subsystem know (once that exists)
 }
 
-void ALyraPlayerState::Server_SelectClass_Implementation(const FClassEntry& ClassEntry)
+void ALyraPlayerState::Server_SelectClass_Implementation(int32 ClassIndex)
 {
-	if (ALyraCharacter* LyraCharacter = GetPawn<ALyraCharacter>())
+	const TArray<FClassEntry>& ClassEntries = UD1ClassData::Get().GetClassEntries();
+	
+	if (ClassEntries.IsValidIndex(ClassIndex))
 	{
-		if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->GetComponentByClass<UD1EquipmentManagerComponent>())
+		const FClassEntry& ClassEntry = ClassEntries[ClassIndex];
+		
+		if (ALyraCharacter* LyraCharacter = GetPawn<ALyraCharacter>())
 		{
-			for (const FDefaultItemEntry& DefaultItemEntry : ClassEntry.DefaultItemEntries)
+			if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->GetComponentByClass<UD1EquipmentManagerComponent>())
 			{
-				EquipmentManager->SetEquipment(DefaultItemEntry.EquipmentSlotType, DefaultItemEntry.ItemTemplateClass, DefaultItemEntry.ItemRarity, DefaultItemEntry.ItemCount);
+				for (const FDefaultItemEntry& DefaultItemEntry : ClassEntry.DefaultItemEntries)
+				{
+					EquipmentManager->SetEquipment(DefaultItemEntry.EquipmentSlotType, DefaultItemEntry.ItemTemplateClass, DefaultItemEntry.ItemRarity, DefaultItemEntry.ItemCount);
+				}
 			}
 		}
-	}
 	
-	AbilitySetGrantedHandles.TakeFromAbilitySystem(AbilitySystemComponent);
-	if (ULyraAbilitySet* AbilitySet = ClassEntry.ClassAbilitySet)
-	{
-		AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, &AbilitySetGrantedHandles, this);
+		AbilitySetGrantedHandles.TakeFromAbilitySystem(AbilitySystemComponent);
+		if (ULyraAbilitySet* AbilitySet = ClassEntry.ClassAbilitySet)
+		{
+			AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, &AbilitySetGrantedHandles, this);
+		}
 	}
 }
 

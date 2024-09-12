@@ -187,7 +187,7 @@ private:
 public:
 	// TODO: Temp
 	UFUNCTION(Server, Reliable)
-	void Server_SelectClass(const FClassEntry& ClassEntry);
+	void Server_SelectClass(int32 ClassIndex);
 	
 public:
 	FLyraAbilitySet_GrantedHandles AbilitySetGrantedHandles;

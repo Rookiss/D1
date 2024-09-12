@@ -1,7 +1,6 @@
 ﻿#include "D1ClassSelectionWidget.h"
 
 #include "D1ClassEntryWidget.h"
-#include "Components/Button.h"
 #include "Components/VerticalBox.h"
 #include "Data/D1ClassData.h"
 
@@ -20,10 +19,10 @@ void UD1ClassSelectionWidget::NativeConstruct()
 	VerticalBox_ClassElements->ClearChildren();
 
 	const TArray<FClassEntry>& ClassEntries = UD1ClassData::Get().GetClassEntries();
-	for (const FClassEntry& ClassEntry : ClassEntries)
+	for (int i = 0; i < ClassEntries.Num(); i++)
 	{
 		UD1ClassEntryWidget* ClassEntryWidget = CreateWidget<UD1ClassEntryWidget>(this, ClassEntryWidgetClass);
-		ClassEntryWidget->InitializeUI(this, ClassEntry);
+		ClassEntryWidget->InitializeUI(this, i);
 		VerticalBox_ClassElements->AddChild(ClassEntryWidget);
 	}
 }
