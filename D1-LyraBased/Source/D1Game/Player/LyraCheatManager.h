@@ -97,6 +97,9 @@ public:
 
 	UFUNCTION(Exec)
 	virtual void ShowDebugWidget();
+
+	UFUNCTION(Exec)
+	virtual void ShowClassWidget();
 	
 	UFUNCTION(BlueprintAuthorityOnly)
 	void EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass);

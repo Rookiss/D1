@@ -442,6 +442,11 @@ void ULyraCheatManager::ShowDebugWidget()
 	}
 }
 
+void ULyraCheatManager::ShowClassWidget()
+{
+	
+}
+
 void ULyraCheatManager::EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass)
 {
 	if (WeaponSlotType == EWeaponSlotType::Count || ItemTemplateClass == nullptr)
