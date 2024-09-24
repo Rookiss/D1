@@ -1,6 +1,5 @@
 ﻿#include "D1PickupableItemBase.h"
 
-#include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Data/D1ItemData.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -17,18 +16,26 @@ AD1PickupableItemBase::AD1PickupableItemBase(const FObjectInitializer& ObjectIni
 	bReplicates = true;
 	bAlwaysRelevant = true;
 	AActor::SetReplicateMovement(true);
-	
-	BoxCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
-	BoxCollision->SetCollisionProfileName(TEXT("Pickupable"));
-	SetRootComponent(BoxCollision);
+
+	MovementCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
+	MovementCollision->SetCollisionProfileName("BlockOnlyWorldObject");
+	SetRootComponent(MovementCollision);
+
+	PickupCollision = CreateDefaultSubobject<UBoxComponent>("PickupCollision");
+	PickupCollision->SetCollisionProfileName("Pickupable");
+	PickupCollision->SetupAttachment(GetRootComponent());
 	
     MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("MeshComponent");
-	MeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
-	MeshComponent->SetupAttachment(GetRootComponent());
-	
 	MeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	MeshComponent->SetCollisionProfileName("NoCollision");
+	MeshComponent->SetupAttachment(GetRootComponent());
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
+	ProjectileMovement->bShouldBounce = true;
+	ProjectileMovement->Bounciness = 0.f;
+	ProjectileMovement->Friction = 1.f;
+	ProjectileMovement->BounceVelocityStopSimulatingThreshold = 0.f;
+	ProjectileMovement->Velocity = FVector::ZeroVector;
 }
 
 void AD1PickupableItemBase::OnRep_PickupInfo()
@@ -56,12 +63,15 @@ void AD1PickupableItemBase::OnRep_PickupInfo()
 
 			if (bAutoCollisionResize)
 			{
-				FVector Origin, BoxExtent;
 				float Radius;
+				FVector Origin, BoxExtent;
 				UKismetSystemLibrary::GetComponentBounds(MeshComponent, Origin, BoxExtent, Radius);
-				BoxExtent.X = FMath::Max(15.f, BoxExtent.X);
-				BoxExtent.Y = FMath::Max(15.f, BoxExtent.Y);
-				BoxCollision->SetBoxExtent(BoxExtent);
+
+				FVector MovementCollisionExtent = FVector(FMath::Min(16.f, BoxExtent.X), FMath::Min(16.f, BoxExtent.Y), BoxExtent.Z);
+				MovementCollision->SetBoxExtent(MovementCollisionExtent);
+				
+				FVector PickupCollisionExtent = FVector(FMath::Max(32.f, BoxExtent.X), FMath::Max(32.f, BoxExtent.Y), BoxExtent.Z);
+				PickupCollision->SetBoxExtent(PickupCollisionExtent);
 			}
 		}
 	}

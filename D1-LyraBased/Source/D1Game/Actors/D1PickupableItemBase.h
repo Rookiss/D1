@@ -24,7 +24,10 @@ protected:
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UBoxComponent> BoxCollision;
+	TObjectPtr<UBoxComponent> MovementCollision;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UBoxComponent> PickupCollision;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> MeshComponent;

@@ -2,10 +2,12 @@
 
 #include "D1EquipmentManagerComponent.h"
 #include "D1InventoryManagerComponent.h"
-#include "NavigationSystem.h"
 #include "Actors/D1PickupableItemBase.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/Character.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemManagerComponent)
@@ -429,46 +431,42 @@ bool UD1ItemManagerComponent::TryDropItem(UD1ItemInstance* FromItemInstance, int
 	if (FromItemInstance == nullptr || FromItemCount <= 0)
 		return false;
 
-	APawn* Pawn = nullptr;
-	if (AController* Controller = Cast<AController>(GetOwner()))
-	{
-		Pawn = Controller->GetPawn();
-	}
-
-	if (Pawn == nullptr)
+	AController* Controller = Cast<AController>(GetOwner());
+	ACharacter* Character = Controller ? Cast<ACharacter>(Controller->GetPawn()) : Cast<ACharacter>(GetOwner());
+	if (Character == nullptr)
 		return false;
-
-	UNavigationSystemV1* NavigationSystem = UNavigationSystemV1::GetNavigationSystem(GetWorld());
-	if (NavigationSystem == nullptr)
-		return false;
-
-	FVector Location;
-	FNavLocation NavLocation;
-	if (NavigationSystem->GetRandomReachablePointInRadius(Pawn->GetActorLocation() + Pawn->GetActorForwardVector() * 200.f, 100.f, NavLocation))
-	{
-		Location = NavLocation.Location;
-	}
-	else if (NavigationSystem->GetRandomReachablePointInRadius(Pawn->GetActorLocation(), 200.f, NavLocation))
-	{
-		Location = NavLocation.Location;
-	}
-	else
-	{
-		Location = Pawn->GetActorLocation();
-	}
-
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	
-	TSubclassOf<AD1PickupableItemBase> PickupableItemClass = ULyraAssetManager::Get().GetSubclassByName<AD1PickupableItemBase>("PickupableItemClass");
-	AD1PickupableItemBase* PickupableItemActor = GetWorld()->SpawnActor<AD1PickupableItemBase>(PickupableItemClass, Location, FRotator::ZeroRotator, SpawnParameters);
+	const float MaxDistance = 100.f;
+	const int32 TryCount = 5.f;
+	
+	float Radius = Character->GetCapsuleComponent()->GetScaledCapsuleRadius();
+	float HalfHeight = Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	TArray<AActor*> ActorsToIgnore = { Character };
 
-	FD1PickupInfo PickupInfo;
-	PickupInfo.PickupInstance.ItemInstance = FromItemInstance;
-	PickupInfo.PickupInstance.ItemCount = FromItemCount;
-	PickupableItemActor->SetPickupInfo(PickupInfo);
+	for (int i = 0; i < TryCount; i++)
+	{
+		FHitResult HitResult;
+		FVector2D RandPoint = FMath::RandPointInCircle(MaxDistance);
+		FVector TraceLocation = Character->GetCapsuleComponent()->GetComponentLocation() + FVector(RandPoint.X, RandPoint.Y, 0.f);
+		
+		if (UKismetSystemLibrary::CapsuleTraceSingle(GetWorld(), TraceLocation, TraceLocation, Radius, HalfHeight, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true))
+			continue;
+	
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	return true;
+		TSubclassOf<AD1PickupableItemBase> PickupableItemBaseClass = ULyraAssetManager::Get().GetSubclassByName<AD1PickupableItemBase>("PickupableItemBaseClass");
+		AD1PickupableItemBase* PickupableItemActor = GetWorld()->SpawnActor<AD1PickupableItemBase>(PickupableItemBaseClass, TraceLocation, FRotator::ZeroRotator, SpawnParameters);
+	
+		FD1PickupInfo PickupInfo;
+		PickupInfo.PickupInstance.ItemInstance = FromItemInstance;
+		PickupInfo.PickupInstance.ItemCount = FromItemCount;
+		PickupableItemActor->SetPickupInfo(PickupInfo);
+
+		return true;
+	}
+	
+	return false;
 }
 
 void UD1ItemManagerComponent::AddAllowedComponent(UActorComponent* ActorComponent)
