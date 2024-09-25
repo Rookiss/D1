@@ -146,6 +146,7 @@ void ULyraAssetManager::StartInitialLoading()
 		STARTUP_JOB_WEIGHTED(GetAssetData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetItemData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetGameData(), 25.f);
+		STARTUP_JOB_WEIGHTED(GetClassData(), 25.f);
 	}
 
 	// Run all the queued up startup jobs
@@ -294,6 +295,7 @@ void ULyraAssetManager::PreBeginPIE(bool bStartSimulate)
 		GetAssetData();
 		GetItemData();
 		GetGameData();
+		GetClassData();
 
 		// Intentionally after GetGameData to avoid counting GameData time in this timer
 		SCOPE_LOG_TIME_IN_SECONDS(TEXT("PreBeginPIE asset preloading complete"), nullptr);

@@ -11,7 +11,7 @@ public:
 	AD1ArmorBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void InitializeActor(USkeletalMesh* InDefaultArmorMesh, USkeletalMesh* InSecondaryArmorMesh);
+	void InitializeActor(TSoftObjectPtr<USkeletalMesh> InDefaultArmorMesh, TSoftObjectPtr<USkeletalMesh> InSecondaryArmorMesh, FName InSkinMaterialSlotName, TSoftObjectPtr<UMaterialInterface> InSkinMaterial);
 
 public:
 	void SetPrimaryArmorMesh(USkeletalMesh* InPrimaryArmorMesh);
@@ -19,7 +19,8 @@ public:
 
 private:
 	void RefreshArmorMesh();
-
+	void SetArmorMesh(TSoftObjectPtr<USkeletalMesh> InArmorMesh);
+	
 public:
 	USkeletalMeshComponent* GetMeshComponent() const { return ArmorMeshComponent; }
 	
@@ -29,14 +30,21 @@ protected:
 
 protected:
 	UPROPERTY()
-	TObjectPtr<USkeletalMesh> DefaultArmorMesh;
+	TSoftObjectPtr<USkeletalMesh> DefaultArmorMesh;
 	
 	UPROPERTY()
-	TObjectPtr<USkeletalMesh> PrimaryArmorMesh;
+	TSoftObjectPtr<USkeletalMesh> PrimaryArmorMesh;
 
 	UPROPERTY()
-	TObjectPtr<USkeletalMesh> SecondaryArmorMesh;
+	TSoftObjectPtr<USkeletalMesh> SecondaryArmorMesh;
 
+protected:
+	UPROPERTY()
+	FName SkinMaterialSlotName;
+
+	UPROPERTY()
+	TSoftObjectPtr<UMaterialInterface> SkinMaterial;
+	
 private:
 	bool bShouldUseSecondaryArmor = false;
 };

@@ -8,31 +8,42 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1CosmeticManagerComponent)
 
+FD1CosmeticDefaultMeshSet::FD1CosmeticDefaultMeshSet()
+{
+	const int32 ArmorTypeCount = (int32)EArmorType::Count; 
+
+	DefaultMeshEntries.SetNum(ArmorTypeCount);
+	for (int32 i = 0; i < ArmorTypeCount; i++)
+	{
+		DefaultMeshEntries[i].ArmorType = (EArmorType)i;
+	}
+
+	SecondaryMeshEntries.SetNum(ArmorTypeCount);
+	for (int32 i = 0; i < ArmorTypeCount; i++)
+	{
+		SecondaryMeshEntries[i].ArmorType = (EArmorType)i;
+	}
+}
+
 UD1CosmeticManagerComponent::UD1CosmeticManagerComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
 
-	const int32 ArmorTypeCount = (int32)EArmorType::Count; 
+	const int32 SkinTypeCount = (int32)ECharacterSkinType::Count;
 
-	DefaultMeshes.SetNum(ArmorTypeCount);
-	for (int32 i = 0; i < ArmorTypeCount; i++)
+	CosmeticDefaultMeshSets.SetNum(SkinTypeCount);
+	for (int i = 0; i < SkinTypeCount; i++)
 	{
-		DefaultMeshes[i].ArmorType = (EArmorType)i;
-	}
-
-	SecondaryMeshes.SetNum(ArmorTypeCount);
-	for (int32 i = 0; i < ArmorTypeCount; i++)
-	{
-		SecondaryMeshes[i].ArmorType = (EArmorType)i;
+		CosmeticDefaultMeshSets[i].CharacterSkinType = (ECharacterSkinType)i;
 	}
 }
 
 void UD1CosmeticManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	Initialize();
+
+	InitializeManager();
 }
 
 void UD1CosmeticManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -57,8 +68,8 @@ void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const U
 {
 	if (ArmorType == EArmorType::Count)
 		return;
-
-	Initialize();
+	
+	InitializeManager();
 	
 	if (ArmorFragment)
 	{
@@ -120,7 +131,7 @@ void UD1CosmeticManagerComponent::SetPrimaryArmorMesh(EArmorType ArmorType, TSof
 	if (ArmorType == EArmorType::Count)
 		return;
 	
-	Initialize();
+	InitializeManager();
 	
 	if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)ArmorType])
 	{
@@ -161,33 +172,52 @@ void UD1CosmeticManagerComponent::GetMeshComponents(TArray<UMeshComponent*>& Out
 	}
 }
 
-void UD1CosmeticManagerComponent::Initialize()
+void UD1CosmeticManagerComponent::InitializeManager()
 {
 	if (bInitialized)
 		return;
 
 	bInitialized = true;
 
-	const int32 ArmorTypeCount = (int32)EArmorType::Count; 
+	const int32 ArmorTypeCount = (int32)EArmorType::Count;
 	CosmeticSlots.SetNumZeroed(ArmorTypeCount);
 	
 	check(CosmeticSlotClass);
+	check(CharacterSkinType != ECharacterSkinType::Count);
 	
 	if (ACharacter* Character = Cast<ACharacter>(GetOwner()))
 	{
 		if (Character->IsNetMode(NM_DedicatedServer) == false)
 		{
-			HeadSlot = SpawnCosmeticSlotActor(HeadDefaultMesh, HeadSecondaryMesh);
+			const int32 SkinTypeIndex = (int32)CharacterSkinType;
+			const FD1CosmeticDefaultMeshSet& CosmeticDefaultMeshSet = CosmeticDefaultMeshSets[SkinTypeIndex];
+			
+			HeadSlot = SpawnCosmeticSlotActor(CosmeticDefaultMeshSet.HeadDefaultMesh, CosmeticDefaultMeshSet.HeadSecondaryMesh, NAME_None, nullptr);
 			
 			for (int32 i = 0; i < (int32)EArmorType::Count; i++)
 			{
-				CosmeticSlots[i] = SpawnCosmeticSlotActor(DefaultMeshes[i].Mesh, SecondaryMeshes[i].Mesh);
+				EArmorType ArmorType = (EArmorType)i;
+				FName SkinMaterialSlotName;
+				TSoftObjectPtr<UMaterialInterface> SkinMaterial;
+				
+				if (ArmorType == EArmorType::Helmet || ArmorType == EArmorType::Chest || ArmorType == EArmorType::Hands)
+				{
+					SkinMaterialSlotName = FName("UpperBody");
+					SkinMaterial = CosmeticDefaultMeshSet.UpperBodySkinMaterial;
+				}
+				else if (ArmorType == EArmorType::Legs || ArmorType == EArmorType::Foot)
+				{
+					SkinMaterialSlotName = FName("LowerBody");
+					SkinMaterial = CosmeticDefaultMeshSet.LowerBodySkinMaterial;
+				}
+				
+				CosmeticSlots[i] = SpawnCosmeticSlotActor(CosmeticDefaultMeshSet.DefaultMeshEntries[i].DefaultMesh, CosmeticDefaultMeshSet.SecondaryMeshEntries[i].DefaultMesh, SkinMaterialSlotName, SkinMaterial);
 			}
 		}
 	}
 }
 
-UChildActorComponent* UD1CosmeticManagerComponent::SpawnCosmeticSlotActor(USkeletalMesh* DefaultMesh, USkeletalMesh* SecondaryMesh)
+UChildActorComponent* UD1CosmeticManagerComponent::SpawnCosmeticSlotActor(TSoftObjectPtr<USkeletalMesh> InDefaultMesh, TSoftObjectPtr<USkeletalMesh> InSecondaryMesh, FName InSkinMaterialSlotName, TSoftObjectPtr<UMaterialInterface> InSkinMaterial)
 {
 	UChildActorComponent* CosmeticComponent = nullptr;
 	
@@ -205,8 +235,8 @@ UChildActorComponent* UD1CosmeticManagerComponent::SpawnCosmeticSlotActor(USkele
 			{
 				SpawnedRootComponent->AddTickPrerequisiteComponent(ComponentToAttachTo);
 			}
-					
-			SpawnedActor->InitializeActor(DefaultMesh, SecondaryMesh);
+			
+			SpawnedActor->InitializeActor(InDefaultMesh, InSecondaryMesh, InSkinMaterialSlotName, InSkinMaterial);
 		}
 	}
 	

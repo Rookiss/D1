@@ -71,8 +71,7 @@ public:
 	bool bCanBlock = false;
 
 public:
-	UPROPERTY()
-	bool bOnlyUseVisual = false;
+	bool bOnlyUseForLocal = false;
 	
 private:
 	FLyraAbilitySet_GrantedHandles SkillAbilitySetHandles;

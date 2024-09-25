@@ -137,7 +137,7 @@ void FD1EquipEntry::Equip()
 									SpawnedPocketWorldWeaponActor = World->SpawnActorDeferred<AD1WeaponBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
 									SpawnedPocketWorldWeaponActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 									SpawnedPocketWorldWeaponActor->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
-									SpawnedPocketWorldWeaponActor->bOnlyUseVisual = true;
+									SpawnedPocketWorldWeaponActor->bOnlyUseForLocal = true;
 									SpawnedPocketWorldWeaponActor->FinishSpawning(FTransform::Identity, true);
 
 									PocketStage->RefreshAlphaMaskActors();

@@ -437,32 +437,33 @@ bool UD1ItemManagerComponent::TryDropItem(UD1ItemInstance* FromItemInstance, int
 		return false;
 	
 	const float MaxDistance = 100.f;
-	const int32 TryCount = 5.f;
-	
-	float Radius = Character->GetCapsuleComponent()->GetScaledCapsuleRadius();
-	float HalfHeight = Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	const int32 MaxTryCount = 5.f;
+	float HalfRadius = Character->GetCapsuleComponent()->GetScaledCapsuleRadius() / 2.f;
+	float QuarterHeight = Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() / 2.f;
 	TArray<AActor*> ActorsToIgnore = { Character };
 
-	for (int i = 0; i < TryCount; i++)
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+	for (int32 i = 0; i < MaxTryCount; i++)
 	{
 		FHitResult HitResult;
 		FVector2D RandPoint = FMath::RandPointInCircle(MaxDistance);
-		FVector TraceLocation = Character->GetCapsuleComponent()->GetComponentLocation() + FVector(RandPoint.X, RandPoint.Y, 0.f);
+		FVector TraceStartLocation = Character->GetCapsuleComponent()->GetComponentLocation();
+		FVector TraceEndLocation = TraceStartLocation + FVector(RandPoint.X, RandPoint.Y, 0.f);
 		
-		if (UKismetSystemLibrary::CapsuleTraceSingle(GetWorld(), TraceLocation, TraceLocation, Radius, HalfHeight, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true))
+		if (UKismetSystemLibrary::CapsuleTraceSingle(GetWorld(), TraceStartLocation, TraceEndLocation, HalfRadius, QuarterHeight, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true))
 			continue;
-	
-		FActorSpawnParameters SpawnParameters;
-		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
+		
 		TSubclassOf<AD1PickupableItemBase> PickupableItemBaseClass = ULyraAssetManager::Get().GetSubclassByName<AD1PickupableItemBase>("PickupableItemBaseClass");
-		AD1PickupableItemBase* PickupableItemActor = GetWorld()->SpawnActor<AD1PickupableItemBase>(PickupableItemBaseClass, TraceLocation, FRotator::ZeroRotator, SpawnParameters);
-	
+		AD1PickupableItemBase* PickupableItemActor = GetWorld()->SpawnActor<AD1PickupableItemBase>(PickupableItemBaseClass, TraceEndLocation, FRotator::ZeroRotator, SpawnParameters);
+		if (PickupableItemActor == nullptr)
+			continue;
+		
 		FD1PickupInfo PickupInfo;
 		PickupInfo.PickupInstance.ItemInstance = FromItemInstance;
 		PickupInfo.PickupInstance.ItemCount = FromItemCount;
 		PickupableItemActor->SetPickupInfo(PickupInfo);
-
 		return true;
 	}
 	

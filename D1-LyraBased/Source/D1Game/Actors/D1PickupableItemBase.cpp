@@ -67,10 +67,10 @@ void AD1PickupableItemBase::OnRep_PickupInfo()
 				FVector Origin, BoxExtent;
 				UKismetSystemLibrary::GetComponentBounds(MeshComponent, Origin, BoxExtent, Radius);
 
-				FVector MovementCollisionExtent = FVector(FMath::Min(16.f, BoxExtent.X), FMath::Min(16.f, BoxExtent.Y), BoxExtent.Z);
+				FVector MovementCollisionExtent = FVector(FMath::Min(MaxMovementCollisionExtent.X, BoxExtent.X), FMath::Min(MaxMovementCollisionExtent.Y, BoxExtent.Y), BoxExtent.Z);
 				MovementCollision->SetBoxExtent(MovementCollisionExtent);
 				
-				FVector PickupCollisionExtent = FVector(FMath::Max(32.f, BoxExtent.X), FMath::Max(32.f, BoxExtent.Y), BoxExtent.Z);
+				FVector PickupCollisionExtent = FVector(FMath::Max(MinPickupCollisionExtent.X, BoxExtent.X), FMath::Max(MinPickupCollisionExtent.Y, BoxExtent.Y), BoxExtent.Z);
 				PickupCollision->SetBoxExtent(PickupCollisionExtent);
 			}
 		}

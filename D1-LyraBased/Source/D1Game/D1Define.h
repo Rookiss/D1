@@ -152,6 +152,15 @@ enum class EOverlayTargetType : uint8
 	All,
 };
 
+UENUM(BlueprintType)
+enum class ECharacterSkinType : uint8
+{
+	Asian,
+	Black,
+
+	Count	UMETA(Hidden)
+};
+
 namespace Item
 {
 	const int32 GoldID = 9999;

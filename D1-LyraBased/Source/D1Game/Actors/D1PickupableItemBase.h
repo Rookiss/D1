@@ -34,4 +34,11 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	FVector2D MaxMovementCollisionExtent = FVector2D(16.f, 16.f);
+
+	UPROPERTY(EditDefaultsOnly)
+	FVector2D MinPickupCollisionExtent = FVector2D(32.f, 32.f);
 };

@@ -5,7 +5,6 @@
 #include "Character/LyraCharacter.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
-#include "Components/SplineComponent.h"
 #include "Data/D1ItemData.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
@@ -40,7 +39,7 @@ void AD1WeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (bOnlyUseVisual)
+	if (bOnlyUseForLocal)
 		return;
 	
 	if (HasAuthority())
@@ -53,7 +52,7 @@ void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	if (bOnlyUseVisual)
+	if (bOnlyUseForLocal)
 		return;
 	
 	DOREPLIFETIME(ThisClass, TemplateID);
@@ -63,7 +62,7 @@ void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 void AD1WeaponBase::Destroyed()
 {
-	if (bOnlyUseVisual)
+	if (bOnlyUseForLocal)
 		return;
 	
 	if (ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner()))
@@ -88,7 +87,7 @@ void AD1WeaponBase::Destroyed()
 
 void AD1WeaponBase::Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSlotType)
 {
-	if (bOnlyUseVisual)
+	if (bOnlyUseForLocal)
 		return;
 	
 	TemplateID = InTemplateID;
@@ -97,7 +96,7 @@ void AD1WeaponBase::Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSlotT
 
 void AD1WeaponBase::ChangeSkill(int32 AbilitySetIndex)
 {
-	if (bOnlyUseVisual)
+	if (bOnlyUseForLocal)
 		return;
 	
 	if (HasAuthority() == false)
@@ -126,7 +125,7 @@ void AD1WeaponBase::ChangeSkill(int32 AbilitySetIndex)
 
 void AD1WeaponBase::ChangeBlockState(bool bShouldBlock)
 {
-	if (bOnlyUseVisual)
+	if (bOnlyUseForLocal)
 		return;
 	
 	if (HasAuthority())
@@ -138,7 +137,7 @@ void AD1WeaponBase::ChangeBlockState(bool bShouldBlock)
 
 void AD1WeaponBase::OnRep_CanBlock()
 {
-	if (bOnlyUseVisual)
+	if (bOnlyUseForLocal)
 		return;
 	
 	WeaponMeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Projectile, bCanBlock ? ECR_Block : ECR_Ignore);
@@ -146,7 +145,7 @@ void AD1WeaponBase::OnRep_CanBlock()
 
 void AD1WeaponBase::OnRep_EquipmentSlotType()
 {
-	if (bOnlyUseVisual)
+	if (bOnlyUseForLocal)
 		return;
 	
 	if (GetOwner() && GetOwner()->FindComponentByClass<UD1EquipManagerComponent>())
