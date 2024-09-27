@@ -22,14 +22,17 @@ void UD1PocketWorldWidget::NativeConstruct()
 	{
 		PocketWorldSubsystem->RegisterAndCallForGetPocketStage(GetOwningLocalPlayer(), FGetPocketStageDelegate::CreateUObject(this, &UD1PocketWorldWidget::OnPocketStageReady));
 	}
-	
-	GetWorld()->GetTimerManager().SetTimer(TickTimerHandle, this, &ThisClass::RefreshUI, 1.f / 60.f, true);
+}
+
+void UD1PocketWorldWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	RefreshUI();
 }
 
 void UD1PocketWorldWidget::NativeDestruct()
 {
-	GetWorld()->GetTimerManager().ClearTimer(TickTimerHandle);
-	
 	UMaterialInstanceDynamic* MaterialInstanceDynamic = Image_Render->GetDynamicMaterial();
 	MaterialInstanceDynamic->ClearParameterValues();
 	

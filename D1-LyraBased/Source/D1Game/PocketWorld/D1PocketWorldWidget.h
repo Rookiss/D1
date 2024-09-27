@@ -15,6 +15,7 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	virtual void NativeDestruct() override;
 
 private:
@@ -33,6 +34,5 @@ private:
 	TWeakObjectPtr<AD1PocketStage> CachedPocketStage;
 
 private:
-	FTimerHandle TickTimerHandle;
 	FDelegateHandle DelegateHandle;
 };

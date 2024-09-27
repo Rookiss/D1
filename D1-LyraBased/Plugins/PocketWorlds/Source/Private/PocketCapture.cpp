@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "PocketCapture.h"
 
 #include "Camera/CameraComponent.h"
@@ -12,13 +10,9 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(PocketCapture)
 
-class UWorld;
-
-// UPocketCapture
-//---------------------------------------------------------------------------------
-
 UPocketCapture::UPocketCapture()
 {
+	
 }
 
 void UPocketCapture::Initialize(UWorld* InWorld, int32 InRendererIndex)
@@ -33,15 +27,11 @@ void UPocketCapture::Initialize(UWorld* InWorld, int32 InRendererIndex)
 	CaptureComponent->bCaptureEveryFrame = false;
 	CaptureComponent->bCaptureOnMovement = false;
 	CaptureComponent->bAlwaysPersistRenderingState = true;
-
-	//UE_LOG(LogPocketLevels, Log, TEXT("ThumbnailRenderer: Initialize:%s"), *GetName());
 }
 
 void UPocketCapture::Deinitialize()
 {
 	CaptureComponent->UnregisterComponent();
-
-	//UE_LOG(LogPocketLevels, Log, TEXT("ThumbnailRenderer: Deinitialize:%s"), *GetName());
 }
 
 void UPocketCapture::BeginDestroy()
@@ -77,8 +67,6 @@ void UPocketCapture::SetRenderTargetSize(int32 Width, int32 Height)
 			EffectsRT->ResizeTarget(SurfaceWidth, SurfaceHeight);
 		}
 	}
-
-	//UE_LOG(LogPocketLevels, Log, TEXT("ThumbnailRenderer: SetRenderTargetSize:%dx%d"), Width, Height);
 }
 
 UTextureRenderTarget2D* UPocketCapture::GetOrCreateDiffuseRenderTarget()
@@ -167,10 +155,7 @@ TArray<UPrimitiveComponent*> UPocketCapture::GatherPrimitivesForCapture(const TA
 bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const TArray<AActor*>& InCaptureActors, ESceneCaptureSource InCaptureSource, UMaterialInterface* OverrideMaterial)
 {
 	if (InRenderTarget == nullptr)
-	{
-		//UE_LOG(LogPocketLevels, Error, TEXT(""));
 		return false;
-	}
 
 	if (AActor* CaptureTarget = CaptureTargetPtr.Get())
 	{
@@ -203,23 +188,18 @@ bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const 
 				FMinimalViewInfo CaptureView;
 				Camera->GetCameraView(0, CaptureView);
 
-				// We need to make sure the texture streamer takes into account this new location,
-				// this request only lasts for one tick, so we call it every time we need to draw, 
-				// so that they stay resident.
-
 				CaptureComponent->TextureTarget = InRenderTarget;
 				CaptureComponent->PostProcessSettings = Camera->PostProcessSettings;
 				CaptureComponent->SetCameraView(CaptureView);
 
 				CaptureComponent->ShowFlags.SetDepthOfField(false);
-				CaptureComponent->ShowFlags.SetMotionBlur(true);
+				CaptureComponent->ShowFlags.SetMotionBlur(true); // Check
 				CaptureComponent->ShowFlags.SetScreenPercentage(false);
 				CaptureComponent->ShowFlags.SetScreenSpaceReflections(false);
 				CaptureComponent->ShowFlags.SetDistanceFieldAO(false);
-				
 				CaptureComponent->ShowFlags.SetLensFlares(false);
 				CaptureComponent->ShowFlags.SetOnScreenDebug(false);
-				CaptureComponent->ShowFlags.SetEyeAdaptation(true);
+				CaptureComponent->ShowFlags.SetEyeAdaptation(true); // Check
 				CaptureComponent->ShowFlags.SetColorGrading(false);
 				CaptureComponent->ShowFlags.SetCameraImperfections(false);
 				CaptureComponent->ShowFlags.SetVignette(false);
@@ -228,20 +208,18 @@ bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const 
 				CaptureComponent->ShowFlags.SetScreenPercentage(false);
 				CaptureComponent->ShowFlags.SetScreenSpaceReflections(false);
 				CaptureComponent->ShowFlags.SetTemporalAA(false);
-				// // might cause reallocation if we render rarely to it - for now off
 				CaptureComponent->ShowFlags.SetAmbientOcclusion(false);
-				// // Requires resources in the FScene, which get reallocated for every temporary scene if enabled
 				CaptureComponent->ShowFlags.SetIndirectLightingCache(false);
 				CaptureComponent->ShowFlags.SetLightShafts(false);
 				CaptureComponent->ShowFlags.SetPostProcessMaterial(false);
 				CaptureComponent->ShowFlags.SetHighResScreenshotMask(false);
 				CaptureComponent->ShowFlags.SetHMDDistortion(false);
 				CaptureComponent->ShowFlags.SetStereoRendering(false);
-				CaptureComponent->ShowFlags.SetFog(false);
+				CaptureComponent->ShowFlags.SetFog(false); // Check
 				CaptureComponent->ShowFlags.SetVolumetricFog(false);
 				CaptureComponent->ShowFlags.SetVolumetricLightmap(false);
 				CaptureComponent->ShowFlags.SetSkyLighting(false);
-
+				
 				CaptureComponent->CaptureSource = InCaptureSource;
 				CaptureComponent->ProfilingEventName = TEXT("Pocket Capture");
 				CaptureComponent->CaptureScene();
@@ -263,14 +241,6 @@ bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const 
 				return true;
 			}
 		}
-		else
-		{
-			//UE_LOG(LogPocketLevels, Warning, TEXT("UPocketCapture: %s CaptureScene Failed: No Capture Actors"), *GetName());
-		}
-	}
-	else
-	{
-		//UE_LOG(LogPocketLevels, Warning, TEXT("UPocketCapture: %s CaptureScene Failed: No Capture Target"), *GetName());
 	}
 
 	return false;
