@@ -4,7 +4,7 @@
 
 #include "AbilitySystemGlobals.h"
 #include "DataValidationModule.h"
-#include "Development/LyraDeveloperSettings.h"
+#include "Development/D1DeveloperSettings.h"
 #include "Editor/UnrealEdEngine.h"
 #include "Engine/GameInstance.h"
 #include "Framework/Application/SlateApplication.h"
@@ -110,14 +110,14 @@ static void OpenCommonMap_Clicked(const FString MapPath)
 
 static bool CanShowCommonMaps()
 {
-	return HasNoPlayWorld() && !GetDefault<ULyraDeveloperSettings>()->CommonEditorMaps.IsEmpty();
+	return HasNoPlayWorld() && !GetDefault<UD1DeveloperSettings>()->CommonEditorMaps.IsEmpty();
 }
 
 static TSharedRef<SWidget> GetCommonMapsDropdown()
 {
 	FMenuBuilder MenuBuilder(true, nullptr);
 	
-	for (const FSoftObjectPath& Path : GetDefault<ULyraDeveloperSettings>()->CommonEditorMaps)
+	for (const FSoftObjectPath& Path : GetDefault<UD1DeveloperSettings>()->CommonEditorMaps)
 	{
 		if (!Path.IsValid())
 		{

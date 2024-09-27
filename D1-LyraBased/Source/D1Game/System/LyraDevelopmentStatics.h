@@ -32,7 +32,7 @@ public:
 	// Should game logic load cosmetic backgrounds in the editor?
 	// Will always return true except when playing in the editor and bSkipLoadingCosmeticBackgroundsInPIE (in Lyra Developer Settings) is true
 	UFUNCTION(BlueprintCallable, Category = "Lyra")
-	static bool CanPlayerBotsAttack();
+	static bool CanMonstersAttackPlayer();
 
 	// Finds the most appropriate play-in-editor world to run 'server' cheats on
 	//   This might be the only world if running standalone, the listen server, or the dedicated server

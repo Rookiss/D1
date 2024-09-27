@@ -390,5 +390,11 @@
 			"Enabled": true
 		}
 	],
+	"TargetPlatforms": [
+		"Linux",
+		"LinuxArm64",
+		"Mac",
+		"Windows"
+	],
 	"EpicSampleNameHash": "451731683"
 }

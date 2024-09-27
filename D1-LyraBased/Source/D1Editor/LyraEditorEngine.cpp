@@ -2,7 +2,7 @@
 
 #include "LyraEditorEngine.h"
 
-#include "Development/LyraDeveloperSettings.h"
+#include "Development/D1DeveloperSettings.h"
 #include "Development/LyraPlatformEmulationSettings.h"
 #include "Engine/GameInstance.h"
 #include "Framework/Notifications/NotificationManager.h"
@@ -73,7 +73,7 @@ FGameInstancePIEResult ULyraEditorEngine::PreCreatePIEInstances(const bool bAnyB
 	}
 
 	//@TODO: Should add delegates that a *non-editor* module could bind to for PIE start/stop instead of poking directly
-	GetDefault<ULyraDeveloperSettings>()->OnPlayInEditorStarted();
+	GetDefault<UD1DeveloperSettings>()->OnPlayInEditorStarted();
 	GetDefault<ULyraPlatformEmulationSettings>()->OnPlayInEditorStarted();
 
 	//

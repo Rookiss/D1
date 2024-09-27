@@ -4,7 +4,7 @@
 #include "D1GameplayTags.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Actors/D1WeaponBase.h"
-#include "Development/LyraDeveloperSettings.h"
+#include "Development/D1DeveloperSettings.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
@@ -130,7 +130,7 @@ void UD1GameplayAbility_Weapon_Melee::DrawDebugHitPoint(const FHitResult& HitRes
 #if UE_EDITOR
 	if (GIsEditor)
 	{
-		const ULyraDeveloperSettings* DeveloperSettings = GetDefault<ULyraDeveloperSettings>();
+		const UD1DeveloperSettings* DeveloperSettings = GetDefault<UD1DeveloperSettings>();
 		if (DeveloperSettings->bForceDisableDebugTrace == false && bShowDebug)
 		{
 			FColor Color = (HasAuthority(&CurrentActivationInfo)) ? FColor::Red : FColor::Green;

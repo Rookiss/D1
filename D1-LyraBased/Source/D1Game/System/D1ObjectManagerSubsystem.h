@@ -36,6 +36,6 @@ private:
 	TSet<TObjectPtr<AD1TargetPointBase>> UsingChestTargetPoints;
 
 private:
-	UPROPERTY()
+	UPROPERTY(Transient)
 	TMap<TWeakObjectPtr<AActor>, TObjectPtr<AD1TargetPointBase>> SpawnedActorToTargetPoint;
 };

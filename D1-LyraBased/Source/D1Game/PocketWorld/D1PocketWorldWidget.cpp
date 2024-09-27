@@ -23,7 +23,7 @@ void UD1PocketWorldWidget::NativeConstruct()
 		PocketWorldSubsystem->RegisterAndCallForGetPocketStage(GetOwningLocalPlayer(), FGetPocketStageDelegate::CreateUObject(this, &UD1PocketWorldWidget::OnPocketStageReady));
 	}
 	
-	GetWorld()->GetTimerManager().SetTimer(TickTimerHandle, this, &ThisClass::RefreshUI, 0.03f, true);
+	GetWorld()->GetTimerManager().SetTimer(TickTimerHandle, this, &ThisClass::RefreshUI, 1.f / 60.f, true);
 }
 
 void UD1PocketWorldWidget::NativeDestruct()
@@ -43,7 +43,7 @@ void UD1PocketWorldWidget::RefreshUI()
 		if (UPocketCapture* PocketCapture = CachedPocketStage->GetPocketCapture())
 		{
 			PocketCapture->CaptureDiffuse();
-			PocketCapture->CaptureAlphaMask();
+			// PocketCapture->CaptureAlphaMask();
 		}
 	}
 }
@@ -55,10 +55,10 @@ void UD1PocketWorldWidget::OnPocketStageReady(AD1PocketStage* PocketStage)
 	if (UPocketCapture* PocketCapture = CachedPocketStage->GetPocketCapture())
 	{
 		UTextureRenderTarget2D* DiffuseRenderTarget = PocketCapture->GetOrCreateDiffuseRenderTarget();
-		UTextureRenderTarget2D* AlphaRenderTarget = PocketCapture->GetOrCreateAlphaMaskRenderTarget();
+		// UTextureRenderTarget2D* AlphaRenderTarget = PocketCapture->GetOrCreateAlphaMaskRenderTarget();
 
 		UMaterialInstanceDynamic* MaterialInstanceDynamic = Image_Render->GetDynamicMaterial();
 		MaterialInstanceDynamic->SetTextureParameterValue("Diffuse", DiffuseRenderTarget);
-		MaterialInstanceDynamic->SetTextureParameterValue("AlphaMask", AlphaRenderTarget);
+		// MaterialInstanceDynamic->SetTextureParameterValue("AlphaMask", AlphaRenderTarget);
 	}
 }

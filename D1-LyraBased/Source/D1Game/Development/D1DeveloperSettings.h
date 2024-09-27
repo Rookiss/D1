@@ -5,7 +5,7 @@
 #include "Engine/DeveloperSettingsBackedByCVars.h"
 #include "UObject/PrimaryAssetId.h"
 #include "UObject/SoftObjectPath.h"
-#include "LyraDeveloperSettings.generated.h"
+#include "D1DeveloperSettings.generated.h"
 
 struct FPropertyChangedEvent;
 
@@ -37,12 +37,12 @@ struct FLyraCheatToRun
  * Developer settings / editor cheats
  */
 UCLASS(config=EditorPerProjectUserSettings, MinimalAPI)
-class ULyraDeveloperSettings : public UDeveloperSettingsBackedByCVars
+class UD1DeveloperSettings : public UDeveloperSettingsBackedByCVars
 {
 	GENERATED_BODY()
 
 public:
-	ULyraDeveloperSettings();
+	UD1DeveloperSettings();
 
 	//~UDeveloperSettings interface
 	virtual FName GetCategoryName() const override;
@@ -57,20 +57,17 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, config, Category=D1)
 	bool bForceDisableCost = true;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, config, Category="D1 Monster")
+	bool bAllowSpawnMonsters = true;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, config, Category="D1 Monster")
+	bool bAllowMonstersAttackPlayer = true;
 	
 	// The experience override to use for Play in Editor (if not set, the default for the world settings of the open map will be used)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, config, Category=Lyra, meta=(AllowedTypes="LyraExperienceDefinition"))
 	FPrimaryAssetId ExperienceOverride;
-
-	UPROPERTY(BlueprintReadOnly, config, Category=LyraBots)
-	bool bOverrideBotCount = false;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, config, Category=LyraBots, meta=(EditCondition=bOverrideBotCount))
-	int32 OverrideNumPlayerBotsToSpawn = 0;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, config, Category=LyraBots)
-	bool bAllowPlayerBotsToAttack = true;
-
+	
 	// Do the full game flow when playing in the editor, or skip 'waiting for player' / etc... game phases?
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, config, Category=Lyra)
 	bool bTestFullGameFlowInPIE = false;

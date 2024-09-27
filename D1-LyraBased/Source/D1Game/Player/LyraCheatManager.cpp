@@ -18,7 +18,7 @@
 #include "Character/LyraHealthComponent.h"
 #include "Character/LyraPawnExtensionComponent.h"
 #include "System/LyraSystemStatics.h"
-#include "Development/LyraDeveloperSettings.h"
+#include "Development/D1DeveloperSettings.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/D1ItemTemplate.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
@@ -64,7 +64,7 @@ void ULyraCheatManager::InitCheatManager()
 	if (GIsEditor)
 	{
 		APlayerController* PC = GetOuterAPlayerController();
-		for (const FLyraCheatToRun& CheatRow : GetDefault<ULyraDeveloperSettings>()->CheatsToRun)
+		for (const FLyraCheatToRun& CheatRow : GetDefault<UD1DeveloperSettings>()->CheatsToRun)
 		{
 			if (CheatRow.Phase == ECheatExecutionTime::OnCheatManagerCreated)
 			{

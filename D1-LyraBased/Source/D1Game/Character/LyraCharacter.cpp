@@ -395,19 +395,30 @@ void ALyraCharacter::UninitAndSpawnSpectator()
 			PawnExtComponent->UninitializeAbilitySystem();
 		}
 	}
-	
-	if (GetLocalRole() == ROLE_Authority && Controller)
-	{
-		TSubclassOf<ASpectatorPawn> SpectatorPawnClass = ULyraAssetManager::GetSubclassByName<ASpectatorPawn>("SpectatorPawnClass");
-	
-		FActorSpawnParameters SpawnParameters;
-		SpawnParameters.Owner = Controller;
 
-		FVector ViewLocation;
-		FRotator ViewRotation;
-		Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
-		ASpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(SpectatorPawnClass, ViewLocation, ViewRotation, SpawnParameters);
-		Controller->Possess(SpectatorPawn);
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		if (Cast<APlayerController>(Controller))
+		{
+			TSubclassOf<ASpectatorPawn> SpectatorPawnClass = ULyraAssetManager::GetSubclassByName<ASpectatorPawn>("SpectatorPawnClass");
+	
+			FActorSpawnParameters SpawnParameters;
+			SpawnParameters.Owner = Controller;
+
+			FVector ViewLocation;
+			FRotator ViewRotation;
+			Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+		
+			ASpectatorPawn* SpectatorPawn = GetWorld()->SpawnActor<ASpectatorPawn>(SpectatorPawnClass, ViewLocation, ViewRotation, SpawnParameters);
+			Controller->Possess(SpectatorPawn);
+			Controller = nullptr;
+		}
+		else
+		{
+			// TODO: Check AIController Destroy 
+			Controller->UnPossess();
+			Controller = nullptr;
+		}
 	}
 }
 

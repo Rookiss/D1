@@ -7,11 +7,9 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
-#include "Development/LyraDeveloperSettings.h"
+#include "Development/D1DeveloperSettings.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AnimNotifyState_PerformTrace)
-
-class ULyraDeveloperSettings;
 
 UD1AnimNotifyState_PerformTrace::UD1AnimNotifyState_PerformTrace(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -119,7 +117,7 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 #if UE_EDITOR
 		if (GIsEditor)
 		{
-			const ULyraDeveloperSettings* DeveloperSettings = GetDefault<ULyraDeveloperSettings>();
+			const UD1DeveloperSettings* DeveloperSettings = GetDefault<UD1DeveloperSettings>();
 			if (DeveloperSettings->bForceDisableDebugTrace == false && TraceDebugParams.bDrawDebugShape)
 			{
 				FColor Color = (HitResults.Num() > 0) ? TraceDebugParams.HitColor : TraceDebugParams.TraceColor;

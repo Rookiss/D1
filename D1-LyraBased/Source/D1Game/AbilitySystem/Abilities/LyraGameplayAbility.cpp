@@ -20,7 +20,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Physics/PhysicalMaterialWithTags.h"
 #include "Camera/LyraCameraMode.h"
-#include "Development/LyraDeveloperSettings.h"
+#include "Development/D1DeveloperSettings.h"
 #include "Input/D1EnhancedPlayerInput.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Player/LyraLocalPlayer.h"
@@ -262,7 +262,7 @@ bool ULyraGameplayAbility::CheckCost(const FGameplayAbilitySpecHandle Handle, co
 
 void ULyraGameplayAbility::ApplyCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
 {
-	if (GIsEditor == false || GetDefault<ULyraDeveloperSettings>()->bForceDisableCost == false)
+	if (GIsEditor == false || GetDefault<UD1DeveloperSettings>()->bForceDisableCost == false)
 	{
 		Super::ApplyCost(Handle, ActorInfo, ActivationInfo);
 	}
@@ -321,7 +321,7 @@ void ULyraGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle
 {
 	if (GIsEditor)
 	{
-		const ULyraDeveloperSettings* DeveloperSettings = GetDefault<ULyraDeveloperSettings>();
+		const UD1DeveloperSettings* DeveloperSettings = GetDefault<UD1DeveloperSettings>();
 		if (DeveloperSettings->bForceDisableCooldown)
 			return;
 	}

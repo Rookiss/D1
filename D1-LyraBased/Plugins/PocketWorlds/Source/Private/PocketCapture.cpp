@@ -212,14 +212,14 @@ bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const 
 				CaptureComponent->SetCameraView(CaptureView);
 
 				CaptureComponent->ShowFlags.SetDepthOfField(false);
-				CaptureComponent->ShowFlags.SetMotionBlur(false);
+				CaptureComponent->ShowFlags.SetMotionBlur(true);
 				CaptureComponent->ShowFlags.SetScreenPercentage(false);
 				CaptureComponent->ShowFlags.SetScreenSpaceReflections(false);
 				CaptureComponent->ShowFlags.SetDistanceFieldAO(false);
-
+				
 				CaptureComponent->ShowFlags.SetLensFlares(false);
 				CaptureComponent->ShowFlags.SetOnScreenDebug(false);
-				CaptureComponent->ShowFlags.SetEyeAdaptation(false);
+				CaptureComponent->ShowFlags.SetEyeAdaptation(true);
 				CaptureComponent->ShowFlags.SetColorGrading(false);
 				CaptureComponent->ShowFlags.SetCameraImperfections(false);
 				CaptureComponent->ShowFlags.SetVignette(false);
@@ -228,9 +228,9 @@ bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const 
 				CaptureComponent->ShowFlags.SetScreenPercentage(false);
 				CaptureComponent->ShowFlags.SetScreenSpaceReflections(false);
 				CaptureComponent->ShowFlags.SetTemporalAA(false);
-				// might cause reallocation if we render rarely to it - for now off
+				// // might cause reallocation if we render rarely to it - for now off
 				CaptureComponent->ShowFlags.SetAmbientOcclusion(false);
-				// Requires resources in the FScene, which get reallocated for every temporary scene if enabled
+				// // Requires resources in the FScene, which get reallocated for every temporary scene if enabled
 				CaptureComponent->ShowFlags.SetIndirectLightingCache(false);
 				CaptureComponent->ShowFlags.SetLightShafts(false);
 				CaptureComponent->ShowFlags.SetPostProcessMaterial(false);
