@@ -38,9 +38,9 @@ void UD1MonsterManagerComponent::OnExperienceLoaded(const ULyraExperienceDefinit
 #endif
 }
 
-#if WITH_SERVER_CODE
 void UD1MonsterManagerComponent::ServerInitializeMonsters()
 {
+#if WITH_SERVER_CODE
 	TArray<AActor*> SpawnedActorList;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), MonsterCharacterBaseClass, SpawnedActorList);
 
@@ -81,6 +81,7 @@ void UD1MonsterManagerComponent::ServerInitializeMonsters()
 	//
 	// 	SpawnedBotList.Add(NewController);
 	// }
+#endif
 }
 
 // void UD1MonsterManagerComponent::RemoveOneBot()
@@ -116,4 +117,3 @@ void UD1MonsterManagerComponent::ServerInitializeMonsters()
 // 		}
 // 	}
 // }
-#endif
