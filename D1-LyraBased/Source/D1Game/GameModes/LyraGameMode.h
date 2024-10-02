@@ -58,6 +58,9 @@ public:
 	virtual void FailedToRestartPlayer(AController* NewPlayer) override;
 	//~End of AGameModeBase interface
 
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void RestartGame();
+	
 	// Restart (respawn) the specified player or bot next frame
 	// - If bForceReset is true, the controller will be reset this frame (abandoning the currently possessed pawn, if any)
 	UFUNCTION(BlueprintCallable)

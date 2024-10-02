@@ -9,6 +9,7 @@
 #include "Data/D1ClassData.h"
 #include "Data/D1ItemData.h"
 #include "Data/D1AssetData.h"
+#include "Data/D1CharacterData.h"
 #include "Character/LyraPawnData.h"
 #include "Misc/App.h"
 #include "Stats/StatsMisc.h"
@@ -107,9 +108,29 @@ void ULyraAssetManager::DumpLoadedAssets()
 	UE_LOG(LogD1, Log, TEXT("========== Finish Dumping Loaded Assets =========="));
 }
 
+const ULyraGameData& ULyraAssetManager::GetGameData()
+{
+	return GetOrLoadTypedGameData<ULyraGameData>(GameDataPath);
+}
+
+const ULyraPawnData* ULyraAssetManager::GetDefaultPawnData() const
+{
+	return GetAssetByPath(DefaultPawnData);
+}
+
 const UD1AssetData& ULyraAssetManager::GetAssetData()
 {
 	return GetOrLoadTypedGameData<UD1AssetData>(AssetDataPath);
+}
+
+const UD1ClassData& ULyraAssetManager::GetClassData()
+{
+	return GetOrLoadTypedGameData<UD1ClassData>(ClassDataPath);
+}
+
+const UD1CharacterData& ULyraAssetManager::GetCharacterData()
+{
+	return GetOrLoadTypedGameData<UD1CharacterData>(CharacterDataPath);
 }
 
 const UD1ItemData& ULyraAssetManager::GetItemData()
@@ -120,11 +141,6 @@ const UD1ItemData& ULyraAssetManager::GetItemData()
 const UD1ElectricFieldPhaseData& ULyraAssetManager::GetElectricFieldPhaseData()
 {
 	return GetOrLoadTypedGameData<UD1ElectricFieldPhaseData>(ElectricFieldPhaseDataPath);
-}
-
-const UD1ClassData& ULyraAssetManager::GetClassData()
-{
-	return GetOrLoadTypedGameData<UD1ClassData>(ClassDataPath);
 }
 
 const UD1CheatData& ULyraAssetManager::GetCheatData()
@@ -143,10 +159,12 @@ void ULyraAssetManager::StartInitialLoading()
 
 	{
 		// Load base game data asset
-		STARTUP_JOB_WEIGHTED(GetAssetData(), 25.f);
-		STARTUP_JOB_WEIGHTED(GetItemData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetGameData(), 25.f);
+		STARTUP_JOB_WEIGHTED(GetAssetData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetClassData(), 25.f);
+		STARTUP_JOB_WEIGHTED(GetCharacterData(), 25.f);
+		STARTUP_JOB_WEIGHTED(GetItemData(), 25.f);
+		STARTUP_JOB_WEIGHTED(GetElectricFieldPhaseData(), 25.f);
 	}
 
 	// Run all the queued up startup jobs
@@ -160,16 +178,6 @@ void ULyraAssetManager::InitializeGameplayCueManager()
 	ULyraGameplayCueManager* GCM = ULyraGameplayCueManager::Get();
 	check(GCM);
 	GCM->LoadAlwaysLoadedCues();
-}
-
-const ULyraGameData& ULyraAssetManager::GetGameData()
-{
-	return GetOrLoadTypedGameData<ULyraGameData>(LyraGameDataPath);
-}
-
-const ULyraPawnData* ULyraAssetManager::GetDefaultPawnData() const
-{
-	return GetAssetByPath(DefaultPawnData);
 }
 
 UPrimaryDataAsset* ULyraAssetManager::LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataClassPath, FPrimaryAssetType PrimaryAssetType)
@@ -292,10 +300,13 @@ void ULyraAssetManager::PreBeginPIE(bool bStartSimulate)
 		const bool bAllowInPIE = true;
 		SlowTask.MakeDialog(bShowCancelButton, bAllowInPIE);
 		
-		GetAssetData();
-		GetItemData();
 		GetGameData();
+		GetAssetData();
 		GetClassData();
+		GetCharacterData();
+		GetItemData();
+		GetElectricFieldPhaseData();
+		GetCheatData();
 
 		// Intentionally after GetGameData to avoid counting GameData time in this timer
 		SCOPE_LOG_TIME_IN_SECONDS(TEXT("PreBeginPIE asset preloading complete"), nullptr);

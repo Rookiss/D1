@@ -157,7 +157,7 @@ enum class ECharacterSkinType : uint8
 {
 	Asian,
 	Black,
-
+	
 	Count	UMETA(Hidden)
 };
 

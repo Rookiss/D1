@@ -11,12 +11,12 @@ const UD1ElectricFieldPhaseData& UD1ElectricFieldPhaseData::Get()
 
 bool UD1ElectricFieldPhaseData::IsValidPhaseIndex(int32 PhaseIndex) const
 {
-	return PhaseIndex >= 0 && PhaseIndex < PhaseEntries.Num();
+	return PhaseEntries.IsValidIndex(PhaseIndex);
 }
 
 const FD1ElectricFieldPhaseEntry& UD1ElectricFieldPhaseData::GetPhaseEntry(int32 PhaseIndex) const
 {
-	if (PhaseIndex < 0 || PhaseIndex >= PhaseEntries.Num())
+	if (IsValidPhaseIndex(PhaseIndex) == false)
 	{
 		static FD1ElectricFieldPhaseEntry EmptyEntry;
 		return EmptyEntry;

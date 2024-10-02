@@ -9,6 +9,7 @@
 #include "Templates/SubclassOf.h"
 #include "LyraAssetManager.generated.h"
 
+class UD1CharacterData;
 class UD1ClassData;
 class UD1CheatData;
 class UD1ElectricFieldPhaseData;
@@ -24,7 +25,6 @@ struct FLyraBundles
 	static const FName Equipped;
 };
 
-
 /**
  * ULyraAssetManager
  *
@@ -32,15 +32,15 @@ struct FLyraBundles
  *	It is expected that most games will want to override AssetManager as it provides a good place for game-specific loading logic.
  *	This class is used by setting 'AssetManagerClassName' in DefaultEngine.ini.
  */
-UCLASS(Config = Game)
+UCLASS(Config=Game)
 class ULyraAssetManager : public UAssetManager
 {
 	GENERATED_BODY()
 
 public:
-
 	ULyraAssetManager();
 
+public:
 	// Returns the AssetManager singleton object.
 	static ULyraAssetManager& Get();
 
@@ -59,13 +59,14 @@ public:
 	// Logs all assets currently loaded and tracked by the asset manager.
 	static void DumpLoadedAssets();
 
+	const ULyraGameData& GetGameData();
+	const ULyraPawnData* GetDefaultPawnData() const;
 	const UD1AssetData& GetAssetData();
 	const UD1ClassData& GetClassData();
+	const UD1CharacterData& GetCharacterData();
 	const UD1ItemData& GetItemData();
-	const ULyraGameData& GetGameData();
-	const UD1CheatData& GetCheatData();
 	const UD1ElectricFieldPhaseData& GetElectricFieldPhaseData();
-	const ULyraPawnData* GetDefaultPawnData() const;
+	const UD1CheatData& GetCheatData();
 
 protected:
 	template <typename GameDataClass>
@@ -79,7 +80,6 @@ protected:
 		// Does a blocking load if needed
 		return *CastChecked<const GameDataClass>(LoadGameDataOfClass(GameDataClass::StaticClass(), DataPath, GameDataClass::StaticClass()->GetFName()));
 	}
-
 
 	static UObject* SynchronousLoadAsset(const FSoftObjectPath& AssetPath);
 	static bool ShouldLogAssetLoads();
@@ -98,10 +98,19 @@ protected:
 
 protected:
 	UPROPERTY(Config)
+	TSoftObjectPtr<ULyraGameData> GameDataPath;
+
+	UPROPERTY(Config)
+	TSoftObjectPtr<ULyraPawnData> DefaultPawnData;
+	
+	UPROPERTY(Config)
 	TSoftObjectPtr<UD1AssetData> AssetDataPath;
 
 	UPROPERTY(Config)
 	TSoftObjectPtr<UD1ClassData> ClassDataPath;
+
+	UPROPERTY(Config)
+	TSoftObjectPtr<UD1CharacterData> CharacterDataPath;
 	
 	UPROPERTY(Config)
 	TSoftObjectPtr<UD1ItemData> ItemDataPath;
@@ -112,18 +121,9 @@ protected:
 	UPROPERTY(Config)
 	TSoftObjectPtr<UD1CheatData> CheatDataPath;
 	
-	// Global game data asset to use.
-	UPROPERTY(Config)
-	TSoftObjectPtr<ULyraGameData> LyraGameDataPath;
-
-	// Loaded version of the game data
 	UPROPERTY(Transient)
 	TMap<TObjectPtr<UClass>, TObjectPtr<UPrimaryDataAsset>> GameDataMap;
-
-	// Pawn data used when spawning player pawns if there isn't one set on the player state.
-	UPROPERTY(Config)
-	TSoftObjectPtr<ULyraPawnData> DefaultPawnData;
-
+	
 private:
 	// Flushes the StartupJobs array. Processes all startup work.
 	void DoAllStartupJobs();

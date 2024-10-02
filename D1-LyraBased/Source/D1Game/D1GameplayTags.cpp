@@ -189,7 +189,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Skill_2,								"Cooldown.Skill.2");
 
 	// GamePhase
-	UE_DEFINE_GAMEPLAY_TAG(GamePhase_WaitForPlayers,					    "GamePhase.WaitForPlayers");
+	UE_DEFINE_GAMEPLAY_TAG(GamePhase_PreGame,								"GamePhase.PreGame");
+	UE_DEFINE_GAMEPLAY_TAG(GamePhase_Game,									"GamePhase.Game");
+	UE_DEFINE_GAMEPLAY_TAG(GamePhase_PostGame,								"GamePhase.PostGame");
 
 	// HUD
 	UE_DEFINE_GAMEPLAY_TAG(HUD_Slot_Reticle,								"HUD.Slot.Reticle");

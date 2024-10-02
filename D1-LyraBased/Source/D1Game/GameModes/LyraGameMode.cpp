@@ -520,3 +520,11 @@ void ALyraGameMode::FailedToRestartPlayer(AController* NewPlayer)
 		UE_LOG(LogD1, Verbose, TEXT("FailedToRestartPlayer(%s) but there's no pawn class so giving up."), *GetPathNameSafe(NewPlayer));
 	}
 }
+
+void ALyraGameMode::RestartGame()
+{
+	if (GameSession->CanRestartGame())
+	{
+		GetWorld()->ServerTravel("?Restart", false);
+	}
+}
