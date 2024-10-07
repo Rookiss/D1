@@ -491,10 +491,6 @@ void ALyraCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightA
 void ALyraCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
-
-	float BaseFallDamage = 10.f;
-	float MaxFallDamage = 50.f;
-	float FallDamageVelocityZThreshold = 800.f;
 	
 	if (HasAuthority())
 	{

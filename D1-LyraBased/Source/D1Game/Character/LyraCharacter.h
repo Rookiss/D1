@@ -247,4 +247,13 @@ protected:
 	
 public:
 	float BaseUnscaledCapsuleHalfHeight = 0.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float BaseFallDamage = 10.f;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float MaxFallDamage = 50.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float FallDamageVelocityZThreshold = 800.f;
 };
