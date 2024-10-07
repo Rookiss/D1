@@ -24,13 +24,7 @@ class UPlayer;
 class UAnimMontage;
 struct FFrame;
 
-UENUM(BlueprintType)
-enum class EKeyboardLayout : uint8
-{
-	Undefined,
-	English,
-	Korean,
-};
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStateChangedDelegate, ALyraPlayerState*, PlayerState);
 
 /**
  * ALyraPlayerController
@@ -43,7 +37,6 @@ class D1GAME_API ALyraPlayerController : public ACommonPlayerController, public 
 	GENERATED_BODY()
 
 public:
-
 	ALyraPlayerController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	UFUNCTION(BlueprintCallable, Category = "Lyra|PlayerController")
@@ -121,6 +114,8 @@ public:
 	virtual FOnLyraTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
 	//~End of ILyraTeamAgentInterface interface
 
+	FOnPlayerStateChangedDelegate* GetOnPlayerStateChangedDelegate() { return &OnPlayerStateChangedDelegate; }
+	
 private:
 	UPROPERTY()
 	FOnLyraTeamIndexChangedDelegate OnTeamChangedDelegate;
@@ -138,6 +133,9 @@ protected:
 
 private:
 	void BroadcastOnPlayerStateChanged();
+	
+	UPROPERTY()
+	FOnPlayerStateChangedDelegate OnPlayerStateChangedDelegate;
 
 protected:
 	void OnSettingsChanged(ULyraSettingsShared* Settings);

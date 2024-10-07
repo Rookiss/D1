@@ -189,6 +189,8 @@ protected:
 	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 
+	virtual void Landed(const FHitResult& Hit) override;
+	
 public:
 	UFUNCTION(BlueprintCallable, Category = "Lyra|Character")
 	ULyraCameraComponent* GetCameraComponent() const { return CameraComponent; }

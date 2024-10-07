@@ -7,52 +7,6 @@
 class AD1ArmorBase;
 class UD1ItemFragment_Equippable_Armor;
 
-USTRUCT(BlueprintType)
-struct FD1CosmeticDefaultMeshEntry
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(VisibleDefaultsOnly)
-	EArmorType ArmorType = EArmorType::Count;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<USkeletalMesh> DefaultMesh = nullptr;
-};
-
-USTRUCT(BlueprintType)
-struct FD1CosmeticDefaultMeshSet
-{
-	GENERATED_BODY()
-
-public:
-	FD1CosmeticDefaultMeshSet();
-	
-public:
-	UPROPERTY(VisibleDefaultsOnly)
-	ECharacterSkinType CharacterSkinType = ECharacterSkinType::Count;
-	
-public:
-	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UMaterialInterface> UpperBodySkinMaterial;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UMaterialInterface> LowerBodySkinMaterial;
-	
-public:
-	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<USkeletalMesh> HeadDefaultMesh;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<USkeletalMesh> HeadSecondaryMesh;
-
-public:
-	UPROPERTY(EditDefaultsOnly, EditFixedSize)
-	TArray<FD1CosmeticDefaultMeshEntry> DefaultMeshEntries;
-
-	UPROPERTY(EditDefaultsOnly, EditFixedSize)
-	TArray<FD1CosmeticDefaultMeshEntry> SecondaryMeshEntries;
-};
 
 UCLASS(BlueprintType, Blueprintable)
 class UD1CosmeticManagerComponent : public UPawnComponent
@@ -83,10 +37,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AD1ArmorBase> CosmeticSlotClass;
 
-protected:
-	UPROPERTY(EditDefaultsOnly, EditFixedSize)
-	TArray<FD1CosmeticDefaultMeshSet> CosmeticDefaultMeshSets;
-	
 private:
 	UPROPERTY()
 	TObjectPtr<UChildActorComponent> HeadSlot;

@@ -209,7 +209,7 @@ void ALyraPlayerController::OnPlayerStateChangedTeam(UObject* TeamAgent, int32 O
 
 void ALyraPlayerController::OnPlayerStateChanged()
 {
-	// Empty, place for derived classes to implement without having to hook all the other events
+	OnPlayerStateChangedDelegate.Broadcast(GetLyraPlayerState());
 }
 
 void ALyraPlayerController::BroadcastOnPlayerStateChanged()

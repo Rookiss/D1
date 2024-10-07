@@ -170,7 +170,7 @@ float ULyraCharacterMovementComponent::GetMaxSpeed() const
 				float DrinkCheck = IsDrink ? ADSCheck * DrinkMovePercent : ADSCheck;
 				float SprintCheck = IsSprint ? DrinkCheck * 1.5f : DrinkCheck;
 
-				GEngine->AddOnScreenDebugMessage(1, 0.1f, FColor::Red, FString::Printf(TEXT("MaxSpeed: %f"), SprintCheck));
+				// GEngine->AddOnScreenDebugMessage(1, 0.1f, FColor::Red, FString::Printf(TEXT("MaxSpeed: %f"), SprintCheck));
 				return SprintCheck;
 			}
 			case MOVE_Falling:

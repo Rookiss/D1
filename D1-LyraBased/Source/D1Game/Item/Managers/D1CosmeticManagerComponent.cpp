@@ -3,40 +3,16 @@
 #include "D1Define.h"
 #include "Actors/D1ArmorBase.h"
 #include "Character/LyraCharacter.h"
+#include "Data/D1CharacterData.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
 #include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1CosmeticManagerComponent)
 
-FD1CosmeticDefaultMeshSet::FD1CosmeticDefaultMeshSet()
-{
-	const int32 ArmorTypeCount = (int32)EArmorType::Count; 
-
-	DefaultMeshEntries.SetNum(ArmorTypeCount);
-	for (int32 i = 0; i < ArmorTypeCount; i++)
-	{
-		DefaultMeshEntries[i].ArmorType = (EArmorType)i;
-	}
-
-	SecondaryMeshEntries.SetNum(ArmorTypeCount);
-	for (int32 i = 0; i < ArmorTypeCount; i++)
-	{
-		SecondaryMeshEntries[i].ArmorType = (EArmorType)i;
-	}
-}
-
 UD1CosmeticManagerComponent::UD1CosmeticManagerComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
-
-	const int32 SkinTypeCount = (int32)ECharacterSkinType::Count;
-
-	CosmeticDefaultMeshSets.SetNum(SkinTypeCount);
-	for (int i = 0; i < SkinTypeCount; i++)
-	{
-		CosmeticDefaultMeshSets[i].CharacterSkinType = (ECharacterSkinType)i;
-	}
 }
 
 void UD1CosmeticManagerComponent::BeginPlay()
@@ -189,10 +165,10 @@ void UD1CosmeticManagerComponent::InitializeManager()
 	{
 		if (Character->IsNetMode(NM_DedicatedServer) == false)
 		{
-			const int32 SkinTypeIndex = (int32)CharacterSkinType;
-			const FD1CosmeticDefaultMeshSet& CosmeticDefaultMeshSet = CosmeticDefaultMeshSets[SkinTypeIndex];
+			const UD1CharacterData& CharacterData = ULyraAssetManager::Get().GetCharacterData();
+			const FD1DefaultArmorMeshSet& DefaultArmorMeshSet = CharacterData.GetDefaultArmorMeshSet(CharacterSkinType);
 			
-			HeadSlot = SpawnCosmeticSlotActor(CosmeticDefaultMeshSet.HeadDefaultMesh, CosmeticDefaultMeshSet.HeadSecondaryMesh, NAME_None, nullptr);
+			HeadSlot = SpawnCosmeticSlotActor(DefaultArmorMeshSet.HeadDefaultMesh, DefaultArmorMeshSet.HeadSecondaryMesh, NAME_None, nullptr);
 			
 			for (int32 i = 0; i < (int32)EArmorType::Count; i++)
 			{
@@ -203,15 +179,15 @@ void UD1CosmeticManagerComponent::InitializeManager()
 				if (ArmorType == EArmorType::Helmet || ArmorType == EArmorType::Chest || ArmorType == EArmorType::Hands)
 				{
 					SkinMaterialSlotName = FName("UpperBody");
-					SkinMaterial = CosmeticDefaultMeshSet.UpperBodySkinMaterial;
+					SkinMaterial = DefaultArmorMeshSet.UpperBodySkinMaterial;
 				}
 				else if (ArmorType == EArmorType::Legs || ArmorType == EArmorType::Foot)
 				{
 					SkinMaterialSlotName = FName("LowerBody");
-					SkinMaterial = CosmeticDefaultMeshSet.LowerBodySkinMaterial;
+					SkinMaterial = DefaultArmorMeshSet.LowerBodySkinMaterial;
 				}
 				
-				CosmeticSlots[i] = SpawnCosmeticSlotActor(CosmeticDefaultMeshSet.DefaultMeshEntries[i].DefaultMesh, CosmeticDefaultMeshSet.SecondaryMeshEntries[i].DefaultMesh, SkinMaterialSlotName, SkinMaterial);
+				CosmeticSlots[i] = SpawnCosmeticSlotActor(DefaultArmorMeshSet.DefaultMeshEntries[i].ArmorMesh, DefaultArmorMeshSet.SecondaryMeshEntries[i].ArmorMesh, SkinMaterialSlotName, SkinMaterial);
 			}
 		}
 	}

@@ -33,7 +33,7 @@ public:
 	
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<USkeletalMesh> HeadDefaultMsh;
+	TSoftObjectPtr<USkeletalMesh> HeadDefaultMesh;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<USkeletalMesh> HeadSecondaryMesh;

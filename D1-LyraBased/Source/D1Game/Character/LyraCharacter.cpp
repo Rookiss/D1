@@ -22,6 +22,7 @@
 #include "Physics/LyraCollisionChannels.h"
 #include "PocketWorld/D1PocketWorldSubsystem.h"
 #include "System/LyraAssetManager.h"
+#include "System/LyraGameData.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraCharacter)
 
@@ -485,6 +486,37 @@ void ALyraCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightA
 	}
 
 	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+}
+
+void ALyraCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	float BaseFallDamage = 10.f;
+	float MaxFallDamage = 50.f;
+	float FallDamageVelocityZThreshold = 800.f;
+	
+	if (HasAuthority())
+	{
+		float VelocityZAbs = FMath::Abs(GetCharacterMovement()->Velocity.Z);
+		if (VelocityZAbs > FallDamageVelocityZThreshold)
+		{
+			float VelocityDiff = VelocityZAbs - FallDamageVelocityZThreshold;
+			float AdditionalDamage = BaseFallDamage * (VelocityDiff / FallDamageVelocityZThreshold);
+			float FinalDamage = FMath::Clamp(BaseFallDamage + AdditionalDamage, BaseFallDamage, MaxFallDamage);
+
+			if (UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
+			{
+				TSubclassOf<UGameplayEffect> IncomingDamageEffect = ULyraGameData::Get().IncomingDamageGameplayEffect_SetByCaller.LoadSynchronous();
+				FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(IncomingDamageEffect, 0.f, ASC->MakeEffectContext());
+
+				FGameplayEffectSpec* Spec = EffectSpecHandle.Data.Get();
+				Spec->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_IncomingDamage, FinalDamage);
+				
+				ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+			}
+		}
+	}
 }
 
 void ALyraCharacter::OnRep_ReplicatedAcceleration()
