@@ -41,7 +41,7 @@ void ALyraPawn::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	// Grab the current team ID and listen for future changes
-	if (ILyraTeamAgentInterface* ControllerAsTeamProvider = Cast<ILyraTeamAgentInterface>(NewController))
+	if (ID1TeamAgentInterface* ControllerAsTeamProvider = Cast<ID1TeamAgentInterface>(NewController))
 	{
 		MyTeamID = ControllerAsTeamProvider->GetGenericTeamId();
 		ControllerAsTeamProvider->GetTeamChangedDelegateChecked().AddDynamic(this, &ThisClass::OnControllerChangedTeam);
@@ -55,7 +55,7 @@ void ALyraPawn::UnPossessed()
 
 	// Stop listening for changes from the old controller
 	const FGenericTeamId OldTeamID = MyTeamID;
-	if (ILyraTeamAgentInterface* ControllerAsTeamProvider = Cast<ILyraTeamAgentInterface>(OldController))
+	if (ID1TeamAgentInterface* ControllerAsTeamProvider = Cast<ID1TeamAgentInterface>(OldController))
 	{
 		ControllerAsTeamProvider->GetTeamChangedDelegateChecked().RemoveAll(this);
 	}
@@ -93,7 +93,7 @@ FGenericTeamId ALyraPawn::GetGenericTeamId() const
 	return MyTeamID;
 }
 
-FOnLyraTeamIndexChangedDelegate* ALyraPawn::GetOnTeamIndexChangedDelegate()
+FOnD1TeamIndexChangedDelegate* ALyraPawn::GetOnTeamIndexChangedDelegate()
 {
 	return &OnTeamChangedDelegate;
 }

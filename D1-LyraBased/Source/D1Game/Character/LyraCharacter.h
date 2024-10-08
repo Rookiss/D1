@@ -7,7 +7,7 @@
 #include "GameplayTagAssetInterface.h"
 #include "ModularCharacter.h"
 #include "Interaction/D1Interactable.h"
-#include "Teams/LyraTeamAgentInterface.h"
+#include "Teams/D1TeamAgentInterface.h"
 
 #include "LyraCharacter.generated.h"
 
@@ -94,7 +94,7 @@ struct TStructOpsTypeTraits<FSharedRepMovement> : public TStructOpsTypeTraitsBas
  *	New behavior should be added via pawn components when possible.
  */
 UCLASS(Config = Game, Meta = (ShortTooltip = "The base character pawn class used by this project."))
-class D1GAME_API ALyraCharacter : public AModularCharacter, public IAbilitySystemInterface, public IGameplayCueInterface, public IGameplayTagAssetInterface, public ILyraTeamAgentInterface, public ID1Interactable
+class D1GAME_API ALyraCharacter : public AModularCharacter, public IAbilitySystemInterface, public IGameplayCueInterface, public IGameplayTagAssetInterface, public ID1TeamAgentInterface, public ID1Interactable
 {
 	GENERATED_BODY()
 
@@ -136,7 +136,7 @@ public:
 	//~ILyraTeamAgentInterface interface
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 	virtual FGenericTeamId GetGenericTeamId() const override;
-	virtual FOnLyraTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
+	virtual FOnD1TeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
 	//~End of ILyraTeamAgentInterface interface
 
 	/** RPCs that is called on frames when default property replication is skipped. This replicates a single movement update to everyone. */
@@ -212,7 +212,7 @@ private:
 	FGenericTeamId MyTeamID;
 
 	UPROPERTY()
-	FOnLyraTeamIndexChangedDelegate OnTeamChangedDelegate;
+	FOnD1TeamIndexChangedDelegate OnTeamChangedDelegate;
 
 protected:
 	// Called to determine what happens to the team ID when possession ends
@@ -249,10 +249,10 @@ public:
 	float BaseUnscaledCapsuleHalfHeight = 0.f;
 
 	UPROPERTY(EditDefaultsOnly)
-	float BaseFallDamage = 10.f;
+	float BaseFallDamage = 3.f;
 	
 	UPROPERTY(EditDefaultsOnly)
-	float MaxFallDamage = 50.f;
+	float MaxFallDamage = 10.f;
 
 	UPROPERTY(EditDefaultsOnly)
 	float FallDamageVelocityZThreshold = 800.f;

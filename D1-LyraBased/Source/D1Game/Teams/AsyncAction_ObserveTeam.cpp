@@ -2,7 +2,7 @@
 
 #include "Teams/AsyncAction_ObserveTeam.h"
 
-#include "Teams/LyraTeamAgentInterface.h"
+#include "Teams/D1TeamAgentInterface.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AsyncAction_ObserveTeam)
 
@@ -16,7 +16,7 @@ UAsyncAction_ObserveTeam* UAsyncAction_ObserveTeam::ObserveTeam(UObject* TeamAge
 	return InternalObserveTeamChanges(TeamAgent);
 }
 
-UAsyncAction_ObserveTeam* UAsyncAction_ObserveTeam::InternalObserveTeamChanges(TScriptInterface<ILyraTeamAgentInterface> TeamActor)
+UAsyncAction_ObserveTeam* UAsyncAction_ObserveTeam::InternalObserveTeamChanges(TScriptInterface<ID1TeamAgentInterface> TeamActor)
 {
 	UAsyncAction_ObserveTeam* Action = nullptr;
 
@@ -35,7 +35,7 @@ void UAsyncAction_ObserveTeam::SetReadyToDestroy()
 	Super::SetReadyToDestroy();
 
 	// If we're being canceled we need to unhook everything we might have tried listening to.
-	if (ILyraTeamAgentInterface* TeamInterface = TeamInterfacePtr.Get())
+	if (ID1TeamAgentInterface* TeamInterface = TeamInterfacePtr.Get())
 	{
 		TeamInterface->GetTeamChangedDelegateChecked().RemoveAll(this);
 	}
@@ -46,7 +46,7 @@ void UAsyncAction_ObserveTeam::Activate()
 	bool bCouldSucceed = false;
 	int32 CurrentTeamIndex = INDEX_NONE;
 
-	if (ILyraTeamAgentInterface* TeamInterface = TeamInterfacePtr.Get())
+	if (ID1TeamAgentInterface* TeamInterface = TeamInterfacePtr.Get())
 	{
 		CurrentTeamIndex = GenericTeamIdToInteger(TeamInterface->GetGenericTeamId());
 

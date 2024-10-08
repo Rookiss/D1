@@ -220,7 +220,7 @@ void ALyraPlayerController::BroadcastOnPlayerStateChanged()
 	FGenericTeamId OldTeamID = FGenericTeamId::NoTeam;
 	if (LastSeenPlayerState != nullptr)
 	{
-		if (ILyraTeamAgentInterface* PlayerStateTeamInterface = Cast<ILyraTeamAgentInterface>(LastSeenPlayerState))
+		if (ID1TeamAgentInterface* PlayerStateTeamInterface = Cast<ID1TeamAgentInterface>(LastSeenPlayerState))
 		{
 			OldTeamID = PlayerStateTeamInterface->GetGenericTeamId();
 			PlayerStateTeamInterface->GetTeamChangedDelegateChecked().RemoveAll(this);
@@ -231,7 +231,7 @@ void ALyraPlayerController::BroadcastOnPlayerStateChanged()
 	FGenericTeamId NewTeamID = FGenericTeamId::NoTeam;
 	if (PlayerState != nullptr)
 	{
-		if (ILyraTeamAgentInterface* PlayerStateTeamInterface = Cast<ILyraTeamAgentInterface>(PlayerState))
+		if (ID1TeamAgentInterface* PlayerStateTeamInterface = Cast<ID1TeamAgentInterface>(PlayerState))
 		{
 			NewTeamID = PlayerStateTeamInterface->GetGenericTeamId();
 			PlayerStateTeamInterface->GetTeamChangedDelegateChecked().AddDynamic(this, &ThisClass::OnPlayerStateChangedTeam);
@@ -507,14 +507,14 @@ void ALyraPlayerController::SetGenericTeamId(const FGenericTeamId& NewTeamID)
 
 FGenericTeamId ALyraPlayerController::GetGenericTeamId() const
 {
-	if (const ILyraTeamAgentInterface* PSWithTeamInterface = Cast<ILyraTeamAgentInterface>(PlayerState))
+	if (const ID1TeamAgentInterface* PSWithTeamInterface = Cast<ID1TeamAgentInterface>(PlayerState))
 	{
 		return PSWithTeamInterface->GetGenericTeamId();
 	}
 	return FGenericTeamId::NoTeam;
 }
 
-FOnLyraTeamIndexChangedDelegate* ALyraPlayerController::GetOnTeamIndexChangedDelegate()
+FOnD1TeamIndexChangedDelegate* ALyraPlayerController::GetOnTeamIndexChangedDelegate()
 {
 	return &OnTeamChangedDelegate;
 }

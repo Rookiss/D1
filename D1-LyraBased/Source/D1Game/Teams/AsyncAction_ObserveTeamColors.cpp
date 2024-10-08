@@ -4,7 +4,7 @@
 
 #include "Engine/Engine.h"
 #include "Engine/World.h"
-#include "Teams/LyraTeamAgentInterface.h"
+#include "Teams/D1TeamAgentInterface.h"
 #include "Teams/LyraTeamStatics.h"
 #include "Teams/LyraTeamSubsystem.h"
 
@@ -22,7 +22,7 @@ UAsyncAction_ObserveTeamColors* UAsyncAction_ObserveTeamColors::ObserveTeamColor
 	if (TeamAgent != nullptr)
 	{
 		Action = NewObject<UAsyncAction_ObserveTeamColors>();
-		Action->TeamInterfacePtr = TWeakInterfacePtr<ILyraTeamAgentInterface>(TeamAgent);
+		Action->TeamInterfacePtr = TWeakInterfacePtr<ID1TeamAgentInterface>(TeamAgent);
 		Action->TeamInterfaceObj = TeamAgent;
 		Action->RegisterWithGameInstance(TeamAgent);
 	}
@@ -35,7 +35,7 @@ void UAsyncAction_ObserveTeamColors::SetReadyToDestroy()
 	Super::SetReadyToDestroy();
 
 	// If we're being canceled we need to unhook everything we might have tried listening to.
-	if (ILyraTeamAgentInterface* TeamInterface = TeamInterfacePtr.Get())
+	if (ID1TeamAgentInterface* TeamInterface = TeamInterfacePtr.Get())
 	{
 		TeamInterface->GetTeamChangedDelegateChecked().RemoveAll(this);
 	}
@@ -47,7 +47,7 @@ void UAsyncAction_ObserveTeamColors::Activate()
 	int32 CurrentTeamIndex = INDEX_NONE;
 	ULyraTeamDisplayAsset* CurrentDisplayAsset = nullptr;
 
-	if (ILyraTeamAgentInterface* TeamInterface = TeamInterfacePtr.Get())
+	if (ID1TeamAgentInterface* TeamInterface = TeamInterfacePtr.Get())
 	{
 		if (UWorld* World = GEngine->GetWorldFromContextObject(TeamInterfaceObj.Get(), EGetWorldErrorMode::LogAndReturnNull))
 		{

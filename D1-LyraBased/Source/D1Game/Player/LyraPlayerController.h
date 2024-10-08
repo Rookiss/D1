@@ -4,7 +4,7 @@
 
 #include "Camera/LyraCameraAssistInterface.h"
 #include "CommonPlayerController.h"
-#include "Teams/LyraTeamAgentInterface.h"
+#include "Teams/D1TeamAgentInterface.h"
 
 #include "LyraPlayerController.generated.h"
 
@@ -32,7 +32,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStateChangedDelegate, ALyra
  *	The base player controller class used by this project.
  */
 UCLASS(Config = Game, Meta = (ShortTooltip = "The base player controller class used by this project."))
-class D1GAME_API ALyraPlayerController : public ACommonPlayerController, public ILyraCameraAssistInterface, public ILyraTeamAgentInterface
+class D1GAME_API ALyraPlayerController : public ACommonPlayerController, public ILyraCameraAssistInterface, public ID1TeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -111,14 +111,14 @@ public:
 	//~ILyraTeamAgentInterface interface
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 	virtual FGenericTeamId GetGenericTeamId() const override;
-	virtual FOnLyraTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
+	virtual FOnD1TeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
 	//~End of ILyraTeamAgentInterface interface
 
 	FOnPlayerStateChangedDelegate* GetOnPlayerStateChangedDelegate() { return &OnPlayerStateChangedDelegate; }
 	
 private:
 	UPROPERTY()
-	FOnLyraTeamIndexChangedDelegate OnTeamChangedDelegate;
+	FOnD1TeamIndexChangedDelegate OnTeamChangedDelegate;
 
 	UPROPERTY()
 	TObjectPtr<APlayerState> LastSeenPlayerState;

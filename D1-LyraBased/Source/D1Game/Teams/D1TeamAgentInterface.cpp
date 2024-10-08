@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Teams/LyraTeamAgentInterface.h"
+#include "Teams/D1TeamAgentInterface.h"
 
 #include "D1GameplayTags.h"
 #include "D1LogChannels.h"
@@ -8,14 +8,14 @@
 #include "Messages/LyraVerbMessage.h"
 #include "UObject/ScriptInterface.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(LyraTeamAgentInterface)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1TeamAgentInterface)
 
-ULyraTeamAgentInterface::ULyraTeamAgentInterface(const FObjectInitializer& ObjectInitializer)
+UD1TeamAgentInterface::UD1TeamAgentInterface(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
-void ILyraTeamAgentInterface::ConditionalBroadcastTeamChanged(TScriptInterface<ILyraTeamAgentInterface> This, FGenericTeamId OldTeamID, FGenericTeamId NewTeamID)
+void ID1TeamAgentInterface::ConditionalBroadcastTeamChanged(TScriptInterface<ID1TeamAgentInterface> This, FGenericTeamId OldTeamID, FGenericTeamId NewTeamID)
 {
 	if (OldTeamID != NewTeamID)
 	{

@@ -125,20 +125,30 @@ protected:
 	UFUNCTION()
 	void HandlePostProcess();
 
+	UPROPERTY(EditDefaultsOnly)
 	FVector2D BaseBright = FVector2D(1.f, 0.6f);
+	
 	float CurrentBright = BaseBright.X;
 	float TargetBright = BaseBright.X;
+
+	UPROPERTY(EditDefaultsOnly)
+	FVector2D BaseDesaturation = FVector2D(0.f, 0.3f);
 	
-	FVector2D BaseDesaturation = FVector2D(0.f, 1.f);
 	float CurrentDesaturation = BaseDesaturation.X;
 	float TargetDesaturation = BaseDesaturation.X;
 
+	UPROPERTY(EditDefaultsOnly)
 	FVector2D BaseTexturePow = FVector2D(2.f, 1.f);
+	
 	float CurrentTexturePow = BaseTexturePow.X;
 	float TargetTexturePow = BaseTexturePow.X;
 
+	UPROPERTY(EditDefaultsOnly)
 	float PostProcessTimerRate = 0.03f;
+
+	UPROPERTY(EditDefaultsOnly)
 	float PostProcessInterpSpeed = 5.f;
+	
 	FTimerHandle PostProcessTimerHandle;
 
 	UPROPERTY(EditAnywhere)

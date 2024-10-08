@@ -7,7 +7,7 @@
 
 #include "AsyncAction_ObserveTeamColors.generated.h"
 
-class ILyraTeamAgentInterface;
+class ID1TeamAgentInterface;
 class ULyraTeamDisplayAsset;
 struct FFrame;
 
@@ -48,7 +48,7 @@ private:
 	UFUNCTION()
 	void OnDisplayAssetChanged(const ULyraTeamDisplayAsset* DisplayAsset);
 
-	TWeakInterfacePtr<ILyraTeamAgentInterface> TeamInterfacePtr;
+	TWeakInterfacePtr<ID1TeamAgentInterface> TeamInterfacePtr;
 	TWeakObjectPtr<UObject> TeamInterfaceObj;
 
 	int32 LastBroadcastTeamId = INDEX_NONE;

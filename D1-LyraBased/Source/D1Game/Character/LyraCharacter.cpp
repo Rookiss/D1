@@ -168,7 +168,7 @@ void ALyraCharacter::NotifyControllerChanged()
 	// Update our team ID based on the controller
 	if (HasAuthority() && (Controller != nullptr))
 	{
-		if (ILyraTeamAgentInterface* ControllerWithTeam = Cast<ILyraTeamAgentInterface>(Controller))
+		if (ID1TeamAgentInterface* ControllerWithTeam = Cast<ID1TeamAgentInterface>(Controller))
 		{
 			MyTeamID = ControllerWithTeam->GetGenericTeamId();
 			ConditionalBroadcastTeamChanged(this, OldTeamId, MyTeamID);
@@ -225,7 +225,7 @@ void ALyraCharacter::PossessedBy(AController* NewController)
 	PawnExtComponent->HandleControllerChanged();
 
 	// Grab the current team ID and listen for future changes
-	if (ILyraTeamAgentInterface* ControllerAsTeamProvider = Cast<ILyraTeamAgentInterface>(NewController))
+	if (ID1TeamAgentInterface* ControllerAsTeamProvider = Cast<ID1TeamAgentInterface>(NewController))
 	{
 		MyTeamID = ControllerAsTeamProvider->GetGenericTeamId();
 		ControllerAsTeamProvider->GetTeamChangedDelegateChecked().AddDynamic(this, &ThisClass::OnControllerChangedTeam);
@@ -239,7 +239,7 @@ void ALyraCharacter::UnPossessed()
 
 	// Stop listening for changes from the old controller
 	const FGenericTeamId OldTeamID = MyTeamID;
-	if (ILyraTeamAgentInterface* ControllerAsTeamProvider = Cast<ILyraTeamAgentInterface>(OldController))
+	if (ID1TeamAgentInterface* ControllerAsTeamProvider = Cast<ID1TeamAgentInterface>(OldController))
 	{
 		ControllerAsTeamProvider->GetTeamChangedDelegateChecked().RemoveAll(this);
 	}
@@ -558,7 +558,7 @@ FGenericTeamId ALyraCharacter::GetGenericTeamId() const
 	return MyTeamID;
 }
 
-FOnLyraTeamIndexChangedDelegate* ALyraCharacter::GetOnTeamIndexChangedDelegate()
+FOnD1TeamIndexChangedDelegate* ALyraCharacter::GetOnTeamIndexChangedDelegate()
 {
 	return &OnTeamChangedDelegate;
 }

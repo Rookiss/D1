@@ -54,7 +54,7 @@ void ULyraLocalPlayer::OnPlayerControllerChanged(APlayerController* NewControlle
 {
 	// Stop listening for changes from the old controller
 	FGenericTeamId OldTeamID = FGenericTeamId::NoTeam;
-	if (ILyraTeamAgentInterface* ControllerAsTeamProvider = Cast<ILyraTeamAgentInterface>(LastBoundPC.Get()))
+	if (ID1TeamAgentInterface* ControllerAsTeamProvider = Cast<ID1TeamAgentInterface>(LastBoundPC.Get()))
 	{
 		OldTeamID = ControllerAsTeamProvider->GetGenericTeamId();
 		ControllerAsTeamProvider->GetTeamChangedDelegateChecked().RemoveAll(this);
@@ -62,7 +62,7 @@ void ULyraLocalPlayer::OnPlayerControllerChanged(APlayerController* NewControlle
 
 	// Grab the current team ID and listen for future changes
 	FGenericTeamId NewTeamID = FGenericTeamId::NoTeam;
-	if (ILyraTeamAgentInterface* ControllerAsTeamProvider = Cast<ILyraTeamAgentInterface>(NewController))
+	if (ID1TeamAgentInterface* ControllerAsTeamProvider = Cast<ID1TeamAgentInterface>(NewController))
 	{
 		NewTeamID = ControllerAsTeamProvider->GetGenericTeamId();
 		ControllerAsTeamProvider->GetTeamChangedDelegateChecked().AddDynamic(this, &ThisClass::OnControllerChangedTeam);
@@ -79,7 +79,7 @@ void ULyraLocalPlayer::SetGenericTeamId(const FGenericTeamId& NewTeamID)
 
 FGenericTeamId ULyraLocalPlayer::GetGenericTeamId() const
 {
-	if (ILyraTeamAgentInterface* ControllerAsTeamProvider = Cast<ILyraTeamAgentInterface>(PlayerController))
+	if (ID1TeamAgentInterface* ControllerAsTeamProvider = Cast<ID1TeamAgentInterface>(PlayerController))
 	{
 		return ControllerAsTeamProvider->GetGenericTeamId();
 	}
@@ -89,7 +89,7 @@ FGenericTeamId ULyraLocalPlayer::GetGenericTeamId() const
 	}
 }
 
-FOnLyraTeamIndexChangedDelegate* ULyraLocalPlayer::GetOnTeamIndexChangedDelegate()
+FOnD1TeamIndexChangedDelegate* ULyraLocalPlayer::GetOnTeamIndexChangedDelegate()
 {
 	return &OnTeamChangedDelegate;
 }

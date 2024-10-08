@@ -261,7 +261,7 @@ FGenericTeamId ALyraPlayerState::GetGenericTeamId() const
 	return MyTeamID;
 }
 
-FOnLyraTeamIndexChangedDelegate* ALyraPlayerState::GetOnTeamIndexChangedDelegate()
+FOnD1TeamIndexChangedDelegate* ALyraPlayerState::GetOnTeamIndexChangedDelegate()
 {
 	return &OnTeamChangedDelegate;
 }

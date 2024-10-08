@@ -39,7 +39,7 @@ void ALyraPlayerBotController::BroadcastOnPlayerStateChanged()
 	FGenericTeamId OldTeamID = FGenericTeamId::NoTeam;
 	if (LastSeenPlayerState != nullptr)
 	{
-		if (ILyraTeamAgentInterface* PlayerStateTeamInterface = Cast<ILyraTeamAgentInterface>(LastSeenPlayerState))
+		if (ID1TeamAgentInterface* PlayerStateTeamInterface = Cast<ID1TeamAgentInterface>(LastSeenPlayerState))
 		{
 			OldTeamID = PlayerStateTeamInterface->GetGenericTeamId();
 			PlayerStateTeamInterface->GetTeamChangedDelegateChecked().RemoveAll(this);
@@ -50,7 +50,7 @@ void ALyraPlayerBotController::BroadcastOnPlayerStateChanged()
 	FGenericTeamId NewTeamID = FGenericTeamId::NoTeam;
 	if (PlayerState != nullptr)
 	{
-		if (ILyraTeamAgentInterface* PlayerStateTeamInterface = Cast<ILyraTeamAgentInterface>(PlayerState))
+		if (ID1TeamAgentInterface* PlayerStateTeamInterface = Cast<ID1TeamAgentInterface>(PlayerState))
 		{
 			NewTeamID = PlayerStateTeamInterface->GetGenericTeamId();
 			PlayerStateTeamInterface->GetTeamChangedDelegateChecked().AddDynamic(this, &ThisClass::OnPlayerStateChangedTeam);
@@ -88,14 +88,14 @@ void ALyraPlayerBotController::SetGenericTeamId(const FGenericTeamId& NewTeamID)
 
 FGenericTeamId ALyraPlayerBotController::GetGenericTeamId() const
 {
-	if (ILyraTeamAgentInterface* PSWithTeamInterface = Cast<ILyraTeamAgentInterface>(PlayerState))
+	if (ID1TeamAgentInterface* PSWithTeamInterface = Cast<ID1TeamAgentInterface>(PlayerState))
 	{
 		return PSWithTeamInterface->GetGenericTeamId();
 	}
 	return FGenericTeamId::NoTeam;
 }
 
-FOnLyraTeamIndexChangedDelegate* ALyraPlayerBotController::GetOnTeamIndexChangedDelegate()
+FOnD1TeamIndexChangedDelegate* ALyraPlayerBotController::GetOnTeamIndexChangedDelegate()
 {
 	return &OnTeamChangedDelegate;
 }
@@ -136,7 +136,7 @@ ETeamAttitude::Type ALyraPlayerBotController::GetTeamAttitudeTowards(const AActo
 {
 	if (const APawn* OtherPawn = Cast<APawn>(&Other)) {
 
-		if (const ILyraTeamAgentInterface* TeamAgent = Cast<ILyraTeamAgentInterface>(OtherPawn->GetController()))
+		if (const ID1TeamAgentInterface* TeamAgent = Cast<ID1TeamAgentInterface>(OtherPawn->GetController()))
 		{
 			FGenericTeamId OtherTeamID = TeamAgent->GetGenericTeamId();
 

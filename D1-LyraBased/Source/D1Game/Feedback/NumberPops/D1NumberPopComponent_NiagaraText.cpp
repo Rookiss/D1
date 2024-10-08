@@ -1,56 +1,47 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+#include "D1NumberPopComponent_NiagaraText.h"
 
-#include "LyraNumberPopComponent_NiagaraText.h"
-
-#include "Feedback/NumberPops/LyraNumberPopComponent.h"
-#include "LyraDamagePopStyleNiagara.h"
-#include "D1LogChannels.h"
+#include "Feedback/NumberPops/D1NumberPopComponent.h"
+#include "D1DamagePopStyleNiagara.h"
 #include "NiagaraComponent.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(LyraNumberPopComponent_NiagaraText)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1NumberPopComponent_NiagaraText)
 
-ULyraNumberPopComponent_NiagaraText::ULyraNumberPopComponent_NiagaraText(const FObjectInitializer& ObjectInitializer)
+UD1NumberPopComponent_NiagaraText::UD1NumberPopComponent_NiagaraText(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-
-
+	
 }
 
-void ULyraNumberPopComponent_NiagaraText::AddNumberPop(const FLyraNumberPopRequest& NewRequest)
+void UD1NumberPopComponent_NiagaraText::AddNumberPop(const FD1NumberPopRequest& NewRequest)
 {
 	int32 LocalDamage = NewRequest.NumberToDisplay;
-
-	//Change Damage to negative to differentiate Critial vs Normal hit
+	
 	if (NewRequest.bIsCriticalDamage)
 	{
 		LocalDamage *= -1;
 	}
 
-	//Add a NiagaraComponent if we don't already have one
-	if (!NiagaraComp)
+	if (NiagaraComp == nullptr)
 	{
 		NiagaraComp = NewObject<UNiagaraComponent>(GetOwner());
-		if (Style != nullptr)
+		if (Style)
 		{
 			NiagaraComp->SetAsset(Style->TextNiagara);
 			NiagaraComp->bAutoActivate = false;
 			
 		}
+		
 		NiagaraComp->SetupAttachment(nullptr);
 		check(NiagaraComp);
 		NiagaraComp->RegisterComponent();
 	}
 
-
 	NiagaraComp->Activate(false);
 	NiagaraComp->SetWorldLocation(NewRequest.WorldLocation);
-
-	UE_LOG(LogD1, Log, TEXT("DamageHit location : %s"), *(NewRequest.WorldLocation.ToString()));
-	//Add Damage information to the current Niagara list - Damage informations are packed inside a FVector4 where XYZ = Position, W = Damage
+	
+	// XYZ = Position, W = Damage
 	TArray<FVector4> DamageList = UNiagaraDataInterfaceArrayFunctionLibrary::GetNiagaraArrayVector4(NiagaraComp, Style->NiagaraArrayName);
 	DamageList.Add(FVector4(NewRequest.WorldLocation.X, NewRequest.WorldLocation.Y, NewRequest.WorldLocation.Z, LocalDamage));
 	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector4(NiagaraComp, Style->NiagaraArrayName, DamageList);
-	
 }
-

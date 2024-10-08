@@ -8,7 +8,7 @@
 
 #include "AsyncAction_ObserveTeam.generated.h"
 
-class ILyraTeamAgentInterface;
+class ID1TeamAgentInterface;
 struct FFrame;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTeamObservedAsyncDelegate, bool, bTeamSet, int32, TeamId);
@@ -41,11 +41,11 @@ public:
 
 private:
 	// Watches for team changes on the specified team actor
-	static UAsyncAction_ObserveTeam* InternalObserveTeamChanges(TScriptInterface<ILyraTeamAgentInterface> TeamActor);
+	static UAsyncAction_ObserveTeam* InternalObserveTeamChanges(TScriptInterface<ID1TeamAgentInterface> TeamActor);
 
 private:
 	UFUNCTION()
 	void OnWatchedAgentChangedTeam(UObject* TeamAgent, int32 OldTeam, int32 NewTeam);
 
-	TWeakInterfacePtr<ILyraTeamAgentInterface> TeamInterfacePtr;
+	TWeakInterfacePtr<ID1TeamAgentInterface> TeamInterfacePtr;
 };

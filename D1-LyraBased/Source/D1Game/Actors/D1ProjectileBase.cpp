@@ -134,6 +134,9 @@ void AD1ProjectileBase::HandleOtherComponentDeactivated(UActorComponent* OtherCo
 
 void AD1ProjectileBase::HandleCollisionDetection(AActor* OtherActor, UPrimitiveComponent* OtherComponent, const FHitResult& HitResult)
 {
+	if (OtherActor == nullptr || OtherComponent == nullptr)
+		return;
+	
 	if (HasAuthority())
 	{
 		AD1WeaponBase* TargetWeapon = Cast<AD1WeaponBase>(OtherActor);

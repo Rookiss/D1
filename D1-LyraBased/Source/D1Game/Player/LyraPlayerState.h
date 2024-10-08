@@ -6,7 +6,7 @@
 #include "ModularPlayerState.h"
 #include "AbilitySystem/LyraAbilitySet.h"
 #include "System/GameplayTagStack.h"
-#include "Teams/LyraTeamAgentInterface.h"
+#include "Teams/D1TeamAgentInterface.h"
 
 #include "LyraPlayerState.generated.h"
 
@@ -47,7 +47,7 @@ enum class ELyraPlayerConnectionType : uint8
  *	Base player state class used by this project.
  */
 UCLASS(Config = Game)
-class D1GAME_API ALyraPlayerState : public AModularPlayerState, public IAbilitySystemInterface, public ILyraTeamAgentInterface
+class D1GAME_API ALyraPlayerState : public AModularPlayerState, public IAbilitySystemInterface, public ID1TeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -82,7 +82,7 @@ public:
 	//~ILyraTeamAgentInterface interface
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 	virtual FGenericTeamId GetGenericTeamId() const override;
-	virtual FOnLyraTeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
+	virtual FOnD1TeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
 	//~End of ILyraTeamAgentInterface interface
 
 	static const FName NAME_LyraAbilityReady;
@@ -163,7 +163,7 @@ private:
 	ELyraPlayerConnectionType MyPlayerConnectionType;
 
 	UPROPERTY()
-	FOnLyraTeamIndexChangedDelegate OnTeamChangedDelegate;
+	FOnD1TeamIndexChangedDelegate OnTeamChangedDelegate;
 
 	UPROPERTY(ReplicatedUsing=OnRep_MyTeamID)
 	FGenericTeamId MyTeamID;
