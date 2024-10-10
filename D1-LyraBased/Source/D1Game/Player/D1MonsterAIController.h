@@ -13,5 +13,33 @@ public:
 	AD1MonsterAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
+	virtual void InitPlayerState() override;
+	virtual void CleanupPlayerState() override;
+	virtual void OnRep_PlayerState() override;
+	virtual void OnPlayerStateChanged();
 	
+	virtual void OnUnPossess() override;
+	
+	virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
+	virtual FGenericTeamId GetGenericTeamId() const override;
+	
+	virtual FOnD1TeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
+	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void UpdateTeamAttitude(UAIPerceptionComponent* AIPerception);
+	
+private:
+	UFUNCTION()
+	void OnPlayerStateChangedTeam(UObject* TeamAgent, int32 OldTeam, int32 NewTeam);
+
+	void BroadcastOnPlayerStateChanged();
+
+private:
+	UPROPERTY()
+	FOnD1TeamIndexChangedDelegate OnTeamChangedDelegate;
+	
+	UPROPERTY()
+	TObjectPtr<APlayerState> LastSeenPlayerState;
 };

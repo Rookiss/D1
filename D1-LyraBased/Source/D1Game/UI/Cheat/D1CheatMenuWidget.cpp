@@ -4,6 +4,7 @@
 #include "D1CheatListWidget.h"
 #include "Components/Button.h"
 #include "Data/D1CheatData.h"
+#include "Data/D1ItemData.h"
 #include "Item/D1ItemTemplate.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"

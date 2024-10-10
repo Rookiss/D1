@@ -81,9 +81,9 @@ void UD1NumberPopComponent_ScreenWidget::ReleaseNextWidgets()
 			{
 				LiveWidget.Widget->RemoveFromParent();
 
-				if (ensure(LiveWidget.Pool))
+				if (ensure(LiveWidget.PoolList))
 				{
-					LiveWidget.Pool->Widgets.Push(LiveWidget.Widget);
+					LiveWidget.PoolList->Widgets.Push(LiveWidget.Widget);
 				}
 				else
 				{

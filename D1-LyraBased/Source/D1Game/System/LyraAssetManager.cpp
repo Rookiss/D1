@@ -10,6 +10,7 @@
 #include "Data/D1ItemData.h"
 #include "Data/D1AssetData.h"
 #include "Data/D1CharacterData.h"
+#include "Data/D1MonsterData.h"
 #include "Character/LyraPawnData.h"
 #include "Misc/App.h"
 #include "Stats/StatsMisc.h"
@@ -133,6 +134,11 @@ const UD1CharacterData& ULyraAssetManager::GetCharacterData()
 	return GetOrLoadTypedGameData<UD1CharacterData>(CharacterDataPath);
 }
 
+const UD1MonsterData& ULyraAssetManager::GetMonsterData()
+{
+	return GetOrLoadTypedGameData<UD1MonsterData>(MonsterDataPath);
+}
+
 const UD1ItemData& ULyraAssetManager::GetItemData()
 {
 	return GetOrLoadTypedGameData<UD1ItemData>(ItemDataPath);
@@ -163,6 +169,7 @@ void ULyraAssetManager::StartInitialLoading()
 		STARTUP_JOB_WEIGHTED(GetAssetData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetClassData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetCharacterData(), 25.f);
+		STARTUP_JOB_WEIGHTED(GetMonsterData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetItemData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetElectricFieldPhaseData(), 25.f);
 	}
@@ -304,6 +311,7 @@ void ULyraAssetManager::PreBeginPIE(bool bStartSimulate)
 		GetAssetData();
 		GetClassData();
 		GetCharacterData();
+		GetMonsterData();
 		GetItemData();
 		GetElectricFieldPhaseData();
 		GetCheatData();

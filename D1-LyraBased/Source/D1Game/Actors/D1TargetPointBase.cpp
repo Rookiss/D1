@@ -5,17 +5,23 @@
 AD1TargetPointBase::AD1TargetPointBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+	PreviewMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PreviewMeshComponent"));
+	PreviewMeshComponent->SetupAttachment(RootComponent);
+	PreviewMeshComponent->SetHiddenInGame(true);
+	PreviewMeshComponent->bIsEditorOnly = true;
 }
 
 AActor* AD1TargetPointBase::SpawnActor()
 {
 	if (HasAuthority() == false)
 		return nullptr;
+
+	FTransform SpawnTransform = GetActorTransform();
+	SpawnTransform.AddToTranslation(SpawnLocationOffset);
 	
-	AActor* SpawningActor = GetWorld()->SpawnActorDeferred<AActor>(SpawnActorClass, GetActorTransform(), this, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	AActor* SpawningActor = GetWorld()->SpawnActorDeferred<AActor>(SpawnActorClass, SpawnTransform, this, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	InitializeSpawningActor(SpawningActor);
-	SpawningActor->FinishSpawning(GetActorTransform());
+	SpawningActor->FinishSpawning(SpawnTransform);
 	SpawnedActor = SpawningActor;
 	
 	return SpawningActor;

@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "LyraGameMode.h"
+
+#include "AIController.h"
 #include "AssetRegistry/AssetData.h"
 #include "Engine/GameInstance.h"
 #include "Engine/World.h"
@@ -10,7 +12,6 @@
 #include "LyraGameState.h"
 #include "System/LyraGameSession.h"
 #include "Player/LyraPlayerController.h"
-#include "Player/LyraPlayerBotController.h"
 #include "Player/LyraPlayerState.h"
 #include "Character/LyraCharacter.h"
 #include "UI/LyraHUD.h"
@@ -45,7 +46,7 @@ ALyraGameMode::ALyraGameMode(const FObjectInitializer& ObjectInitializer)
 const ULyraPawnData* ALyraGameMode::GetPawnDataForController(const AController* InController) const
 {
 	// See if pawn data is already set on the player state
-	if (InController != nullptr)
+	if (InController)
 	{
 		if (const ALyraPlayerState* LyraPS = InController->GetPlayerState<ALyraPlayerState>())
 		{
@@ -55,22 +56,29 @@ const ULyraPawnData* ALyraGameMode::GetPawnDataForController(const AController* 
 			}
 		}
 	}
-
-	// If not, fall back to the the default for the current experience
-	check(GameState);
-	ULyraExperienceManagerComponent* ExperienceComponent = GameState->FindComponentByClass<ULyraExperienceManagerComponent>();
-	check(ExperienceComponent);
-
-	if (ExperienceComponent->IsExperienceLoaded())
+	
+	if (InController->IsA(AAIController::StaticClass()))
 	{
-		const ULyraExperienceDefinition* Experience = ExperienceComponent->GetCurrentExperienceChecked();
-		if (Experience->DefaultPawnData != nullptr)
-		{
-			return Experience->DefaultPawnData;
-		}
+		// AI controllers can't find pawn data in expeience, so we'll find in monster data asset
+		
+	}
+	else
+	{
+		check(GameState);
+		ULyraExperienceManagerComponent* ExperienceComponent = GameState->FindComponentByClass<ULyraExperienceManagerComponent>();
+		check(ExperienceComponent);
 
-		// Experience is loaded and there's still no pawn data, fall back to the default for now
-		return ULyraAssetManager::Get().GetDefaultPawnData();
+		if (ExperienceComponent->IsExperienceLoaded())
+		{
+			const ULyraExperienceDefinition* Experience = ExperienceComponent->GetCurrentExperienceChecked();
+			if (Experience->DefaultPawnData != nullptr)
+			{
+				return Experience->DefaultPawnData;
+			}
+
+			// Experience is loaded and there's still no pawn data, fall back to the default for now
+			return ULyraAssetManager::Get().GetDefaultPawnData();
+		}
 	}
 
 	// Experience not loaded yet, so there is no pawn data to be had
@@ -476,10 +484,6 @@ void ALyraGameMode::RequestPlayerRestartNextFrame(AController* Controller, bool 
 	if (APlayerController* PC = Cast<APlayerController>(Controller))
 	{
 		GetWorldTimerManager().SetTimerForNextTick(PC, &APlayerController::ServerRestartPlayer_Implementation);
-	}
-	else if (ALyraPlayerBotController* BotController = Cast<ALyraPlayerBotController>(Controller))
-	{
-		GetWorldTimerManager().SetTimerForNextTick(BotController, &ALyraPlayerBotController::ServerRestartController);
 	}
 }
 

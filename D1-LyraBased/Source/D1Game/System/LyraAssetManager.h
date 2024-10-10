@@ -5,10 +5,10 @@
 #include "Engine/AssetManager.h"
 #include "LyraAssetManagerStartupJob.h"
 #include "Data/D1AssetData.h"
-#include "Data/D1ItemData.h"
 #include "Templates/SubclassOf.h"
 #include "LyraAssetManager.generated.h"
 
+class UD1MonsterData;
 class UD1CharacterData;
 class UD1ClassData;
 class UD1CheatData;
@@ -64,6 +64,7 @@ public:
 	const UD1AssetData& GetAssetData();
 	const UD1ClassData& GetClassData();
 	const UD1CharacterData& GetCharacterData();
+	const UD1MonsterData& GetMonsterData();
 	const UD1ItemData& GetItemData();
 	const UD1ElectricFieldPhaseData& GetElectricFieldPhaseData();
 	const UD1CheatData& GetCheatData();
@@ -111,6 +112,9 @@ protected:
 
 	UPROPERTY(Config)
 	TSoftObjectPtr<UD1CharacterData> CharacterDataPath;
+
+	UPROPERTY(Config)
+	TSoftObjectPtr<UD1MonsterData> MonsterDataPath;
 	
 	UPROPERTY(Config)
 	TSoftObjectPtr<UD1ItemData> ItemDataPath;

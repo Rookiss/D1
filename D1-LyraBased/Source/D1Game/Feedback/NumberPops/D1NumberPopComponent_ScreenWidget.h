@@ -24,14 +24,14 @@ struct FLiveWidgetNumberPopEntry
 public:
 	FLiveWidgetNumberPopEntry() { }
 
-FLiveWidgetNumberPopEntry(UD1NumberPopWidgetBase* InWidget, FPooledNumberPopWidgetList* InPool, float InReleaseTime)
-	: Widget(InWidget), Pool(InPool), ReleaseTime(InReleaseTime) { }
+	FLiveWidgetNumberPopEntry(UD1NumberPopWidgetBase* InWidget, FPooledNumberPopWidgetList* InPoolList, float InReleaseTime)
+		: Widget(InWidget), PoolList(InPoolList), ReleaseTime(InReleaseTime) { }
 	
 public:
 	UPROPERTY(Transient)
 	TObjectPtr<UD1NumberPopWidgetBase> Widget = nullptr;
 
-	FPooledNumberPopWidgetList* Pool = nullptr;
+	FPooledNumberPopWidgetList* PoolList = nullptr;
 
 	float ReleaseTime = 0.f;
 };

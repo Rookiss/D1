@@ -3,12 +3,15 @@
 #include "Engine/TargetPoint.h"
 #include "D1TargetPointBase.generated.h"
 
+class AAIController;
+
 UENUM(BlueprintType)
 enum class ED1TargetPointType : uint8
 {
 	None,
 	Statue,
 	Chest,
+	Monster,
 };
 
 UCLASS()
@@ -23,15 +26,27 @@ public:
 	AActor* SpawnActor();
 	void DestroyActor();
 
+	AActor* GetSpawnedActor() const { return SpawnedActor.Get(); };
+	
 protected:
 	virtual void InitializeSpawningActor(AActor* InSpawningActor) { }
-	
+
 public:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="TargetPoint")
 	ED1TargetPointType TargetPointType = ED1TargetPointType::None;
+
+	UPROPERTY(EditDefaultsOnly, Category="TargetPoint")
+	bool bSpawnWhenDestroyed = false;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="TargetPoint")
 	TSubclassOf<AActor> SpawnActorClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="TargetPoint")
+	FVector SpawnLocationOffset = FVector::ZeroVector;
+
+protected:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> PreviewMeshComponent;
 	
 protected:
 	UPROPERTY()
