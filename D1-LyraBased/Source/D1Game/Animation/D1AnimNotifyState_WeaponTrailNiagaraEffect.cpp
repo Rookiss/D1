@@ -1,13 +1,13 @@
-﻿#include "D1AnimNotify_WeaponTrailNiagaraEffect.h"
+﻿#include "D1AnimNotifyState_WeaponTrailNiagaraEffect.h"
 
 #include "NiagaraComponent.h"
 #include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1AnimNotify_WeaponTrailNiagaraEffect)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1AnimNotifyState_WeaponTrailNiagaraEffect)
 
-UD1AnimNotify_WeaponTrailNiagaraEffect::UD1AnimNotify_WeaponTrailNiagaraEffect(const FObjectInitializer& ObjectInitializer)
+UD1AnimNotifyState_WeaponTrailNiagaraEffect::UD1AnimNotifyState_WeaponTrailNiagaraEffect(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 #if WITH_EDITORONLY_DATA
@@ -19,7 +19,7 @@ UD1AnimNotify_WeaponTrailNiagaraEffect::UD1AnimNotify_WeaponTrailNiagaraEffect(c
 	RotationOffset = FRotator(0.0f, 0.0f, 0.0f);
 }
 
-void UD1AnimNotify_WeaponTrailNiagaraEffect::NotifyBegin(class USkeletalMeshComponent* MeshComponent, class UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
+void UD1AnimNotifyState_WeaponTrailNiagaraEffect::NotifyBegin(class USkeletalMeshComponent* MeshComponent, class UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
 	USkeletalMeshComponent* WeaponMeshComponent = GetWeaponMeshComponent(MeshComponent);
 	Super::NotifyBegin(WeaponMeshComponent ? WeaponMeshComponent : MeshComponent, Animation, TotalDuration, EventReference);
@@ -27,7 +27,7 @@ void UD1AnimNotify_WeaponTrailNiagaraEffect::NotifyBegin(class USkeletalMeshComp
 	UpdateNiagaraParameters(WeaponMeshComponent);
 }
 
-void UD1AnimNotify_WeaponTrailNiagaraEffect::NotifyTick(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
+void UD1AnimNotifyState_WeaponTrailNiagaraEffect::NotifyTick(USkeletalMeshComponent* MeshComponent, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
 {
 	USkeletalMeshComponent* WeaponMeshComponent = GetWeaponMeshComponent(MeshComponent);
 	Super::NotifyTick(WeaponMeshComponent ? WeaponMeshComponent : MeshComponent, Animation, FrameDeltaTime, EventReference);
@@ -35,7 +35,7 @@ void UD1AnimNotify_WeaponTrailNiagaraEffect::NotifyTick(USkeletalMeshComponent* 
 	UpdateNiagaraParameters(WeaponMeshComponent);
 }
 
-void UD1AnimNotify_WeaponTrailNiagaraEffect::NotifyEnd(class USkeletalMeshComponent* MeshComponent, class UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
+void UD1AnimNotifyState_WeaponTrailNiagaraEffect::NotifyEnd(class USkeletalMeshComponent* MeshComponent, class UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	USkeletalMeshComponent* WeaponMeshComponent = GetWeaponMeshComponent(MeshComponent);
 	Super::NotifyEnd(WeaponMeshComponent ? WeaponMeshComponent : MeshComponent, Animation, EventReference);
@@ -43,7 +43,7 @@ void UD1AnimNotify_WeaponTrailNiagaraEffect::NotifyEnd(class USkeletalMeshCompon
 	UpdateNiagaraParameters(WeaponMeshComponent);
 }
 
-void UD1AnimNotify_WeaponTrailNiagaraEffect::UpdateNiagaraParameters(USkeletalMeshComponent* WeaponMeshComponent)
+void UD1AnimNotifyState_WeaponTrailNiagaraEffect::UpdateNiagaraParameters(USkeletalMeshComponent* WeaponMeshComponent)
 {
 	if (WeaponMeshComponent == nullptr)
 		return;
@@ -63,7 +63,7 @@ void UD1AnimNotify_WeaponTrailNiagaraEffect::UpdateNiagaraParameters(USkeletalMe
 	}
 }
 
-USkeletalMeshComponent* UD1AnimNotify_WeaponTrailNiagaraEffect::GetWeaponMeshComponent(USkeletalMeshComponent* CharacterMeshComponent) const
+USkeletalMeshComponent* UD1AnimNotifyState_WeaponTrailNiagaraEffect::GetWeaponMeshComponent(USkeletalMeshComponent* CharacterMeshComponent) const
 {
 	USkeletalMeshComponent* WeaponMeshComponent = nullptr;
 	

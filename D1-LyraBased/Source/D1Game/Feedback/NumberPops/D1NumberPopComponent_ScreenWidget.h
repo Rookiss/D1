@@ -3,6 +3,7 @@
 #include "D1NumberPopComponent.h"
 #include "D1NumberPopComponent_ScreenWidget.generated.h"
 
+class UWidgetComponent;
 class UD1NumberPopWidgetBase;
 class UD1DamagePopStyleScreenWidget;
 
@@ -13,7 +14,7 @@ struct FPooledNumberPopWidgetList
 
 public:
 	UPROPERTY(Transient)
-	TArray<TObjectPtr<UD1NumberPopWidgetBase>> Widgets;
+	TArray<TObjectPtr<UWidgetComponent>> Widgets;
 };
 
 USTRUCT()
@@ -24,12 +25,12 @@ struct FLiveWidgetNumberPopEntry
 public:
 	FLiveWidgetNumberPopEntry() { }
 
-	FLiveWidgetNumberPopEntry(UD1NumberPopWidgetBase* InWidget, FPooledNumberPopWidgetList* InPoolList, float InReleaseTime)
-		: Widget(InWidget), PoolList(InPoolList), ReleaseTime(InReleaseTime) { }
+	FLiveWidgetNumberPopEntry(UWidgetComponent* InWidgetComponent, FPooledNumberPopWidgetList* InPoolList, float InReleaseTime)
+		: WidgetComponent(InWidgetComponent), PoolList(InPoolList), ReleaseTime(InReleaseTime) { }
 	
 public:
 	UPROPERTY(Transient)
-	TObjectPtr<UD1NumberPopWidgetBase> Widget = nullptr;
+	TObjectPtr<UWidgetComponent> WidgetComponent = nullptr;
 
 	FPooledNumberPopWidgetList* PoolList = nullptr;
 

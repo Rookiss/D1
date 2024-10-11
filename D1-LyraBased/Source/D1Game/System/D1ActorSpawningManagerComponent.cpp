@@ -124,7 +124,7 @@ void UD1ActorSpawningManagerComponent::SpawnToTargetPoint(FPendingTargetPointLis
 	if (AActor* SpawnedActor = PendingTargetPoint->SpawnActor())
 	{
 		SpawnedActor->OnDestroyed.AddUniqueDynamic(this, &ThisClass::OnActorDestroyed);
-		SpawnedActorToTargetPoint.Emplace(SpawnedActor, FUsingTargetPointEntry(PendingTargetPoint, &InTargetPointList));
+		SpawnedActorToTargetPoint.Add(SpawnedActor, FUsingTargetPointEntry(PendingTargetPoint, &InTargetPointList));
 	}
 #endif
 }

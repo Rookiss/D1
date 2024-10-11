@@ -2,15 +2,15 @@
 
 #include "D1Define.h"
 #include "AnimNotifyState_TimedNiagaraEffect.h"
-#include "D1AnimNotify_WeaponTrailNiagaraEffect.generated.h"
+#include "D1AnimNotifyState_WeaponTrailNiagaraEffect.generated.h"
 
 UCLASS(Blueprintable, meta=(DisplayName="Weapon Trail Niagara Effect"), MinimalAPI)
-class UD1AnimNotify_WeaponTrailNiagaraEffect : public UAnimNotifyState_TimedNiagaraEffect
+class UD1AnimNotifyState_WeaponTrailNiagaraEffect : public UAnimNotifyState_TimedNiagaraEffect
 {
 	GENERATED_BODY()
 	
 public:
-	UD1AnimNotify_WeaponTrailNiagaraEffect(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UD1AnimNotifyState_WeaponTrailNiagaraEffect(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
 	virtual void NotifyBegin(class USkeletalMeshComponent* MeshComponent, class UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;

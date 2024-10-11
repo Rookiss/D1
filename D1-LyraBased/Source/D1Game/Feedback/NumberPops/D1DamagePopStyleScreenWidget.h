@@ -29,5 +29,5 @@ public:
 	bool bOverrideWidget = false;
 
 	UPROPERTY(EditDefaultsOnly, Category="DamagePop", meta=(EditCondition=bOverrideWidget))
-	TSubclassOf<UD1NumberPopWidgetBase> TextWidget;
+	TSubclassOf<UD1NumberPopWidgetBase> WidgetClass;
 };

@@ -7,6 +7,8 @@
 AD1StatueBase::AD1StatueBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = false;
+	
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
 	SetRootComponent(ArrowComponent);
 	

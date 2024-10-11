@@ -15,8 +15,4 @@ public:
 
 protected:
 	virtual void InitializeSpawningActor(AActor* InSpawningActor) override;
-	
-protected:
-	UPROPERTY(EditDefaultsOnly, Category="TargetPoint")
-	TSubclassOf<AAIController> AIControllerClass;
 };

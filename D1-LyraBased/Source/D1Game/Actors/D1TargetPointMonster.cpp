@@ -10,22 +10,26 @@
 AD1TargetPointMonster::AD1TargetPointMonster(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+	TargetPointType = ED1TargetPointType::Monster;
 }
 
 void AD1TargetPointMonster::InitializeSpawningActor(AActor* InSpawningActor)
 {
 	Super::InitializeSpawningActor(InSpawningActor);
-
+	
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParameters.OverrideLevel = InSpawningActor->GetLevel();
 	SpawnParameters.ObjectFlags |= RF_Transient;
-	
-	AAIController* NewController = GetWorld()->SpawnActor<AAIController>(AIControllerClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParameters);
+
+	APawn* SpawningPawn = Cast<APawn>(InSpawningActor);
+	if (SpawningPawn == nullptr)
+		return;
+
+	AAIController* NewController = GetWorld()->SpawnActor<AAIController>(SpawningPawn->AIControllerClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParameters);
 	if (NewController)
 	{
-		NewController->Possess(Cast<APawn>(InSpawningActor));
+		NewController->Possess(SpawningPawn);
 	}
 	
 	if (APawn* ControlledPawn = NewController->GetPawn())

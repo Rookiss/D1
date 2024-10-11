@@ -399,7 +399,7 @@ void ALyraCharacter::UninitAndSpawnSpectator()
 
 	if (GetLocalRole() == ROLE_Authority)
 	{
-		if (Cast<APlayerController>(Controller))
+		if (Controller.IsA(APlayerController::StaticClass()))
 		{
 			TSubclassOf<ASpectatorPawn> SpectatorPawnClass = ULyraAssetManager::GetSubclassByName<ASpectatorPawn>("SpectatorPawnClass");
 	

@@ -2,6 +2,7 @@
 
 #include "D1DamagePopStyleScreenWidget.h"
 #include "Blueprint/SlateBlueprintLibrary.h"
+#include "Components/WidgetComponent.h"
 #include "UI/HUD/D1NumberPopWidgetBase.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1NumberPopComponent_ScreenWidget)
@@ -25,43 +26,39 @@ void UD1NumberPopComponent_ScreenWidget::AddNumberPop(const FD1NumberPopRequest&
 		return;
 
 	FPooledNumberPopWidgetList& WidgetPool = PooledWidgetMap.FindOrAdd(WidgetClassToUse);
-
-	UD1NumberPopWidgetBase* WidgetToUse;
 	
+	UWidgetComponent* ComponentToUse;
 	if (WidgetPool.Widgets.Num() > 0)
 	{
-		WidgetToUse = WidgetPool.Widgets.Pop();
+		ComponentToUse = WidgetPool.Widgets.Pop();
 	}
 	else
-	{
-		UWorld* LocalWorld = GetWorld();
-		check(LocalWorld);
-		
-		WidgetToUse = CreateWidget<UD1NumberPopWidgetBase>(LocalWorld, WidgetClassToUse);
-		LiveWidgets.Emplace(WidgetToUse, &WidgetPool, LocalWorld->GetTimeSeconds() + WidgetLifeSpan);
-
-		if (LocalWorld->GetTimerManager().IsTimerActive(ReleaseTimerHandle) == false)
-		{
-			LocalWorld->GetTimerManager().SetTimer(ReleaseTimerHandle, this, &ThisClass::ReleaseNextWidgets, WidgetLifeSpan);
-		}
+	{		
+		ComponentToUse = NewObject<UWidgetComponent>(GetOwner());
+		ComponentToUse->SetupAttachment(nullptr);
+		ComponentToUse->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+		ComponentToUse->SetWidgetSpace(EWidgetSpace::Screen);
+		ComponentToUse->SetWidgetClass(WidgetClassToUse);
 	}
 
-	if (WidgetToUse)
-	{
-		WidgetToUse->InitializeUI(NewRequest.NumberToDisplay, DetermineColor(NewRequest));
-		WidgetToUse->AddToViewport();
-		
-		FVector2D ScreenPosition;
-		PlayerController->ProjectWorldLocationToScreen(NewRequest.WorldLocation, ScreenPosition, false);
-		
-		FVector2D AbsolutePosition;
-		USlateBlueprintLibrary::ScreenToWidgetAbsolute(WidgetToUse, ScreenPosition, AbsolutePosition, false);
-		
-		FVector2D PixelPosition, ViewportPosition;
-		USlateBlueprintLibrary::AbsoluteToViewport(WidgetToUse, AbsolutePosition, PixelPosition, ViewportPosition);
+	check(ComponentToUse);
+	ComponentToUse->RegisterComponent();
 
-		WidgetToUse->SetPositionInViewport(ViewportPosition, false);
+	UWorld* LocalWorld = GetWorld();
+	check(LocalWorld);
+	LiveWidgets.Emplace(ComponentToUse, &WidgetPool, LocalWorld->GetTimeSeconds() + WidgetLifeSpan);
+
+	if (LocalWorld->GetTimerManager().IsTimerActive(ReleaseTimerHandle) == false)
+	{
+		LocalWorld->GetTimerManager().SetTimer(ReleaseTimerHandle, this, &ThisClass::ReleaseNextWidgets, WidgetLifeSpan);
 	}
+
+	if (UD1NumberPopWidgetBase* NumberPopWidget = Cast<UD1NumberPopWidgetBase>(ComponentToUse->GetWidget()))
+	{
+		NumberPopWidget->InitializeUI(NewRequest.NumberToDisplay, DetermineColor(NewRequest));
+	}
+
+	ComponentToUse->SetWorldLocation(NewRequest.WorldLocation);
 }
 
 void UD1NumberPopComponent_ScreenWidget::ReleaseNextWidgets()
@@ -77,18 +74,18 @@ void UD1NumberPopComponent_ScreenWidget::ReleaseNextWidgets()
 		if (CurrentTime >= LiveWidget.ReleaseTime)
 		{
 			NumRelased++;
-			if (ensure(LiveWidget.Widget))
+			if (ensure(LiveWidget.WidgetComponent))
 			{
-				LiveWidget.Widget->RemoveFromParent();
+				LiveWidget.WidgetComponent->UnregisterComponent();
 
 				if (ensure(LiveWidget.PoolList))
 				{
-					LiveWidget.PoolList->Widgets.Push(LiveWidget.Widget);
+					LiveWidget.PoolList->Widgets.Push(LiveWidget.WidgetComponent);
 				}
 				else
 				{
-					LiveWidget.Widget->SetFlags(RF_Transient);
-					LiveWidget.Widget->Rename(nullptr, GetTransientPackage(), RF_NoFlags);
+					LiveWidget.WidgetComponent->SetFlags(RF_Transient);
+					LiveWidget.WidgetComponent->Rename(nullptr, GetTransientPackage(), RF_NoFlags);
 				}
 			}
 		}
@@ -132,7 +129,7 @@ TSubclassOf<UD1NumberPopWidgetBase> UD1NumberPopComponent_ScreenWidget::Determin
 		{
 			if (Style->MatchPattern.Matches(Request.TargetTags) || Style->MatchPattern.IsEmpty())
 			{
-				return Style->TextWidget;
+				return Style->WidgetClass;
 			}
 		}
 	}

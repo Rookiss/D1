@@ -5,8 +5,11 @@
 AD1TargetPointBase::AD1TargetPointBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = false;
+	
 	PreviewMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PreviewMeshComponent"));
 	PreviewMeshComponent->SetupAttachment(RootComponent);
+	PreviewMeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
 	PreviewMeshComponent->SetHiddenInGame(true);
 	PreviewMeshComponent->bIsEditorOnly = true;
 }

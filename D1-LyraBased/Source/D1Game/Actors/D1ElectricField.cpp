@@ -10,7 +10,7 @@ class ALyraGameState;
 AD1ElectricField::AD1ElectricField(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	bReplicates = true;
 	bAlwaysRelevant = true;

@@ -13,6 +13,8 @@
 AD1PickupableItemBase::AD1PickupableItemBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = false;
+	
 	bReplicates = true;
 	bAlwaysRelevant = true;
 	AActor::SetReplicateMovement(true);

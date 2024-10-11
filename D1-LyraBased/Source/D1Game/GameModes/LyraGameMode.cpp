@@ -27,6 +27,7 @@
 #include "CommonSessionSubsystem.h"
 #include "TimerManager.h"
 #include "GameMapsSettings.h"
+#include "Data/D1MonsterData.h"
 #include "Player/D1PlayerSpawningManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraGameMode)
@@ -60,7 +61,8 @@ const ULyraPawnData* ALyraGameMode::GetPawnDataForController(const AController* 
 	if (InController->IsA(AAIController::StaticClass()))
 	{
 		// AI controllers can't find pawn data in expeience, so we'll find in monster data asset
-		
+		const ULyraPawnData* PawnData = UD1MonsterData::Get().GetPawnData(InController->GetClass());
+		return PawnData;
 	}
 	else
 	{

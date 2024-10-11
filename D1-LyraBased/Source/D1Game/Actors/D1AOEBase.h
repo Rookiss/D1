@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "GameplayEffectTypes.h"
 #include "D1AOEBase.generated.h"
 
 class USphereComponent;

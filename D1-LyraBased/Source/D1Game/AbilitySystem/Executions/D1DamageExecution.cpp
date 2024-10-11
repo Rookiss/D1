@@ -4,6 +4,7 @@
 #include "AbilitySystem/Attributes/D1VitalSet.h"
 #include "AbilitySystem/Attributes/D1CombatSet.h"
 #include "AbilitySystem/LyraGameplayEffectContext.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Teams/LyraTeamSubsystem.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1DamageExecution)
@@ -65,14 +66,16 @@ void UD1DamageExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 
 	float Defense = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DefenseDef, EvaluateParameters, Defense);
+	Defense = FMath::Max(Defense, 1.f);
 
 	float DrainLifePercent = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DrainLifePercentDef, EvaluateParameters, DrainLifePercent);
 
 	float DamageReductionPercent = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageReductionPercentDef, EvaluateParameters, DamageReductionPercent);
-	
-	float DamageDone = FMath::Max((BaseDamage + Strength) / (FMath::Pow(Defense, 0.3f)), 0.0f);
+
+	float Damage = UKismetMathLibrary::SafeDivide(BaseDamage + Strength, FMath::Pow(Defense, 0.3f));
+	float DamageDone = FMath::Max(Damage, 0.0f);
 	DamageDone -= DamageDone * (DamageReductionPercent / 100.f);
 	
 	if (DamageDone > 0.0f)

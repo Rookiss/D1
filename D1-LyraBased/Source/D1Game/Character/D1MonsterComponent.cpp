@@ -14,7 +14,7 @@ const FName UD1MonsterComponent::NAME_ActorFeatureName("Monster");
 UD1MonsterComponent::UD1MonsterComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 void UD1MonsterComponent::OnRegister()
@@ -23,19 +23,19 @@ void UD1MonsterComponent::OnRegister()
 
 	if (GetPawn<APawn>() == nullptr)
 	{
-		UE_LOG(LogD1, Error, TEXT("[UD1MonsterComponent::OnRegister] This component has been added to a blueprint whose base class is not a Pawn. To use this component, it MUST be placed on a Pawn Blueprint."));
+		UE_LOG(LogD1, Error, TEXT("[UD1MonsterComponent::OnRegister] It MUST be placed on a Pawn Blueprint."));
 
 #if WITH_EDITOR
 		if (GIsEditor)
 		{
-			static const FText Message = NSLOCTEXT("UD1MonsterComponent", "NotOnPawnError", "has been added to a blueprint whose base class is not a Pawn. To use this component, it MUST be placed on a Pawn Blueprint. This will cause a crash if you PIE!");
-			static const FName HeroMessageLogName = TEXT("UD1MonsterComponent");
+			static const FText Message = NSLOCTEXT("UD1MonsterComponent", "NotOnPawnError", "It MUST be placed on a Pawn Blueprint.");
+			static const FName MonsterMessageLogName = TEXT("UD1MonsterComponent");
 			
-			FMessageLog(HeroMessageLogName).Error()
+			FMessageLog(MonsterMessageLogName).Error()
 				->AddToken(FUObjectToken::Create(this, FText::FromString(GetNameSafe(this))))
 				->AddToken(FTextToken::Create(Message));
 				
-			FMessageLog(HeroMessageLogName).Open();
+			FMessageLog(MonsterMessageLogName).Open();
 		}
 #endif
 	}
