@@ -45,11 +45,29 @@ void AD1PocketStage::BeginPlay()
 	
 	if (UPocketCaptureSubsystem* PocketCaptureSubsystem = GetWorld()->GetSubsystem<UPocketCaptureSubsystem>())
 	{
+		FVector2D RenderTargetSize;
+		
+		FVector2D ViewportSize = FVector2D(1920, 1080);
+		if (GEngine && GEngine->GameViewport && GEngine->GameViewport->Viewport)
+		{
+			ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
+		}
+		
+		const float AspectRatio = ViewportSize.X / ViewportSize.Y;
+		if (AspectRatio < 0.5f)
+		{
+			RenderTargetSize = FVector2D(ViewportSize.X, ViewportSize.X * 2);
+		}
+		else
+		{
+			RenderTargetSize = FVector2D(ViewportSize.Y / 2, ViewportSize.Y);
+		}
+		
 		PocketCapture = PocketCaptureSubsystem->CreateThumbnailRenderer(PocketCaptureClass);
-		PocketCapture->SetRenderTargetSize(512, 1024);
+		PocketCapture->SetRenderTargetSize(RenderTargetSize.X, RenderTargetSize.Y);
 		PocketCapture->SetCaptureTarget(this);
 
-		RefreshAlphaMaskActors();
+		RefreshLightingChannelToActors();
 	}
 }
 
@@ -75,12 +93,10 @@ void AD1PocketStage::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void AD1PocketStage::RefreshAlphaMaskActors()
+void AD1PocketStage::RefreshLightingChannelToActors()
 {
 	TArray<AActor*> AttachedActors;
 	GetAttachedActors(AttachedActors, true, true);
-
-	PocketCapture->SetAlphaMaskedActors(AttachedActors);
 
 	for (AActor* AttachedActor : AttachedActors)
 	{
@@ -113,10 +129,10 @@ void AD1PocketStage::RefreshAlphaMaskActors()
 
 UD1CosmeticManagerComponent* AD1PocketStage::GetCosmeticManager() const
 {
-	UD1CosmeticManagerComponent* Result = nullptr;
+	UD1CosmeticManagerComponent* CosmeticManager = nullptr;
 	if (SpawnedCharacter)
 	{
-		Result = SpawnedCharacter->GetComponentByClass<UD1CosmeticManagerComponent>();
+		CosmeticManager = SpawnedCharacter->GetComponentByClass<UD1CosmeticManagerComponent>();
 	}
-	return Result;
+	return CosmeticManager;
 }

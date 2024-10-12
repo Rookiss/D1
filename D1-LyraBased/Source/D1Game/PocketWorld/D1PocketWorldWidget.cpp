@@ -28,7 +28,7 @@ void UD1PocketWorldWidget::NativeTick(const FGeometry& MyGeometry, float InDelta
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	RefreshUI();
+	RefreshRenderTarget();
 }
 
 void UD1PocketWorldWidget::NativeDestruct()
@@ -39,14 +39,13 @@ void UD1PocketWorldWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UD1PocketWorldWidget::RefreshUI()
+void UD1PocketWorldWidget::RefreshRenderTarget()
 {
 	if (CachedPocketStage.IsValid())
 	{
 		if (UPocketCapture* PocketCapture = CachedPocketStage->GetPocketCapture())
 		{
 			PocketCapture->CaptureDiffuse();
-			// PocketCapture->CaptureAlphaMask();
 		}
 	}
 }
@@ -58,10 +57,8 @@ void UD1PocketWorldWidget::OnPocketStageReady(AD1PocketStage* PocketStage)
 	if (UPocketCapture* PocketCapture = CachedPocketStage->GetPocketCapture())
 	{
 		UTextureRenderTarget2D* DiffuseRenderTarget = PocketCapture->GetOrCreateDiffuseRenderTarget();
-		// UTextureRenderTarget2D* AlphaRenderTarget = PocketCapture->GetOrCreateAlphaMaskRenderTarget();
-
+		
 		UMaterialInstanceDynamic* MaterialInstanceDynamic = Image_Render->GetDynamicMaterial();
 		MaterialInstanceDynamic->SetTextureParameterValue("Diffuse", DiffuseRenderTarget);
-		// MaterialInstanceDynamic->SetTextureParameterValue("AlphaMask", AlphaRenderTarget);
 	}
 }

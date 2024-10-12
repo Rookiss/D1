@@ -2,8 +2,8 @@
 
 #include "D1PocketWorldSubsystem.generated.h"
 
-class UPocketLevelInstance;
 class AD1PocketStage;
+class UPocketLevelInstance;
 
 DECLARE_DELEGATE_OneParam(FGetPocketStageDelegate, AD1PocketStage*);
 

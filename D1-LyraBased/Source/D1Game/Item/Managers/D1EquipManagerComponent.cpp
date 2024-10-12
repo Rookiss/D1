@@ -139,7 +139,7 @@ void FD1EquipEntry::Equip()
 									SpawnedPocketWorldWeaponActor->bOnlyUseForLocal = true;
 									SpawnedPocketWorldWeaponActor->FinishSpawning(FTransform::Identity, true);
 
-									PocketStage->RefreshAlphaMaskActors();
+									PocketStage->RefreshLightingChannelToActors();
 									
 									if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
 									{
