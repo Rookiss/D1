@@ -132,7 +132,7 @@ bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const 
 				CaptureComponent->ShowFlags.SetTemporalAA(true);			// Check
 				CaptureComponent->ShowFlags.SetPostProcessMaterial(true);	// Check
 				CaptureComponent->ShowFlags.SetFog(false);					// Check
-				CaptureComponent->ShowFlags.SetSkyLighting(true);			// Check
+				CaptureComponent->ShowFlags.SetSkyLighting(false);			// Check
 				
 				CaptureComponent->ShowFlags.SetDepthOfField(false);
 				CaptureComponent->ShowFlags.SetScreenPercentage(false);
