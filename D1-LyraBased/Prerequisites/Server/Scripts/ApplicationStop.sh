@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REPOSITORY=/home/ubuntu/server
-PROCESS_NAME=D1Server-Linux
+PROCESS_NAME=D1Server
 
 CURRENT_PID=$(pgrep -fl $PROCESS_NAME | awk '{print $1}')
 
