@@ -19,7 +19,7 @@ protected:
 	virtual void NativeDestruct() override;
 
 private:
-	void RefreshUI();
+	void RefreshRenderTarget();
 
 private:
 	UFUNCTION()

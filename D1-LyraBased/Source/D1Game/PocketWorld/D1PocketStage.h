@@ -18,7 +18,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
-	void RefreshAlphaMaskActors();
+	void RefreshLightingChannelToActors();
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)

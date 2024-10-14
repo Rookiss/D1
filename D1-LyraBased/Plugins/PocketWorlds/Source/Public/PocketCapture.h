@@ -24,47 +24,30 @@ class POCKETWORLDS_API UPocketCapture : public UObject
 public:
 	UPocketCapture();
 
+public:
 	virtual void Initialize(UWorld* InWorld, int32 RendererIndex);
 	virtual void Deinitialize();
-
 	virtual void BeginDestroy() override;
 
+public:
 	UFUNCTION(BlueprintCallable)
 	void SetRenderTargetSize(int32 Width, int32 Height);
 
 	UFUNCTION(BlueprintCallable)
 	UTextureRenderTarget2D* GetOrCreateDiffuseRenderTarget();
-
-	UFUNCTION(BlueprintCallable)
-	UTextureRenderTarget2D* GetOrCreateAlphaMaskRenderTarget();
-
-	UFUNCTION(BlueprintCallable)
-	UTextureRenderTarget2D* GetOrCreateEffectsRenderTarget();
-
+	
 	UFUNCTION(BlueprintCallable)
 	void SetCaptureTarget(AActor* InCaptureTarget);
-
-	UFUNCTION(BlueprintCallable)
-	void SetAlphaMaskedActors(const TArray<AActor*>& InCaptureTarget);
-
+	
 	UFUNCTION(BlueprintCallable)
 	void CaptureDiffuse();
-
-	UFUNCTION(BlueprintCallable)
-	void CaptureAlphaMask();
-
-	UFUNCTION(BlueprintCallable)
-	void CaptureEffects();
-
+	
 	UFUNCTION(BlueprintCallable)
 	virtual void ReleaseResources();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void ReclaimResources();
 
-	UFUNCTION(BlueprintCallable)
-	int32 GetRendererIndex() const;
-	
 protected:
 	AActor* GetCaptureTarget() const { return CaptureTargetPtr.Get(); }
 	virtual void OnCaptureTargetChanged(AActor* InCaptureTarget) {}

@@ -23,7 +23,6 @@ void UPocketCapture::Initialize(UWorld* InWorld, int32 InRendererIndex)
 	CaptureComponent = NewObject<USceneCaptureComponent2D>(this, "Thumbnail_Capture_Component");
 	CaptureComponent->RegisterComponentWithWorld(InWorld);
 	CaptureComponent->bConsiderUnrenderedOpaquePixelAsFullyTranslucent = true;
-	CaptureComponent->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 	CaptureComponent->bCaptureEveryFrame = false;
 	CaptureComponent->bCaptureOnMovement = false;
 	CaptureComponent->bAlwaysPersistRenderingState = true;
@@ -56,16 +55,6 @@ void UPocketCapture::SetRenderTargetSize(int32 Width, int32 Height)
 		{
 			DiffuseRT->ResizeTarget(SurfaceWidth, SurfaceHeight);
 		}
-
-		if (AlphaMaskRT)
-		{
-			AlphaMaskRT->ResizeTarget(SurfaceWidth, SurfaceHeight);
-		}
-
-		if (EffectsRT)
-		{
-			EffectsRT->ResizeTarget(SurfaceWidth, SurfaceHeight);
-		}
 	}
 }
 
@@ -82,47 +71,11 @@ UTextureRenderTarget2D* UPocketCapture::GetOrCreateDiffuseRenderTarget()
 	return DiffuseRT;
 }
 
-UTextureRenderTarget2D* UPocketCapture::GetOrCreateAlphaMaskRenderTarget()
-{
-	if (AlphaMaskRT == nullptr)
-	{
-		AlphaMaskRT = NewObject<UTextureRenderTarget2D>(this, TEXT("ThumbnailRenderer_AlphaMask"));
-		AlphaMaskRT->RenderTargetFormat = RTF_R8;
-		AlphaMaskRT->InitAutoFormat(SurfaceWidth, SurfaceHeight);
-		AlphaMaskRT->UpdateResourceImmediate(true);
-	}
-
-	return AlphaMaskRT;
-}
-
-UTextureRenderTarget2D* UPocketCapture::GetOrCreateEffectsRenderTarget()
-{
-	if (EffectsRT == nullptr)
-	{
-		EffectsRT = NewObject<UTextureRenderTarget2D>(this, TEXT("ThumbnailRenderer_Fx"));
-		EffectsRT->RenderTargetFormat = RTF_R8;
-		EffectsRT->InitAutoFormat(SurfaceWidth, SurfaceHeight);
-		EffectsRT->UpdateResourceImmediate(true);
-	}
-
-	return EffectsRT;
-}
-
 void UPocketCapture::SetCaptureTarget(AActor* InCaptureTarget)
 {
 	CaptureTargetPtr = InCaptureTarget;
 
 	OnCaptureTargetChanged(InCaptureTarget);
-}
-
-void UPocketCapture::SetAlphaMaskedActors(const TArray<AActor*>& InCaptureTargets)
-{
-	AlphaMaskActorPtrs.Reset();
-
-	for (AActor* CaptureTarget : InCaptureTargets)
-	{
-		AlphaMaskActorPtrs.Add(CaptureTarget);
-	}
 }
 
 UPocketCaptureSubsystem* UPocketCapture::GetThumbnailSystem() const
@@ -142,7 +95,7 @@ TArray<UPrimitiveComponent*> UPocketCapture::GatherPrimitivesForCapture(const TA
 
 		for (UPrimitiveComponent* ChildPrimitiveComponent : ChildPrimitiveComponents)
 		{
-			if (!ChildPrimitiveComponent->bHiddenInGame)
+			if (ChildPrimitiveComponent->bHiddenInGame == false)
 			{
 				PrimitiveComponents.Add(ChildPrimitiveComponent);
 			}
@@ -162,29 +115,11 @@ bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const 
 		if (InCaptureActors.Num() > 0)
 		{
 			TArray<UPrimitiveComponent*> PrimitiveComponents = GatherPrimitivesForCapture(InCaptureActors);
-			
 			GetThumbnailSystem()->StreamThisFrame(PrimitiveComponents);
-
-			TArray<UMaterialInterface*> OriginalMaterials;
-			if (OverrideMaterial)
-			{
-				for (UPrimitiveComponent* PrimitiveComponent : PrimitiveComponents)
-				{
-					const int32 MaterialCount = PrimitiveComponent->GetNumMaterials();
-					for (int32 MaterialIndex = 0; MaterialIndex < MaterialCount; MaterialIndex++)
-					{
-						OriginalMaterials.Add(PrimitiveComponent->GetMaterial(MaterialIndex));
-
-						PrimitiveComponent->SetMaterial(MaterialIndex, OverrideMaterial);
-					}
-				}
-			}
 
 			UCameraComponent* Camera = CaptureTarget->FindComponentByClass<UCameraComponent>();
 			if (ensure(Camera))
 			{
-				CaptureComponent->ShowOnlyActors = InCaptureActors;
-
 				FMinimalViewInfo CaptureView;
 				Camera->GetCameraView(0, CaptureView);
 
@@ -192,14 +127,19 @@ bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const 
 				CaptureComponent->PostProcessSettings = Camera->PostProcessSettings;
 				CaptureComponent->SetCameraView(CaptureView);
 
+				CaptureComponent->ShowFlags.SetMotionBlur(false);			// Check
+				CaptureComponent->ShowFlags.SetEyeAdaptation(true);			// Check
+				CaptureComponent->ShowFlags.SetTemporalAA(true);			// Check
+				CaptureComponent->ShowFlags.SetPostProcessMaterial(true);	// Check
+				CaptureComponent->ShowFlags.SetFog(false);					// Check
+				CaptureComponent->ShowFlags.SetSkyLighting(true);			// Check
+				
 				CaptureComponent->ShowFlags.SetDepthOfField(false);
-				CaptureComponent->ShowFlags.SetMotionBlur(true); // Check
 				CaptureComponent->ShowFlags.SetScreenPercentage(false);
 				CaptureComponent->ShowFlags.SetScreenSpaceReflections(false);
 				CaptureComponent->ShowFlags.SetDistanceFieldAO(false);
 				CaptureComponent->ShowFlags.SetLensFlares(false);
 				CaptureComponent->ShowFlags.SetOnScreenDebug(false);
-				CaptureComponent->ShowFlags.SetEyeAdaptation(true); // Check
 				CaptureComponent->ShowFlags.SetColorGrading(false);
 				CaptureComponent->ShowFlags.SetCameraImperfections(false);
 				CaptureComponent->ShowFlags.SetVignette(false);
@@ -207,36 +147,18 @@ bool UPocketCapture::CaptureScene(UTextureRenderTarget2D* InRenderTarget, const 
 				CaptureComponent->ShowFlags.SetSeparateTranslucency(false);
 				CaptureComponent->ShowFlags.SetScreenPercentage(false);
 				CaptureComponent->ShowFlags.SetScreenSpaceReflections(false);
-				CaptureComponent->ShowFlags.SetTemporalAA(false);
 				CaptureComponent->ShowFlags.SetAmbientOcclusion(false);
 				CaptureComponent->ShowFlags.SetIndirectLightingCache(false);
 				CaptureComponent->ShowFlags.SetLightShafts(false);
-				CaptureComponent->ShowFlags.SetPostProcessMaterial(false);
 				CaptureComponent->ShowFlags.SetHighResScreenshotMask(false);
 				CaptureComponent->ShowFlags.SetHMDDistortion(false);
 				CaptureComponent->ShowFlags.SetStereoRendering(false);
-				CaptureComponent->ShowFlags.SetFog(false); // Check
 				CaptureComponent->ShowFlags.SetVolumetricFog(false);
 				CaptureComponent->ShowFlags.SetVolumetricLightmap(false);
-				CaptureComponent->ShowFlags.SetSkyLighting(true); // Check
 				
 				CaptureComponent->CaptureSource = InCaptureSource;
 				CaptureComponent->ProfilingEventName = TEXT("Pocket Capture");
 				CaptureComponent->CaptureScene();
-
-				if (OriginalMaterials.Num() > 0)
-				{
-					int32 TotalMaterialIndex = 0;
-					for (UPrimitiveComponent* PrimitiveComponent : PrimitiveComponents)
-					{
-						const int32 MaterialCount = PrimitiveComponent->GetNumMaterials();
-						for (int32 MaterialIndex = 0; MaterialIndex < MaterialCount; MaterialIndex++)
-						{
-							PrimitiveComponent->SetMaterial(MaterialIndex, OriginalMaterials[TotalMaterialIndex]);
-							TotalMaterialIndex++;
-						}
-					}
-				}
 
 				return true;
 			}
@@ -257,34 +179,7 @@ void UPocketCapture::CaptureDiffuse()
 			CaptureActors.Add(CaptureTarget);
 		}
 
-		CaptureScene(RenderTarget, CaptureActors, ESceneCaptureSource::SCS_FinalColorLDR, nullptr);
-	}
-}
-
-void UPocketCapture::CaptureAlphaMask()
-{
-	if (UTextureRenderTarget2D* RenderTarget = GetOrCreateAlphaMaskRenderTarget())
-	{
-		TArray<AActor*> CaptureActors;
-		for (const TWeakObjectPtr<AActor>& AlphaMaskTargetPtr : AlphaMaskActorPtrs)
-		{
-			if (AActor* AlphaMaskTarget = AlphaMaskTargetPtr.Get())
-			{
-				CaptureActors.Add(AlphaMaskTarget);
-			}
-		}
-
-		CaptureScene(RenderTarget, CaptureActors, ESceneCaptureSource::SCS_SceneColorHDR, AlphaMaskMaterial);
-	}
-}
-
-void UPocketCapture::CaptureEffects()
-{
-	if (UTextureRenderTarget2D* RenderTarget = GetOrCreateEffectsRenderTarget())
-	{
-		ensure(false);//TODO
-		TArray<AActor*> CaptureActors;
-		CaptureScene(RenderTarget, CaptureActors, ESceneCaptureSource::SCS_SceneColorHDR, EffectMaskMaterial);
+		CaptureScene(RenderTarget, CaptureActors, ESceneCaptureSource::SCS_FinalToneCurveHDR, nullptr);
 	}
 }
 
@@ -294,18 +189,6 @@ void UPocketCapture::ReleaseResources()
 	{
 		DiffuseRT->ReleaseResource();
 	}
-
-	if (AlphaMaskRT)
-	{
-		AlphaMaskRT->ReleaseResource();
-	}
-
-	if (EffectsRT)
-	{
-		EffectsRT->ReleaseResource();
-	}
-
-	//OnReleaseResources();
 }
 
 void UPocketCapture::ReclaimResources()
@@ -314,21 +197,4 @@ void UPocketCapture::ReclaimResources()
 	{
 		DiffuseRT->UpdateResource();
 	}
-
-	if (AlphaMaskRT)
-	{
-		AlphaMaskRT->UpdateResource();
-	}
-
-	if (EffectsRT)
-	{
-		EffectsRT->UpdateResource();
-	}
-
-	//OnReclaimResources();
-}
-
-int32 UPocketCapture::GetRendererIndex() const
-{
-	return RendererIndex;
 }
