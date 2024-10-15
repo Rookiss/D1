@@ -2,6 +2,7 @@
 
 #include "D1AOEBase.generated.h"
 
+class ULyraCameraMode;
 class USphereComponent;
 class UArrowComponent;
 
@@ -28,18 +29,24 @@ protected:
 	TObjectPtr<USphereComponent> SphereComponent;
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, Category="AOE")
+	UPROPERTY(EditDefaultsOnly, Category="D1|AOE")
 	TSubclassOf<AActor> AOEElementClass;
 
-	UPROPERTY(EditDefaultsOnly, Category="AOE")
+	UPROPERTY(EditDefaultsOnly, Category="D1|AOE")
 	float StartDelay = 2.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category="AOE")
+	UPROPERTY(EditDefaultsOnly, Category="D1|AOE")
 	float AttackTotalTime = 10.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category="AOE")
+	UPROPERTY(EditDefaultsOnly, Category="D1|AOE")
 	int32 TargetAttackCount = 5;
 
+	UPROPERTY(EditDefaultsOnly, Category="D1|AOE")
+	TSubclassOf<ULyraCameraMode> StartCameraModeClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="D1|AOE")
+	TSubclassOf<ULyraCameraMode> TickCameraModeClass;
+	
 private:
 	int32 CurrentAttackCount = 0;
 	float AttackIntervalTime = 0.f;

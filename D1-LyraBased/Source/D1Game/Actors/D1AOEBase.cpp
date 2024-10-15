@@ -1,5 +1,6 @@
 ﻿#include "D1AOEBase.h"
 
+#include "Character/LyraCharacter.h"
 #include "Components/ArrowComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -37,33 +38,38 @@ void AD1AOEBase::BeginPlay()
 
 void AD1AOEBase::BeginAOE()
 {
-	if (HasAuthority())
-	{
-		GetWorld()->GetTimerManager().SetTimer(AOETimerHandle, this, &ThisClass::TickAOE, AttackIntervalTime, true, StartDelay);
-	}
+	// TODO: Begin CameraShake
+	GetWorld()->GetTimerManager().SetTimer(AOETimerHandle, this, &ThisClass::TickAOE, AttackIntervalTime, true, StartDelay);
 }
 
 void AD1AOEBase::TickAOE()
 {
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.Owner = GetOwner();
-	SpawnParameters.Instigator = Cast<APawn>(GetOwner());
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	FVector SphereLocation = SphereComponent->GetComponentLocation();
-	float SphereRadius = SphereComponent->GetScaledSphereRadius();
-
-	FVector RandDir = FMath::VRand();
-	RandDir.Z = 0.f;
-	RandDir = RandDir.GetSafeNormal();
-	
-	FVector SpawnLocation = SphereLocation + (RandDir * FMath::RandRange(0.f, SphereRadius));
-	GetWorld()->SpawnActor<AActor>(AOEElementClass, SpawnLocation, FRotator::ZeroRotator, SpawnParameters);
-	CurrentAttackCount++;
-	
-	if (CurrentAttackCount == TargetAttackCount)
+	if (HasAuthority())
 	{
-		GetWorld()->GetTimerManager().ClearTimer(AOETimerHandle);
-		Destroy();
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = GetOwner();
+		SpawnParameters.Instigator = Cast<APawn>(GetOwner());
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		FVector SphereLocation = SphereComponent->GetComponentLocation();
+		float SphereRadius = SphereComponent->GetScaledSphereRadius();
+
+		FVector RandDir = FMath::VRand();
+		RandDir.Z = 0.f;
+		RandDir = RandDir.GetSafeNormal();
+	
+		FVector SpawnLocation = SphereLocation + (RandDir * FMath::RandRange(0.f, SphereRadius));
+		GetWorld()->SpawnActor<AActor>(AOEElementClass, SpawnLocation, FRotator::ZeroRotator, SpawnParameters);
+		CurrentAttackCount++;
+	
+		if (CurrentAttackCount == TargetAttackCount)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(AOETimerHandle);
+			Destroy();
+		}
+	}
+	else
+	{
+		// TODO: Tick CameraShake
 	}
 }
