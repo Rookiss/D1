@@ -3,7 +3,6 @@
 #include "Character/LyraCharacter.h"
 #include "Components/ArrowComponent.h"
 #include "Components/SphereComponent.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Player/LyraPlayerController.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AOEBase)

@@ -43,7 +43,7 @@ void UD1GameplayAbility_Weapon_Bow_Shoot::SpawnProjectile()
 				FHitResult HitResult;
 				TArray<AActor*> ActorsToIgnore = { LyraCharacter, WeaponActor };
 
-				bool bHit = UKismetSystemLibrary::LineTraceSingle(GetWorld(), StartLocation, EndLocation, UEngineTypes::ConvertToTraceType(D1_TraceChannel_AimAssist), false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true);
+				bool bHit = UKismetSystemLibrary::LineTraceSingle(GetWorld(), StartLocation, EndLocation, UEngineTypes::ConvertToTraceType(D1_TraceChannel_AimAssist), false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResult, true);
 				SocketRotation = bHit ? (HitResult.ImpactPoint - SocketLocation).Rotation() : (EndLocation - SocketLocation).Rotation();
 				
 				SpawnTransform.SetLocation(SocketLocation);
