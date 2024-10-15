@@ -4,6 +4,7 @@
 #include "Components/ArrowComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Player/LyraPlayerController.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1AOEBase)
 
@@ -33,12 +34,11 @@ void AD1AOEBase::BeginPlay()
 		return;
 	}
 	
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::BeginAOE);
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::StartAOE);
 }
 
-void AD1AOEBase::BeginAOE()
+void AD1AOEBase::StartAOE()
 {
-	// TODO: Begin CameraShake
 	GetWorld()->GetTimerManager().SetTimer(AOETimerHandle, this, &ThisClass::TickAOE, AttackIntervalTime, true, StartDelay);
 }
 
@@ -70,6 +70,18 @@ void AD1AOEBase::TickAOE()
 	}
 	else
 	{
-		// TODO: Tick CameraShake
+		if (CameraShakeClass)
+		{
+			if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetOwner()))
+			{
+				if (ALyraPlayerController* LyraPlayerController = LyraCharacter->GetLyraPlayerController())
+				{
+					if (LyraPlayerController->IsLocalController())
+					{
+						LyraPlayerController->ClientStartCameraShake(CameraShakeClass);
+					}
+				}
+			}
+		}
 	}
 }

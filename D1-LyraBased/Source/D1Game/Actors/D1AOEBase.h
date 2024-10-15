@@ -2,7 +2,7 @@
 
 #include "D1AOEBase.generated.h"
 
-class ULyraCameraMode;
+class ULegacyCameraShake;
 class USphereComponent;
 class UArrowComponent;
 
@@ -18,7 +18,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	void BeginAOE();
+	void StartAOE();
 	void TickAOE();
 
 protected:
@@ -40,12 +40,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category="D1|AOE")
 	int32 TargetAttackCount = 5;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category="D1|AOE")
-	TSubclassOf<ULyraCameraMode> StartCameraModeClass;
-
-	UPROPERTY(EditDefaultsOnly, Category="D1|AOE")
-	TSubclassOf<ULyraCameraMode> TickCameraModeClass;
+	TSubclassOf<UCameraShakeBase> CameraShakeClass;
 	
 private:
 	int32 CurrentAttackCount = 0;
