@@ -1,18 +1,18 @@
-﻿#include "D1GameplayAbility_Weapon_Target.h"
+﻿#include "D1GameplayAbility_Skill_Targeting.h"
 
 #include "AbilitySystemComponent.h"
 #include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_Target)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Skill_Targeting)
 
-UD1GameplayAbility_Weapon_Target::UD1GameplayAbility_Weapon_Target(const FObjectInitializer& ObjectInitializer)
+UD1GameplayAbility_Skill_Targeting::UD1GameplayAbility_Skill_Targeting(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1GameplayAbility_Weapon_Target::ApplyTarget()
+void UD1GameplayAbility_Skill_Targeting::ApplyTarget()
 {
 	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
 	if (SourceASC == nullptr)

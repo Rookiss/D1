@@ -79,7 +79,7 @@ struct TStructOpsTypeTraits<FD1InventoryList> : public TStructOpsTypeTraitsBase2
 	};
 };
 
-UCLASS(BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent))
+UCLASS(BlueprintType, meta=(BlueprintSpawnableComponent))
 class UD1InventoryManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -94,7 +94,6 @@ protected:
 	virtual void ReadyForReplication() override;
 	
 public:
-	// TODO: 통합 정리 필요함
 	int32 CanMoveOrMergeItem(UD1InventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, const FIntPoint& ToItemSlotPos) const;
 	int32 CanMoveOrMergeItem(UD1EquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, const FIntPoint& ToItemSlotPos) const;
 

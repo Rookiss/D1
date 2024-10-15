@@ -1,26 +1,25 @@
-﻿#include "D1GameplayAbility_Weapon_GroundBreaker.h"
+﻿#include "D1GameplayAbility_Skill_GroundBreaker.h"
 
 #include "D1GameplayTags.h"
-#include "D1LogChannels.h"
 #include "Character/LyraCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_GroundBreaker)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Skill_GroundBreaker)
 
-UD1GameplayAbility_Weapon_GroundBreaker::UD1GameplayAbility_Weapon_GroundBreaker(const FObjectInitializer& ObjectInitializer)
+UD1GameplayAbility_Skill_GroundBreaker::UD1GameplayAbility_Skill_GroundBreaker(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1GameplayAbility_Weapon_GroundBreaker::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UD1GameplayAbility_Skill_GroundBreaker::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UD1GameplayAbility_Weapon_GroundBreaker::Execute()
+void UD1GameplayAbility_Skill_GroundBreaker::Execute()
 {
 	if (HasAuthority(&CurrentActivationInfo) == false)
 		return;

@@ -3,7 +3,6 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
-#include "AbilitySystem/Abilities/D1GameplayAbility_Weapon.h"
 #include "Character/LyraPawnExtensionComponent.h"
 #include "Components/HorizontalBox.h"
 #include "Components/Image.h"

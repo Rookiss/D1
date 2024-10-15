@@ -107,7 +107,7 @@ struct TStructOpsTypeTraits<FD1EquipList> : public TStructOpsTypeTraitsBase2<FD1
 	};
 };
 
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, meta=(BlueprintSpawnableComponent))
 class UD1EquipManagerComponent : public UPawnComponent
 {
 	GENERATED_BODY()

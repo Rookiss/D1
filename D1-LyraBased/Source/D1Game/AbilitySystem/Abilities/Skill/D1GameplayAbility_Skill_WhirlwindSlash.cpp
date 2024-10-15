@@ -1,18 +1,18 @@
-﻿#include "D1GameplayAbility_Weapon_WhirlwindSlash.h"
+﻿#include "D1GameplayAbility_Skill_WhirlwindSlash.h"
 
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Character/LyraCharacter.h"
 #include "System/LyraGameData.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_WhirlwindSlash)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Skill_WhirlwindSlash)
 
-UD1GameplayAbility_Weapon_WhirlwindSlash::UD1GameplayAbility_Weapon_WhirlwindSlash(const FObjectInitializer& ObjectInitializer)
+UD1GameplayAbility_Skill_WhirlwindSlash::UD1GameplayAbility_Skill_WhirlwindSlash(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1GameplayAbility_Weapon_WhirlwindSlash::OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InTargetDataHandle)
+void UD1GameplayAbility_Skill_WhirlwindSlash::OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InTargetDataHandle)
 {
 	ULyraAbilitySystemComponent* SourceASC = GetLyraAbilitySystemComponentFromActorInfo();
 	check(SourceASC);

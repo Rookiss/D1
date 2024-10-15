@@ -1,18 +1,18 @@
-﻿#include "D1GameplayAbility_Weapon_AOE.h"
+﻿#include "D1GameplayAbility_Skill_AOE.h"
 
 #include "Actors/D1AOEBase.h"
 #include "Character/LyraCharacter.h"
 #include "System/LyraGameData.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_AOE)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Skill_AOE)
 
-UD1GameplayAbility_Weapon_AOE::UD1GameplayAbility_Weapon_AOE(const FObjectInitializer& ObjectInitializer)
+UD1GameplayAbility_Skill_AOE::UD1GameplayAbility_Skill_AOE(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1GameplayAbility_Weapon_AOE::SpawnAOE()
+void UD1GameplayAbility_Skill_AOE::SpawnAOE()
 {
 	if (TargetDataHandle.Data.IsValidIndex(0))
 	{

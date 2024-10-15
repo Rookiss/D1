@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "D1GameplayAbility_Weapon.h"
+#include "AbilitySystem/Abilities/Weapon/D1GameplayAbility_Weapon.h"
 #include "D1GameplayAbility_Utility_Drink.generated.h"
 
 UCLASS()

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "D1Define.h"
-#include "LyraGameplayAbility.h"
+#include "AbilitySystem/Abilities/LyraGameplayAbility.h"
 #include "Character/LyraCharacter.h"
 #include "D1GameplayAbility_Weapon.generated.h"
 
@@ -20,24 +20,27 @@ protected:
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const override;
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintPure, meta=(GameplayTagFilter = "SetByCaller"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, meta=(GameplayTagFilter="SetByCaller"))
 	int32 GetWeaponStatValue(FGameplayTag StatTag) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetAttackRate() const;
 	
 protected:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Weapon")
 	EWeaponHandType WeaponHandType = EWeaponHandType::Count;
-
-	UPROPERTY(EditDefaultsOnly)
+	
+	UPROPERTY(EditDefaultsOnly, Category="D1|Weapon")
 	bool bShouldCheckWeaponType = true;
 	
-	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bShouldCheckWeaponType", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category="D1|Weapon", meta=(EditCondition="bShouldCheckWeaponType", EditConditionHides))
 	EWeaponType RequiredWeaponType = EWeaponType::Count;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Weapon")
 	float DefaultAttackRate = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="D1|Weapon")
+	TSubclassOf<ULyraCameraMode> CameraModeClass;
 	
 protected:
 	UPROPERTY(BlueprintReadOnly)

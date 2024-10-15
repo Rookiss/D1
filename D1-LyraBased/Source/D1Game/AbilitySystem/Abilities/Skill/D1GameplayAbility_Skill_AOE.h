@@ -1,22 +1,23 @@
 ﻿#pragma once
 
-#include "D1GameplayAbility_Weapon.h"
-#include "D1GameplayAbility_Weapon_Target.generated.h"
+#include "Abilities/GameplayAbilityWorldReticle.h"
+#include "AbilitySystem/Abilities/Weapon/D1GameplayAbility_Weapon.h"
+#include "D1GameplayAbility_Skill_AOE.generated.h"
 
-class AGameplayAbilityWorldReticle;
+class AD1ProjectileBase;
 
 UCLASS()
-class UD1GameplayAbility_Weapon_Target : public UD1GameplayAbility_Weapon
+class UD1GameplayAbility_Skill_AOE : public UD1GameplayAbility_Weapon
 {
 	GENERATED_BODY()
 	
 public:
-	UD1GameplayAbility_Weapon_Target(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UD1GameplayAbility_Skill_AOE(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	void ApplyTarget();
-	
+	void SpawnAOE();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell", meta=(Categories="GameplayCue"))
 	FGameplayTag CastGameplayCueTag;
@@ -29,13 +30,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell")
 	UAnimMontage* SpellMontage = nullptr;
-
-protected:
-	UPROPERTY(EditDefaultsOnly, meta=(Categories="GameplayCue"))
-	FGameplayTag BurstGameplayCueTag;
 	
-	UPROPERTY(EditDefaultsOnly)
-	TArray<TSubclassOf<UGameplayEffect>> GameplayEffectClasses;
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell Type", DisplayName="AOE Reticle Class")
+	TSubclassOf<AGameplayAbilityWorldReticle> AOEReticleClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Spell Type", DisplayName="AOE Spawner Class")
+	TSubclassOf<AActor> AOESpawnerClass;
 
 private:
 	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess="true"))

@@ -1,16 +1,16 @@
-﻿#include "D1GameplayAbility_Weapon_Buff.h"
+﻿#include "D1GameplayAbility_Skill_Buff.h"
 
 #include "NiagaraSystem.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_Buff)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Skill_Buff)
 
-UD1GameplayAbility_Weapon_Buff::UD1GameplayAbility_Weapon_Buff(const FObjectInitializer& ObjectInitializer)
+UD1GameplayAbility_Skill_Buff::UD1GameplayAbility_Skill_Buff(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1GameplayAbility_Weapon_Buff::ApplyEffect()
+void UD1GameplayAbility_Skill_Buff::ApplyEffect()
 {
 	if (BuffGameplayEffectClass == nullptr)
 		return;
@@ -28,7 +28,7 @@ void UD1GameplayAbility_Weapon_Buff::ApplyEffect()
 	ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle);
 }
 
-void UD1GameplayAbility_Weapon_Buff::AdditionalEffects_Implementation()
+void UD1GameplayAbility_Skill_Buff::AdditionalEffects_Implementation()
 {
 	
 }
