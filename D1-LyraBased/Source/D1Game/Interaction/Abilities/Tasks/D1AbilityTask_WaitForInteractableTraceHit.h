@@ -49,7 +49,7 @@ private:
 	UPROPERTY()
 	FGameplayAbilityTargetingLocationInfo StartLocation;
 
-	ECollisionChannel TraceChannel;
+	ECollisionChannel TraceChannel = ECC_Visibility;
 	float InteractionTraceRange = 100.f;
 	float InteractionTraceRate = 0.1f;
 	bool bShowDebug = false;

@@ -75,14 +75,14 @@ void UD1AnimNotifyState_PerformTrace::NotifyEnd(USkeletalMeshComponent* MeshComp
 
 void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshComponent)
 {
-	const FTransform& CurrentSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceParams.TraceSocketName);
+	FTransform CurrentSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceParams.TraceSocketName);
 	float Distance = (PreviousSocketTransform.GetLocation() - CurrentSocketTransform.GetLocation()).Length();
 		
 	int SubStepCount = FMath::CeilToInt(Distance / TraceParams.TargetDistance);
 	if (SubStepCount <= 0)
 		return;
 	
-	const float SubstepRatio = 1.f / SubStepCount;
+	float SubstepRatio = 1.f / SubStepCount;
 
 	const FTransform& CurrentTraceTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
 	const FTransform& CurrentDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
@@ -91,9 +91,9 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 	
 	for (int32 i = 0; i < SubStepCount; i++)
 	{
-		const FTransform& StartTraceTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
-		const FTransform& EndTraceTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
-		const FTransform& AverageTraceTransform = UKismetMathLibrary::TLerp(StartTraceTransform, EndTraceTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
+		FTransform StartTraceTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
+		FTransform EndTraceTransform = UKismetMathLibrary::TLerp(PreviousTraceTransform, CurrentTraceTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
+		FTransform AverageTraceTransform = UKismetMathLibrary::TLerp(StartTraceTransform, EndTraceTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
 
 		FComponentQueryParams Params = FComponentQueryParams::DefaultComponentQueryParams;
 		Params.bReturnPhysicalMaterial = true;
@@ -122,9 +122,9 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 			{
 				FColor Color = (HitResults.Num() > 0) ? TraceDebugParams.HitColor : TraceDebugParams.TraceColor;
 			
-				const FTransform& StartDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
-				const FTransform& EndDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
-				const FTransform& AverageDebugTransform = UKismetMathLibrary::TLerp(StartDebugTransform, EndDebugTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
+				FTransform StartDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * i, ELerpInterpolationMode::DualQuatInterp);
+				FTransform EndDebugTransform = UKismetMathLibrary::TLerp(PreviousDebugTransform, CurrentDebugTransform, SubstepRatio * (i + 1), ELerpInterpolationMode::DualQuatInterp);
+				FTransform AverageDebugTransform = UKismetMathLibrary::TLerp(StartDebugTransform, EndDebugTransform, 0.5f, ELerpInterpolationMode::DualQuatInterp);
 			
 				DrawDebugSweptBox(MeshComponent->GetWorld(), StartDebugTransform.GetLocation(), EndDebugTransform.GetLocation(), AverageDebugTransform.GetRotation().Rotator(), WeaponActor->TraceDebugCollision->GetScaledBoxExtent(), Color, false, 2.f);
 			}
