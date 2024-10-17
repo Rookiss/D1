@@ -751,13 +751,15 @@ bool ALyraCharacter::CanInteraction(const FD1InteractionQuery& InteractionQuery)
 {
 	if (HealthComponent)
 	{
-		return HealthComponent->IsDeadOrDying();
+		return HealthComponent->GetDeathState() == ELyraDeathState::DeathFinished;
 	}
 	return false;
 }
 
 void ALyraCharacter::GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const
 {
+	OutMeshComponents.Add(GetMesh());
+	
 	if (UD1CosmeticManagerComponent* CosmeticManager = GetComponentByClass<UD1CosmeticManagerComponent>())
 	{
 		CosmeticManager->GetMeshComponents(OutMeshComponents);

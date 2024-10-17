@@ -135,7 +135,7 @@ bool AD1AOEElementBase::PerformTrace(const FVector& StartLocation, const FVector
 	return UKismetSystemLibrary::SphereTraceMultiByProfile(GetWorld(),
 		StartLocation + FVector(0.f, 0.f, CollisionComponent->GetScaledCapsuleHalfHeight()), EndLocation - FVector(0.f, 0.f, CollisionComponent->GetScaledCapsuleHalfHeight()),
 		CollisionComponent->GetScaledCapsuleRadius(), TEXT("Projectile"),
-		false, IgnoredActors, EDrawDebugTrace::ForDuration, OutHitResults, true, FLinearColor::Red, FLinearColor::Green, 5.f
+		false, IgnoredActors, EDrawDebugTrace::None, OutHitResults, true, FLinearColor::Red, FLinearColor::Green, 5.f
 	);
 }
 
