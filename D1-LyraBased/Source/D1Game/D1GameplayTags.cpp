@@ -122,6 +122,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Knockback,							"GameplayEvent.Knockback");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Stun,								"GameplayEvent.Stun");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Bow_ADS,							"GameplayEvent.Bow.ADS");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_HitReact,							"GameplayEvent.HitReact");
 	
 	// Cheat
 	UE_DEFINE_GAMEPLAY_TAG(Cheat_GodMode,									"Cheat.GodMode");
@@ -173,7 +174,6 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Skill_Targeting_Burst,		"GameplayCue.Weapon.Skill.Targeting.Burst");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Skill_Targeting_Loop,			"GameplayCue.Weapon.Skill.Targeting.Loop");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Overlay,						"GameplayCue.Weapon.Overlay");
-	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_HitReact,							"GameplayCue.HitReact");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Loop,							"GameplayCue.Statue.Loop");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Success,						"GameplayCue.Statue.Success");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Statue_Fail,							"GameplayCue.Statue.Fail");

@@ -65,7 +65,8 @@ public:
 private:
 	UPROPERTY()
 	TArray<FD1GameplayTagStack> Stacks;
-	
+
+	UPROPERTY(NotReplicated)
 	TMap<FGameplayTag, int32> TagToCountMap;
 };
 
