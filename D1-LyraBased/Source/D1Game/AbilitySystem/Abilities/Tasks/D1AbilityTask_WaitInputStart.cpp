@@ -7,7 +7,7 @@
 UD1AbilityTask_WaitInputStart::UD1AbilityTask_WaitInputStart(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	StartTime = 0.f;
+	
 }
 
 UD1AbilityTask_WaitInputStart* UD1AbilityTask_WaitInputStart::WaitInputStart(UGameplayAbility* OwningAbility)
@@ -18,8 +18,6 @@ UD1AbilityTask_WaitInputStart* UD1AbilityTask_WaitInputStart::WaitInputStart(UGa
 
 void UD1AbilityTask_WaitInputStart::Activate()
 {
-	StartTime = GetWorld()->GetTimeSeconds();
-
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC && Ability)
 	{
@@ -36,8 +34,6 @@ void UD1AbilityTask_WaitInputStart::Activate()
 
 void UD1AbilityTask_WaitInputStart::OnStartCallback()
 {
-	float ElapsedTime = GetWorld()->GetTimeSeconds() - StartTime;
-
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (Ability == nullptr || ASC == nullptr)
 		return;
@@ -57,7 +53,7 @@ void UD1AbilityTask_WaitInputStart::OnStartCallback()
 
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
-		OnStart.Broadcast(ElapsedTime);	
+		OnStart.Broadcast();	
 	}
 	EndTask();
 }

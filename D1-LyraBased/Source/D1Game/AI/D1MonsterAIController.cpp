@@ -2,16 +2,33 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
+#include "D1LogChannels.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Navigation/CrowdFollowingComponent.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
 #include "Player/LyraPlayerState.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1MonsterAIController)
 
 AD1MonsterAIController::AD1MonsterAIController(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>("PathFollowingComponent"))
 {
     bWantsPlayerState = true;
 	bStopAILogicOnUnposses = false;
+
+	AISenseConfigSight = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AISenseConfigSight"));
+	AISenseConfigSight->SightRadius = 3000.f;
+	AISenseConfigSight->LoseSightRadius = 3500.f;
+	AISenseConfigSight->PeripheralVisionAngleDegrees = 60.f;
+	AISenseConfigSight->DetectionByAffiliation.bDetectEnemies = true;
+	AISenseConfigSight->DetectionByAffiliation.bDetectFriendlies = false;
+	AISenseConfigSight->DetectionByAffiliation.bDetectNeutrals = false;
+
+	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+	AIPerceptionComponent->ConfigureSense(*AISenseConfigSight);
+	AIPerceptionComponent->SetDominantSense(UAISense_Sight::StaticClass());
+	AIPerceptionComponent->OnTargetPerceptionUpdated.AddUniqueDynamic(this, &ThisClass::OnTargetPerceptionUpdated);
 }
 
 void AD1MonsterAIController::InitPlayerState()
@@ -19,6 +36,14 @@ void AD1MonsterAIController::InitPlayerState()
 	Super::InitPlayerState();
 
 	BroadcastOnPlayerStateChanged();
+
+	if (HasAuthority())
+	{
+		if (ALyraPlayerState* LyraPS = Cast<ALyraPlayerState>(PlayerState))
+		{
+			LyraPS->SetGenericTeamId(IntegerToGenericTeamId(1));
+		}
+	}
 }
 
 void AD1MonsterAIController::CleanupPlayerState()
@@ -58,7 +83,7 @@ void AD1MonsterAIController::OnUnPossess()
 
 void AD1MonsterAIController::SetGenericTeamId(const FGenericTeamId& NewTeamID)
 {
-	
+	UE_LOG(LogD1Team, Error, TEXT("You can't set the team ID on a ai controller (%s); it's driven by the associated player state"), *GetPathNameSafe(this));
 }
 
 FGenericTeamId AD1MonsterAIController::GetGenericTeamId() const
@@ -87,6 +112,17 @@ ETeamAttitude::Type AD1MonsterAIController::GetTeamAttitudeTowards(const AActor&
 	}
 
 	return ETeamAttitude::Neutral;
+}
+
+void AD1MonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+{
+	if (Actor && Stimulus.WasSuccessfullySensed())
+	{
+		if (UBlackboardComponent* BlackboardComponent = GetBlackboardComponent())
+		{
+			BlackboardComponent->SetValueAsObject(FName("TargetActor"), Actor);
+		}
+	}
 }
 
 void AD1MonsterAIController::UpdateTeamAttitude(UAIPerceptionComponent* AIPerception)

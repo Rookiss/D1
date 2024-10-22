@@ -1,6 +1,7 @@
 ﻿#include "D1GameplayAbility_Skill_ShieldBash.h"
 
 #include "D1GameplayTags.h"
+#include "D1LogChannels.h"
 #include "Abilities/Async/AbilityAsync_WaitGameplayEvent.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
@@ -23,7 +24,7 @@ UD1GameplayAbility_Skill_ShieldBash::UD1GameplayAbility_Skill_ShieldBash(const F
 void UD1GameplayAbility_Skill_ShieldBash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
+	
 	ALyraCharacter* SourceCharacter = GetLyraCharacterFromActorInfo();
 	if (SourceCharacter == nullptr || SourceCharacter->GetCharacterMovement()->IsFalling() || K2_CheckAbilityCooldown() == false || K2_CheckAbilityCost() == false)
 	{
@@ -49,26 +50,26 @@ void UD1GameplayAbility_Skill_ShieldBash::ActivateAbility(const FGameplayAbility
 		PlayMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
 		PlayMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		PlayMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->Activate();
+		PlayMontageTask->ReadyForActivation();
 	}
 
 	if (UAbilityTask_WaitGameplayEvent* WaitGameplayEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, D1GameplayTags::GameplayEvent_Montage_Begin, nullptr, true, true))
 	{
 		WaitGameplayEventTask->EventReceived.AddDynamic(this, &ThisClass::OnMontageBegin);
-		WaitGameplayEventTask->Activate();
+		WaitGameplayEventTask->ReadyForActivation();
 	}
 }
 
 void UD1GameplayAbility_Skill_ShieldBash::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-
 	ClearCameraMode();
 
 	if (ALyraPlayerController* SourcePlayerController = GetLyraPlayerControllerFromActorInfo())
 	{
 		SourcePlayerController->SetIgnoreLookInput(false);
 	}
+	
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UD1GameplayAbility_Skill_ShieldBash::OnMontageFinished()

@@ -14,30 +14,44 @@ public:
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
-protected:
-	UFUNCTION(BlueprintCallable)
-	void OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InTargetDataHandle);
+private:
+	void WaitInputContinue();
+	void WaitInputStop();
 	
-	UFUNCTION(BlueprintCallable)
-	void TryContinueToNextStage();
+private:
+	UFUNCTION()
+	void OnInputReleased(float TimeHeld);
 
+	UFUNCTION()
+	void OnInputStart();
+
+	UFUNCTION()
+	void OnInputCancel();
+
+private:
+	UFUNCTION()
+	void OnTargetDataReady(FGameplayEventData Payload);
+
+	UFUNCTION()
+	void OnMontageFinished();
+	
+	UFUNCTION()
+	void TryContinueToNextStage(FGameplayEventData Payload);
+	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UAnimMontage> AttackMontage;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UAnimMontage> BackwardMontage;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UD1GameplayAbility_Weapon_MeleeCombo> NextAbilityClass;
 
-protected:
-	UPROPERTY(BlueprintReadWrite)
+private:
 	bool bInputPressed = false;
-
-	UPROPERTY(BlueprintReadWrite)
 	bool bInputReleased = false;
-	
+
 private:
 	bool bBlocked = false;
 	FTimerHandle BlockMontageTimerHandle;

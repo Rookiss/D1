@@ -3,7 +3,7 @@
 #include "Abilities/Tasks/AbilityTask.h"
 #include "D1AbilityTask_WaitInputStart.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInputStartDelegate, float, TimeWaited);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInputStartDelegate);
 
 UCLASS()
 class UD1AbilityTask_WaitInputStart : public UAbilityTask
@@ -16,7 +16,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Ability|Tasks", meta=(HidePin="OwningAbility", DefaultToSelf="OwningAbility", BlueprintInternalUseOnly="true"))
 	static UD1AbilityTask_WaitInputStart* WaitInputStart(UGameplayAbility* OwningAbility);
 	
-protected:
+public:
 	virtual void Activate() override;
 	
 public:
@@ -28,6 +28,5 @@ public:
 	FInputStartDelegate OnStart;
 	
 protected:
-	float StartTime;
 	FDelegateHandle DelegateHandle;
 };

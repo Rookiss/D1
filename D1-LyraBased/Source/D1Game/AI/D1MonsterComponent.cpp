@@ -2,7 +2,7 @@
 
 #include "D1GameplayTags.h"
 #include "D1LogChannels.h"
-#include "LyraPawnExtensionComponent.h"
+#include "Character/LyraPawnExtensionComponent.h"
 #include "Components/GameFrameworkComponentManager.h"
 #include "Misc/UObjectToken.h"
 #include "Player/LyraPlayerState.h"

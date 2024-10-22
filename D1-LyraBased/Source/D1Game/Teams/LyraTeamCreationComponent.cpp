@@ -92,7 +92,7 @@ void ULyraTeamCreationComponent::ServerChooseTeamForPlayer(ALyraPlayerState* PS)
 	}
 	else
 	{
-		PS->SetGenericTeamId(0);
+		PS->SetGenericTeamId(IntegerToGenericTeamId(0));
 	}
 }
 

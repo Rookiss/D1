@@ -4,6 +4,8 @@
 #include "Teams/D1TeamAgentInterface.h"
 #include "D1MonsterAIController.generated.h"
 
+class UAISenseConfig_Sight;
+
 UCLASS(Blueprintable)
 class AD1MonsterAIController : public AModularAIController, public ID1TeamAgentInterface
 {
@@ -26,6 +28,9 @@ protected:
 	virtual FOnD1TeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
 	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
 
+	UFUNCTION()
+	virtual void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateTeamAttitude(UAIPerceptionComponent* AIPerception);
@@ -36,6 +41,13 @@ private:
 
 	void BroadcastOnPlayerStateChanged();
 
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAIPerceptionComponent> AIPerceptionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAISenseConfig_Sight> AISenseConfigSight;
+	
 private:
 	UPROPERTY()
 	FOnD1TeamIndexChangedDelegate OnTeamChangedDelegate;
