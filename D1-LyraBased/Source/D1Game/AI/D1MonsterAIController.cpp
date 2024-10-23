@@ -18,8 +18,8 @@ AD1MonsterAIController::AD1MonsterAIController(const FObjectInitializer& ObjectI
 	bStopAILogicOnUnposses = false;
 
 	AISenseConfigSight = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AISenseConfigSight"));
-	AISenseConfigSight->SightRadius = 3000.f;
-	AISenseConfigSight->LoseSightRadius = 3500.f;
+	AISenseConfigSight->SightRadius = 2000.f;
+	AISenseConfigSight->LoseSightRadius = 5000.f;
 	AISenseConfigSight->PeripheralVisionAngleDegrees = 60.f;
 	AISenseConfigSight->DetectionByAffiliation.bDetectEnemies = true;
 	AISenseConfigSight->DetectionByAffiliation.bDetectFriendlies = false;
