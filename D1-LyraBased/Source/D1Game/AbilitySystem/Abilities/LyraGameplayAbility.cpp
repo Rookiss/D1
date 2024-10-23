@@ -325,10 +325,8 @@ void ULyraGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle
 		if (DeveloperSettings->bForceDisableCooldown)
 			return;
 	}
-
-	return;
 	
-	Super::ApplyCooldown(Handle, ActorInfo, ActivationInfo);
+	// Super::ApplyCooldown(Handle, ActorInfo, ActivationInfo);
 }
 
 FGameplayEffectContextHandle ULyraGameplayAbility::MakeEffectContext(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo) const
