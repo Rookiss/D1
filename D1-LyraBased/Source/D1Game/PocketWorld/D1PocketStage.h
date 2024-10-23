@@ -2,6 +2,7 @@
 
 #include "D1PocketStage.generated.h"
 
+class FViewport;
 class UCameraComponent;
 class UPocketCapture;
 
@@ -19,6 +20,9 @@ protected:
 
 public:
 	void RefreshLightingChannelToActors();
+
+private:
+	void RefreshRenderTargetSize(FViewport* InViewport, uint32 InValue);
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -53,4 +57,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> CharacterSpawnPoint;
+
+private:
+	FDelegateHandle ViewportResizedDelegateHandle;
 };

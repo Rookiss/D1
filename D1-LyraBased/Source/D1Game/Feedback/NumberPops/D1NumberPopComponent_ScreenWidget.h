@@ -63,7 +63,7 @@ protected:
 	TSubclassOf<UD1NumberPopWidgetBase> DefaultWidgetClass;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float WidgetLifeSpan = 5.f;
+	float WidgetLifeSpan = 3.f;
 
 protected:
 	int32 DamageNumber = 0;

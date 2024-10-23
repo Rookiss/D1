@@ -30,7 +30,7 @@ AD1PocketStage::AD1PocketStage(const FObjectInitializer& ObjectInitializer)
 void AD1PocketStage::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParameters.Owner = this;
@@ -45,28 +45,16 @@ void AD1PocketStage::BeginPlay()
 	
 	if (UPocketCaptureSubsystem* PocketCaptureSubsystem = GetWorld()->GetSubsystem<UPocketCaptureSubsystem>())
 	{
-		FVector2D RenderTargetSize;
-		
-		FVector2D ViewportSize = FVector2D(1920, 1080);
-		if (GEngine && GEngine->GameViewport && GEngine->GameViewport->Viewport)
-		{
-			ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
-		}
-		
-		const float AspectRatio = ViewportSize.X / ViewportSize.Y;
-		if (AspectRatio < 0.5f)
-		{
-			RenderTargetSize = FVector2D(ViewportSize.X, ViewportSize.X * 2);
-		}
-		else
-		{
-			RenderTargetSize = FVector2D(ViewportSize.Y / 2, ViewportSize.Y);
-		}
-		
 		PocketCapture = PocketCaptureSubsystem->CreateThumbnailRenderer(PocketCaptureClass);
-		PocketCapture->SetRenderTargetSize(RenderTargetSize.X, RenderTargetSize.Y);
 		PocketCapture->SetCaptureTarget(this);
 
+		if (GEngine && GEngine->GameViewport && GEngine->GameViewport->Viewport)
+		{
+			FViewport* Viewport = GEngine->GameViewport->Viewport;
+			RefreshRenderTargetSize(Viewport, 0);
+			ViewportResizedDelegateHandle = Viewport->ViewportResizedEvent.AddUObject(this, &AD1PocketStage::RefreshRenderTargetSize);
+		}
+	
 		RefreshLightingChannelToActors();
 	}
 }
@@ -88,6 +76,16 @@ void AD1PocketStage::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	{
 		SpawnedCharacter->Destroy();
 		SpawnedCharacter = nullptr;
+	}
+
+	if (ViewportResizedDelegateHandle.IsValid())
+	{
+		if (GEngine && GEngine->GameViewport && GEngine->GameViewport->Viewport)
+		{
+			FViewport* Viewport = GEngine->GameViewport->Viewport;
+			Viewport->ViewportResizedEvent.Remove(ViewportResizedDelegateHandle);
+			ViewportResizedDelegateHandle.Reset();
+		}
 	}
 	
 	Super::EndPlay(EndPlayReason);
@@ -125,6 +123,29 @@ void AD1PocketStage::RefreshLightingChannelToActors()
 			}
 		}
 	}
+}
+
+void AD1PocketStage::RefreshRenderTargetSize(FViewport* InViewport, uint32 InValue)
+{
+	FVector2D RenderTargetSize;
+	FVector2D ViewportSize = FVector2D(1920, 1080);
+
+	if (InViewport)
+	{
+		ViewportSize = FVector2D(InViewport->GetSizeXY());
+	}
+
+	const float AspectRatio = ViewportSize.X / ViewportSize.Y;
+	if (AspectRatio < 0.5f)
+	{
+		RenderTargetSize = FVector2D(ViewportSize.X, ViewportSize.X * 2);
+	}
+	else
+	{
+		RenderTargetSize = FVector2D(ViewportSize.Y / 2, ViewportSize.Y);
+	}
+
+	PocketCapture->SetRenderTargetSize(RenderTargetSize.X, RenderTargetSize.Y);
 }
 
 UD1CosmeticManagerComponent* AD1PocketStage::GetCosmeticManager() const

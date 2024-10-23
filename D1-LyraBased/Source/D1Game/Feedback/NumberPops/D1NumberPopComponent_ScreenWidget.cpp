@@ -1,7 +1,7 @@
 ﻿#include "D1NumberPopComponent_ScreenWidget.h"
 
 #include "D1DamagePopStyleScreenWidget.h"
-#include "Blueprint/SlateBlueprintLibrary.h"
+#include "D1LogChannels.h"
 #include "Components/WidgetComponent.h"
 #include "UI/HUD/D1NumberPopWidgetBase.h"
 
@@ -91,7 +91,6 @@ void UD1NumberPopComponent_ScreenWidget::ReleaseNextWidgets()
 		}
 		else
 		{
-			// 시간에 따라 정렬되어 있어서 더 이상 찾아볼 필요가 없음
 			break;
 		}
 	}
