@@ -264,7 +264,7 @@ void ULyraGameplayAbility::ApplyCost(const FGameplayAbilitySpecHandle Handle, co
 {
 	if (GIsEditor == false || GetDefault<UD1DeveloperSettings>()->bForceDisableCost == false)
 	{
-		Super::ApplyCost(Handle, ActorInfo, ActivationInfo);
+		// Super::ApplyCost(Handle, ActorInfo, ActivationInfo);
 	}
 	
 	check(ActorInfo);
@@ -325,6 +325,8 @@ void ULyraGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle
 		if (DeveloperSettings->bForceDisableCooldown)
 			return;
 	}
+
+	return;
 	
 	Super::ApplyCooldown(Handle, ActorInfo, ActivationInfo);
 }
