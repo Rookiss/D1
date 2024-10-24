@@ -19,7 +19,8 @@ protected:
 	virtual void CleanupPlayerState() override;
 	virtual void OnRep_PlayerState() override;
 	virtual void OnPlayerStateChanged();
-	
+
+	virtual void BeginPlay() override;
 	virtual void OnUnPossess() override;
 	
 	virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
@@ -42,12 +43,16 @@ private:
 	void BroadcastOnPlayerStateChanged();
 
 protected:
+	UPROPERTY(EditDefaultsOnly, Category="D1|AI Controller")
+	float CrowdCollisionQueryRange = 600.f;
+	
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAIPerceptionComponent> AIPerceptionComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAISenseConfig_Sight> AISenseConfigSight;
-	
+
 private:
 	UPROPERTY()
 	FOnD1TeamIndexChangedDelegate OnTeamChangedDelegate;

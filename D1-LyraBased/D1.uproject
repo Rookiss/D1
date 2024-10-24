@@ -374,14 +374,6 @@
 			"Enabled": true
 		},
 		{
-			"Name": "LyraExampleContent",
-			"Enabled": false
-		},
-		{
-			"Name": "LyraExtTool",
-			"Enabled": false
-		},
-		{
 			"Name": "WaveformEditor",
 			"Enabled": true
 		},

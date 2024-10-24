@@ -18,8 +18,8 @@ AD1MonsterAIController::AD1MonsterAIController(const FObjectInitializer& ObjectI
 	bStopAILogicOnUnposses = false;
 
 	AISenseConfigSight = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AISenseConfigSight"));
-	AISenseConfigSight->SightRadius = 2000.f;
-	AISenseConfigSight->LoseSightRadius = 5000.f;
+	AISenseConfigSight->SightRadius = 200.f;
+	AISenseConfigSight->LoseSightRadius = 500.f;
 	AISenseConfigSight->PeripheralVisionAngleDegrees = 60.f;
 	AISenseConfigSight->DetectionByAffiliation.bDetectEnemies = true;
 	AISenseConfigSight->DetectionByAffiliation.bDetectFriendlies = false;
@@ -63,6 +63,20 @@ void AD1MonsterAIController::OnRep_PlayerState()
 void AD1MonsterAIController::OnPlayerStateChanged()
 {
 	
+}
+
+void AD1MonsterAIController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (UCrowdFollowingComponent* CrowdFollowingComponent = Cast<UCrowdFollowingComponent>(GetPathFollowingComponent()))
+	{
+		CrowdFollowingComponent->SetCrowdSimulationState(ECrowdSimulationState::Enabled);
+		CrowdFollowingComponent->SetCrowdAvoidanceQuality(ECrowdAvoidanceQuality::High);
+		CrowdFollowingComponent->SetAvoidanceGroup(1);
+		CrowdFollowingComponent->SetGroupsToAvoid(1);
+		CrowdFollowingComponent->SetCrowdCollisionQueryRange(CrowdCollisionQueryRange);
+	}
 }
 
 void AD1MonsterAIController::OnUnPossess()

@@ -44,7 +44,7 @@ void UD1GameplayAbility_Skill_ShieldBash::ActivateAbility(const FGameplayAbility
 		SourcePlayerController->SetIgnoreLookInput(true);
 	}
 
-	if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ShieldBash"), ShieldBashMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ShieldBashMontage"), ShieldBashMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
 	{
 		PlayMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		PlayMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);

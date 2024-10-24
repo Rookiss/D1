@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "GameplayTagContainer.h"
-#include "AbilitySystem/Abilities/LyraGameplayAbility_Death.h"
+#include "Abilities/GameplayAbilityTypes.h"
 #include "D1AnimNotify_SendGameplayEvent.generated.h"
 
 UCLASS(meta=(DisplayName="Send Gameplay Event"))

@@ -15,6 +15,9 @@ public:
 protected:
 	virtual void Activate() override;
 	virtual void OnDestroy(bool bInOwnerFinished) override;
+
+protected:
+	virtual bool IsSupportedForNetworking() const override { return true; }
 	
 private:
 	void QueryInteractables();
