@@ -114,20 +114,6 @@ FOnD1TeamIndexChangedDelegate* AD1MonsterAIController::GetOnTeamIndexChangedDele
 	return &OnTeamChangedDelegate;
 }
 
-ETeamAttitude::Type AD1MonsterAIController::GetTeamAttitudeTowards(const AActor& Other) const
-{
-	if (const APawn* OtherPawn = Cast<APawn>(&Other))
-	{
-		if (const ID1TeamAgentInterface* TeamAgent = Cast<ID1TeamAgentInterface>(OtherPawn->GetController()))
-		{
-			FGenericTeamId OtherTeamID = TeamAgent->GetGenericTeamId();
-			return OtherTeamID.GetId() != GetGenericTeamId().GetId() ? ETeamAttitude::Hostile : ETeamAttitude::Friendly;
-		}
-	}
-
-	return ETeamAttitude::Neutral;
-}
-
 void AD1MonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 	if (Actor && Stimulus.WasSuccessfullySensed())

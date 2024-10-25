@@ -27,7 +27,6 @@ protected:
 	virtual FGenericTeamId GetGenericTeamId() const override;
 	
 	virtual FOnD1TeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() override;
-	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
 
 	UFUNCTION()
 	virtual void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);

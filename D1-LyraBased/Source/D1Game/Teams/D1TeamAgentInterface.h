@@ -1,10 +1,7 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 
 #include "GenericTeamAgentInterface.h"
 #include "UObject/Object.h"
-
 #include "UObject/WeakObjectPtr.h"
 #include "D1TeamAgentInterface.generated.h"
 
@@ -22,7 +19,6 @@ inline FGenericTeamId IntegerToGenericTeamId(int32 ID)
 	return (ID == INDEX_NONE) ? FGenericTeamId::NoTeam : FGenericTeamId((uint8)ID);
 }
 
-/** Interface for actors which can be associated with teams */
 UINTERFACE(meta=(CannotImplementInterfaceInBlueprint))
 class UD1TeamAgentInterface : public UGenericTeamAgentInterface
 {
@@ -33,7 +29,9 @@ class D1GAME_API ID1TeamAgentInterface : public IGenericTeamAgentInterface
 {
 	GENERATED_IINTERFACE_BODY()
 
+public:
 	virtual FOnD1TeamIndexChangedDelegate* GetOnTeamIndexChangedDelegate() { return nullptr; }
+	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
 
 	static void ConditionalBroadcastTeamChanged(TScriptInterface<ID1TeamAgentInterface> This, FGenericTeamId OldTeamID, FGenericTeamId NewTeamID);
 	
