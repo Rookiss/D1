@@ -17,6 +17,7 @@
 #include "Character/LyraCharacter.h"
 #include "Character/LyraHealthComponent.h"
 #include "Character/LyraPawnExtensionComponent.h"
+#include "Data/D1ItemData.h"
 #include "System/LyraSystemStatics.h"
 #include "Development/D1DeveloperSettings.h"
 #include "Item/D1ItemInstance.h"
@@ -596,5 +597,21 @@ void ULyraCheatManager::DestroyElectricField()
 	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
 	{
 		LyraPC->Server_DestroyElectricField();
+	}
+}
+
+void ULyraCheatManager::ResetCooldown()
+{
+	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
+	{
+		LyraPC->Server_ResetCooldown();
+	}
+}
+
+void ULyraCheatManager::ResetVital()
+{
+	if (ALyraPlayerController* LyraPC = Cast<ALyraPlayerController>(GetOuterAPlayerController()))
+	{
+		LyraPC->Server_ResetVital();
 	}
 }

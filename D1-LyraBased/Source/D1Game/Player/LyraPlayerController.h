@@ -77,6 +77,12 @@ public:
 	
 	UFUNCTION(Server, Reliable)
 	void Server_DestroyElectricField();
+
+	UFUNCTION(Server, Reliable)
+	void Server_ResetCooldown();
+
+	UFUNCTION(Server, Reliable)
+	void Server_ResetVital();
 	
 	//~AActor interface
 	virtual void PreInitializeComponents() override;
@@ -115,7 +121,7 @@ public:
 	//~End of ILyraTeamAgentInterface interface
 
 	FOnPlayerStateChangedDelegate* GetOnPlayerStateChangedDelegate() { return &OnPlayerStateChangedDelegate; }
-	
+
 private:
 	UPROPERTY()
 	FOnD1TeamIndexChangedDelegate OnTeamChangedDelegate;

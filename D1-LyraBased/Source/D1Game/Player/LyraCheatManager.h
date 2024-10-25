@@ -121,6 +121,12 @@ public:
 
 	UFUNCTION(Exec)
 	virtual void DestroyElectricField();
+
+	UFUNCTION(Exec)
+	virtual void ResetCooldown();
+
+	UFUNCTION(Exec)
+	virtual void ResetVital();
 	
 protected:
 	virtual void EnableDebugCamera() override;

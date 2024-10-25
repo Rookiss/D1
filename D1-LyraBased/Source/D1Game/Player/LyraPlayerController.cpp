@@ -25,6 +25,7 @@
 #include "GameMapsSettings.h"
 #include "Actors/D1ElectricField.h"
 #include "Character/LyraCharacter.h"
+#include "Data/D1CheatData.h"
 #include "Item/D1ItemTemplate.h"
 #include "Kismet/GameplayStatics.h"
 #include "System/LyraAssetManager.h"
@@ -386,6 +387,42 @@ void ALyraPlayerController::Server_DestroyElectricField_Implementation()
 	if (AActor* ElectricFieldActor = UGameplayStatics::GetActorOfClass(GetWorld(), AD1ElectricField::StaticClass()))
 	{
 		ElectricFieldActor->Destroy();
+	}
+#endif // #if USING_CHEAT_MANAGER
+}
+
+void ALyraPlayerController::Server_ResetCooldown_Implementation()
+{
+#if USING_CHEAT_MANAGER
+	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetPawn()))
+	{
+		if (UAbilitySystemComponent* ASC = LyraCharacter->GetAbilitySystemComponent())
+		{
+			const UD1CheatData& CheatData = UD1CheatData::Get();
+			if (TSubclassOf<UGameplayEffect> EffectClass = CheatData.GetResetCooldownGameplayEffectClass())
+			{
+				const UGameplayEffect* GameplayEffectCDO = EffectClass->GetDefaultObject<UGameplayEffect>();
+				ASC->ApplyGameplayEffectToSelf(GameplayEffectCDO, 1.0f, ASC->MakeEffectContext());
+			}
+		}
+	}
+#endif // #if USING_CHEAT_MANAGER
+}
+
+void ALyraPlayerController::Server_ResetVital_Implementation()
+{
+#if USING_CHEAT_MANAGER
+	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetPawn()))
+	{
+		if (UAbilitySystemComponent* ASC = LyraCharacter->GetAbilitySystemComponent())
+		{
+			const UD1CheatData& CheatData = UD1CheatData::Get();
+			if (TSubclassOf<UGameplayEffect> EffectClass = CheatData.GetResetVitalGameplayEffectClass())
+			{
+				const UGameplayEffect* GameplayEffectCDO = EffectClass->GetDefaultObject<UGameplayEffect>();
+				ASC->ApplyGameplayEffectToSelf(GameplayEffectCDO, 1.0f, ASC->MakeEffectContext());
+			}
+		}
 	}
 #endif // #if USING_CHEAT_MANAGER
 }
