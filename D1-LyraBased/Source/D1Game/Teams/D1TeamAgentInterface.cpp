@@ -35,7 +35,7 @@ ETeamAttitude::Type ID1TeamAgentInterface::GetTeamAttitudeTowards(const AActor& 
 			const int32 MyTeamID = GenericTeamIdToInteger(GetGenericTeamId());
 			const int32 OtherTeamID = GenericTeamIdToInteger(TeamAgent->GetGenericTeamId());
 			
-			if (MyTeamID != OtherTeamID || MyTeamID == 0 && OtherTeamID == 0)
+			if ((MyTeamID != OtherTeamID) || (MyTeamID == 0 && OtherTeamID == 0))
 			{
 				return ETeamAttitude::Hostile;
 			}
