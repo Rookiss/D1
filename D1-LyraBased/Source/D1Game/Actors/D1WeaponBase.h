@@ -42,6 +42,7 @@ private:
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	int32 GetTemplateID() const { return TemplateID; }
+	EEquipmentSlotType GetEquipmentSlotType() const { return EquipmentSlotType; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UAnimMontage* GetEquipMontage();

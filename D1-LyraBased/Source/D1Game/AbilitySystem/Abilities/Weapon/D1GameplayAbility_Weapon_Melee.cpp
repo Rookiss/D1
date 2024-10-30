@@ -65,7 +65,7 @@ void UD1GameplayAbility_Weapon_Melee::ParseTargetData(const FGameplayAbilityTarg
 	}
 }
 
-void UD1GameplayAbility_Weapon_Melee::ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BackwardMontage)
+void UD1GameplayAbility_Weapon_Melee::ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BackwardMontage, AD1WeaponBase* WeaponActor)
 {
 	ULyraAbilitySystemComponent* SourceASC = GetLyraAbilitySystemComponentFromActorInfo();
 	if (SourceASC == nullptr)
@@ -128,7 +128,7 @@ void UD1GameplayAbility_Weapon_Melee::DrawDebugHitPoint(const FHitResult& HitRes
 		const UD1DeveloperSettings* DeveloperSettings = GetDefault<UD1DeveloperSettings>();
 		if (DeveloperSettings->bForceDisableDebugTrace == false && bShowDebug)
 		{
-			FColor Color = (HasAuthority(&CurrentActivationInfo)) ? FColor::Red : FColor::Green;
+			FColor Color = HasAuthority(&CurrentActivationInfo) ? FColor::Red : FColor::Green;
 			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 4, 32, Color, false, 5);
 		}
 	}

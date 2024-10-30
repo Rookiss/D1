@@ -15,7 +15,12 @@ UD1GameplayAbility_Skill_WhirlwindSlash::UD1GameplayAbility_Skill_WhirlwindSlash
 void UD1GameplayAbility_Skill_WhirlwindSlash::OnTargetDataReady(const FGameplayAbilityTargetDataHandle& InTargetDataHandle)
 {
 	ULyraAbilitySystemComponent* SourceASC = GetLyraAbilitySystemComponentFromActorInfo();
-	check(SourceASC);
+	if (SourceASC == nullptr)
+		return;
+
+	AD1WeaponBase* WeaponActor = GetFirstWeaponActor();
+	if (WeaponActor == nullptr)
+		return;
 
 	if (SourceASC->FindAbilitySpecFromHandle(CurrentSpecHandle))
 	{
@@ -28,13 +33,13 @@ void UD1GameplayAbility_Skill_WhirlwindSlash::OnTargetDataReady(const FGameplayA
 		for (int32 BlockHitIndex : BlockHitIndexes)
 		{
 			FHitResult HitResult = *(LocalTargetDataHandle.Data[BlockHitIndex]->GetHitResult());
-			ProcessHitResult(HitResult, Damage, true, nullptr);
+			ProcessHitResult(HitResult, Damage, true, nullptr, WeaponActor);
 		}
 
 		for (int32 CharacterHitIndex : CharacterHitIndexes)
 		{
 			FHitResult HitResult = *LocalTargetDataHandle.Data[CharacterHitIndex]->GetHitResult();
-			ProcessHitResult(HitResult, Damage, false, nullptr);
+			ProcessHitResult(HitResult, Damage, false, nullptr, WeaponActor);
 		}
 	}
 }

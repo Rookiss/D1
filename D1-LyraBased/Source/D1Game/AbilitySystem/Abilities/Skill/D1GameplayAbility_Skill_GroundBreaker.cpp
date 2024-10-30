@@ -28,6 +28,10 @@ void UD1GameplayAbility_Skill_GroundBreaker::Execute()
 	if (LyraCharacter == nullptr)
 		return;
 
+	AD1WeaponBase* WeaponActor = GetFirstWeaponActor();
+	if (WeaponActor == nullptr)
+		return;
+
 	float ScaledCapsuleRadius = LyraCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	float ScaledCapsuleHalfHeight = LyraCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	
@@ -72,7 +76,7 @@ void UD1GameplayAbility_Skill_GroundBreaker::Execute()
 		{
 			const int32 HitResultIndex = HitInfo.Value.Key;
 			const FHitResult& HitResult = OutHitResults[HitResultIndex];
-			ProcessHitResult(HitResult, Damage, IsCharacterBlockingHit(Cast<ALyraCharacter>(HitResult.GetActor())), nullptr);
+			ProcessHitResult(HitResult, Damage, IsCharacterBlockingHit(Cast<ALyraCharacter>(HitResult.GetActor())), nullptr, WeaponActor);
 
 			FGameplayEventData EventData;
 			EventData.EventMagnitude = StunDruation;
