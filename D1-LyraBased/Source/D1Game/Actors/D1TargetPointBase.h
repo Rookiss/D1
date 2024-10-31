@@ -22,14 +22,19 @@ class AD1TargetPointBase : public ATargetPoint
 public:
 	AD1TargetPointBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+protected:
+	virtual void BeginPlay() override;
+	virtual void InitializeSpawningActor(AActor* InSpawningActor) { }
+	
 public:
 	AActor* SpawnActor();
 	void DestroyActor();
 
 	AActor* GetSpawnedActor() const { return SpawnedActor.Get(); };
 	
-protected:
-	virtual void InitializeSpawningActor(AActor* InSpawningActor) { }
+private:
+	UFUNCTION()
+	void OnExperienceLoaded(const ULyraExperienceDefinition* ExperienceDefinition);
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category="TargetPoint")

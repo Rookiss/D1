@@ -42,19 +42,14 @@ class UD1ActorSpawningManagerComponent : public UGameStateComponent
 public:
 	UD1ActorSpawningManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-protected:
-	virtual void BeginPlay() override;
-
+public:
+	void RegisterTargetPoint(AD1TargetPointBase* InTargetPoint);
+	
 private:
-	void OnExperienceLoaded(const ULyraExperienceDefinition* ExperienceDefinition);
-	void ServerSpawnActors();
+	void SpawnToTargetPoint(FPendingTargetPointList& InTargetPointList, AD1TargetPointBase* InTargetPoint);
 	
 	UFUNCTION()
 	void OnActorDestroyed(AActor* DestroyedActor);
-
-	void SpawnToRandomTargetPoints(FPendingTargetPointList& InTargetPointList, int32 InSpawnCount);
-	void SpawnToAllTargetPoints(FPendingTargetPointList& InTargetPointList);
-	void SpawnToTargetPoint(FPendingTargetPointList& InTargetPointList, int32 InTargetPointIndex);
 	
 private:
 	UPROPERTY(Transient)

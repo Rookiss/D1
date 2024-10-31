@@ -28,6 +28,7 @@ void UD1GameplayAbility_Weapon_Projectile::SpawnProjectile()
 	if (HasAuthority(&CurrentActivationInfo) == false)
 		return;
 	
+	AD1WeaponBase* WeaponActor = GetFirstWeaponActor();
 	if (WeaponActor == nullptr)
 		return;
 	

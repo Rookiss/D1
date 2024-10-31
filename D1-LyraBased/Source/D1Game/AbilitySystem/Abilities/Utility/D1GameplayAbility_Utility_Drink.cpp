@@ -19,9 +19,10 @@ UD1GameplayAbility_Utility_Drink::UD1GameplayAbility_Utility_Drink(const FObject
 
 void UD1GameplayAbility_Utility_Drink::ApplyUtilityGameplayEffect()
 {
+	AD1WeaponBase* WeaponActor = GetFirstWeaponActor();
 	if (WeaponActor == nullptr)
 		return;
-
+	
 	int32 ItemTemplateID = WeaponActor->GetTemplateID();
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
 
@@ -45,7 +46,7 @@ void UD1GameplayAbility_Utility_Drink::ApplyUtilityGameplayEffect()
 	if (UD1EquipManagerComponent::IsUtilityEquipState(EquipManager->GetCurrentEquipState()) == false)
 		return;
 
-	EEquipmentSlotType EquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponHandType, EquipManager->GetCurrentEquipState());
+	EEquipmentSlotType EquipmentSlotType = WeaponActor->GetEquipmentSlotType();
 	if (EquipmentSlotType == EEquipmentSlotType::Count)
 		return;
 

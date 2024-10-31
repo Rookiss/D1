@@ -3,6 +3,8 @@
 #include "D1GameplayAbility_Weapon.h"
 #include "D1GameplayAbility_Weapon_Melee.generated.h"
 
+class AD1WeaponBase;
+
 UCLASS()
 class UD1GameplayAbility_Weapon_Melee : public UD1GameplayAbility_Weapon
 {
@@ -19,7 +21,7 @@ protected:
 	void ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutCharacterHitIndexes, TArray<int32>& OutBlockHitIndexes);
 
 	UFUNCTION(BlueprintCallable)
-	void ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BackwardMontage);
+	void ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BackwardMontage, AD1WeaponBase* WeaponActor);
 
 	UFUNCTION(BlueprintCallable)
 	void ResetHitActors();
@@ -32,13 +34,13 @@ public:
 	bool IsCharacterBlockingHit(ALyraCharacter* TargetCharacter);
 	
 protected:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Melee")
 	float BlockingAngle = 60.f;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Melee")
 	float BlockHitDamageMultiplier = 0.3f;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Melee")
 	bool bShowDebug = false;
 
 protected:

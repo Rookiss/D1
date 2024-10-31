@@ -21,6 +21,7 @@ UD1GameplayAbility_Utility_Throw::UD1GameplayAbility_Utility_Throw(const FObject
 
 FTransform UD1GameplayAbility_Utility_Throw::GetSpawnTransform()
 {
+	AD1WeaponBase* WeaponActor = GetFirstWeaponActor();
 	if (WeaponActor == nullptr)
 		return FTransform::Identity;
 	
@@ -47,11 +48,6 @@ FTransform UD1GameplayAbility_Utility_Throw::GetSpawnTransform()
 
 void UD1GameplayAbility_Utility_Throw::SpawnThrowableItem()
 {
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.Owner = GetLyraCharacterFromActorInfo();
-	
-	AD1PickupableItemBase* PickupableItemActor = GetWorld()->SpawnActor<AD1PickupableItemBase>(ThrowableItemClass, GetSpawnTransform(), SpawnParameters);
-	
 	ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetLyraCharacterFromActorInfo());
 	if (LyraCharacter == nullptr)
 		return;
@@ -60,13 +56,22 @@ void UD1GameplayAbility_Utility_Throw::SpawnThrowableItem()
 	if (EquipManager == nullptr)
 		return;
 
-	EEquipmentSlotType EquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponHandType, EquipManager->GetCurrentEquipState());
+	AD1WeaponBase* WeaponActor = GetFirstWeaponActor();
+	if (WeaponActor == nullptr)
+		return;
+	
+	EEquipmentSlotType EquipmentSlotType = WeaponActor->GetEquipmentSlotType();
 	if (EquipmentSlotType == EEquipmentSlotType::Count)
 		return;
 
 	UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->GetComponentByClass<UD1EquipmentManagerComponent>();
 	if (EquipmentManager == nullptr)
 		return;
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.Owner = GetLyraCharacterFromActorInfo();
+	
+	AD1PickupableItemBase* PickupableItemActor = GetWorld()->SpawnActor<AD1PickupableItemBase>(ThrowableItemClass, GetSpawnTransform(), SpawnParameters);
 	
 	FD1PickupInfo PickupInfo;
 	PickupInfo.PickupInstance.ItemInstance = EquipmentManager->GetItemInstance(EquipmentSlotType);

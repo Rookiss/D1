@@ -17,6 +17,10 @@ void UD1GameplayAbility_Skill_Targeting::ApplyTarget()
 	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
 	if (SourceASC == nullptr)
 		return;
+
+	AD1WeaponBase* WeaponActor = GetFirstWeaponActor();
+	if (WeaponActor == nullptr)
+		return;
 	
 	if (TargetDataHandle.Data.IsValidIndex(0))
 	{

@@ -149,6 +149,7 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 		
 		FGameplayEventData EventData;
 		EventData.TargetData = TargetDataHandle;
+		EventData.Instigator = WeaponActor.Get();
 
 		if (EventTag.IsValid())
 		{

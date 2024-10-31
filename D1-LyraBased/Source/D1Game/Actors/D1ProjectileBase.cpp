@@ -29,11 +29,13 @@ AD1ProjectileBase::AD1ProjectileBase(const FObjectInitializer& ObjectInitializer
 	SphereCollisionComponent->SetCollisionProfileName("Projectile");
 	SphereCollisionComponent->SetupAttachment(GetRootComponent());
 	SphereCollisionComponent->bReturnMaterialOnMove = true;
+	SphereCollisionComponent->SetCanEverAffectNavigation(false);
 	SetRootComponent(SphereCollisionComponent);
 
 	ProjectileMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("ProjectileMeshComponent");
 	ProjectileMeshComponent->SetCollisionProfileName("NoCollision");
 	ProjectileMeshComponent->SetupAttachment(SphereCollisionComponent);
+	ProjectileMeshComponent->SetCanEverAffectNavigation(false);
 	
 	TrailNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>("TrailNiagaraComponent");
 	TrailNiagaraComponent->SetupAttachment(ProjectileMeshComponent);
