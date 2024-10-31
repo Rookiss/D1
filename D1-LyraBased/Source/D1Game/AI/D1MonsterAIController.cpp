@@ -2,6 +2,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
+#include "D1Define.h"
 #include "D1LogChannels.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Navigation/CrowdFollowingComponent.h"
@@ -41,7 +42,7 @@ void AD1MonsterAIController::InitPlayerState()
 	{
 		if (ALyraPlayerState* LyraPS = Cast<ALyraPlayerState>(PlayerState))
 		{
-			LyraPS->SetGenericTeamId(IntegerToGenericTeamId(1));
+			LyraPS->SetGenericTeamId(EnumToGenericTeamId(ED1TeamID::Monster));
 		}
 	}
 }

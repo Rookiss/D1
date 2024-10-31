@@ -40,6 +40,10 @@ void UD1GameplayAbility_Weapon_Melee::ParseTargetData(const FGameplayAbilityTarg
 					TargetCharacter = Cast<ALyraCharacter>(HitActor->GetOwner());
 				}
 
+				ID1TeamAgentInterface* TeamAgentInterface = Cast<ID1TeamAgentInterface>(TargetCharacter);
+				if (TeamAgentInterface && (TeamAgentInterface->GetTeamAttitudeTowards(*GetLyraCharacterFromActorInfo()) != ETeamAttitude::Hostile))
+					continue;
+				
 				bool bIsCharacterBlockingHit = TargetCharacter ? IsCharacterBlockingHit(TargetCharacter) : false;
 				
 				AD1WeaponBase* HitWeaponActor = Cast<AD1WeaponBase>(HitActor);

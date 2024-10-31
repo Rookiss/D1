@@ -86,14 +86,8 @@ void ULyraTeamCreationComponent::ServerAssignPlayersToTeams()
 
 void ULyraTeamCreationComponent::ServerChooseTeamForPlayer(ALyraPlayerState* PS)
 {
-	if (PS->IsOnlyASpectator())
-	{
-		PS->SetGenericTeamId(FGenericTeamId::NoTeam);
-	}
-	else
-	{
-		PS->SetGenericTeamId(IntegerToGenericTeamId(0));
-	}
+	// TODO: Party(Squad) Play
+	PS->SetGenericTeamId(EnumToGenericTeamId(ED1TeamID::NoTeam));
 }
 
 void ULyraTeamCreationComponent::OnPlayerInitialized(AGameModeBase* GameMode, AController* NewPlayer)

@@ -5,6 +5,7 @@
 #endif // UE_WITH_IRIS
 
 #include "D1ItemTemplate.h"
+#include "D1LogChannels.h"
 #include "Data/D1ItemData.h"
 #include "Net/UnrealNetwork.h"
 
@@ -25,6 +26,16 @@ void UD1ItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(ThisClass, StatContainer);
 }
 
+float UD1ItemInstance::GetDistanceAttenuation(float Distance, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags) const
+{
+	return 0;
+}
+
+float UD1ItemInstance::GetPhysicalMaterialAttenuation(const UPhysicalMaterial* PhysicalMaterial, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags) const
+{
+	return 0;
+}
+
 void UD1ItemInstance::Init(int32 InItemTemplateID, EItemRarity InItemRarity)
 {
 	if (InItemTemplateID <= INDEX_NONE || InItemRarity == EItemRarity::Count)
@@ -41,6 +52,15 @@ void UD1ItemInstance::Init(int32 InItemTemplateID, EItemRarity InItemRarity)
 			Fragment->OnInstanceCreated(this);
 		}
 	}
+}
+
+UD1ItemInstance* UD1ItemInstance::Duplicate() const
+{
+	UD1ItemInstance* NewItemInstance = NewObject<UD1ItemInstance>();
+	NewItemInstance->ItemTemplateID = ItemTemplateID;
+	NewItemInstance->ItemRarity = ItemRarity;
+	NewItemInstance->StatContainer = StatContainer;
+	return NewItemInstance;
 }
 
 #if UE_WITH_IRIS

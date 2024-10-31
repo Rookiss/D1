@@ -161,6 +161,13 @@ enum class ECharacterSkinType : uint8
 	Count	UMETA(Hidden)
 };
 
+UENUM(BlueprintType)
+enum class ED1TeamID : uint8
+{
+	NoTeam,
+	Monster = 1,
+};
+
 namespace Item
 {
 	const int32 GoldID = 9999;

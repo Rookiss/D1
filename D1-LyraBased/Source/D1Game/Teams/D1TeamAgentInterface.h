@@ -1,5 +1,6 @@
 #pragma once
 
+#include "D1Define.h"
 #include "GenericTeamAgentInterface.h"
 #include "UObject/Object.h"
 #include "UObject/WeakObjectPtr.h"
@@ -11,12 +12,17 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnD1TeamIndexChangedDelegate, UO
 
 inline int32 GenericTeamIdToInteger(FGenericTeamId ID)
 {
-	return (ID == FGenericTeamId::NoTeam) ? INDEX_NONE : (int32)ID;
+	return (int32)ID;
 }
 
 inline FGenericTeamId IntegerToGenericTeamId(int32 ID)
 {
 	return (ID == INDEX_NONE) ? FGenericTeamId::NoTeam : FGenericTeamId((uint8)ID);
+}
+
+inline FGenericTeamId EnumToGenericTeamId(ED1TeamID ID)
+{
+	return (ID == ED1TeamID::NoTeam) ? FGenericTeamId::NoTeam : FGenericTeamId((uint8)ID);
 }
 
 UINTERFACE(meta=(CannotImplementInterfaceInBlueprint))

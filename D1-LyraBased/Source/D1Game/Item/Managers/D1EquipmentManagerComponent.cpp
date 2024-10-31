@@ -649,7 +649,7 @@ void UD1EquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType Equipm
 		if (ItemInstance == nullptr)
 			return;
 		
-		UD1ItemInstance* AddedItemInstance = DuplicateObject<UD1ItemInstance>(ItemInstance, GetTransientPackage());
+		UD1ItemInstance* AddedItemInstance = ItemInstance->Duplicate();
 		Entry.Init(AddedItemInstance, ItemCount);
 
 		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && AddedItemInstance)

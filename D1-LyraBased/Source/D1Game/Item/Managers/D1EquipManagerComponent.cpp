@@ -4,6 +4,7 @@
 #include "D1CosmeticManagerComponent.h"
 #include "D1EquipmentManagerComponent.h"
 #include "D1GameplayTags.h"
+#include "D1LogChannels.h"
 #include "Engine/ActorChannel.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"

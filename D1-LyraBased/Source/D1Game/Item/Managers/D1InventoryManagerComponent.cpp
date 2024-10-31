@@ -562,13 +562,13 @@ void UD1InventoryManagerComponent::AddItem_Unsafe(const FIntPoint& ItemSlotPos, 
 			return;
 		
 		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
-
-		UD1ItemInstance* AddedItemInstance = DuplicateObject<UD1ItemInstance>(ItemInstance, GetTransientPackage());
-		Entry.Init(AddedItemInstance, ItemCount);
-
-		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && AddedItemInstance)
+		
+		UD1ItemInstance* AddedItemInstandce = ItemInstance->Duplicate();
+		Entry.Init(AddedItemInstandce, ItemCount);
+		
+		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && AddedItemInstandce)
 		{
-			AddReplicatedSubObject(AddedItemInstance);
+			AddReplicatedSubObject(AddedItemInstandce);
 		}
 
 		MarkSlotChecks(true, ItemSlotPos, ItemTemplate.SlotCount);

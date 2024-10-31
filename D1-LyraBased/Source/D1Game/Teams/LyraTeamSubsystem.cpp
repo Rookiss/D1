@@ -166,6 +166,12 @@ int32 ULyraTeamSubsystem::FindTeamFromObject(const UObject* TestObject) const
 			return GenericTeamIdToInteger(InstigatorWithTeamInterface->GetGenericTeamId());
 		}
 
+		// See if the owner is a team actor
+		if (const ID1TeamAgentInterface* OwnerWithTeamInterface = Cast<ID1TeamAgentInterface>(TestActor->GetOwner()))
+		{
+			return GenericTeamIdToInteger(OwnerWithTeamInterface->GetGenericTeamId());
+		}
+
 		// TeamInfo actors don't actually have the team interface, so they need a special case
 		if (const ALyraTeamInfoBase* TeamInfo = Cast<ALyraTeamInfoBase>(TestActor))
 		{
@@ -230,7 +236,14 @@ ELyraTeamComparison ULyraTeamSubsystem::CompareTeams(const UObject* A, const UOb
 	}
 	else
 	{
-		return (TeamIdA == TeamIdB) ? ELyraTeamComparison::OnSameTeam : ELyraTeamComparison::DifferentTeams;
+		if ((TeamIdA == FGenericTeamId::NoTeam) || (TeamIdB == FGenericTeamId::NoTeam) || (TeamIdA != TeamIdB))
+		{
+			return ELyraTeamComparison::DifferentTeams;
+		}
+		else
+		{
+			return ELyraTeamComparison::OnSameTeam;
+		}
 	}
 }
 

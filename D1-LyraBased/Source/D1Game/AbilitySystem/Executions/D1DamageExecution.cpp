@@ -1,6 +1,6 @@
 #include "D1DamageExecution.h"
 
-#include "D1LogChannels.h"
+#include "AbilitySystem/LyraAbilitySourceInterface.h"
 #include "AbilitySystem/Attributes/D1VitalSet.h"
 #include "AbilitySystem/Attributes/D1CombatSet.h"
 #include "AbilitySystem/LyraGameplayEffectContext.h"
@@ -66,7 +66,6 @@ void UD1DamageExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 
 	float Defense = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DefenseDef, EvaluateParameters, Defense);
-	Defense = FMath::Max(Defense, 1.f);
 
 	float DrainLifePercent = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DrainLifePercentDef, EvaluateParameters, DrainLifePercent);
@@ -74,8 +73,40 @@ void UD1DamageExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 	float DamageReductionPercent = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageReductionPercentDef, EvaluateParameters, DamageReductionPercent);
 
-	float Damage = UKismetMathLibrary::SafeDivide(BaseDamage + Strength, FMath::Pow(Defense, 0.3f));
-	float DamageDone = FMath::Max(Damage, 0.0f);
+	const AActor* EffectCauser = TypedContext->GetEffectCauser();
+	const FHitResult* HitActorResult = TypedContext->GetHitResult();
+	AActor* HitActor = nullptr;
+	
+	if (HitActorResult)
+	{
+		const FHitResult& CurrHitResult = *HitActorResult;
+		HitActor = CurrHitResult.HitObjectHandle.FetchActor();
+	}
+	
+	float Damage = UKismetMathLibrary::SafeDivide(BaseDamage + Strength, FMath::Pow(FMath::Max(Defense, 1.f), 0.3f));
+
+	// Apply rules for team damage
+	float DamageInteractionAllowedMultiplier = 0.0f;
+	if (HitActor)
+	{
+		ULyraTeamSubsystem* TeamSubsystem = HitActor->GetWorld()->GetSubsystem<ULyraTeamSubsystem>();
+		if (ensure(TeamSubsystem))
+		{
+			DamageInteractionAllowedMultiplier = TeamSubsystem->CanCauseDamage(EffectCauser, HitActor) ? 1.f : 0.f;
+		}
+	}
+	
+	// Weak point damage calculation
+	float PhysicalMaterialAttenuation = 1.0f;
+	if (const ILyraAbilitySourceInterface* AbilitySource = TypedContext->GetAbilitySource())
+	{
+		if (const UPhysicalMaterial* PhysicalMaterial = TypedContext->GetPhysicalMaterial())
+		{
+			PhysicalMaterialAttenuation = AbilitySource->GetPhysicalMaterialAttenuation(PhysicalMaterial, SourceTags, TargetTags);
+		}
+	}
+	
+	float DamageDone = FMath::Max(Damage * PhysicalMaterialAttenuation * DamageInteractionAllowedMultiplier, 0.0f);
 	DamageDone -= DamageDone * (DamageReductionPercent / 100.f);
 	
 	if (DamageDone > 0.0f)
