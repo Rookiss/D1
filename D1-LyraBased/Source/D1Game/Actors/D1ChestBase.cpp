@@ -11,6 +11,9 @@
 AD1ChestBase::AD1ChestBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bStartWithTickEnabled = false;
+	
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
 	SetRootComponent(ArrowComponent);
 	
@@ -19,6 +22,7 @@ AD1ChestBase::AD1ChestBase(const FObjectInitializer& ObjectInitializer)
 	MeshComponent->SetCollisionProfileName(TEXT("Interactable"));
 	MeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 	MeshComponent->SetCanEverAffectNavigation(true);
+	MeshComponent->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickMontagesAndRefreshBonesWhenPlayingMontages;
 	
 	InventoryManager = CreateDefaultSubobject<UD1InventoryManagerComponent>(TEXT("InventoryManager"));
 }

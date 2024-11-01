@@ -10,6 +10,7 @@ AD1TargetPointBase::AD1TargetPointBase(const FObjectInitializer& ObjectInitializ
 	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bStartWithTickEnabled = false;
 	
 	PreviewMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PreviewMeshComponent"));
 	PreviewMeshComponent->SetupAttachment(RootComponent);

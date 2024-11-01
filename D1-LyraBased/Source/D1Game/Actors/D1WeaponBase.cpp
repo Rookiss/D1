@@ -19,20 +19,26 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bStartWithTickEnabled = false;
+	
     bReplicates = true;
 
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>("ArrowComponent");
+	ArrowComponent->PrimaryComponentTick.bStartWithTickEnabled = false;
 	SetRootComponent(ArrowComponent);
 	
 	WeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
 	WeaponMeshComponent->SetCollisionProfileName("Weapon");
 	WeaponMeshComponent->SetGenerateOverlapEvents(false);
 	WeaponMeshComponent->SetupAttachment(GetRootComponent());
+	WeaponMeshComponent->PrimaryComponentTick.bStartWithTickEnabled = false;
+	WeaponMeshComponent->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 	
 	TraceDebugCollision = CreateDefaultSubobject<UBoxComponent>("TraceDebugCollision");
 	TraceDebugCollision->SetCollisionProfileName("NoCollision");
 	TraceDebugCollision->SetGenerateOverlapEvents(false);
 	TraceDebugCollision->SetupAttachment(GetRootComponent());
+	TraceDebugCollision->PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
 void AD1WeaponBase::BeginPlay()

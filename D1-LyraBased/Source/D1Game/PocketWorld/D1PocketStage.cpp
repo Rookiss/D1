@@ -145,7 +145,10 @@ void AD1PocketStage::RefreshRenderTargetSize(FViewport* InViewport, uint32 InVal
 		RenderTargetSize = FVector2D(ViewportSize.Y / 2, ViewportSize.Y);
 	}
 
-	PocketCapture->SetRenderTargetSize(RenderTargetSize.X, RenderTargetSize.Y);
+	if (PocketCapture)
+	{
+		PocketCapture->SetRenderTargetSize(RenderTargetSize.X, RenderTargetSize.Y);
+	}
 }
 
 UD1CosmeticManagerComponent* AD1PocketStage::GetCosmeticManager() const
