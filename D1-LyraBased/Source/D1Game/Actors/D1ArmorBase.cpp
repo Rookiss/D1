@@ -8,6 +8,7 @@ AD1ArmorBase::AD1ArmorBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bStartWithTickEnabled = false;
 
     ArmorMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("ArmorMeshComponent");
 	ArmorMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
