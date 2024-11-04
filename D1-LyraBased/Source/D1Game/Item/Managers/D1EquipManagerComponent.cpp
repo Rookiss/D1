@@ -4,7 +4,6 @@
 #include "D1CosmeticManagerComponent.h"
 #include "D1EquipmentManagerComponent.h"
 #include "D1GameplayTags.h"
-#include "D1LogChannels.h"
 #include "Engine/ActorChannel.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
@@ -142,11 +141,8 @@ void FD1EquipEntry::Equip()
 
 									PocketStage->RefreshLightingChannelToActors();
 									
-									if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
-									{
-										UAnimSequence* PocketWorldAnim = ULyraAssetManager::GetAssetByPath<UAnimSequence>(AttachmentFragment->PocketWorldAnim);
-										MeshComponent->PlayAnimation(PocketWorldAnim, true);
-									}
+									UAnimMontage* PocketWorldIdleMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->PocketWorldIdleMontage);
+									Character->PlayAnimMontage(PocketWorldIdleMontage);
 								}
 							})
 						);

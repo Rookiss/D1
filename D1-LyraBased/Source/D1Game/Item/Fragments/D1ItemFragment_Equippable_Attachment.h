@@ -55,7 +55,7 @@ public:
 	TSoftObjectPtr<UAnimMontage> BlockHitMontage;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UAnimSequence> PocketWorldAnim;
+	TSoftObjectPtr<UAnimMontage> PocketWorldIdleMontage;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UAnimInstance> AnimInstanceClass;
