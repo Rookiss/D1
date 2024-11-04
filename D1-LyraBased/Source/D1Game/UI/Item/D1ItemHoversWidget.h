@@ -1,8 +1,10 @@
 ﻿#pragma once
 
 #include "Blueprint/UserWidget.h"
+#include "Item/D1ItemInstance.h"
 #include "D1ItemHoversWidget.generated.h"
 
+class UD1EquipmentManagerComponent;
 class UD1ItemInstance;
 class UCanvasPanel;
 class UHorizontalBox;
@@ -15,7 +17,7 @@ class UD1ItemHoversWidget : public UUserWidget
 	
 public:
 	UD1ItemHoversWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-	
+
 public:
 	void RefreshUI(const UD1ItemInstance* HoveredItemInstance);
 	void SetPosition(const FVector2D& AbsolutePosition);

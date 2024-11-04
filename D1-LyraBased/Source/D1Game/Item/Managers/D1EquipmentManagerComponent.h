@@ -138,6 +138,8 @@ public:
 	
 	static bool IsPrimaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);
 	static bool IsSecondaryWeaponSlot(EEquipmentSlotType EquipmentSlotType);
+
+	const UD1ItemInstance* FindPairItemInstance(const UD1ItemInstance* InBaseItemInstance, EEquipmentSlotType& OutEquipmentSlotType) const;
 	
 	bool IsAllEmpty(EEquipState EquipState) const;
 

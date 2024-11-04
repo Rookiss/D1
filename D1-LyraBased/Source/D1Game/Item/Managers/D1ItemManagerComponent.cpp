@@ -4,6 +4,7 @@
 #include "D1InventoryManagerComponent.h"
 #include "Actors/D1PickupableItemBase.h"
 #include "Components/CapsuleComponent.h"
+#include "Data/D1ItemData.h"
 #include "GameFramework/Character.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
@@ -144,44 +145,46 @@ void UD1ItemManagerComponent::Server_QuickFromInventory_Implementation(UD1Invent
 	if (FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
 	{
 		// 1. [장비]
-		// 1-1. [내 인벤토리] -> 내 장비 장착 -> 내 장비 교체
-		// 1-2. [다른 인벤토리] -> 내 장비 장착 -> 내 인벤토리 -> 내 장비 교체
-	
+		// 1-1. [내 인벤토리] -> 내 장비 교체 -> 내 장비 장착 
+		// 1-2. [다른 인벤토리] -> 내 장비 교체 -> 내 장비 장착 -> 내 인벤토리
+
 		EEquipmentSlotType ToEquipmentSlotType;
-		int32 MovableCount = MyEquipmentManager->CanMoveOrMergeEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType);
-		if (MovableCount > 0)
+		FIntPoint ToItemSlotPos;
+		if (MyEquipmentManager->CanSwapEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType, ToItemSlotPos))
 		{
-			UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, MovableCount);
-			MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance, MovableCount);
+			const int32 FromItemCount = FromInventoryManager->GetItemCount(FromItemSlotPos);
+			const int32 ToItemCount = MyEquipmentManager->GetItemCount(ToEquipmentSlotType);
+				
+			UD1ItemInstance* RemovedItemInstanceFrom = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, FromItemCount);
+			UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType, ToItemCount);
+			FromInventoryManager->AddItem_Unsafe(ToItemSlotPos, RemovedItemInstanceTo, ToItemCount);
+			MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom, FromItemCount);
 		}
 		else
 		{
-			if (MyInventoryManager != FromInventoryManager)
+			int32 MovableCount = MyEquipmentManager->CanMoveOrMergeEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType);
+			if (MovableCount > 0)
 			{
-				TArray<FIntPoint> OutToItemSlotPoses;
-				TArray<int32> OutToItemCounts;
-				MovableCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromInventoryManager, FromItemSlotPos, OutToItemSlotPoses, OutToItemCounts);
-				if (MovableCount > 0)
-				{
-					UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, MovableCount);
-					for (int32 i = 0; i < OutToItemSlotPoses.Num(); i++)
-					{
-						MyInventoryManager->AddItem_Unsafe(OutToItemSlotPoses[i], RemovedItemInstance, OutToItemCounts[i]);
-					}
-					return;
-				}
+				UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, MovableCount);
+				MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance, MovableCount);
 			}
-
-			FIntPoint ToItemSlotPos;
-			if (MyEquipmentManager->CanSwapEquipment_Quick(FromInventoryManager, FromItemSlotPos, ToEquipmentSlotType, ToItemSlotPos))
+			else
 			{
-				const int32 FromItemCount = FromInventoryManager->GetItemCount(FromItemSlotPos);
-				const int32 ToItemCount = MyEquipmentManager->GetItemCount(ToEquipmentSlotType);
-				
-				UD1ItemInstance* RemovedItemInstanceFrom = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, FromItemCount);
-				UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType, ToItemCount);
-				FromInventoryManager->AddItem_Unsafe(ToItemSlotPos, RemovedItemInstanceTo, ToItemCount);
-				MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom, FromItemCount);
+				if (MyInventoryManager != FromInventoryManager)
+				{
+					TArray<FIntPoint> OutToItemSlotPoses;
+					TArray<int32> OutToItemCounts;
+					MovableCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromInventoryManager, FromItemSlotPos, OutToItemSlotPoses, OutToItemCounts);
+					if (MovableCount > 0)
+					{
+						UD1ItemInstance* RemovedItemInstance = FromInventoryManager->RemoveItem_Unsafe(FromItemSlotPos, MovableCount);
+						for (int32 i = 0; i < OutToItemSlotPoses.Num(); i++)
+						{
+							MyInventoryManager->AddItem_Unsafe(OutToItemSlotPoses[i], RemovedItemInstance, OutToItemCounts[i]);
+						}
+						return;
+					}
+				}
 			}
 		}
 	}
@@ -221,7 +224,7 @@ void UD1ItemManagerComponent::Server_QuickFromEquipment_Implementation(UD1Equipm
 		return;
 
 	// 1. [내 장비창] -> 내 인벤토리
-	// 2. [다른 장비창] -> 내 장비 장착 -> 내 인벤토리 -> 내 장비 교체
+	// 2. [다른 장비창] -> 내 장비 교체 -> 내 장비 장착 -> 내 인벤토리 
 
 	UD1InventoryManagerComponent* MyInventoryManager = GetMyInventoryManager();
 	UD1EquipmentManagerComponent* MyEquipmentManager = GetMyEquipmentManager();
@@ -249,37 +252,37 @@ void UD1ItemManagerComponent::Server_QuickFromEquipment_Implementation(UD1Equipm
 	else
 	{
 		EEquipmentSlotType ToEquipmentSlotType;
-		int32 MovableCount = MyEquipmentManager->CanMoveOrMergeEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType);
-		if (MovableCount > 0)
+		if (MyEquipmentManager->CanSwapEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
 		{
-			UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, MovableCount);
-			MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance, MovableCount);
+			const int32 FromItemCount = FromEquipmentManager->GetItemCount(FromEquipmentSlotType);
+			const int32 ToItemCount = MyEquipmentManager->GetItemCount(ToEquipmentSlotType);
+					
+			UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, FromItemCount);
+			UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType, ToItemCount);
+			FromEquipmentManager->AddEquipment_Unsafe(FromEquipmentSlotType, RemovedItemInstanceTo, ToItemCount);
+			MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom, FromItemCount);
 		}
 		else
 		{
-			TArray<FIntPoint> ToItemSlotPoses;
-			TArray<int32> ToItemCounts;
-
-			MovableCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPoses, ToItemCounts);
+			int32 MovableCount = MyEquipmentManager->CanMoveOrMergeEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType);
 			if (MovableCount > 0)
 			{
 				UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, MovableCount);
-				for (int32 i = 0; i < ToItemSlotPoses.Num(); i++)
-				{
-					MyInventoryManager->AddItem_Unsafe(ToItemSlotPoses[i], RemovedItemInstance, ToItemCounts[i]);
-				}
+				MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstance, MovableCount);
 			}
 			else
 			{
-				if (MyEquipmentManager->CanSwapEquipment_Quick(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType))
+				TArray<FIntPoint> ToItemSlotPoses;
+				TArray<int32> ToItemCounts;
+
+				MovableCount = MyInventoryManager->CanMoveOrMergeItem_Quick(FromEquipmentManager, FromEquipmentSlotType, ToItemSlotPoses, ToItemCounts);
+				if (MovableCount > 0)
 				{
-					const int32 FromItemCount = FromEquipmentManager->GetItemCount(FromEquipmentSlotType);
-					const int32 ToItemCount = MyEquipmentManager->GetItemCount(ToEquipmentSlotType);
-					
-					UD1ItemInstance* RemovedItemInstanceFrom = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, FromItemCount);
-					UD1ItemInstance* RemovedItemInstanceTo = MyEquipmentManager->RemoveEquipment_Unsafe(ToEquipmentSlotType, ToItemCount);
-					FromEquipmentManager->AddEquipment_Unsafe(FromEquipmentSlotType, RemovedItemInstanceTo, ToItemCount);
-					MyEquipmentManager->AddEquipment_Unsafe(ToEquipmentSlotType, RemovedItemInstanceFrom, FromItemCount);
+					UD1ItemInstance* RemovedItemInstance = FromEquipmentManager->RemoveEquipment_Unsafe(FromEquipmentSlotType, MovableCount);
+					for (int32 i = 0; i < ToItemSlotPoses.Num(); i++)
+					{
+						MyInventoryManager->AddItem_Unsafe(ToItemSlotPoses[i], RemovedItemInstance, ToItemCounts[i]);
+					}
 				}
 			}
 		}

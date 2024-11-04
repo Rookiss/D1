@@ -5,10 +5,6 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Components/HorizontalBox.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Equippable.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
-#include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemHoversWidget)
@@ -21,90 +17,15 @@ UD1ItemHoversWidget::UD1ItemHoversWidget(const FObjectInitializer& ObjectInitial
 
 void UD1ItemHoversWidget::RefreshUI(const UD1ItemInstance* HoveredItemInstance)
 {
-	UD1ItemInstance* SelectedItemInstance = nullptr;
-	
-	if (HoveredItemInstance)
+	const UD1ItemInstance* PairItemInstance = nullptr;
+	if (UD1EquipmentManagerComponent* EquipmentManager = GetOwningPlayerPawn()->GetComponentByClass<UD1EquipmentManagerComponent>())
 	{
-		UD1EquipManagerComponent* EquipManager = GetOwningPlayerPawn()->GetComponentByClass<UD1EquipManagerComponent>();
-		UD1EquipmentManagerComponent* EquipmentManager = GetOwningPlayerPawn()->GetComponentByClass<UD1EquipmentManagerComponent>();
-		
-		if (EquipManager && EquipmentManager)
-		{
-			if (const UD1ItemFragment_Equippable* HoveredEquippableFragment = HoveredItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
-			{
-				if (HoveredEquippableFragment->EquipmentType == EEquipmentType::Weapon)
-				{
-					const UD1ItemFragment_Equippable_Weapon* HoveredWeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(HoveredEquippableFragment);
-
-					UD1ItemInstance* BestPickItemInstance = nullptr;
-					UD1ItemInstance* SecondPickItemInstance = nullptr;
-					
-					TArray<UD1ItemInstance*> ItemInstances;
-					EquipManager->GetAllEquippedItemInstances(ItemInstances);
-
-					for (UD1ItemInstance* ItemInstance : ItemInstances)
-					{
-						if (const UD1ItemFragment_Equippable_Weapon* EquippedWeaponFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
-						{
-							if (HoveredWeaponFragment->WeaponType == EquippedWeaponFragment->WeaponType)
-							{
-								if (HoveredWeaponFragment->WeaponHandType == EquippedWeaponFragment->WeaponHandType)
-								{
-									BestPickItemInstance = ItemInstance;
-									break;
-								}
-
-								if (SecondPickItemInstance == nullptr)
-								{
-									SecondPickItemInstance = ItemInstance;
-								}
-							}
-						}
-					}
-
-					if (BestPickItemInstance == nullptr)
-					{
-						EquipmentManager->GetAllWeaponItemInstances(ItemInstances);
-
-						for (UD1ItemInstance* WeaponItemInstance : ItemInstances)
-						{
-							if (const UD1ItemFragment_Equippable_Weapon* EquippedWeaponFragment = WeaponItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
-							{
-								if (HoveredWeaponFragment->WeaponType == EquippedWeaponFragment->WeaponType)
-								{
-									if (HoveredWeaponFragment->WeaponHandType == EquippedWeaponFragment->WeaponHandType)
-									{
-										BestPickItemInstance = WeaponItemInstance;
-										break;
-									}
-							
-									if (SecondPickItemInstance == nullptr)
-									{
-										SecondPickItemInstance = WeaponItemInstance;
-									}
-								}
-							}
-						}
-					}
-
-					SelectedItemInstance = (BestPickItemInstance ? BestPickItemInstance : SecondPickItemInstance);
-				}
-				else if (HoveredEquippableFragment->EquipmentType == EEquipmentType::Armor)
-				{
-					const UD1ItemFragment_Equippable_Armor* HoveredArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(HoveredEquippableFragment);
-					SelectedItemInstance = EquipmentManager->GetItemInstance(UD1EquipManagerComponent::ConvertToEquipmentSlotType(HoveredArmorFragment->ArmorType));
-				}
-
-				if (HoveredItemInstance == SelectedItemInstance)
-				{
-					SelectedItemInstance = nullptr;
-				}
-			}
-		}
+		EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
+		PairItemInstance = EquipmentManager->FindPairItemInstance(HoveredItemInstance, EquipmentSlotType);
 	}
-
+	
 	HoverWidget_Left->RefreshUI(HoveredItemInstance);
-	HoverWidget_Right->RefreshUI(SelectedItemInstance);
+	HoverWidget_Right->RefreshUI(PairItemInstance);
 }
 
 void UD1ItemHoversWidget::SetPosition(const FVector2D& AbsolutePosition)
