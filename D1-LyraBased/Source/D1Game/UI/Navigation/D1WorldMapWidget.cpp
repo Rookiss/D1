@@ -4,6 +4,7 @@
 #include "D1ElectricFieldCircleWidget.h"
 #include "D1MiniMapWidget.h"
 #include "Actors/D1ElectricField.h"
+#include "Blueprint/SlateBlueprintLibrary.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Image.h"
@@ -126,7 +127,9 @@ FReply UD1WorldMapWidget::NativeOnMouseMove(const FGeometry& InGeometry, const F
 	
 	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton) && TargetWorldMapZoom > MinWorldMapZoom)
 	{
-		TargetWorldMapPos = WorldMapPanelSlot->GetPosition() + InMouseEvent.GetCursorDelta();
+		FVector2D AbsoluteCursorDelta = InMouseEvent.GetCursorDelta();
+		FVector2D AbsolutePanelPos = USlateBlueprintLibrary::LocalToAbsolute(CanvasPanel_WorldMap->GetCachedGeometry(), WorldMapPanelSlot->GetPosition());
+		TargetWorldMapPos = CanvasPanel_WorldMap->GetCachedGeometry().AbsoluteToLocal(AbsolutePanelPos + AbsoluteCursorDelta);
 		WorldMapPanelSlot->SetPosition(TargetWorldMapPos);
 		return FReply::Handled();
 	}

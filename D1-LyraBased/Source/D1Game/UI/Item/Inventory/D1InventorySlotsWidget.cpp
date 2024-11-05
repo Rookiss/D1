@@ -1,5 +1,6 @@
 ﻿#include "D1InventorySlotsWidget.h"
 
+#include "AbilitySystemComponent.h"
 #include "D1InventoryEntryWidget.h"
 #include "D1InventorySlotWidget.h"
 #include "Components/CanvasPanel.h"

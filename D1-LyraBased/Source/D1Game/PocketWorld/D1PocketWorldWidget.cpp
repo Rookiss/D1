@@ -33,8 +33,10 @@ void UD1PocketWorldWidget::NativeTick(const FGeometry& MyGeometry, float InDelta
 
 void UD1PocketWorldWidget::NativeDestruct()
 {
-	UMaterialInstanceDynamic* MaterialInstanceDynamic = Image_Render->GetDynamicMaterial();
-	MaterialInstanceDynamic->ClearParameterValues();
+	if (UMaterialInstanceDynamic* MaterialInstanceDynamic = Image_Render->GetDynamicMaterial())
+	{
+		MaterialInstanceDynamic->ClearParameterValues();
+	}
 	
 	Super::NativeDestruct();
 }
@@ -58,7 +60,9 @@ void UD1PocketWorldWidget::OnPocketStageReady(AD1PocketStage* PocketStage)
 	{
 		UTextureRenderTarget2D* DiffuseRenderTarget = PocketCapture->GetOrCreateDiffuseRenderTarget();
 		
-		UMaterialInstanceDynamic* MaterialInstanceDynamic = Image_Render->GetDynamicMaterial();
-		MaterialInstanceDynamic->SetTextureParameterValue("Diffuse", DiffuseRenderTarget);
+		if (UMaterialInstanceDynamic* MaterialInstanceDynamic = Image_Render->GetDynamicMaterial())
+		{
+			MaterialInstanceDynamic->SetTextureParameterValue("Diffuse", DiffuseRenderTarget);
+		}
 	}
 }

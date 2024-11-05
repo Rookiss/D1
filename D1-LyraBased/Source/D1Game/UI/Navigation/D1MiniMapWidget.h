@@ -61,17 +61,14 @@ private:
 
 private:
 	float CurrentMiniMapZoom = 1.f;
-	float MinMiniMapZoom = 0.5f;
-	float MaxMiniMapZoom = 3.f;
-	float DeltaMiniMapZoom = 0.5f;
 
 	FVector2D InitialMiniMapSize;
 	FVector2D InitialIconPos;
 
 private:
-	FVector2D WorldFirstPos = FVector2D(9590.f, -9590.f);
-	FVector2D WorldSecondPos = FVector2D(-9590.f, 9590.f);
+	FVector2D WorldFirstPos = FVector2D(14415.f, -14415.f);
+	FVector2D WorldSecondPos = FVector2D(-13993.f, 14415.f);
 	
-	FVector2D WidgetFirstPos = FVector2D(995.f, 995.f);
-	FVector2D WidgetSecondPos = FVector2D(-995.f, -995.f);
+	FVector2D WidgetFirstPos = FVector2D(750.f, 750.f);
+	FVector2D WidgetSecondPos = FVector2D(-750.f, -750.f);
 };

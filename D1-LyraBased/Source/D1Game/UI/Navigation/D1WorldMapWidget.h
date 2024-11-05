@@ -85,7 +85,7 @@ private:
 	
 private:
 	float MinWorldMapZoom = 1.f;
-	float MaxWorldMapZoom;
+	float MaxWorldMapZoom = 1.f;
 	int32 StepWorldMapZoom = 5;
 	float MultiplierWorldMapZoom = 1.5f;
 
@@ -97,11 +97,11 @@ private:
 	FVector2D TargetWorldMapSize;
 	FVector2D TargetWorldMapPos;
 
-	float WidgetUnitSize;
+	float WidgetUnitSize = 0.f;
 
 private:
-	FVector2D WorldFirstPos = FVector2D(9560.f, -9560.f);
-	FVector2D WorldSecondPos = FVector2D(-9560.f, 9560.f);
+	FVector2D WorldFirstPos = FVector2D(14415.f, -14415.f);
+	FVector2D WorldSecondPos = FVector2D(-13993.f, 14415.f);
 	
 	FVector2D WidgetFirstPos = FVector2D(-450.f, -450.f);
 	FVector2D WidgetSecondPos = FVector2D(450.f, 450.f);
