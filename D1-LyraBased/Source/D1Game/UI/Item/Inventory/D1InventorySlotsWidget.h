@@ -30,7 +30,6 @@ public:
 	UD1InventorySlotsWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	
@@ -50,14 +49,14 @@ public:
 	UD1InventoryManagerComponent* GetInventoryManagerComponent() const { return InventoryManager; }
 
 protected:
-	UPROPERTY(EditAnywhere, meta=(Categories="Message"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Categories="Message"))
 	FGameplayTag MessageChannelTag;
 	
 private:
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UD1InventorySlotWidget> SlotWidgetClass;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UD1InventoryEntryWidget> EntryWidgetClass;
 
 private:

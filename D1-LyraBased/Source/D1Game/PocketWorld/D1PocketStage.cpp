@@ -19,8 +19,8 @@ AD1PocketStage::AD1PocketStage(const FObjectInitializer& ObjectInitializer)
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(GetRootComponent());
 	CameraComponent->SetRelativeLocationAndRotation(FVector(425.27f, 0.f, 65.f), FRotator(-10.f, -180.f, 0.f));
-	CameraComponent->FieldOfView = 18.f;
-	CameraComponent->AspectRatio = 0.66f;
+	CameraComponent->FieldOfView = 22.f;
+	CameraComponent->AspectRatio = 0.74f;
 	CameraComponent->SetConstraintAspectRatio(true);
 	
 	CharacterSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("CharacterSpawnPoint"));
@@ -134,6 +134,8 @@ void AD1PocketStage::RefreshRenderTargetSize(FViewport* InViewport, uint32 InVal
 	{
 		ViewportSize = FVector2D(InViewport->GetSizeXY());
 	}
+
+	ViewportSize /= 2.f;
 	
 	const float ViewportAspectRatio = ViewportSize.X / ViewportSize.Y;
 	const float CameraAspectRatio = CameraComponent->AspectRatio;

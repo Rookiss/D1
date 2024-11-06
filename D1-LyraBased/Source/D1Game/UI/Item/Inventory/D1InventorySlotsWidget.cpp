@@ -25,14 +25,6 @@ UD1InventorySlotsWidget::UD1InventorySlotsWidget(const FObjectInitializer& Objec
 	
 }
 
-void UD1InventorySlotsWidget::NativeOnInitialized()
-{
-	Super::NativeOnInitialized();
-	
-	SlotWidgetClass = ULyraAssetManager::GetSubclassByName<UD1InventorySlotWidget>("InventorySlotWidgetClass");
-	EntryWidgetClass = ULyraAssetManager::GetSubclassByName<UD1InventoryEntryWidget>("InventoryEntryWidgetClass");
-}
-
 void UD1InventorySlotsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();

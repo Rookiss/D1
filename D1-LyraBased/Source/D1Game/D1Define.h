@@ -171,7 +171,7 @@ enum class ED1TeamID : uint8
 namespace Item
 {
 	const int32 GoldID = 9999;
-	const FIntPoint UnitInventorySlotSize = FIntPoint(45.f, 45.f);
+	const FIntPoint UnitInventorySlotSize = FIntPoint(41.f, 41.f);
 
 	const TArray<TArray<EEquipmentSlotType>> EquipmentSlotsByEquipState = {
 		{ EEquipmentSlotType::Unarmed_LeftHand,    EEquipmentSlotType::Unarmed_RightHand                                            },

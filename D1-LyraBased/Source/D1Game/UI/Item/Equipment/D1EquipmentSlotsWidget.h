@@ -42,8 +42,8 @@ private:
 	
 	void OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount);
 
-protected:
-	UPROPERTY(EditAnywhere, meta=(Categories="Message"))
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Categories="Message"))
 	FGameplayTag MessageChannelTag;
 	
 private:
