@@ -34,9 +34,6 @@ protected:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_ItemType;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_ItemClass;
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_AttributeModifiers;

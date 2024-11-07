@@ -1,5 +1,6 @@
 ﻿#include "D1EquipmentSlotWeaponWidget.h"
 
+#include "CommonVisibilitySwitcher.h"
 #include "D1Define.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
@@ -29,21 +30,14 @@ void UD1EquipmentSlotWeaponWidget::Init(EWeaponSlotType InWeaponSlotType, UD1Equ
 	EquipmentManager = InEquipmentManager;
 }
 
-void UD1EquipmentSlotWeaponWidget::NativePreConstruct()
-{
-	Super::NativePreConstruct();
-
-	Image_Icon_Left->SetBrushFromTexture(WeaponIconTexture_Left, true);
-	Image_Icon_Right->SetBrushFromTexture(WeaponIconTexture_Right, true);
-}
-
 void UD1EquipmentSlotWeaponWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
 	EntryWidgets.SetNum((int32)EWeaponHandType::Count);
-	SlotImages   = { Image_Slot_LeftHand, Image_Slot_RightHand, Image_Slot_TwoHand };
-	SlotOverlays = { Overlay_Slot_LeftHand, Overlay_Slot_RightHand, Overlay_Slot_TwoHand };
+	SlotRedImages = { Image_Red_LeftHand, Image_Red_RightHand, Image_Red_TwoHand };
+	SlotGreenImages = { Image_Green_LeftHand, Image_Green_RightHand, Image_Green_TwoHand };
+	SlotOverlays = { Overlay_LeftHand, Overlay_RightHand, Overlay_TwoHand };
 }
 
 bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -63,12 +57,9 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry,
 	if (FromItemInstance == nullptr)
 		return false;
 	
-	bool bIsValid = false;
-	UImage* TargetImage = Image_Slot_TwoHand;
-	
 	if (const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 	{
-		TargetImage = SlotImages[(int32)FromWeaponFragment->WeaponHandType];
+		bool bIsValid = false;
 		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, WeaponSlotType);
 	
 		if (UD1InventoryManagerComponent* FromInventoryManager = ItemDragDrop->FromInventoryManager)
@@ -94,9 +85,20 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry,
 				bIsValid = EquipmentManager->CanMoveOrMergeEquipment(FromEquipmentManager, ItemDragDrop->FromEquipmentSlotType, ToEquipmentSlotType) > 0;
 			}
 		}
+
+		const int32 WeaponHandIndex = (int32)FromWeaponFragment->WeaponHandType;
+		if (bIsValid)
+		{
+			SlotGreenImages[WeaponHandIndex]->SetVisibility(ESlateVisibility::Visible);
+			SlotRedImages[WeaponHandIndex]->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			SlotRedImages[WeaponHandIndex]->SetVisibility(ESlateVisibility::Visible);
+			SlotGreenImages[WeaponHandIndex]->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 	
-	ChangeHoverState(TargetImage, bIsValid ? ESlotState::Valid : ESlotState::Invalid);
 	return true;
 }
 
@@ -142,10 +144,15 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDrop(const FGeometry& InGeometry, con
 void UD1EquipmentSlotWeaponWidget::FinishDrag()
 {
 	Super::FinishDrag();
-	
-	for (UImage* TargetImage : SlotImages)
+
+	for (UImage* SlotGreenImage : SlotGreenImages)
 	{
-		ChangeHoverState(TargetImage, ESlotState::Default);
+		SlotGreenImage->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	for (UImage* SlotRedImage : SlotRedImages)
+	{
+		SlotRedImage->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
@@ -154,7 +161,7 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 	if (InWeaponHandType == EWeaponHandType::Count)
 		return;
 
-	int32 WeaponHandIndex = (int32)InWeaponHandType;
+	const int32 WeaponHandIndex = (int32)InWeaponHandType;
 	UOverlay* TargetOverlay = SlotOverlays[WeaponHandIndex];
 
 	if (UD1EquipmentEntryWidget* EntryWidget = EntryWidgets[WeaponHandIndex])
@@ -171,6 +178,8 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 		TargetOverlay->RemoveChild(EntryWidget);
 		EntryWidgets[WeaponHandIndex] = nullptr;
 	}
+
+	int32 ActiveWidgetIndex = Switcher_WeaponHand->GetActiveWidgetIndex();
 	
 	if (InItemInstance)
 	{
@@ -182,59 +191,15 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 		OverlaySlot->SetVerticalAlignment(VAlign_Fill);
 		
 		EntryWidget->Init(InItemInstance, InItemCount, UD1EquipManagerComponent::ConvertToEquipmentSlotType(InWeaponHandType, WeaponSlotType), EquipmentManager);
+		
+		if (InWeaponHandType == EWeaponHandType::TwoHand)
+			ActiveWidgetIndex = 1;
 	}
-
-	FSlateBrush LeftBrush, RightBrush;
-	
-	switch (InWeaponHandType)
+	else
 	{
-	case EWeaponHandType::LeftHand:
-		if (InItemInstance)
-		{
-			Image_Icon_Left->SetRenderOpacity(0.f);
-		}
-		else
-		{
-			Image_Icon_Left->SetRenderOpacity(1.f);
-		}
-		break;
-	case EWeaponHandType::RightHand:
-		if (InItemInstance)
-		{
-			Image_Icon_Right->SetRenderOpacity(0.f);
-		}
-		else
-		{
-			Image_Icon_Right->SetRenderOpacity(1.f);
-		}
-		break;
-	case EWeaponHandType::TwoHand:
-		if (InItemInstance)
-		{
-			Image_Icon_Left->SetRenderOpacity(0.f);
-			Image_Icon_Right->SetRenderOpacity(0.f);
-
-			LeftBrush = Image_Frame_Left->GetBrush();
-			LeftBrush.Margin.Right = 0.f;
-			Image_Frame_Left->SetBrush(LeftBrush);
-
-			RightBrush = Image_Frame_Right->GetBrush();
-			RightBrush.Margin.Left = 0.f;
-			Image_Frame_Right->SetBrush(RightBrush);
-		}
-		else
-		{
-			Image_Icon_Left->SetRenderOpacity(1.f);
-			Image_Icon_Right->SetRenderOpacity(1.f);
-
-			LeftBrush = Image_Frame_Left->GetBrush();
-			LeftBrush.Margin.Right = LeftBrush.Margin.Left / 2.f;
-			Image_Frame_Left->SetBrush(LeftBrush);
-
-			RightBrush = Image_Frame_Right->GetBrush();
-			RightBrush.Margin.Left = LeftBrush.Margin.Right / 2.f;
-			Image_Frame_Right->SetBrush(RightBrush);
-		}
-		break;
+		if (InWeaponHandType == EWeaponHandType::TwoHand)
+			ActiveWidgetIndex = 0;
 	}
+	
+	Switcher_WeaponHand->SetActiveWidgetIndex(ActiveWidgetIndex);
 }

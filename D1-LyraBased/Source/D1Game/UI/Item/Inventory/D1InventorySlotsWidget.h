@@ -4,6 +4,8 @@
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "D1InventorySlotsWidget.generated.h"
 
+class UOverlay;
+class UTextBlock;
 class UD1InventoryEntryWidget;
 class UD1InventorySlotWidget;
 class UD1InventoryManagerComponent;
@@ -30,6 +32,7 @@ public:
 	UD1InventorySlotsWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
+	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	
@@ -46,11 +49,15 @@ private:
 	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 InItemCount);
 
 public:
-	UD1InventoryManagerComponent* GetInventoryManagerComponent() const { return InventoryManager; }
+	UD1InventoryManagerComponent* GetInventoryManager() const { return InventoryManager; }
+	const FGeometry& GetWidgetGeometry() const;
 
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(Categories="Message"))
+public:
+	UPROPERTY(EditAnywhere, meta=(Categories="Message"))
 	FGameplayTag MessageChannelTag;
+
+	UPROPERTY(EditAnywhere)
+	FText TitleText;
 	
 private:
 	UPROPERTY(EditDefaultsOnly)
@@ -74,13 +81,22 @@ private:
 	
 private:
 	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> Text_Title;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UOverlay> Overlay_Slots;
+	
+	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UUniformGridPanel> GridPanel_Slots;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UCanvasPanel> CanvasPanel_Entries;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UCanvasPanel> CanvasPanel_SlotCovers;
 	
 private:
-	FDelegateHandle DelegateHandle;
+	FDelegateHandle EntryChangedDelegateHandle;
 	FIntPoint PrevDragOverSlotPos = FIntPoint(-1, -1);
 	FGameplayMessageListenerHandle ListenerHandle;
 };

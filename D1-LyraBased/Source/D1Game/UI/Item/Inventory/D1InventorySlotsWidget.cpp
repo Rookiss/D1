@@ -5,6 +5,8 @@
 #include "D1InventorySlotWidget.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Components/Overlay.h"
+#include "Components/TextBlock.h"
 #include "Components/UniformGridPanel.h"
 #include "Data/D1ItemData.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
@@ -13,7 +15,6 @@
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
-#include "System/LyraAssetManager.h"
 #include "UI/Item/D1ItemDragDrop.h"
 #include "UI/Item/Equipment/D1EquipmentEntryWidget.h"
 
@@ -22,7 +23,14 @@
 UD1InventorySlotsWidget::UD1InventorySlotsWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	
+	TitleText = FText::FromString(TEXT("Title"));
+}
+
+void UD1InventorySlotsWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+
+	Text_Title->SetText(TitleText);
 }
 
 void UD1InventorySlotsWidget::NativeConstruct()
@@ -48,9 +56,10 @@ bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, cons
 	Super::NativeOnDragOver(InGeometry, InDragDropEvent, InOperation);
 	
 	UD1ItemDragDrop* DragDrop = Cast<UD1ItemDragDrop>(InOperation);
-	check(DragDrop);
+	if (DragDrop == nullptr)
+		return false;
 	
-	FVector2D MouseWidgetPos = InGeometry.AbsoluteToLocal(InDragDropEvent.GetScreenSpacePosition());
+	FVector2D MouseWidgetPos = GetWidgetGeometry().AbsoluteToLocal(InDragDropEvent.GetScreenSpacePosition());
 	FVector2D ToWidgetPos = MouseWidgetPos - DragDrop->DeltaWidgetPos;
 	FIntPoint ToItemSlotPos = FIntPoint(ToWidgetPos.X / Item::UnitInventorySlotSize.X, ToWidgetPos.Y / Item::UnitInventorySlotSize.Y);
 
@@ -61,7 +70,8 @@ bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, cons
 	
 	UD1ItemEntryWidget* FromEntryWidget = DragDrop->FromEntryWidget;
 	UD1ItemInstance* FromItemInstance = FromEntryWidget->GetItemInstance();
-	check(FromItemInstance);
+	if (FromItemInstance == nullptr)
+		return false;
 	
 	const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromItemInstance->GetItemTemplateID());
 	const FIntPoint& FromItemSlotCount = FromItemTemplate.SlotCount;
@@ -92,7 +102,7 @@ bool UD1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, cons
 			if (UD1InventorySlotWidget* SlotWidget = SlotWidgets[Index])
 			{
 				HoveredSlotWidgets.Add(SlotWidget);
-				SlotWidget->ChangeHoverState(SlotWidget->Image_Slot, (MovableCount > 0) ? ESlotState::Valid : ESlotState::Invalid);
+				// SlotWidget->ChangeHoverState(SlotWidget->Image_Slot, (MovableCount > 0) ? ESlotState::Valid : ESlotState::Invalid);
 			}
 		}
 	}
@@ -118,7 +128,7 @@ bool UD1InventorySlotsWidget::NativeOnDrop(const FGeometry& InGeometry, const FD
 	UD1ItemEntryWidget* FromEntryWidget = DragDrop->FromEntryWidget;
 	FromEntryWidget->RefreshWidgetOpacity(true);
 	
-	FVector2D MouseWidgetPos = InGeometry.AbsoluteToLocal(InDragDropEvent.GetScreenSpacePosition());
+	FVector2D MouseWidgetPos = GetWidgetGeometry().AbsoluteToLocal(InDragDropEvent.GetScreenSpacePosition());
 	FVector2D ToWidgetPos = MouseWidgetPos - DragDrop->DeltaWidgetPos;
 	FIntPoint ToItemSlotPos = FIntPoint(ToWidgetPos.X / Item::UnitInventorySlotSize.X, ToWidgetPos.Y / Item::UnitInventorySlotSize.Y);
 
@@ -170,13 +180,13 @@ void UD1InventorySlotsWidget::ConstructUI(FGameplayTag Channel, const FInventory
 			OnInventoryEntryChanged(ItemSlotPos, ItemInstance, Entry.GetItemCount());
 		}
 	}
-	DelegateHandle = InventoryManager->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
+	EntryChangedDelegateHandle = InventoryManager->OnInventoryEntryChanged.AddUObject(this, &ThisClass::OnInventoryEntryChanged);
 }
 
 void UD1InventorySlotsWidget::DestructUI()
 {
-	InventoryManager->OnInventoryEntryChanged.Remove(DelegateHandle);
-	DelegateHandle.Reset();
+	InventoryManager->OnInventoryEntryChanged.Remove(EntryChangedDelegateHandle);
+	EntryChangedDelegateHandle.Reset();
 
 	CanvasPanel_Entries->ClearChildren();
 	EntryWidgets.Reset();
@@ -189,7 +199,7 @@ void UD1InventorySlotsWidget::UnhoverSlots()
 {
 	for (UD1InventorySlotWidget* SlotWidget : HoveredSlotWidgets)
 	{
-		SlotWidget->ChangeHoverState(SlotWidget->Image_Slot, ESlotState::Default);
+		// SlotWidget->ChangeHoverState(SlotWidget->Image_Slot, ESlotState::Default);
 	}
 	HoveredSlotWidgets.Reset();
 }
@@ -227,7 +237,7 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlo
 					{
 						if (UD1InventorySlotWidget* SlotWidget = SlotWidgets[y * InventorySlotCount.X + x])
 						{
-							SlotWidget->ChangeSlotState(SlotWidget->Image_Slot, ESlotState::Default);
+							// SlotWidget->ChangeSlotState(SlotWidget->Image_Slot, ESlotState::Default);
 						}
 					}
 				}
@@ -260,9 +270,14 @@ void UD1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlo
 			{
 				if (UD1InventorySlotWidget* SlotWidget = SlotWidgets[y * InventorySlotCount.X + x])
 				{
-					SlotWidget->ChangeSlotState(SlotWidget->Image_Slot, ESlotState::Valid);
+					// SlotWidget->ChangeSlotState(SlotWidget->Image_Slot, ESlotState::Valid);
 				}
 			}
 		}
 	}
+}
+
+const FGeometry& UD1InventorySlotsWidget::GetWidgetGeometry() const
+{
+	return Overlay_Slots->GetCachedGeometry();
 }

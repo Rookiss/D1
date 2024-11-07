@@ -2,7 +2,6 @@
 
 #include "D1InventorySlotsWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
-#include "Components/Image.h"
 #include "Components/SizeBox.h"
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
@@ -36,8 +35,8 @@ FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 {
 	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 	
-	FVector2D MouseWidgetPos = SlotsWidget->GetCachedGeometry().AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-	FVector2D ItemWidgetPos = SlotsWidget->GetCachedGeometry().AbsoluteToLocal(InGeometry.LocalToAbsolute(Item::UnitInventorySlotSize / 2.f));
+	FVector2D MouseWidgetPos = SlotsWidget->GetWidgetGeometry().AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+	FVector2D ItemWidgetPos = SlotsWidget->GetWidgetGeometry().AbsoluteToLocal(InGeometry.LocalToAbsolute(Item::UnitInventorySlotSize / 2.f));
 	FIntPoint ItemSlotPos = FIntPoint(ItemWidgetPos.X / Item::UnitInventorySlotSize.X, ItemWidgetPos.Y / Item::UnitInventorySlotSize.Y);
 	
 	CachedFromSlotPos = ItemSlotPos;
@@ -46,7 +45,7 @@ FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	if (Reply.IsEventHandled() == false && UWidgetBlueprintLibrary::IsDragDropping() == false && InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
 	{
 		UD1ItemManagerComponent* ItemManager = GetOwningPlayer()->FindComponentByClass<UD1ItemManagerComponent>();
-		UD1InventoryManagerComponent* FromInventoryManager = SlotsWidget->GetInventoryManagerComponent();
+		UD1InventoryManagerComponent* FromInventoryManager = SlotsWidget->GetInventoryManager();
 
 		if (ItemManager && FromInventoryManager)
 		{
@@ -73,7 +72,7 @@ void UD1InventoryEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	DragDrop->Pivot = EDragPivot::TopLeft;
 	DragDrop->Offset = -((CachedDeltaWidgetPos + Item::UnitInventorySlotSize / 2.f) / DragWidgetSize);
 	DragDrop->FromEntryWidget = this;
-	DragDrop->FromInventoryManager = SlotsWidget->GetInventoryManagerComponent();
+	DragDrop->FromInventoryManager = SlotsWidget->GetInventoryManager();
 	DragDrop->FromItemSlotPos = CachedFromSlotPos;
 	DragDrop->FromItemInstance = ItemInstance;
 	DragDrop->DeltaWidgetPos = CachedDeltaWidgetPos;

@@ -75,8 +75,6 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	}
 	Text_ItemRarity->SetText(ItemRarityText);
 	Text_ItemRarity->SetColorAndOpacity(Item::ItemRarityTextColors[(int32)ItemRarity]);
-	
-	Text_ItemType->SetColorAndOpacity(Item::ItemRarityTextColors[(int32)ItemRarity]);
 
 	// Item Specifics
 	if (const UD1ItemFragment_Equippable* EquippableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable>())
