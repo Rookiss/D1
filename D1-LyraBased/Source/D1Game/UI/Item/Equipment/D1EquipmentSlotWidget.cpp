@@ -14,10 +14,10 @@ void UD1EquipmentSlotWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropE
 {
 	Super::NativeOnDragLeave(InDragDropEvent, InOperation);
 
-	FinishDrag();
+	OnDragEnded();
 }
 
-void UD1EquipmentSlotWidget::FinishDrag()
+void UD1EquipmentSlotWidget::OnDragEnded()
 {
 	bAlreadyHovered = false;
 }

@@ -1,7 +1,7 @@
 ﻿#include "D1InventorySlotWidget.h"
 
-#include "D1Define.h"
 #include "Components/SizeBox.h"
+#include "Data/D1UIData.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1InventorySlotWidget)
 
@@ -14,7 +14,8 @@ UD1InventorySlotWidget::UD1InventorySlotWidget(const FObjectInitializer& ObjectI
 void UD1InventorySlotWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	
-	SizeBox_Root->SetWidthOverride(Item::UnitInventorySlotSize.X);
-	SizeBox_Root->SetHeightOverride(Item::UnitInventorySlotSize.Y);
+
+	FIntPoint UnitInventorySlotSize = UD1UIData::Get().UnitInventorySlotSize;
+	SizeBox_Root->SetWidthOverride(UnitInventorySlotSize.X);
+	SizeBox_Root->SetHeightOverride(UnitInventorySlotSize.Y);
 }

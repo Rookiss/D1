@@ -8,6 +8,7 @@
 #include "Components/Image.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
+#include "Data/D1UIData.h"
 #include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
@@ -37,7 +38,7 @@ void UD1EquipmentSlotWeaponWidget::NativeOnInitialized()
 	EntryWidgets.SetNum((int32)EWeaponHandType::Count);
 	SlotRedImages = { Image_Red_LeftHand, Image_Red_RightHand, Image_Red_TwoHand };
 	SlotGreenImages = { Image_Green_LeftHand, Image_Green_RightHand, Image_Green_TwoHand };
-	SlotOverlays = { Overlay_LeftHand, Overlay_RightHand, Overlay_TwoHand };
+	SlotOverlays = { Overlay_LeftHandEntry, Overlay_RightHandEntry, Overlay_TwoHandEntry };
 }
 
 bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -56,10 +57,12 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry,
 	UD1ItemInstance* FromItemInstance = ItemDragDrop->FromItemInstance;
 	if (FromItemInstance == nullptr)
 		return false;
+
+	bool bIsValid = false;
+	UImage* TargetImage = Image_Red_TwoHand;
 	
 	if (const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
 	{
-		bool bIsValid = false;
 		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, WeaponSlotType);
 	
 		if (UD1InventoryManagerComponent* FromInventoryManager = ItemDragDrop->FromInventoryManager)
@@ -87,16 +90,12 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry,
 		}
 
 		const int32 WeaponHandIndex = (int32)FromWeaponFragment->WeaponHandType;
-		if (bIsValid)
-		{
-			SlotGreenImages[WeaponHandIndex]->SetVisibility(ESlateVisibility::Visible);
-			SlotRedImages[WeaponHandIndex]->SetVisibility(ESlateVisibility::Hidden);
-		}
-		else
-		{
-			SlotRedImages[WeaponHandIndex]->SetVisibility(ESlateVisibility::Visible);
-			SlotGreenImages[WeaponHandIndex]->SetVisibility(ESlateVisibility::Hidden);
-		}
+		TargetImage = bIsValid ? SlotGreenImages[WeaponHandIndex] : SlotRedImages[WeaponHandIndex];
+	}
+
+	if (TargetImage)
+	{
+		TargetImage->SetVisibility(ESlateVisibility::Visible);
 	}
 	
 	return true;
@@ -106,7 +105,7 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDrop(const FGeometry& InGeometry, con
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
-	FinishDrag();
+	OnDragEnded();
 	
 	UD1ItemDragDrop* ItemDragDrop = Cast<UD1ItemDragDrop>(InOperation);
 	if (ItemDragDrop == nullptr)
@@ -141,9 +140,9 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDrop(const FGeometry& InGeometry, con
 	return true;
 }
 
-void UD1EquipmentSlotWeaponWidget::FinishDrag()
+void UD1EquipmentSlotWeaponWidget::OnDragEnded()
 {
-	Super::FinishDrag();
+	Super::OnDragEnded();
 
 	for (UImage* SlotGreenImage : SlotGreenImages)
 	{
@@ -179,10 +178,11 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 		EntryWidgets[WeaponHandIndex] = nullptr;
 	}
 
-	int32 ActiveWidgetIndex = Switcher_WeaponHand->GetActiveWidgetIndex();
+	int32 ActiveWidgetIndex = Switcher_WeaponHandEntry->GetActiveWidgetIndex();
 	
 	if (InItemInstance)
 	{
+		TSubclassOf<UD1EquipmentEntryWidget> EntryWidgetClass = UD1UIData::Get().EquipmentEntryWidgetClass;
 		UD1EquipmentEntryWidget* EntryWidget = CreateWidget<UD1EquipmentEntryWidget>(GetOwningPlayer(), EntryWidgetClass);
 		EntryWidgets[WeaponHandIndex] = EntryWidget;
 		
@@ -201,5 +201,5 @@ void UD1EquipmentSlotWeaponWidget::OnEquipmentEntryChanged(EWeaponHandType InWea
 			ActiveWidgetIndex = 0;
 	}
 	
-	Switcher_WeaponHand->SetActiveWidgetIndex(ActiveWidgetIndex);
+	Switcher_WeaponHandEntry->SetActiveWidgetIndex(ActiveWidgetIndex);
 }

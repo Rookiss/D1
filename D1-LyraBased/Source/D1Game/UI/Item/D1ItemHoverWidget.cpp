@@ -44,12 +44,16 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 		SetVisibility(ESlateVisibility::Collapsed);
 		return;
 	}
-	
+
 	SetVisibility(ESlateVisibility::HitTestInvisible);
+	PlayAnimationForward(Animation_FadeIn);
 	
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
 	const EItemRarity ItemRarity = ItemInstance->GetItemRarity();
 
+	FColor RarityColor = UD1UIData::Get().GetRarityColor(ItemRarity);
+	Text_IsEquipped->SetColorAndOpacity(RarityColor);
+	
 	// Default Visibility
 	Text_WeaponHandType->SetVisibility(ESlateVisibility::Collapsed);
 	Text_AttributeModifiers->SetVisibility(ESlateVisibility::Collapsed);
@@ -58,8 +62,10 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	
 	// Display Name
 	Text_DisplayName->SetText(ItemTemplate.DisplayName);
-	Text_DisplayName->SetColorAndOpacity(Item::ItemRarityTextColors[(int32)ItemRarity]);
-	Image_DisplayName_Background->SetColorAndOpacity(Item::ItemRarityBackgroundColors[(int32)ItemRarity]);
+	Text_DisplayName->SetColorAndOpacity(RarityColor);
+
+	UTexture2D* RarityTexture = UD1UIData::Get().GetHoverRarityTexture(ItemRarity);
+	Image_DisplayName_Background->SetBrushFromTexture(RarityTexture);
 
 	// Item Rarity
 	FText ItemRarityText;
@@ -74,7 +80,7 @@ void UD1ItemHoverWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	case EItemRarity::Legendary:	ItemRarityText = LOCTEXT("ItemRarity-Legendary",	"Legendary");	break;
 	}
 	Text_ItemRarity->SetText(ItemRarityText);
-	Text_ItemRarity->SetColorAndOpacity(Item::ItemRarityTextColors[(int32)ItemRarity]);
+	Text_ItemRarity->SetColorAndOpacity(RarityColor);
 
 	// Item Specifics
 	if (const UD1ItemFragment_Equippable* EquippableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable>())

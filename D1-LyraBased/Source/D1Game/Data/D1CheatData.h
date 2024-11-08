@@ -17,7 +17,7 @@ public:
 	const TSubclassOf<UGameplayEffect> GetResetCooldownGameplayEffectClass() const { return ResetCooldownGameplayEffectClass; }
 	const TSubclassOf<UGameplayEffect> GetResetVitalGameplayEffectClass() const { return ResetVitalGameplayEffectClass; }
 	
-protected:
+private:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSoftObjectPtr<UAnimMontage>> AnimMontagePaths;
 

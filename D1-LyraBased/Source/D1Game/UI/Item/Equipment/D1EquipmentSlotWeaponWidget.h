@@ -26,7 +26,7 @@ protected:
 	virtual void NativeOnInitialized() override;
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-	virtual void FinishDrag() override;
+	virtual void OnDragEnded() override;
 
 public:
 	void OnEquipmentEntryChanged(EWeaponHandType InWeaponHandType, UD1ItemInstance* InItemInstance, int32 InItemCount);
@@ -46,16 +46,16 @@ private:
 
 private:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UCommonVisibilitySwitcher> Switcher_WeaponHand;
+	TObjectPtr<UCommonVisibilitySwitcher> Switcher_WeaponHandEntry;
 	
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UOverlay> Overlay_LeftHand;
+	TObjectPtr<UOverlay> Overlay_LeftHandEntry;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UOverlay> Overlay_RightHand;
+	TObjectPtr<UOverlay> Overlay_RightHandEntry;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UOverlay> Overlay_TwoHand;
+	TObjectPtr<UOverlay> Overlay_TwoHandEntry;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Red_LeftHand;
@@ -74,12 +74,6 @@ private:
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Green_TwoHand;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Hover_LeftHand;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Hover_RightHand;
 
 private:
 	EWeaponSlotType WeaponSlotType = EWeaponSlotType::Count;

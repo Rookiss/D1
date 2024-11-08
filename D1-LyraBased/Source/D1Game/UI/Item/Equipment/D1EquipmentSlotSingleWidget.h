@@ -34,7 +34,7 @@ protected:
 	virtual void NativePreConstruct() override;
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-	virtual void FinishDrag() override;
+	virtual void OnDragEnded() override;
 
 public:
 	void OnEquipmentEntryChanged(UD1ItemInstance* InItemInstance, int32 InItemCount);
@@ -42,9 +42,9 @@ public:
 private:
 	EEquipmentSlotType GetEquipmentSlotType() const;
 	
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UTexture2D> IconTexture;
+protected:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UTexture2D> BaseIconTexture;
 	
 private:
 	UPROPERTY()
@@ -52,13 +52,16 @@ private:
 
 protected:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UOverlay> Overlay_Root;
+	TObjectPtr<UOverlay> Overlay_Entry;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Slot;
+	TObjectPtr<UImage> Image_BaseIcon;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(BindWidget))
-	TObjectPtr<UImage> Image_Icon;
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Red;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Green;
 
 private:
 	EEquipmentSingleSlotType EquipmentSingleSlotType = EEquipmentSingleSlotType::None;

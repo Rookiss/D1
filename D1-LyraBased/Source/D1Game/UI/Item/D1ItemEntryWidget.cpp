@@ -7,17 +7,14 @@
 #include "D1ItemDragWidget.h"
 #include "D1ItemHoversWidget.h"
 #include "Components/TextBlock.h"
+#include "Data/D1UIData.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemEntryWidget)
 
 UD1ItemEntryWidget::UD1ItemEntryWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	EntryRarityTextures.SetNum((int32)EItemRarity::Count);
-	for (int i = 0; i < EntryRarityTextures.Num(); i++)
-	{
-		EntryRarityTextures[i].Rarity = (EItemRarity)i;
-	}
+	
 }
 
 void UD1ItemEntryWidget::NativeOnInitialized()
@@ -53,6 +50,7 @@ void UD1ItemEntryWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const F
 
 	if (HoversWidget == nullptr)
 	{
+		TSubclassOf<UD1ItemHoversWidget> HoversWidgetClass = UD1UIData::Get().HoversWidgetClass;
 		HoversWidget = CreateWidget<UD1ItemHoversWidget>(GetOwningPlayer(), HoversWidgetClass);
 	}
 	
@@ -127,7 +125,9 @@ void UD1ItemEntryWidget::RefreshUI(UD1ItemInstance* NewItemInstance, int32 NewIt
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
 	Image_Icon->SetBrushFromTexture(ItemTemplate.IconTexture, true);
 	Text_Count->SetText(ItemCount <= 1 ? FText::GetEmpty() : FText::AsNumber(ItemCount));
-	Image_RarityCover->SetBrushFromTexture(EntryRarityTextures[(int32)ItemInstance->GetItemRarity()].Texture, false);
+
+	UTexture2D* RarityTexture = UD1UIData::Get().GetEntryRarityTexture(ItemInstance->GetItemRarity());
+	Image_RarityCover->SetBrushFromTexture(RarityTexture, true);
 }
 
 void UD1ItemEntryWidget::RefreshItemCount(int32 NewItemCount)

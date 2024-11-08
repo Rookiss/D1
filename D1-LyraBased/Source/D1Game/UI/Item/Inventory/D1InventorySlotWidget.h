@@ -20,7 +20,4 @@ protected:
 public:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<USizeBox> SizeBox_Root;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Slot;
 };

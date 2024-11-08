@@ -3,6 +3,7 @@
 #include "D1EquipmentSlotsWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Data/D1ItemData.h"
+#include "Data/D1UIData.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/D1ItemTemplate.h"
 #include "UI/Item/D1ItemDragDrop.h"
@@ -23,6 +24,7 @@ void UD1EquipmentEntryWidget::Init(UD1ItemInstance* InItemInstance, int32 InItem
 		return;
 	
 	RefreshUI(InItemInstance, InItemCount);
+	
 	EquipmentSlotType = InEquipmentSlotType;
 	EquipmentManager = InEquipmentManager;
 }
@@ -31,10 +33,12 @@ void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
+	FIntPoint UnitInventorySlotSize = UD1UIData::Get().UnitInventorySlotSize;
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
-	
+
+	TSubclassOf<UD1ItemDragWidget> DragWidgetClass = UD1UIData::Get().DragWidgetClass;
 	UD1ItemDragWidget* ItemDragWidget = CreateWidget<UD1ItemDragWidget>(GetOwningPlayer(), DragWidgetClass);
-	FVector2D DragWidgetSize = FVector2D(ItemTemplate.SlotCount * Item::UnitInventorySlotSize);
+	FVector2D DragWidgetSize = FVector2D(ItemTemplate.SlotCount * UnitInventorySlotSize);
 	ItemDragWidget->Init(DragWidgetSize, ItemTemplate.IconTexture, ItemCount);
 	
 	UD1ItemDragDrop* ItemDragDrop = NewObject<UD1ItemDragDrop>();
@@ -44,7 +48,7 @@ void UD1EquipmentEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	ItemDragDrop->FromEquipmentManager = EquipmentManager;
 	ItemDragDrop->FromEquipmentSlotType = EquipmentSlotType;
 	ItemDragDrop->FromItemInstance = ItemInstance;
-	ItemDragDrop->DeltaWidgetPos = (DragWidgetSize / 2.f) - (Item::UnitInventorySlotSize / 2.f);
+	ItemDragDrop->DeltaWidgetPos = (DragWidgetSize / 2.f) - (UnitInventorySlotSize / 2.f);
 	OutOperation = ItemDragDrop;
 }
 

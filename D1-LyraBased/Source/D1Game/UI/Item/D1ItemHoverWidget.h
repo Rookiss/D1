@@ -23,6 +23,10 @@ public:
 	void RefreshUI(const UD1ItemInstance* ItemInstance);
 
 protected:
+	UPROPERTY(EditAnywhere)
+	bool bIsEquippedWidget = false;
+	
+protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_DisplayName;
 
@@ -49,12 +53,10 @@ protected:
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_WeaponHandType;
-
-protected:
+	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_DisplayName_Background;
 
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bIsEquippedWidget = false;
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> Animation_FadeIn;
 };

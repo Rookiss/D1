@@ -154,6 +154,11 @@ const UD1CheatData& ULyraAssetManager::GetCheatData()
 	return GetOrLoadTypedGameData<UD1CheatData>(CheatDataPath);
 }
 
+const UD1UIData& ULyraAssetManager::GetUIData()
+{
+	return GetOrLoadTypedGameData<UD1UIData>(UIDataPath);
+}
+
 void ULyraAssetManager::StartInitialLoading()
 {
 	SCOPED_BOOT_TIMING("ULyraAssetManager::StartInitialLoading");
@@ -172,6 +177,7 @@ void ULyraAssetManager::StartInitialLoading()
 		STARTUP_JOB_WEIGHTED(GetMonsterData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetItemData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetElectricFieldPhaseData(), 25.f);
+		STARTUP_JOB_WEIGHTED(GetUIData(), 25.f);
 	}
 
 	// Run all the queued up startup jobs
@@ -315,6 +321,7 @@ void ULyraAssetManager::PreBeginPIE(bool bStartSimulate)
 		GetItemData();
 		GetElectricFieldPhaseData();
 		GetCheatData();
+		GetUIData();
 
 		// Intentionally after GetGameData to avoid counting GameData time in this timer
 		SCOPE_LOG_TIME_IN_SECONDS(TEXT("PreBeginPIE asset preloading complete"), nullptr);

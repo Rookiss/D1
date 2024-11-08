@@ -16,7 +16,7 @@ public:
 public:
 	ULyraPawnData* GetPawnData(TSubclassOf<AAIController> AIControllerClass) const;
 	
-public:
+private:
 	UPROPERTY(EditDefaultsOnly)
 	TMap<TSubclassOf<AAIController>, TObjectPtr<ULyraPawnData>> PawnDataMap;
 };

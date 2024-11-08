@@ -4,6 +4,7 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/SizeBox.h"
 #include "Data/D1ItemData.h"
+#include "Data/D1UIData.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equippable.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
@@ -21,23 +22,30 @@ UD1InventoryEntryWidget::UD1InventoryEntryWidget(const FObjectInitializer& Objec
 
 void UD1InventoryEntryWidget::Init(UD1InventorySlotsWidget* InSlotsWidget, UD1ItemInstance* InItemInstance, int32 InItemCount)
 {
-	SlotsWidget = InSlotsWidget;
-	RefreshUI(InItemInstance, InItemCount);
+	if (InSlotsWidget == nullptr || InItemInstance == nullptr)
+		return;
 	
-	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
+	SlotsWidget = InSlotsWidget;
 
-	FVector2D WidgetSize = FVector2D(ItemTemplate.SlotCount.X * Item::UnitInventorySlotSize.X, ItemTemplate.SlotCount.Y * Item::UnitInventorySlotSize.Y);
+	FIntPoint UnitInventorySlotSize = UD1UIData::Get().UnitInventorySlotSize;
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(InItemInstance->GetItemTemplateID());
+
+	FVector2D WidgetSize = FVector2D(ItemTemplate.SlotCount.X * UnitInventorySlotSize.X, ItemTemplate.SlotCount.Y * UnitInventorySlotSize.Y);
 	SizeBox_Root->SetWidthOverride(WidgetSize.X);
 	SizeBox_Root->SetHeightOverride(WidgetSize.Y);
+	
+	RefreshUI(InItemInstance, InItemCount);
 }
 
 FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+
+	FIntPoint UnitInventorySlotSize = UD1UIData::Get().UnitInventorySlotSize;
 	
-	FVector2D MouseWidgetPos = SlotsWidget->GetWidgetGeometry().AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-	FVector2D ItemWidgetPos = SlotsWidget->GetWidgetGeometry().AbsoluteToLocal(InGeometry.LocalToAbsolute(Item::UnitInventorySlotSize / 2.f));
-	FIntPoint ItemSlotPos = FIntPoint(ItemWidgetPos.X / Item::UnitInventorySlotSize.X, ItemWidgetPos.Y / Item::UnitInventorySlotSize.Y);
+	FVector2D MouseWidgetPos = SlotsWidget->GetSlotContainerGeometry().AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+	FVector2D ItemWidgetPos = SlotsWidget->GetSlotContainerGeometry().AbsoluteToLocal(InGeometry.LocalToAbsolute(UnitInventorySlotSize / 2.f));
+	FIntPoint ItemSlotPos = FIntPoint(ItemWidgetPos.X / UnitInventorySlotSize.X, ItemWidgetPos.Y / UnitInventorySlotSize.Y);
 	
 	CachedFromSlotPos = ItemSlotPos;
 	CachedDeltaWidgetPos = MouseWidgetPos - ItemWidgetPos;
@@ -60,17 +68,19 @@ FReply UD1InventoryEntryWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 void UD1InventoryEntryWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-	
+
+	FIntPoint UnitInventorySlotSize = UD1UIData::Get().UnitInventorySlotSize;
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
-	
+
+	TSubclassOf<UD1ItemDragWidget> DragWidgetClass = UD1UIData::Get().DragWidgetClass;
 	UD1ItemDragWidget* DragWidget = CreateWidget<UD1ItemDragWidget>(GetOwningPlayer(), DragWidgetClass);
-	FVector2D DragWidgetSize = FVector2D(ItemTemplate.SlotCount.X * Item::UnitInventorySlotSize.X, ItemTemplate.SlotCount.Y * Item::UnitInventorySlotSize.Y);
+	FVector2D DragWidgetSize = FVector2D(ItemTemplate.SlotCount.X * UnitInventorySlotSize.X, ItemTemplate.SlotCount.Y * UnitInventorySlotSize.Y);
 	DragWidget->Init(DragWidgetSize, ItemTemplate.IconTexture, ItemCount);
 	
 	UD1ItemDragDrop* DragDrop = NewObject<UD1ItemDragDrop>();
 	DragDrop->DefaultDragVisual = DragWidget;
 	DragDrop->Pivot = EDragPivot::TopLeft;
-	DragDrop->Offset = -((CachedDeltaWidgetPos + Item::UnitInventorySlotSize / 2.f) / DragWidgetSize);
+	DragDrop->Offset = -((CachedDeltaWidgetPos + UnitInventorySlotSize / 2.f) / DragWidgetSize);
 	DragDrop->FromEntryWidget = this;
 	DragDrop->FromInventoryManager = SlotsWidget->GetInventoryManager();
 	DragDrop->FromItemSlotPos = CachedFromSlotPos;

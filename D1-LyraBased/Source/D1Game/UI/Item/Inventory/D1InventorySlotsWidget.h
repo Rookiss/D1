@@ -4,6 +4,7 @@
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "D1InventorySlotsWidget.generated.h"
 
+class UD1InventoryValidWidget;
 class UOverlay;
 class UTextBlock;
 class UD1InventoryEntryWidget;
@@ -44,13 +45,13 @@ private:
 	void ConstructUI(FGameplayTag Channel, const FInventoryInitializeMessage& Message);
 	void DestructUI();
 	
-	void UnhoverSlots();
+	void ResetValidSlots();
 	void FinishDrag();
 	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 InItemCount);
 
 public:
 	UD1InventoryManagerComponent* GetInventoryManager() const { return InventoryManager; }
-	const FGeometry& GetWidgetGeometry() const;
+	const FGeometry& GetSlotContainerGeometry() const;
 
 public:
 	UPROPERTY(EditAnywhere, meta=(Categories="Message"))
@@ -58,13 +59,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FText TitleText;
-	
-private:
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UD1InventorySlotWidget> SlotWidgetClass;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UD1InventoryEntryWidget> EntryWidgetClass;
 
 private:
 	UPROPERTY()
@@ -74,7 +68,7 @@ private:
 	TArray<TObjectPtr<UD1InventoryEntryWidget>> EntryWidgets;
 
 	UPROPERTY()
-	TArray<TObjectPtr<UD1InventorySlotWidget>> HoveredSlotWidgets;
+	TArray<TObjectPtr<UD1InventoryValidWidget>> ValidWidgets;
 
 	UPROPERTY()
 	TObjectPtr<UD1InventoryManagerComponent> InventoryManager;
@@ -93,7 +87,7 @@ private:
 	TObjectPtr<UCanvasPanel> CanvasPanel_Entries;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UCanvasPanel> CanvasPanel_SlotCovers;
+	TObjectPtr<UUniformGridPanel> GridPanel_ValidSlots;
 	
 private:
 	FDelegateHandle EntryChangedDelegateHandle;

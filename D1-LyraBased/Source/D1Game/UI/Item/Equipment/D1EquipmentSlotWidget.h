@@ -16,11 +16,7 @@ public:
 
 protected:
 	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-	virtual void FinishDrag();
-	
-protected:
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UD1EquipmentEntryWidget> EntryWidgetClass;
+	virtual void OnDragEnded();
 
 protected:
 	UPROPERTY()

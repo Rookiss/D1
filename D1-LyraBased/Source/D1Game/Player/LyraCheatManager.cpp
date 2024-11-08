@@ -487,7 +487,8 @@ void ULyraCheatManager::EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<
 
 	UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
 	int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
-	ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
+	EItemRarity RandomItemRarity = (EItemRarity)FMath::RandRange(0, (int32)EItemRarity::Count - 1);
+	ItemInstance->Init(ItemTemplateID, RandomItemRarity);
 	EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponFragment->WeaponHandType, WeaponSlotType), ItemInstance, 1);
 	
 	if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
@@ -525,7 +526,8 @@ void ULyraCheatManager::EquipUtility(EUtilitySlotType UtilitySlotType, TSubclass
 
 	UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
 	int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
-	ItemInstance->Init(ItemTemplateID, EItemRarity::Junk);
+	EItemRarity RandomItemRarity = (EItemRarity)FMath::RandRange(0, (int32)EItemRarity::Count - 1);
+	ItemInstance->Init(ItemTemplateID, RandomItemRarity);
 	EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(UtilitySlotType), ItemInstance, 1);
 	
 	if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
@@ -567,7 +569,8 @@ void ULyraCheatManager::EquipArmor(TSubclassOf<UD1ItemTemplate> ItemTemplateClas
 
 	UD1ItemInstance* ItemInstance = NewObject<UD1ItemInstance>();
 	int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
-	ItemInstance->Init(ItemTemplateID, EItemRarity::Normal);
+	EItemRarity RandomItemRarity = (EItemRarity)FMath::RandRange(0, (int32)EItemRarity::Count - 1);
+	ItemInstance->Init(ItemTemplateID, RandomItemRarity);
 	EquipmentManager->AddEquipment_Unsafe(UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorFragment->ArmorType), ItemInstance, 1);
 }
 

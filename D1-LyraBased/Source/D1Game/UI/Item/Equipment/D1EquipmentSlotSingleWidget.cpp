@@ -12,6 +12,7 @@
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
+#include "System/LyraAssetManager.h"
 #include "UI/Item/D1ItemDragDrop.h"
 #include "UI/Item/Equipment/D1EquipmentEntryWidget.h"
 #include "UI/Item/Inventory/D1InventoryEntryWidget.h"
@@ -46,7 +47,10 @@ void UD1EquipmentSlotSingleWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
-	Image_Icon->SetBrushFromTexture(IconTexture, true);
+	if (Image_BaseIcon)
+	{
+		Image_BaseIcon->SetBrushFromTexture(BaseIconTexture, true);
+	}
 }
 
 bool UD1EquipmentSlotSingleWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -94,8 +98,17 @@ bool UD1EquipmentSlotSingleWidget::NativeOnDragOver(const FGeometry& InGeometry,
 			bIsValid = EquipmentManager->CanMoveOrMergeEquipment(FromEquipmentManager, ItemDragDrop->FromEquipmentSlotType, ToEquipmentSlotType) > 0;
 		}
 	}
-	//
-	// ChangeHoverState(Image_Slot, bIsValid ? ESlotState::Valid : ESlotState::Invalid);
+	
+	if (bIsValid)
+	{
+		Image_Red->SetVisibility(ESlateVisibility::Hidden);
+		Image_Green->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		Image_Red->SetVisibility(ESlateVisibility::Visible);
+		Image_Green->SetVisibility(ESlateVisibility::Hidden);
+	}
 	return true;
 }
 
@@ -103,7 +116,7 @@ bool UD1EquipmentSlotSingleWidget::NativeOnDrop(const FGeometry& InGeometry, con
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
-	FinishDrag();
+	OnDragEnded();
 
 	UD1ItemDragDrop* ItemDragDrop = Cast<UD1ItemDragDrop>(InOperation);
 	if (ItemDragDrop == nullptr)
@@ -147,36 +160,38 @@ bool UD1EquipmentSlotSingleWidget::NativeOnDrop(const FGeometry& InGeometry, con
 	return true;
 }
 
-void UD1EquipmentSlotSingleWidget::FinishDrag()
+void UD1EquipmentSlotSingleWidget::OnDragEnded()
 {
-	Super::FinishDrag();
-	
-	// ChangeHoverState(Image_Slot, ESlotState::Default);
+	Super::OnDragEnded();
+
+	Image_Red->SetVisibility(ESlateVisibility::Hidden);
+	Image_Green->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UD1EquipmentSlotSingleWidget::OnEquipmentEntryChanged(UD1ItemInstance* InItemInstance, int32 InItemCount)
 {
 	if (EntryWidget)
 	{
-		Overlay_Root->RemoveChild(EntryWidget);
+		Overlay_Entry->RemoveChild(EntryWidget);
 		EntryWidget = nullptr;
 	}
 	
 	if (InItemInstance)
 	{
+		TSubclassOf<UD1EquipmentEntryWidget> EntryWidgetClass = UD1UIData::Get().EquipmentEntryWidgetClass;
 		EntryWidget = CreateWidget<UD1EquipmentEntryWidget>(GetOwningPlayer(), EntryWidgetClass);
 		
-		UOverlaySlot* OverlaySlot = Overlay_Root->AddChildToOverlay(EntryWidget);
+		UOverlaySlot* OverlaySlot = Overlay_Entry->AddChildToOverlay(EntryWidget);
 		OverlaySlot->SetHorizontalAlignment(HAlign_Fill);
 		OverlaySlot->SetVerticalAlignment(VAlign_Fill);
 		
 		EntryWidget->Init(InItemInstance, InItemCount, GetEquipmentSlotType(), EquipmentManager);
 
-		Image_Icon->SetRenderOpacity(0.f);
+		Image_BaseIcon->SetRenderOpacity(0.f);
 	}
 	else
 	{
-		Image_Icon->SetRenderOpacity(1.f);
+		Image_BaseIcon->SetRenderOpacity(1.f);
 	}
 }
 

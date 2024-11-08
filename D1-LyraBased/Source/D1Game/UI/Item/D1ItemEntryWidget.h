@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "D1Define.h"
 #include "Blueprint/UserWidget.h"
 #include "D1ItemEntryWidget.generated.h"
 
@@ -9,19 +8,6 @@ class UTextBlock;
 class UD1ItemInstance;
 class UD1ItemDragWidget;
 class UD1ItemHoversWidget;
-
-USTRUCT(BlueprintType)
-struct FEntryRarityTexture
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(VisibleDefaultsOnly)
-	EItemRarity Rarity = EItemRarity::Junk;
-
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UTexture2D> Texture;
-};
 
 UCLASS()
 class UD1ItemEntryWidget : public UUserWidget
@@ -74,14 +60,4 @@ protected:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_Count;
-
-protected:
-	UPROPERTY(EditDefaultsOnly)
-	TArray<FEntryRarityTexture> EntryRarityTextures;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UD1ItemDragWidget> DragWidgetClass;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UD1ItemHoversWidget> HoversWidgetClass;
 };

@@ -5,6 +5,7 @@
 #include "Engine/AssetManager.h"
 #include "LyraAssetManagerStartupJob.h"
 #include "Data/D1AssetData.h"
+#include "Data/D1UIData.h"
 #include "Templates/SubclassOf.h"
 #include "LyraAssetManager.generated.h"
 
@@ -68,6 +69,7 @@ public:
 	const UD1ItemData& GetItemData();
 	const UD1ElectricFieldPhaseData& GetElectricFieldPhaseData();
 	const UD1CheatData& GetCheatData();
+	const UD1UIData& GetUIData();
 
 protected:
 	template <typename GameDataClass>
@@ -124,6 +126,9 @@ protected:
 
 	UPROPERTY(Config)
 	TSoftObjectPtr<UD1CheatData> CheatDataPath;
+
+	UPROPERTY(Config)
+	TSoftObjectPtr<UD1UIData> UIDataPath;
 	
 	UPROPERTY(Transient)
 	TMap<TObjectPtr<UClass>, TObjectPtr<UPrimaryDataAsset>> GameDataMap;
