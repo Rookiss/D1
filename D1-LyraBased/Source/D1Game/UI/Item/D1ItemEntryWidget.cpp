@@ -4,7 +4,6 @@
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/D1ItemTemplate.h"
-#include "System/LyraAssetManager.h"
 #include "D1ItemDragWidget.h"
 #include "D1ItemHoversWidget.h"
 #include "Components/TextBlock.h"
@@ -14,24 +13,25 @@
 UD1ItemEntryWidget::UD1ItemEntryWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+	EntryRarityTextures.SetNum((int32)EItemRarity::Count);
+	for (int i = 0; i < EntryRarityTextures.Num(); i++)
+	{
+		EntryRarityTextures[i].Rarity = (EItemRarity)i;
+	}
 }
 
 void UD1ItemEntryWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-
-	DragWidgetClass = ULyraAssetManager::GetSubclassByName<UD1ItemDragWidget>("DragWidgetClass");
-	HoversWidgetClass = ULyraAssetManager::GetSubclassByName<UD1ItemHoversWidget>("HoversWidgetClass");
-
+	
 	Text_Count->SetText(FText::GetEmpty());
 }
 
 void UD1ItemEntryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	Image_Hover->SetRenderOpacity(0.f);
+	
+	Image_Hover->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UD1ItemEntryWidget::NativeDestruct()
@@ -49,12 +49,13 @@ void UD1ItemEntryWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const F
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 
-	Image_Hover->SetRenderOpacity(1.f);
+	Image_Hover->SetVisibility(ESlateVisibility::Visible);
 
 	if (HoversWidget == nullptr)
 	{
 		HoversWidget = CreateWidget<UD1ItemHoversWidget>(GetOwningPlayer(), HoversWidgetClass);
 	}
+	
 	HoversWidget->RefreshUI(ItemInstance);
 	HoversWidget->AddToViewport();
 }
@@ -76,7 +77,7 @@ void UD1ItemEntryWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
 
-	Image_Hover->SetRenderOpacity(0.f);
+	Image_Hover->SetVisibility(ESlateVisibility::Hidden);
 
 	if (HoversWidget)
 	{
@@ -126,6 +127,7 @@ void UD1ItemEntryWidget::RefreshUI(UD1ItemInstance* NewItemInstance, int32 NewIt
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
 	Image_Icon->SetBrushFromTexture(ItemTemplate.IconTexture, true);
 	Text_Count->SetText(ItemCount <= 1 ? FText::GetEmpty() : FText::AsNumber(ItemCount));
+	Image_RarityCover->SetBrushFromTexture(EntryRarityTextures[(int32)ItemInstance->GetItemRarity()].Texture, false);
 }
 
 void UD1ItemEntryWidget::RefreshItemCount(int32 NewItemCount)

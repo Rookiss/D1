@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-#include "UI/Item/D1ItemSlotWidget.h"
+#include "Blueprint/UserWidget.h"
 #include "D1InventorySlotWidget.generated.h"
 
 class UImage;
 class USizeBox;
 
 UCLASS()
-class UD1InventorySlotWidget : public UD1ItemSlotWidget
+class UD1InventorySlotWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	

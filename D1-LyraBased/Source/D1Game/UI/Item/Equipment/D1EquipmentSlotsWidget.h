@@ -9,8 +9,7 @@
 class UD1ItemInstance;
 class UD1ItemSlotWidget;
 class UD1EquipmentSlotWeaponWidget;
-class UD1EquipmentSlotArmorWidget;
-class UD1EquipmentSlotUtilityWidget;
+class UD1EquipmentSlotSingleWidget;
 class UD1EquipmentManagerComponent;
 
 USTRUCT(BlueprintType)
@@ -51,41 +50,47 @@ private:
 	TArray<TObjectPtr<UD1EquipmentSlotWeaponWidget>> WeaponSlotWidgets;
 
 	UPROPERTY()
-	TArray<TObjectPtr<UD1EquipmentSlotArmorWidget>> ArmorSlotWidgets;
+	TArray<TObjectPtr<UD1EquipmentSlotSingleWidget>> ArmorSlotWidgets;
 
 	UPROPERTY()
-	TArray<TObjectPtr<UD1EquipmentSlotUtilityWidget>> UtilitySlotWidgets;
+	TArray<TObjectPtr<UD1EquipmentSlotSingleWidget>> UtilitySlotWidgets;
 	
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
 
 protected:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotWeaponWidget> Equipment_Weapon_Primary;
+	TObjectPtr<UD1EquipmentSlotWeaponWidget> Widget_Weapon_Primary;
 	
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotWeaponWidget> Equipment_Weapon_Secondary;
+	TObjectPtr<UD1EquipmentSlotWeaponWidget> Widget_Weapon_Secondary;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_Armor_Head;
+	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Armor_Head;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_Armor_Chest;
+	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Armor_Chest;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_Armor_Legs;
+	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Armor_Legs;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_Armor_Hand;
+	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Armor_Hand;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotArmorWidget> Equipment_Armor_Foot;
+	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Armor_Foot;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotUtilityWidget> Equipment_Utility_Primary;
+	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Utility_Primary;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotUtilityWidget> Equipment_Utility_Secondary;
+	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Utility_Secondary;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Utility_Tertiary;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Utility_Fourthiary;
 
 private:
 	FDelegateHandle DelegateHandle;

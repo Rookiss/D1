@@ -6,6 +6,7 @@
 
 class UImage;
 class UOverlay;
+class UCommonVisibilitySwitcher;
 class UD1ItemInstance;
 class UD1EquipmentEntryWidget;
 class UD1EquipmentManagerComponent;
@@ -22,12 +23,9 @@ public:
 	void Init(EWeaponSlotType InWeaponSlotType, UD1EquipmentManagerComponent* InEquipmentManager);
 	
 protected:
-	virtual void NativePreConstruct() override;
 	virtual void NativeOnInitialized() override;
 	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-
-protected:
 	virtual void FinishDrag() override;
 
 public:
@@ -38,48 +36,50 @@ private:
 	TArray<TObjectPtr<UD1EquipmentEntryWidget>> EntryWidgets;
 	
 	UPROPERTY()
-	TArray<TObjectPtr<UImage>> SlotImages;
+	TArray<TObjectPtr<UImage>> SlotRedImages;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UImage>> SlotGreenImages;
 
 	UPROPERTY()
 	TArray<TObjectPtr<UOverlay>> SlotOverlays;
 
-public:
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UTexture2D> WeaponIconTexture_Left;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UTexture2D> WeaponIconTexture_Right;
-
 private:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Slot_LeftHand;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Slot_RightHand;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Slot_TwoHand;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UOverlay> Overlay_Slot_LeftHand;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UOverlay> Overlay_Slot_RightHand;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UOverlay> Overlay_Slot_TwoHand;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Icon_Left;
+	TObjectPtr<UCommonVisibilitySwitcher> Switcher_WeaponHand;
 	
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Icon_Right;
+	TObjectPtr<UOverlay> Overlay_LeftHand;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Frame_Left;
+	TObjectPtr<UOverlay> Overlay_RightHand;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_Frame_Right;
+	TObjectPtr<UOverlay> Overlay_TwoHand;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Red_LeftHand;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Green_LeftHand;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Red_RightHand;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Green_RightHand;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Red_TwoHand;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Green_TwoHand;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Hover_LeftHand;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Hover_RightHand;
 
 private:
 	EWeaponSlotType WeaponSlotType = EWeaponSlotType::Count;

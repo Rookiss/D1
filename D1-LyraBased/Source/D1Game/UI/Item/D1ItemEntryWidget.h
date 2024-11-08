@@ -1,13 +1,27 @@
 ﻿#pragma once
 
+#include "D1Define.h"
 #include "Blueprint/UserWidget.h"
 #include "D1ItemEntryWidget.generated.h"
 
-class UTextBlock;
 class UImage;
+class UTextBlock;
 class UD1ItemInstance;
 class UD1ItemDragWidget;
 class UD1ItemHoversWidget;
+
+USTRUCT(BlueprintType)
+struct FEntryRarityTexture
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleDefaultsOnly)
+	EItemRarity Rarity = EItemRarity::Junk;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UTexture2D> Texture;
+};
 
 UCLASS()
 class UD1ItemEntryWidget : public UUserWidget
@@ -44,15 +58,14 @@ protected:
 
 	UPROPERTY()
 	int32 ItemCount = 0;
+	
+	UPROPERTY()
+	TObjectPtr<UD1ItemHoversWidget> HoversWidget;
 
 protected:
-	UPROPERTY()
-	TSubclassOf<UD1ItemDragWidget> DragWidgetClass;
-
-	UPROPERTY()
-	TSubclassOf<UD1ItemHoversWidget> HoversWidgetClass;
-
-protected:
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_RarityCover;
+	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Icon;
 	
@@ -62,7 +75,13 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_Count;
 
-private:
-	UPROPERTY()
-	TObjectPtr<UD1ItemHoversWidget> HoversWidget;
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FEntryRarityTexture> EntryRarityTextures;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UD1ItemDragWidget> DragWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UD1ItemHoversWidget> HoversWidgetClass;
 };
