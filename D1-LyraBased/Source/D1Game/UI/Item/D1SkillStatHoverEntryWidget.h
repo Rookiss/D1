@@ -3,6 +3,7 @@
 #include "Blueprint/UserWidget.h"
 #include "D1SkillStatHoverEntryWidget.generated.h"
 
+class URichTextBlock;
 class UTextBlock;
 
 UCLASS()
@@ -21,7 +22,7 @@ protected:
 	TObjectPtr<UTextBlock> Text_Name;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_Description;
+	TObjectPtr<URichTextBlock> Text_Description;
 	
 	UPROPERTY(meta=(BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> Animation_FadeIn;

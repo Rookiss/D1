@@ -2,6 +2,7 @@
 
 #include "AbilitySystem/Abilities/LyraGameplayAbility.h"
 #include "Components/Image.h"
+#include "Components/RichTextBlock.h"
 #include "Components/TextBlock.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ClassSkillEntryWidget)

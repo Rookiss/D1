@@ -17,9 +17,9 @@ UD1InventorySkillWidget::UD1InventorySkillWidget(const FObjectInitializer& Objec
     
 }
 
-void UD1InventorySkillWidget::NativeOnInitialized()
+void UD1InventorySkillWidget::NativeConstruct()
 {
-	Super::NativeOnInitialized();
+	Super::NativeConstruct();
 
 	if (ULyraPawnExtensionComponent* PawnExtensionComponent = ULyraPawnExtensionComponent::FindPawnExtensionComponent(GetOwningPlayerPawn()))
 	{
@@ -33,6 +33,12 @@ void UD1InventorySkillWidget::NativeDestruct()
 	{
 		LyraASC->AbilityChangedDelegate.Remove(AbilityDelegateHandle);
 		AbilityDelegateHandle.Reset();
+	}
+
+	if (HoverWidget)
+	{
+		HoverWidget->RemoveFromParent();
+		HoverWidget = nullptr;
 	}
 	
 	Super::NativeDestruct();

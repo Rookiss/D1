@@ -1,5 +1,6 @@
 ﻿#include "D1SkillStatHoverEntryWidget.h"
 
+#include "Components/RichTextBlock.h"
 #include "Components/TextBlock.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1SkillStatHoverEntryWidget)

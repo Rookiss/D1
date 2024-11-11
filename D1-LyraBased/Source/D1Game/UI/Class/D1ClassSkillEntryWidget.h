@@ -3,6 +3,7 @@
 #include "Blueprint/UserWidget.h"
 #include "D1ClassSkillEntryWidget.generated.h"
 
+class URichTextBlock;
 class UImage;
 class UTextBlock;
 class ULyraGameplayAbility;
@@ -26,5 +27,5 @@ protected:
 	TObjectPtr<UTextBlock> Text_SkillName;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_SkillDescription;
+	TObjectPtr<URichTextBlock> Text_SkillDescription;
 };
