@@ -415,7 +415,6 @@ void ALyraCharacter::UninitAndSpawnSpectator()
 		}
 		else
 		{
-			// TODO: Check AIController Destroy 
 			Controller->UnPossess();
 			Controller = nullptr;
 		}

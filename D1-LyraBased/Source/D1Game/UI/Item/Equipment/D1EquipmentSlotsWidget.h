@@ -90,7 +90,7 @@ protected:
 	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Utility_Tertiary;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Utility_Fourthiary;
+	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Utility_Quaternary;
 
 private:
 	FDelegateHandle DelegateHandle;

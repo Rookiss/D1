@@ -710,6 +710,14 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 	{
 		EquipmentSlotType = EEquipmentSlotType::Utility_Secondary;
 	}
+	else if (EquipState == EEquipState::Utility_Tertiary)
+	{
+		EquipmentSlotType = EEquipmentSlotType::Utility_Tertiary;
+	}
+	else if (EquipState == EEquipState::Utility_Quaternary)
+	{
+		EquipmentSlotType = EEquipmentSlotType::Utility_Quaternary;
+	}
 	
 	return EquipmentSlotType;
 }
@@ -764,6 +772,8 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EUtility
 	{
 	case EUtilitySlotType::Primary:		EquipmentSlotType = EEquipmentSlotType::Utility_Primary;	break;
 	case EUtilitySlotType::Secondary:	EquipmentSlotType = EEquipmentSlotType::Utility_Secondary;	break;
+	case EUtilitySlotType::Tertiary:	EquipmentSlotType = EEquipmentSlotType::Utility_Tertiary;	break;
+	case EUtilitySlotType::Quaternary:	EquipmentSlotType = EEquipmentSlotType::Utility_Quaternary;	break;
 	}
 	
 	return EquipmentSlotType;
@@ -816,8 +826,10 @@ EUtilitySlotType UD1EquipManagerComponent::ConvertToUtilitySlotType(EEquipmentSl
 
 	switch (EquipmentSlotType)
 	{
-	case EEquipmentSlotType::Utility_Primary:	UtilitySlotType = EUtilitySlotType::Primary;	break;
-	case EEquipmentSlotType::Utility_Secondary:	UtilitySlotType = EUtilitySlotType::Secondary;	break;
+	case EEquipmentSlotType::Utility_Primary:		UtilitySlotType = EUtilitySlotType::Primary;	break;
+	case EEquipmentSlotType::Utility_Secondary:		UtilitySlotType = EUtilitySlotType::Secondary;	break;
+	case EEquipmentSlotType::Utility_Tertiary:		UtilitySlotType = EUtilitySlotType::Tertiary;	break;
+	case EEquipmentSlotType::Utility_Quaternary:	UtilitySlotType = EUtilitySlotType::Quaternary;	break;
 	}
 
 	return UtilitySlotType;
@@ -844,6 +856,8 @@ EEquipState UD1EquipManagerComponent::ConvertToEquipState(EUtilitySlotType Utili
 	{
 	case EUtilitySlotType::Primary:		EquipState = EEquipState::Utility_Primary;		break;
 	case EUtilitySlotType::Secondary:	EquipState = EEquipState::Utility_Secondary;	break;
+	case EUtilitySlotType::Tertiary:	EquipState = EEquipState::Utility_Tertiary;		break;
+	case EUtilitySlotType::Quaternary:	EquipState = EEquipState::Utility_Quaternary;	break;
 	}
 
 	return EquipState;
@@ -856,7 +870,7 @@ bool UD1EquipManagerComponent::IsWeaponEquipState(EEquipState EquipState)
 
 bool UD1EquipManagerComponent::IsUtilityEquipState(EEquipState EquipState)
 {
-	return (EEquipState::Utility_Primary <= EquipState && EquipState <= EEquipState::Utility_Secondary);
+	return (EEquipState::Utility_Primary <= EquipState && EquipState <= EEquipState::Utility_Quaternary);
 }
 
 EWeaponSlotType UD1EquipManagerComponent::ConvertToWeaponSlotType(EEquipmentSlotType EquipmentSlotType)

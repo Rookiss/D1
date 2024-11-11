@@ -24,6 +24,8 @@ enum class EEquipmentSlotType : uint8
 
 	Utility_Primary,
 	Utility_Secondary,
+	Utility_Tertiary,
+	Utility_Quaternary,
 	
 	Helmet,
 	Chest,
@@ -38,10 +40,14 @@ UENUM(BlueprintType)
 enum class EEquipState : uint8
 {
 	Unarmed,
+	
 	Weapon_Primary,
 	Weapon_Secondary,
+
 	Utility_Primary,
 	Utility_Secondary,
+	Utility_Tertiary,
+	Utility_Quaternary,
 
 	Count	UMETA(Hidden)
 };
@@ -115,6 +121,8 @@ enum class EUtilitySlotType : uint8
 {
 	Primary,
 	Secondary,
+	Tertiary,
+	Quaternary,
 
 	Count	UMETA(Hidden)
 };
@@ -174,7 +182,6 @@ namespace Item
 		{ EEquipmentSlotType::Unarmed_LeftHand,    EEquipmentSlotType::Unarmed_RightHand                                            },
 		{ EEquipmentSlotType::Primary_LeftHand,    EEquipmentSlotType::Primary_RightHand,    EEquipmentSlotType::Primary_TwoHand    },
 		{ EEquipmentSlotType::Secondary_LeftHand,  EEquipmentSlotType::Secondary_RightHand,  EEquipmentSlotType::Secondary_TwoHand  },
-		{ EEquipmentSlotType::Utility_Primary   },
-		{ EEquipmentSlotType::Utility_Secondary },
+		{ EEquipmentSlotType::Utility_Primary }, { EEquipmentSlotType::Utility_Secondary }, { EEquipmentSlotType::Utility_Tertiary }, { EEquipmentSlotType::Utility_Quaternary },
 	};
 }

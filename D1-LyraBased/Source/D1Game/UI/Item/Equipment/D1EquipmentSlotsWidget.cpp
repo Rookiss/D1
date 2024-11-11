@@ -19,7 +19,7 @@ void UD1EquipmentSlotsWidget::NativeOnInitialized()
 
 	WeaponSlotWidgets  = { Widget_Weapon_Primary, Widget_Weapon_Secondary };
 	ArmorSlotWidgets   = { Widget_Armor_Head, Widget_Armor_Chest, Widget_Armor_Legs, Widget_Armor_Hand, Widget_Armor_Foot };
-	UtilitySlotWidgets = { Widget_Utility_Primary, Widget_Utility_Secondary };
+	UtilitySlotWidgets = { Widget_Utility_Primary, Widget_Utility_Secondary, Widget_Utility_Tertiary, Widget_Utility_Quaternary };
 }
 
 void UD1EquipmentSlotsWidget::NativeConstruct()
@@ -57,7 +57,7 @@ void UD1EquipmentSlotsWidget::ConstructUI(FGameplayTag Channel, const FEquipment
 		ArmorSlotWidgets[i]->Init((EArmorType)i, EquipmentManager);
 	}
 
-	for (int32 i = 0; i < WeaponSlotWidgets.Num(); i++)
+	for (int32 i = 0; i < UtilitySlotWidgets.Num(); i++)
 	{
 		UtilitySlotWidgets[i]->Init((EUtilitySlotType)i, EquipmentManager);
 	}
