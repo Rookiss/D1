@@ -3,9 +3,10 @@
 #include "D1Define.h"
 #include "D1UIData.generated.h"
 
+class UD1SkillStatHoverWidget;
 class UD1InventoryValidWidget;
 class UD1ItemDragWidget;
-class UD1ItemHoversWidget;
+class UD1ItemHoverWidget;
 class UD1EquipmentEntryWidget;
 class UD1InventorySlotWidget;
 class UD1InventoryEntryWidget;
@@ -69,7 +70,10 @@ public:
 	TSubclassOf<UD1ItemDragWidget> DragWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UD1ItemHoversWidget> HoversWidgetClass;
+	TSubclassOf<UD1ItemHoverWidget> ItemHoverWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UD1SkillStatHoverWidget> SkillStatHoverWidget;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UD1EquipmentEntryWidget> EquipmentEntryWidgetClass;

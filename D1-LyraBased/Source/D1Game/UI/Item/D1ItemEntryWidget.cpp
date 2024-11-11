@@ -5,7 +5,7 @@
 #include "Item/D1ItemInstance.h"
 #include "Item/D1ItemTemplate.h"
 #include "D1ItemDragWidget.h"
-#include "D1ItemHoversWidget.h"
+#include "D1ItemHoverWidget.h"
 #include "Components/TextBlock.h"
 #include "Data/D1UIData.h"
 
@@ -33,10 +33,10 @@ void UD1ItemEntryWidget::NativeConstruct()
 
 void UD1ItemEntryWidget::NativeDestruct()
 {
-	if (HoversWidget)
+	if (HoverWidget)
 	{
-		HoversWidget->RemoveFromParent();
-		HoversWidget = nullptr;
+		HoverWidget->RemoveFromParent();
+		HoverWidget = nullptr;
 	}
 	
 	Super::NativeDestruct();
@@ -48,23 +48,26 @@ void UD1ItemEntryWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const F
 
 	Image_Hover->SetVisibility(ESlateVisibility::Visible);
 
-	if (HoversWidget == nullptr)
+	if (HoverWidget == nullptr)
 	{
-		TSubclassOf<UD1ItemHoversWidget> HoversWidgetClass = UD1UIData::Get().HoversWidgetClass;
-		HoversWidget = CreateWidget<UD1ItemHoversWidget>(GetOwningPlayer(), HoversWidgetClass);
+		TSubclassOf<UD1ItemHoverWidget> HoverWidgetClass = UD1UIData::Get().ItemHoverWidgetClass;
+		HoverWidget = CreateWidget<UD1ItemHoverWidget>(GetOwningPlayer(), HoverWidgetClass);
 	}
-	
-	HoversWidget->RefreshUI(ItemInstance);
-	HoversWidget->AddToViewport();
+
+	if (HoverWidget)
+	{
+		HoverWidget->RefreshUI(ItemInstance);
+		HoverWidget->AddToViewport();
+	}
 }
 
 FReply UD1ItemEntryWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	FReply Reply = Super::NativeOnMouseMove(InGeometry, InMouseEvent);
 
-	if (HoversWidget)
+	if (HoverWidget)
 	{
-		HoversWidget->SetPosition(InMouseEvent.GetScreenSpacePosition());
+		HoverWidget->SetPosition(InMouseEvent.GetScreenSpacePosition());
 		return FReply::Handled();
 	}
 	
@@ -77,10 +80,10 @@ void UD1ItemEntryWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 
 	Image_Hover->SetVisibility(ESlateVisibility::Hidden);
 
-	if (HoversWidget)
+	if (HoverWidget)
 	{
-		HoversWidget->RemoveFromParent();
-		HoversWidget = nullptr;
+		HoverWidget->RemoveFromParent();
+		HoverWidget = nullptr;
 	}
 }
 

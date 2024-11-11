@@ -7,7 +7,7 @@ class UImage;
 class UTextBlock;
 class UD1ItemInstance;
 class UD1ItemDragWidget;
-class UD1ItemHoversWidget;
+class UD1ItemHoverWidget;
 
 UCLASS()
 class UD1ItemEntryWidget : public UUserWidget
@@ -46,7 +46,7 @@ protected:
 	int32 ItemCount = 0;
 	
 	UPROPERTY()
-	TObjectPtr<UD1ItemHoversWidget> HoversWidget;
+	TObjectPtr<UD1ItemHoverWidget> HoverWidget;
 
 protected:
 	UPROPERTY(meta=(BindWidget))

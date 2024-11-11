@@ -1,62 +1,30 @@
 ﻿#pragma once
 
-#include "Blueprint/UserWidget.h"
+#include "Item/D1ItemInstance.h"
+#include "UI/D1HoverWidget.h"
 #include "D1ItemHoverWidget.generated.h"
 
-class UImage;
-class UTextBlock;
-class UHorizontalBox;
+class UD1EquipmentManagerComponent;
 class UD1ItemInstance;
+class UCanvasPanel;
+class UHorizontalBox;
+class UD1ItemHoverEntryWidget;
 
 UCLASS()
-class UD1ItemHoverWidget : public UUserWidget
+class UD1ItemHoverWidget : public UD1HoverWidget
 {
 	GENERATED_BODY()
 	
 public:
-	UD1ItemHoverWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());\
-	
-protected:
-	virtual void NativePreConstruct() override;
+	UD1ItemHoverWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	void RefreshUI(const UD1ItemInstance* ItemInstance);
-
-protected:
-	UPROPERTY(EditAnywhere)
-	bool bIsEquippedWidget = false;
+	void RefreshUI(const UD1ItemInstance* HoveredItemInstance);
 	
 protected:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_DisplayName;
+	TObjectPtr<UD1ItemHoverEntryWidget> HoverWidget_Left;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_IsEquipped;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_ItemRarity;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_ItemType;
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_AttributeModifiers;
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_AdditionalAttributeModifiers;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_Description;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_Gold;
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_WeaponHandType;
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_DisplayName_Background;
-
-	UPROPERTY(meta=(BindWidgetAnim), Transient)
-	TObjectPtr<UWidgetAnimation> Animation_FadeIn;
+	TObjectPtr<UD1ItemHoverEntryWidget> HoverWidget_Right;
 };
