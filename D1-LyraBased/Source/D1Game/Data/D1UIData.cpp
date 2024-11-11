@@ -64,3 +64,15 @@ FColor UD1UIData::GetRarityColor(EItemRarity ItemRarity) const
 {
 	return RarityInfoSet.GetRarityColor(ItemRarity);
 }
+
+const FD1UIInfo& UD1UIData::GetTagUIInfo(FGameplayTag Tag) const
+{
+	const FD1UIInfo* UIInfo = TagUIInfos.Find(Tag);
+	if (UIInfo == nullptr)
+	{
+		static FD1UIInfo EmptyInfo;
+		return EmptyInfo;
+	}
+
+	return *UIInfo;
+}
