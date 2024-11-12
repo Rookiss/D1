@@ -92,5 +92,5 @@ private:
 private:
 	FDelegateHandle EntryChangedDelegateHandle;
 	FIntPoint PrevDragOverSlotPos = FIntPoint(-1, -1);
-	FGameplayMessageListenerHandle ListenerHandle;
+	FGameplayMessageListenerHandle MessageListenerHandle;
 };

@@ -625,18 +625,17 @@ AD1WeaponBase* UD1EquipManagerComponent::GetFirstEquippedActor() const
 	return WeaponActor;
 }
 
-void UD1EquipManagerComponent::OnRep_CurrentEquipState()
+void UD1EquipManagerComponent::OnRep_CurrentEquipState(EEquipState PrevEquipState)
 {
-	BroadcastChangedMessage(CurrentEquipState);
+	BroadcastChangedMessage(PrevEquipState, CurrentEquipState);
 }
 
-void UD1EquipManagerComponent::BroadcastChangedMessage(EEquipState NewEquipState)
+void UD1EquipManagerComponent::BroadcastChangedMessage(EEquipState PrevEquipState, EEquipState NewEquipState)
 {
-	// FD1EquipStateChangedMessage Message;
-	// Message.EquipState = NewEquipState;
-	//
-	// UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
-	// MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Item_WeaponEquipStateChanged, Message);
+	if (OnEquipStateChanged.IsBound())
+	{
+		OnEquipStateChanged.Broadcast(PrevEquipState, NewEquipState);
+	}
 }
 
 ALyraCharacter* UD1EquipManagerComponent::GetCharacter() const

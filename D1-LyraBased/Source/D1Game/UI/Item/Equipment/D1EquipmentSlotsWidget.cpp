@@ -1,5 +1,6 @@
 ﻿#include "D1EquipmentSlotsWidget.h"
 
+#include "CommonVisibilitySwitcher.h"
 #include "D1EquipmentSlotSingleWidget.h"
 #include "D1EquipmentSlotWeaponWidget.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
@@ -27,7 +28,7 @@ void UD1EquipmentSlotsWidget::NativeConstruct()
 	Super::NativeConstruct();
 	
 	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	ListenerHandle = MessageSubsystem.RegisterListener(MessageChannelTag, this, &ThisClass::ConstructUI);
+	MessageListenerHandle = MessageSubsystem.RegisterListener(MessageChannelTag, this, &ThisClass::ConstructUI);
 }
 
 void UD1EquipmentSlotsWidget::NativeDestruct()
@@ -35,17 +36,18 @@ void UD1EquipmentSlotsWidget::NativeDestruct()
 	DestructUI();
 	
 	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	MessageSubsystem.UnregisterListener(ListenerHandle);
+	MessageSubsystem.UnregisterListener(MessageListenerHandle);
 	
 	Super::NativeDestruct();
 }
 
 void UD1EquipmentSlotsWidget::ConstructUI(FGameplayTag Channel, const FEquipmentInitializeMessage& Message)
 {
-	if (Message.EquipmentManager == nullptr)
+	if (Message.EquipmentManager == nullptr || Message.EquipManager == nullptr)
 		return;
 
 	EquipmentManager = Message.EquipmentManager;
+	EquipManager = Message.EquipManager;
 	
 	for (int32 i = 0; i < WeaponSlotWidgets.Num(); i++)
 	{
@@ -71,13 +73,20 @@ void UD1EquipmentSlotsWidget::ConstructUI(FGameplayTag Channel, const FEquipment
 			OnEquipmentEntryChanged((EEquipmentSlotType)i, ItemInstance, Entry.GetItemCount());
 		}
 	}
-	DelegateHandle = EquipmentManager->OnEquipmentEntryChanged.AddUObject(this, &ThisClass::OnEquipmentEntryChanged);
+	EntryChangedDelegateHandle = EquipmentManager->OnEquipmentEntryChanged.AddUObject(this, &ThisClass::OnEquipmentEntryChanged);
+
+	EEquipState CurrentEquipState = EquipManager->GetCurrentEquipState();
+	OnEquipStateChanged(CurrentEquipState, CurrentEquipState);
+	EquipStateChangedDelegateHandle = EquipManager->OnEquipStateChanged.AddUObject(this, &ThisClass::OnEquipStateChanged);
 }
 
 void UD1EquipmentSlotsWidget::DestructUI()
 {
-	EquipmentManager->OnEquipmentEntryChanged.Remove(DelegateHandle);
-	DelegateHandle.Reset();
+	EquipmentManager->OnEquipmentEntryChanged.Remove(EntryChangedDelegateHandle);
+	EntryChangedDelegateHandle.Reset();
+
+	EquipManager->OnEquipStateChanged.Remove(EquipStateChangedDelegateHandle);
+	EquipStateChangedDelegateHandle.Reset();
 
 	for (UD1EquipmentSlotWeaponWidget* SlotWeaponWidget : WeaponSlotWidgets)
 	{
@@ -145,5 +154,23 @@ void UD1EquipmentSlotsWidget::OnEquipmentEntryChanged(EEquipmentSlotType Equipme
 				UtilitySlotWidget->OnEquipmentEntryChanged(ItemInstance, ItemCount);
 			}
 		}
+	}
+}
+
+void UD1EquipmentSlotsWidget::OnEquipStateChanged(EEquipState PrevEquipState, EEquipState NewEquipState)
+{
+	switch (NewEquipState)
+	{
+	case EEquipState::Weapon_Primary:
+		Switcher_Weapon_Primary->SetActiveWidgetIndex(1);
+		Switcher_Weapon_Secondary->SetActiveWidgetIndex(0);
+		break;
+	case EEquipState::Weapon_Secondary:
+		Switcher_Weapon_Primary->SetActiveWidgetIndex(0);
+		Switcher_Weapon_Secondary->SetActiveWidgetIndex(1);
+		break;
+	default:
+		Switcher_Weapon_Primary->SetActiveWidgetIndex(0);
+		Switcher_Weapon_Secondary->SetActiveWidgetIndex(0);
 	}
 }

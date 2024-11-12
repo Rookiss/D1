@@ -20,6 +20,16 @@ void UD1ItemFragment_Equippable_Armor::PreSave(FObjectPreSaveContext SaveContext
 	{
 		bIsFullBody = false;
 	}
+	
+	for (int i = 0; i < RarityStatRangeSets.Num(); i++)
+	{
+		TArray<FRarityStatRange>& RarityStatRanges = RarityStatRangeSets[i].RarityStatRanges;
+		RarityStatRanges.SetNum((int32)EItemRarity::Count);
+		for (int32 j = 0; j < RarityStatRanges.Num(); j++)
+		{
+			RarityStatRanges[j].Rarity = (EItemRarity)j;
+		}
+	}
 }
 #endif // WITH_EDITORONLY_DATA
 

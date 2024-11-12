@@ -12,6 +12,11 @@ class UD1ItemFragment_Equippable_Weapon : public UD1ItemFragment_Equippable_Atta
 public:
 	UD1ItemFragment_Equippable_Weapon(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+protected:
+#if WITH_EDITORONLY_DATA
+	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
+#endif // WITH_EDITORONLY_DATA
+	
 public:
 	virtual void OnInstanceCreated(UD1ItemInstance* ItemInstance) const override;
 	

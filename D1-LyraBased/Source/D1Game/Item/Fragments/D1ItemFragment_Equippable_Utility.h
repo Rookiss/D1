@@ -13,6 +13,11 @@ class UD1ItemFragment_Equippable_Utility : public UD1ItemFragment_Equippable_Att
 public:
 	UD1ItemFragment_Equippable_Utility(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+protected:
+#if WITH_EDITORONLY_DATA
+	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
+#endif // WITH_EDITORONLY_DATA
+
 public:
 	virtual void OnInstanceCreated(UD1ItemInstance* ItemInstance) const override;
 

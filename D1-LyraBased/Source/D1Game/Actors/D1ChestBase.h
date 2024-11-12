@@ -94,7 +94,7 @@ protected:
 	TSubclassOf<UD1ItemTemplate> FallbackItemTemplateClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="Info", meta=(EditCondition="bShouldFallback", EditConditionHides))
-	EItemRarity FallbackItemItemRarity = EItemRarity::Junk;
+	EItemRarity FallbackItemItemRarity = EItemRarity::Poor;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

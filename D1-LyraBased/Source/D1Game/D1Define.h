@@ -130,12 +130,10 @@ enum class EUtilitySlotType : uint8
 UENUM(BlueprintType)
 enum class EItemRarity : uint8
 {
-	Junk,
 	Poor,
-	Normal,
-	Special,
+	Common,
+	Uncommon,
 	Rare,
-	Epic,
 	Legendary,
 
 	Count	UMETA(Hidden)

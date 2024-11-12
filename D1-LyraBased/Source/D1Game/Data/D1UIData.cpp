@@ -1,6 +1,7 @@
 ﻿#include "D1UIData.h"
 
 #include "System/LyraAssetManager.h"
+#include "UObject/ObjectSaveContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1UIData)
 
@@ -49,6 +50,22 @@ const UD1UIData& UD1UIData::Get()
 {
 	return ULyraAssetManager::Get().GetUIData();
 }
+
+#if WITH_EDITORONLY_DATA
+void UD1UIData::PreSave(FObjectPreSaveContext SaveContext)
+{
+	Super::PreSave(SaveContext);
+
+	const int32 ItemRarityCount = (int32)EItemRarity::Count;
+	TArray<FD1ItemRarityInfoEntry>& RarityInfoEntries = RarityInfoSet.RarityInfoEntries;
+	RarityInfoEntries.SetNum(ItemRarityCount);
+	
+	for (int i = 0; i < RarityInfoEntries.Num(); i++)
+	{
+		RarityInfoEntries[i].Rarity = (EItemRarity)i;
+	}
+}
+#endif // WITH_EDITORONLY_DATA
 
 UTexture2D* UD1UIData::GetEntryRarityTexture(EItemRarity ItemRarity) const
 {

@@ -71,12 +71,10 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	FText ItemRarityText;
 	switch (ItemRarity)
 	{
-	case EItemRarity::Junk:			ItemRarityText = LOCTEXT("ItemRarity-Junk",			"Junk");		break;
 	case EItemRarity::Poor:			ItemRarityText = LOCTEXT("ItemRarity-Poor",			"Poor");		break;
-	case EItemRarity::Normal:		ItemRarityText = LOCTEXT("ItemRarity-Normal",		"Normal");		break;
-	case EItemRarity::Special:		ItemRarityText = LOCTEXT("ItemRarity-Special",		"Special");		break;
+	case EItemRarity::Common:		ItemRarityText = LOCTEXT("ItemRarity-Common",		"Common");		break;
+	case EItemRarity::Uncommon:		ItemRarityText = LOCTEXT("ItemRarity-Uncommon",		"Uncommon");	break;
 	case EItemRarity::Rare:			ItemRarityText = LOCTEXT("ItemRarity-Rare",			"Rare");		break;
-	case EItemRarity::Epic:			ItemRarityText = LOCTEXT("ItemRarity-Epic",			"Epic");		break;
 	case EItemRarity::Legendary:	ItemRarityText = LOCTEXT("ItemRarity-Legendary",	"Legendary");	break;
 	}
 	Text_ItemRarity->SetText(ItemRarityText);

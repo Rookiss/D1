@@ -6,10 +6,12 @@
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "D1EquipmentSlotsWidget.generated.h"
 
+class UCommonVisibilitySwitcher;
 class UD1ItemInstance;
 class UD1ItemSlotWidget;
 class UD1EquipmentSlotWeaponWidget;
 class UD1EquipmentSlotSingleWidget;
+class UD1EquipManagerComponent;
 class UD1EquipmentManagerComponent;
 
 USTRUCT(BlueprintType)
@@ -20,6 +22,9 @@ struct FEquipmentInitializeMessage
 public:
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UD1EquipManagerComponent> EquipManager;
 };
 
 UCLASS()
@@ -40,6 +45,7 @@ private:
 	void DestructUI();
 	
 	void OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount);
+	void OnEquipStateChanged(EEquipState PrevEquipState, EEquipState NewEquipState);
 
 public:
 	UPROPERTY(EditAnywhere, meta=(Categories="Message"))
@@ -57,6 +63,9 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
+	
+	UPROPERTY()
+	TObjectPtr<UD1EquipManagerComponent> EquipManager;
 
 protected:
 	UPROPERTY(meta=(BindWidget))
@@ -92,7 +101,14 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UD1EquipmentSlotSingleWidget> Widget_Utility_Quaternary;
 
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UCommonVisibilitySwitcher> Switcher_Weapon_Primary;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UCommonVisibilitySwitcher> Switcher_Weapon_Secondary;
+
 private:
-	FDelegateHandle DelegateHandle;
-	FGameplayMessageListenerHandle ListenerHandle;
+	FDelegateHandle EntryChangedDelegateHandle;
+	FDelegateHandle EquipStateChangedDelegateHandle;
+	FGameplayMessageListenerHandle MessageListenerHandle;
 };

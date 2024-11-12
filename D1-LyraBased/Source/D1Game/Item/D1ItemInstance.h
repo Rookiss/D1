@@ -12,7 +12,7 @@ struct FD1ItemRarityProbability
 
 public:
 	UPROPERTY(VisibleAnywhere)
-	EItemRarity Rarity = EItemRarity::Junk;
+	EItemRarity Rarity = EItemRarity::Poor;
 
 	UPROPERTY(EditAnywhere)
 	float Probability = 0;
@@ -82,7 +82,7 @@ private:
 	int32 ItemTemplateID = INDEX_NONE;
 
 	UPROPERTY(Replicated)
-	EItemRarity ItemRarity = EItemRarity::Junk;
+	EItemRarity ItemRarity = EItemRarity::Poor;
 	
 	UPROPERTY(Replicated)
 	FD1GameplayTagStackContainer StatContainer;

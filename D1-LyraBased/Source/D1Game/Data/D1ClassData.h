@@ -21,7 +21,7 @@ public:
 	TSubclassOf<UD1ItemTemplate> ItemTemplateClass;
 
 	UPROPERTY(EditDefaultsOnly)
-	EItemRarity ItemRarity = EItemRarity::Junk;
+	EItemRarity ItemRarity = EItemRarity::Poor;
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 ItemCount = 1;

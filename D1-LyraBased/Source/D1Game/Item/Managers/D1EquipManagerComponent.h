@@ -14,15 +14,7 @@ class UD1ItemInstance;
 class UD1EquipManagerComponent;
 class UD1EquipmentManagerComponent;
 
-USTRUCT(BlueprintType)
-struct FD1EquipStateChangedMessage
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadOnly)
-	EEquipState EquipState = EEquipState::Count;
-};
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEquipStateChanged, EEquipState, EEquipState);
 
 USTRUCT(BlueprintType)
 struct FD1EquipEntry : public FFastArraySerializerItem
@@ -139,9 +131,9 @@ public:
 
 private:
 	UFUNCTION()
-	void OnRep_CurrentEquipState();
+	void OnRep_CurrentEquipState(EEquipState PrevEquipState);
 
-	void BroadcastChangedMessage(EEquipState NewEquipState);
+	void BroadcastChangedMessage(EEquipState PrevEquipState, EEquipState NewEquipState);
 
 public:
 	ALyraCharacter* GetCharacter() const;
@@ -189,6 +181,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AD1WeaponBase* GetFirstEquippedActor() const;
+
+public:
+	FOnEquipStateChanged OnEquipStateChanged;
 	
 private:
 	UPROPERTY(Replicated)

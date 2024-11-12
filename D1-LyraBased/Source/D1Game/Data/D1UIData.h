@@ -20,7 +20,7 @@ struct FD1ItemRarityInfoEntry
 
 public:
 	UPROPERTY(VisibleDefaultsOnly)
-	EItemRarity Rarity = EItemRarity::Junk;
+	EItemRarity Rarity = EItemRarity::Poor;
 
 	UPROPERTY(EditDefaultsOnly)
 	FColor Color = FColor::Black;
@@ -74,6 +74,11 @@ class UD1UIData : public UPrimaryDataAsset
 public:
 	static const UD1UIData& Get();
 
+protected:
+#if WITH_EDITORONLY_DATA
+	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
+#endif // WITH_EDITORONLY_DATA
+	
 public:
 	UTexture2D* GetEntryRarityTexture(EItemRarity ItemRarity) const;
 	UTexture2D* GetHoverRarityTexture(EItemRarity ItemRarity) const;
