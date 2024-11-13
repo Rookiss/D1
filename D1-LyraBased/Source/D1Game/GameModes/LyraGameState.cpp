@@ -34,11 +34,6 @@ ALyraGameState::ALyraGameState(const FObjectInitializer& ObjectInitializer)
 	ServerFPS = 0.0f;
 }
 
-void ALyraGameState::PreInitializeComponents()
-{
-	Super::PreInitializeComponents();
-}
-
 void ALyraGameState::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -50,11 +45,6 @@ void ALyraGameState::PostInitializeComponents()
 UAbilitySystemComponent* ALyraGameState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
-}
-
-void ALyraGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
 }
 
 void ALyraGameState::SeamlessTravelTransitionCheckpoint(bool bToTransitionMap)
@@ -76,10 +66,6 @@ void ALyraGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(ThisClass, ServerFPS);
 	DOREPLIFETIME_CONDITION(ThisClass, RecorderPlayerState, COND_ReplayOnly);
-	
-	DOREPLIFETIME(ThisClass, TargetPhaseRadius);
-	DOREPLIFETIME(ThisClass, TargetPhasePosition);
-	DOREPLIFETIME(ThisClass, bShouldShow);
 }
 
 void ALyraGameState::Tick(float DeltaSeconds)

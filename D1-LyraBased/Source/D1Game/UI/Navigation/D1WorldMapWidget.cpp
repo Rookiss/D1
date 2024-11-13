@@ -12,6 +12,7 @@
 #include "GameModes/LyraGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/LyraPlayerController.h"
+#include "System/D1ElectricFieldManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1WorldMapWidget)
 
@@ -98,20 +99,16 @@ void UD1WorldMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 
 		if (ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(GetOwningPlayer())))
 		{
-			if (LyraGameState->bShouldShow)
+			if (UD1ElectricFieldManagerComponent* ElectricFieldManager = LyraGameState->FindComponentByClass<UD1ElectricFieldManagerComponent>())
 			{
-				TargetCircleWidget->SetVisibility(ESlateVisibility::Visible);
-			}
-			else
-			{
-				TargetCircleWidget->SetVisibility(ESlateVisibility::Hidden);
-			}
+				TargetCircleWidget->SetVisibility(ElectricFieldManager->bShouldShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 			
-			InitialPos = WorldPosToInitialWidgetPos(LyraGameState->TargetPhasePosition);
-			TargetCircleSlot->SetPosition(InitialPos * GetCurrentWorldMapZoom());
-			
-			InitialSize = InitialSize = FVector2D(WorldLengthToInitialWidgetLength(LyraGameState->TargetPhaseRadius * 2.f));
-			TargetCircleSlot->SetSize(InitialSize * GetCurrentWorldMapZoom());
+				InitialPos = WorldPosToInitialWidgetPos(ElectricFieldManager->TargetPhasePosition);
+				TargetCircleSlot->SetPosition(InitialPos * GetCurrentWorldMapZoom());
+				
+				InitialSize = InitialSize = FVector2D(WorldLengthToInitialWidgetLength(ElectricFieldManager->TargetPhaseRadius * 2.f));
+				TargetCircleSlot->SetSize(InitialSize * GetCurrentWorldMapZoom());
+			}
 		}
 	}
 	else
@@ -269,10 +266,13 @@ float UD1WorldMapWidget::WorldLengthToInitialWidgetLength(float WorldLength)
 AD1ElectricField* UD1WorldMapWidget::GetElectricFieldActor()
 {
 	AD1ElectricField* ElectricFieldActor = nullptr;
-	
-	if (ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this)))
+
+	if (ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(GetOwningPlayer())))
 	{
-		ElectricFieldActor = LyraGameState->CachedElectricFieldActor.Get();
+		if (UD1ElectricFieldManagerComponent* ElectricFieldManager = LyraGameState->FindComponentByClass<UD1ElectricFieldManagerComponent>())
+		{
+			ElectricFieldActor = ElectricFieldManager->ElectricFieldActor;
+		}
 	}
 	
 	return ElectricFieldActor;

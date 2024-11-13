@@ -54,15 +54,6 @@ void UD1ItemInstance::Init(int32 InItemTemplateID, EItemRarity InItemRarity)
 	}
 }
 
-UD1ItemInstance* UD1ItemInstance::Duplicate() const
-{
-	UD1ItemInstance* NewItemInstance = NewObject<UD1ItemInstance>();
-	NewItemInstance->ItemTemplateID = ItemTemplateID;
-	NewItemInstance->ItemRarity = ItemRarity;
-	NewItemInstance->StatContainer = StatContainer;
-	return NewItemInstance;
-}
-
 #if UE_WITH_IRIS
 void UD1ItemInstance::RegisterReplicationFragments(UE::Net::FFragmentRegistrationContext& Context, UE::Net::EFragmentRegistrationFlags RegistrationFlags)
 {

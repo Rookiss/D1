@@ -684,7 +684,7 @@ void UD1EquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType Equipm
 		return;
 	
 	FD1EquipmentEntry& Entry = EquipmentList.Entries[(int32)EquipmentSlotType];
-
+	
 	if (Entry.GetItemInstance())
 	{
 		Entry.ItemCount += ItemCount;
@@ -695,12 +695,11 @@ void UD1EquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType Equipm
 		if (ItemInstance == nullptr)
 			return;
 		
-		UD1ItemInstance* AddedItemInstance = ItemInstance->Duplicate();
-		Entry.Init(AddedItemInstance, ItemCount);
-
-		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && AddedItemInstance)
+		Entry.Init(ItemInstance, ItemCount);
+		
+		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && ItemInstance)
 		{
-			AddReplicatedSubObject(AddedItemInstance);
+			AddReplicatedSubObject(ItemInstance);
 		}
 		
 		EquipmentList.MarkItemDirty(Entry);

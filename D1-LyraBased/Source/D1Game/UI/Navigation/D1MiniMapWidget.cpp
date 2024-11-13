@@ -54,18 +54,11 @@ void UD1MiniMapWidget::ShowPinIcon(const FVector& PinWorldPos)
 {
 	Image_PinIcon->SetVisibility(ESlateVisibility::Visible);
 	InitialIconPos = PinWorldPosToMiniMapInitialPos(FVector2D(PinWorldPos.X, PinWorldPos.Y));
-	RefreshZoom();
 }
 
 void UD1MiniMapWidget::HidePinIcon()
 {
 	Image_PinIcon->SetVisibility(ESlateVisibility::Hidden);
-}
-
-void UD1MiniMapWidget::RefreshZoom()
-{
-	MiniMapPanelSlot->SetSize(InitialMiniMapSize * CurrentMiniMapZoom);
-	PinIconSlot->SetPosition(InitialIconPos * CurrentMiniMapZoom);
 }
 
 FVector2D UD1MiniMapWidget::PawnWorldPosToMiniMapPanelPos(const FVector2D& PawnWorldPos)
@@ -80,7 +73,7 @@ FVector2D UD1MiniMapWidget::PawnWorldPosToMiniMapPanelPos(const FVector2D& PawnW
 		FVector2D(WidgetFirstPos.Y, WidgetSecondPos.Y),
 		PawnWorldPos.X);
 	
-	return FVector2D(x, y) * CurrentMiniMapZoom;
+	return FVector2D(x, y);
 }
 
 FVector2D UD1MiniMapWidget::PinWorldPosToMiniMapInitialPos(const FVector2D& PinWorldPos)

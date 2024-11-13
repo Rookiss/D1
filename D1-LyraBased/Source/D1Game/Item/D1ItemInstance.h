@@ -34,7 +34,6 @@ public:
 	
 public:
 	void Init(int32 InItemTemplateID, EItemRarity InItemRarity);
-	UD1ItemInstance* Duplicate() const;
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)

@@ -82,6 +82,9 @@ void UD1ItemManagerComponent::Server_InventoryToInventory_Implementation(UD1Inve
 	if (IsAllowedComponent(FromInventoryManager) == false ||  IsAllowedComponent(ToInventoryManager) == false)
 		return;
 
+	if (FromInventoryManager == ToInventoryManager && FromItemSlotPos == ToItemSlotPos)
+		return;
+
 	int32 MovableCount = ToInventoryManager->CanMoveOrMergeItem(FromInventoryManager, FromItemSlotPos, ToItemSlotPos);
 	if (MovableCount > 0)
 	{
@@ -99,6 +102,9 @@ void UD1ItemManagerComponent::Server_EquipmentToEquipment_Implementation(UD1Equi
 		return;
 
 	if (IsAllowedComponent(FromEquipmentManager) == false ||  IsAllowedComponent(ToEquipmentManager) == false)
+		return;
+
+	if (FromEquipmentManager == ToEquipmentManager && FromEquipmentSlotType == ToEquipmentSlotType)
 		return;
 
 	int32 MovableCount = ToEquipmentManager->CanMoveOrMergeEquipment(FromEquipmentManager, FromEquipmentSlotType, ToEquipmentSlotType);

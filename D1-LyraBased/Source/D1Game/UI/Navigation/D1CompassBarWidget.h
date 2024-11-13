@@ -38,7 +38,7 @@ private:
 
 private:
 	UPROPERTY(VisibleAnywhere)
-	bool bIsTargetSet;
+	bool bIsTargetSet = false;
 
 	UPROPERTY(VisibleAnywhere)
 	FVector TargetWorldPos;

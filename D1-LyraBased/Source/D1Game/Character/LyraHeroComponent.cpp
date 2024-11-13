@@ -28,6 +28,7 @@
 #include "GameModes/LyraGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMaterialLibrary.h"
+#include "System/D1ElectricFieldManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraHeroComponent)
 
@@ -575,13 +576,17 @@ void ULyraHeroComponent::HandlePostProcess()
 	if (LyraGameState == nullptr)
 		return;
 
+	UD1ElectricFieldManagerComponent* ElectricFieldManager = LyraGameState->FindComponentByClass<UD1ElectricFieldManagerComponent>();
+	if (ElectricFieldManager == nullptr)
+		return;
+
 	ALyraCharacter* LyraCharacter = GetPawn<ALyraCharacter>();
 	if (LyraCharacter == nullptr)
 		return;
 
 	bool bOutOfField = false;
 	
-	AD1ElectricField* ElectricFieldActor = LyraGameState->CachedElectricFieldActor.Get();
+	AD1ElectricField* ElectricFieldActor = ElectricFieldManager->ElectricFieldActor;
 	if (IsValid(ElectricFieldActor))
 	{
 		float Length = (FVector2D(LyraCharacter->GetActorLocation()) - FVector2D(ElectricFieldActor->GetActorLocation())).Length();

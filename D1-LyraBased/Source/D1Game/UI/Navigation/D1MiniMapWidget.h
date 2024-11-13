@@ -25,8 +25,6 @@ public:
 	void HidePinIcon();
 	
 private:
-	void RefreshZoom();
-	
 	FVector2D PawnWorldPosToMiniMapPanelPos(const FVector2D& PawnWorldPos);
 	FVector2D PinWorldPosToMiniMapInitialPos(const FVector2D& PinWorldPos);
 
@@ -60,8 +58,6 @@ private:
 	TObjectPtr<UCanvasPanel> CanvasPanel_Player;
 
 private:
-	float CurrentMiniMapZoom = 1.f;
-
 	FVector2D InitialMiniMapSize;
 	FVector2D InitialIconPos;
 
@@ -69,6 +65,6 @@ private:
 	FVector2D WorldFirstPos = FVector2D(14415.f, -14415.f);
 	FVector2D WorldSecondPos = FVector2D(-13993.f, 14415.f);
 	
-	FVector2D WidgetFirstPos = FVector2D(750.f, 750.f);
-	FVector2D WidgetSecondPos = FVector2D(-750.f, -750.f);
+	FVector2D WidgetFirstPos = FVector2D(500.f, 500.f);
+	FVector2D WidgetSecondPos = FVector2D(-500.f, -500.f);
 };

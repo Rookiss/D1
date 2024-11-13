@@ -2,6 +2,7 @@
 
 #include "GameModes/LyraGameState.h"
 #include "Kismet/GameplayStatics.h"
+#include "System/D1ElectricFieldManagerComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ElectricField)
 
@@ -28,6 +29,9 @@ void AD1ElectricField::BeginPlay()
 
 	if (ALyraGameState* LyraGameState = Cast<ALyraGameState>(UGameplayStatics::GetGameState(this)))
 	{
-		LyraGameState->CachedElectricFieldActor = this;
+		if (UD1ElectricFieldManagerComponent* ElectricFieldManager = LyraGameState->FindComponentByClass<UD1ElectricFieldManagerComponent>())
+		{
+			ElectricFieldManager->ElectricFieldActor = this;
+		}
 	}
 }

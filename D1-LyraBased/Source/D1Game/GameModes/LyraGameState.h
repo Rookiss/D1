@@ -30,9 +30,7 @@ public:
 	ALyraGameState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	//~AActor interface
-	virtual void PreInitializeComponents() override;
 	virtual void PostInitializeComponents() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	//~End of AActor interface
@@ -92,17 +90,4 @@ protected:
 
 	UFUNCTION()
 	void OnRep_RecorderPlayerState();
-
-public:
-	UPROPERTY(Replicated)
-	bool bShouldShow = false;
-	
-	UPROPERTY(Replicated)
-	float TargetPhaseRadius = 0.f;
-	
-	UPROPERTY(Replicated)
-	FVector TargetPhasePosition = FVector::ZeroVector;
-
-	UPROPERTY()
-	TWeakObjectPtr<AD1ElectricField> CachedElectricFieldActor;
 };

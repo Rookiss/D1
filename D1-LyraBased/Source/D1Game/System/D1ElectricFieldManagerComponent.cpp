@@ -7,6 +7,7 @@
 #include "Data/D1ElectricFieldPhaseData.h"
 #include "GameModes/LyraGameState.h"
 #include "Messages/LyraVerbMessage.h"
+#include "Net/UnrealNetwork.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ElectricFieldManagerComponent)
 
@@ -20,6 +21,9 @@ UD1ElectricFieldManagerComponent::UD1ElectricFieldManagerComponent(const FObject
 
 void UD1ElectricFieldManagerComponent::Initialize()
 {
+	if (HasAuthority() == false)
+		return;
+	
 #if WITH_SERVER_CODE
 	TSubclassOf<AD1ElectricField> ElectricFieldClass = ULyraAssetManager::Get().GetSubclassByName<AD1ElectricField>("ElectricFieldClass");
 	check(ElectricFieldClass);
@@ -29,16 +33,16 @@ void UD1ElectricFieldManagerComponent::Initialize()
 		return;
 
 	ElectricFieldActor = GetWorld()->SpawnActor<AD1ElectricField>(ElectricFieldClass);
-	StartPhasePosition = LyraGameState->TargetPhasePosition = FVector(0.f, 0.f, -50.f * ElectricFieldActor->GetActorScale3D().Z);
+	StartPhasePosition = TargetPhasePosition = FVector(0.f, 0.f, -50.f * ElectricFieldActor->GetActorScale3D().Z);
 	ElectricFieldActor->SetActorLocation(StartPhasePosition);
 
 	const UD1ElectricFieldPhaseData& PhaseData = ULyraAssetManager::Get().GetElectricFieldPhaseData();
 	FD1ElectricFieldPhaseEntry PhaseEntry = PhaseData.GetPhaseEntry(CurrentPhaseIndex);
-	StartPhaseRadius = LyraGameState->TargetPhaseRadius = PhaseEntry.TargetRadius;
+	StartPhaseRadius = TargetPhaseRadius = PhaseEntry.TargetRadius;
 
 	float Scale = StartPhaseRadius / 50.f;
 	ElectricFieldActor->SetActorScale3D(FVector(Scale, Scale, ElectricFieldActor->GetActorScale3D().Z));
-	
+    	
 	SetupNextElectricFieldPhase();
 #endif
 }
@@ -47,6 +51,9 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (HasAuthority() == false)
+		return;
+	
 #if WITH_SERVER_CODE
 	if (IsValid(ElectricFieldActor) == false)
 	{
@@ -60,47 +67,44 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 	
 	if (CurrentPhaseState == ED1ElectricFieldState::Break)
 	{
-		CurrentPhaseEntry.BreakTime -= DeltaTime;
-		if (CurrentPhaseEntry.BreakTime < 0.f)
+		RemainTime -= DeltaTime;
+		
+		if (RemainTime < 0.f)
 		{
+			RemainTime = CurrentPhaseEntry.NoticeTime;
 			CurrentPhaseState = ED1ElectricFieldState::Notice;
 		}
 	}
 	else if (CurrentPhaseState == ED1ElectricFieldState::Notice)
 	{
-		LyraGameState->bShouldShow = true;
-		CurrentPhaseEntry.NoticeTime -= DeltaTime;
-		if (CurrentPhaseEntry.NoticeTime < 0.f)
+		bShouldShow = true;
+		RemainTime -= DeltaTime;
+		
+		if (RemainTime < 0.f)
 		{
+			RemainTime = CurrentPhaseEntry.ShrinkTime;
 			CurrentPhaseState = ED1ElectricFieldState::Shrink;
 		}
 	}
 	else if (CurrentPhaseState == ED1ElectricFieldState::Shrink)
 	{
-		CurrentPhaseEntry.ShrinkTime -= DeltaTime;
+		RemainTime -= DeltaTime;
 	
-		if (CurrentPhaseEntry.ShrinkTime > 0.f)
+		if (RemainTime > 0.f)
 		{
-			float Alpha = 1.f - (CurrentPhaseEntry.ShrinkTime / CachedPhaseEntry.ShrinkTime);
+			float Alpha = 1.f - (CurrentPhaseEntry.ShrinkTime / RemainTime);
 			
-			FVector Position = FMath::Lerp(StartPhasePosition, LyraGameState->TargetPhasePosition, Alpha);
+			FVector Position = FMath::Lerp(StartPhasePosition, TargetPhasePosition, Alpha);
 			ElectricFieldActor->SetActorLocation(Position);
 
-			float Radius = FMath::Lerp(StartPhaseRadius, LyraGameState->TargetPhaseRadius, Alpha);
+			float Radius = FMath::Lerp(StartPhaseRadius, TargetPhaseRadius, Alpha);
 			float Scale = Radius / 50.f;
 			ElectricFieldActor->SetActorScale3D(FVector(Scale, Scale, ElectricFieldActor->GetActorScale3D().Z));
 		}
 		else
 		{
-			LyraGameState->bShouldShow = false;
-			if (SetupNextElectricFieldPhase())
-			{
-				CurrentPhaseState = ED1ElectricFieldState::Break;
-			}
-			else
-			{
-				CurrentPhaseState = ED1ElectricFieldState::End;
-			}
+			bShouldShow = false;
+			CurrentPhaseState = SetupNextElectricFieldPhase() ? ED1ElectricFieldState::Break : ED1ElectricFieldState::End;
 		}
 	}
 
@@ -116,37 +120,52 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 					float Length = (FVector2D(LyraCharacter->GetActorLocation()) - FVector2D(ElectricFieldActor->GetActorLocation())).Length();
 					if (Length > ElectricFieldActor->GetActorScale3D().X * 50.f)
 					{
-						if (OutSideCharacters.Contains(LyraCharacter) == false)
+						if (OutsideCharacters.Contains(LyraCharacter) == false)
 						{
 							TSubclassOf<UGameplayEffect> ElectricFieldDamageClass = ULyraAssetManager::GetSubclassByName<UGameplayEffect>("ElectricFieldDamageClass");
 							FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(ElectricFieldDamageClass, 1.0f, ASC->MakeEffectContext());
 							FGameplayEffectSpec* Spec = SpecHandle.Data.Get();
 							FActiveGameplayEffectHandle Handle = ASC->ApplyGameplayEffectSpecToSelf(*Spec);
 
-							OutSideCharacters.Add(LyraCharacter, Handle);
+							OutsideCharacters.Add(LyraCharacter, Handle);
 						}
 					}
 					else
 					{
-						if (FActiveGameplayEffectHandle* HandlePtr = OutSideCharacters.Find(LyraCharacter))
+						if (FActiveGameplayEffectHandle* HandlePtr = OutsideCharacters.Find(LyraCharacter))
 						{
 							ASC->RemoveActiveGameplayEffect(*HandlePtr);
-							OutSideCharacters.Remove(LyraCharacter);
+							OutsideCharacters.Remove(LyraCharacter);
 						}
 					}
 				}
 				else
 				{
-					OutSideCharacters.Remove(LyraCharacter);
+					OutsideCharacters.Remove(LyraCharacter);
 				}
 			}
 		}
 	}
+
+	RemainTimeSeconds = FMath::RoundToInt(FMath::Max(0.f, RemainTime));
 #endif
+}
+
+void UD1ElectricFieldManagerComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, TargetPhaseRadius);
+	DOREPLIFETIME(ThisClass, TargetPhasePosition);
+	DOREPLIFETIME(ThisClass, bShouldShow);
+	DOREPLIFETIME(ThisClass, RemainTimeSeconds);
 }
 
 bool UD1ElectricFieldManagerComponent::SetupNextElectricFieldPhase()
 {
+	if (HasAuthority() == false)
+		return false;
+	
 #if WITH_SERVER_CODE
 	ALyraGameState* LyraGameState = GetGameState<ALyraGameState>();
 	if (LyraGameState == nullptr)
@@ -158,42 +177,46 @@ bool UD1ElectricFieldManagerComponent::SetupNextElectricFieldPhase()
 	if (ElectricFieldPhaseData.IsValidPhaseIndex(CurrentPhaseIndex) == false)
 		return false;
 
-	CachedPhaseEntry = CurrentPhaseEntry = ElectricFieldPhaseData.GetPhaseEntry(CurrentPhaseIndex);
-
-	StartPhaseRadius = LyraGameState->TargetPhaseRadius;
-	LyraGameState->TargetPhaseRadius = CachedPhaseEntry.TargetRadius;
+	CurrentPhaseEntry = ElectricFieldPhaseData.GetPhaseEntry(CurrentPhaseIndex);
+	RemainTime = CurrentPhaseEntry.BreakTime;
+	
+	StartPhaseRadius = TargetPhaseRadius;
+	TargetPhaseRadius = CurrentPhaseEntry.TargetRadius;
 
 	if (CurrentPhaseIndex > 1)
 	{
 		FVector RandDirection = FMath::VRand();
 		RandDirection = FVector(RandDirection.X, RandDirection.Y, 0.f).GetSafeNormal();
 	
-		float MaxLength = LyraGameState->TargetPhaseRadius - StartPhaseRadius;
+		float MaxLength = TargetPhaseRadius - StartPhaseRadius;
 		float RandLength = FMath::RandRange(0.f, MaxLength);
 
-		StartPhasePosition = LyraGameState->TargetPhasePosition;
-		LyraGameState->TargetPhasePosition = StartPhasePosition + (RandDirection * RandLength);
+		StartPhasePosition = TargetPhasePosition;
+		TargetPhasePosition = StartPhasePosition + (RandDirection * RandLength);
 	}
-#endif
-	
 	return true;
+#endif
 }
 
 void UD1ElectricFieldManagerComponent::RemoveAllDamageEffects()
 {
-	if (OutSideCharacters.Num() <= 0)
+	if (HasAuthority() == false)
 		return;
 	
-	for (auto& OutSideCharacter : OutSideCharacters)
+#if WITH_SERVER_CODE
+	if (OutsideCharacters.Num() <= 0)
+		return;
+	
+	for (auto& OutsideCharacter : OutsideCharacters)
 	{
-		if (ALyraCharacter* LyraCharacter = OutSideCharacter.Key.Get())
+		if (ALyraCharacter* LyraCharacter = OutsideCharacter.Key.Get())
 		{
 			if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(LyraCharacter))
 			{
-				ASC->RemoveActiveGameplayEffect(OutSideCharacter.Value);
+				ASC->RemoveActiveGameplayEffect(OutsideCharacter.Value);
 			}
 		}
 	}
-
-	OutSideCharacters.Reset();
+	OutsideCharacters.Reset();
+#endif
 }
