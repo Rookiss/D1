@@ -82,11 +82,17 @@ void UD1EquipmentSlotsWidget::ConstructUI(FGameplayTag Channel, const FEquipment
 
 void UD1EquipmentSlotsWidget::DestructUI()
 {
-	EquipmentManager->OnEquipmentEntryChanged.Remove(EntryChangedDelegateHandle);
-	EntryChangedDelegateHandle.Reset();
-
-	EquipManager->OnEquipStateChanged.Remove(EquipStateChangedDelegateHandle);
-	EquipStateChangedDelegateHandle.Reset();
+	if (EquipmentManager)
+	{
+		EquipmentManager->OnEquipmentEntryChanged.Remove(EntryChangedDelegateHandle);
+		EntryChangedDelegateHandle.Reset();
+	}
+	
+	if (EquipManager)
+	{
+		EquipManager->OnEquipStateChanged.Remove(EquipStateChangedDelegateHandle);
+		EquipStateChangedDelegateHandle.Reset();
+	}
 
 	for (UD1EquipmentSlotWeaponWidget* SlotWeaponWidget : WeaponSlotWidgets)
 	{
