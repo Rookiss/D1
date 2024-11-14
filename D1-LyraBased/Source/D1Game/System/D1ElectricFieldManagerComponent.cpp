@@ -194,8 +194,9 @@ bool UD1ElectricFieldManagerComponent::SetupNextElectricFieldPhase()
 		StartPhasePosition = TargetPhasePosition;
 		TargetPhasePosition = StartPhasePosition + (RandDirection * RandLength);
 	}
-	return true;
 #endif
+	
+	return true;
 }
 
 void UD1ElectricFieldManagerComponent::RemoveAllDamageEffects()

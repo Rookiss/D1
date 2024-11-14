@@ -43,6 +43,8 @@ void UD1WorldMapWidget::NativeOnInitialized()
 
 	CurrentCircleWidget->SetVisibility(ESlateVisibility::Hidden);
 	TargetCircleWidget->SetVisibility(ESlateVisibility::Hidden);
+
+	MultiplierWorldMapZoom = FMath::Max(1.f, MultiplierWorldMapZoom);
 }
 
 void UD1WorldMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -148,7 +150,7 @@ FReply UD1WorldMapWidget::NativeOnMouseWheel(const FGeometry& InGeometry, const 
 			FVector2D WorldMapPanelHalfSize = WorldMapPanelSlot->GetSize() / 2.f;
 			FVector2D WorldMapPanelPos = WorldMapPanelSlot->GetPosition();
 			FVector2D MouseLocalPos = CanvasPanel_WorldMap->GetCachedGeometry().AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-			TargetWorldMapPos = WorldMapPanelPos - WorldMapPanelHalfSize - (MouseLocalPos * FMath::Abs(1 - MultiplierWorldMapZoom)) + (WorldMapPanelHalfSize * MultiplierWorldMapZoom);
+			TargetWorldMapPos = (WorldMapPanelPos - WorldMapPanelHalfSize) - (MouseLocalPos * (MultiplierWorldMapZoom - 1)) + (WorldMapPanelHalfSize * MultiplierWorldMapZoom);
 		}
 
 		TargetWorldMapZoom = FMath::Clamp(TargetWorldMapZoom * MultiplierWorldMapZoom, MinWorldMapZoom, MaxWorldMapZoom);
@@ -161,7 +163,7 @@ FReply UD1WorldMapWidget::NativeOnMouseWheel(const FGeometry& InGeometry, const 
 			FVector2D WorldMapPanelHalfSize = WorldMapPanelSlot->GetSize() / 2.f;
 			FVector2D WorldMapPanelPos = WorldMapPanelSlot->GetPosition();
 			FVector2D MouseLocalPos = CanvasPanel_WorldMap->GetCachedGeometry().AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-			TargetWorldMapPos = WorldMapPanelPos - WorldMapPanelHalfSize + (MouseLocalPos / MultiplierWorldMapZoom * FMath::Abs(1 - MultiplierWorldMapZoom)) + (WorldMapPanelHalfSize / MultiplierWorldMapZoom);
+			TargetWorldMapPos = (WorldMapPanelPos - WorldMapPanelHalfSize) + (MouseLocalPos / MultiplierWorldMapZoom * (MultiplierWorldMapZoom - 1)) + (WorldMapPanelHalfSize / MultiplierWorldMapZoom);
 		}
 
 		TargetWorldMapZoom = FMath::Clamp(TargetWorldMapZoom / MultiplierWorldMapZoom, MinWorldMapZoom, MaxWorldMapZoom);
