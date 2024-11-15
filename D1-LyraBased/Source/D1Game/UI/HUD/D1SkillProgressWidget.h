@@ -61,6 +61,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	TObjectPtr<UProgressBar> ProgressBar_SkillProgress;
 
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> Text_RemainTime;
+	
 protected:
 	UPROPERTY(EditAnywhere, meta=(Categories="Message"))
 	FGameplayTag ConstructMessageChannelTag;

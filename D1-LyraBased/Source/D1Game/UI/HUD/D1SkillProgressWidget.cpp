@@ -41,6 +41,11 @@ void UD1SkillProgressWidget::NativeTick(const FGeometry& MyGeometry, float InDel
 	{
 		PassedCastTime = FMath::Min(PassedCastTime + InDeltaTime, TargetCastTime);
 		ProgressBar_SkillProgress->SetPercent(UKismetMathLibrary::SafeDivide(PassedCastTime, TargetCastTime));
+
+		FNumberFormattingOptions Options;
+		Options.MinimumFractionalDigits = 1;
+		Options.MaximumFractionalDigits = 1;
+		Text_RemainTime->SetText(FText::AsNumber(FMath::Clamp(TargetCastTime - PassedCastTime, 0.f, TargetCastTime), &Options));
 	}
 }
 

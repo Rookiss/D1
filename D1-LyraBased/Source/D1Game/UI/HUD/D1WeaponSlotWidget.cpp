@@ -1,6 +1,7 @@
 ﻿#include "D1WeaponSlotWidget.h"
 
 #include "CommonVisibilitySwitcher.h"
+#include "Animation/UMGSequencePlayer.h"
 #include "Character/LyraCharacter.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -92,8 +93,8 @@ void UD1WeaponSlotWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSl
 
 			Image_TwoSlot_Selected_1->SetBrushFromTexture(ItemTemplate.IconTexture, true);
 			Image_TwoSlot_Selected_1->SetVisibility(ESlateVisibility::HitTestInvisible);
-
-			Switcher_Slots->SetActiveWidgetIndex(bIsSelected ? 3 : 2);
+			
+			SetActiveWidgetIndex(bIsSelected ? 3 : 2);
 		}
 		else
 		{
@@ -113,7 +114,7 @@ void UD1WeaponSlotWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSl
 			Image_TwoSlot_Selected_2->SetBrushFromTexture(ItemTemplate.IconTexture, true);
 			Image_TwoSlot_Selected_2->SetVisibility(ESlateVisibility::HitTestInvisible);
 			
-			Switcher_Slots->SetActiveWidgetIndex(bIsSelected ? 3 : 2);
+			SetActiveWidgetIndex(bIsSelected ? 3 : 2);
 		}
 		else
 		{
@@ -133,7 +134,7 @@ void UD1WeaponSlotWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSl
 			Image_OneSlot_Selected->SetBrushFromTexture(ItemTemplate.IconTexture, true);
 			Image_OneSlot_Selected->SetVisibility(ESlateVisibility::HitTestInvisible);
 
-			Switcher_Slots->SetActiveWidgetIndex(bIsSelected ? 1 : 0);
+			SetActiveWidgetIndex(bIsSelected ? 1 : 0);
 		}
 		else
 		{
@@ -150,10 +151,65 @@ void UD1WeaponSlotWidget::OnEquipStateChanged(EEquipState PrevEquipState, EEquip
 	
 	if (bIsSelected)
 	{
-		Switcher_Slots->IncrementActiveWidgetIndex(false);
+		if (GetActiveWidgetIndex() == 0)
+		{
+			Overlay_OneSlot_Selected->SetVisibility(ESlateVisibility::HitTestInvisible);
+
+			UUMGSequencePlayer* SequencePlayer = PlayAnimationForward(Animation_Highlight_In_OneSlot);
+			PendingWidgetIndex = 1;
+			SequencePlayer->OnSequenceFinishedPlaying().AddUObject(this, &ThisClass::OnSequenceFinished);
+		}
+		else if (GetActiveWidgetIndex() == 2)
+		{
+			Overlay_TwoSlot_Selected->SetVisibility(ESlateVisibility::HitTestInvisible);
+
+			UUMGSequencePlayer* SequencePlayer = PlayAnimationForward(Animation_Highlight_In_TwoSlot);
+			PendingWidgetIndex = 3;
+			SequencePlayer->OnSequenceFinishedPlaying().AddUObject(this, &ThisClass::OnSequenceFinished);
+		}
 	}
 	else if (PrevEquipState == SlotEquipState)
 	{
-		Switcher_Slots->DecrementActiveWidgetIndex(false);
+		if (GetActiveWidgetIndex() == 1)
+		{
+			UUMGSequencePlayer* SequencePlayer = PlayAnimationReverse(Animation_Highlight_In_OneSlot);
+			Overlay_OneSlot_Unselected->SetVisibility(ESlateVisibility::HitTestInvisible);
+			PendingWidgetIndex = 0;
+			SequencePlayer->OnSequenceFinishedPlaying().AddUObject(this, &ThisClass::OnSequenceFinished);
+		}
+		else if (GetActiveWidgetIndex() == 3)
+		{
+			UUMGSequencePlayer* SequencePlayer = PlayAnimationReverse(Animation_Highlight_In_TwoSlot);
+			Overlay_TwoSlot_Unselected->SetVisibility(ESlateVisibility::HitTestInvisible);
+			PendingWidgetIndex = 2;
+			SequencePlayer->OnSequenceFinishedPlaying().AddUObject(this, &ThisClass::OnSequenceFinished);
+		}
 	}
 }
+
+void UD1WeaponSlotWidget::SetActiveWidgetIndex(int32 Index)
+{
+	if (CurrentWidgetIndex == Index)
+		return;
+
+	CurrentWidgetIndex = Index;
+	
+	Overlay_OneSlot_Unselected->SetVisibility(ESlateVisibility::Hidden);
+	Overlay_OneSlot_Selected->SetVisibility(ESlateVisibility::Hidden);
+	Overlay_TwoSlot_Unselected->SetVisibility(ESlateVisibility::Hidden);
+	Overlay_TwoSlot_Selected->SetVisibility(ESlateVisibility::Hidden);
+	
+	switch (Index)
+	{
+	case 0: Overlay_OneSlot_Unselected->SetVisibility(ESlateVisibility::HitTestInvisible); break;
+	case 1: Overlay_OneSlot_Selected->SetVisibility(ESlateVisibility::HitTestInvisible); break;
+	case 2: Overlay_TwoSlot_Unselected->SetVisibility(ESlateVisibility::HitTestInvisible); break;
+	case 3: Overlay_TwoSlot_Selected->SetVisibility(ESlateVisibility::HitTestInvisible); break;
+	}
+}
+
+void UD1WeaponSlotWidget::OnSequenceFinished(class UUMGSequencePlayer& Player)
+{
+	SetActiveWidgetIndex(PendingWidgetIndex);
+}
+

@@ -6,10 +6,10 @@
 #include "D1WeaponSlotWidget.generated.h"
 
 class UImage;
-class UCommonVisibilitySwitcher;
+class UOverlay;
 class UTextBlock;
-class UD1EquipmentManagerComponent;
 class UD1EquipManagerComponent;
+class UD1EquipmentManagerComponent;
 
 UCLASS()
 class UD1WeaponSlotWidget : public UUserWidget
@@ -27,6 +27,13 @@ protected:
 private:
 	void OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount);
 	void OnEquipStateChanged(EEquipState PrevEquipState, EEquipState NewEquipState);
+
+private:
+	void SetActiveWidgetIndex(int32 Index);
+	int32 GetActiveWidgetIndex() const { return CurrentWidgetIndex; }
+
+private:
+	void OnSequenceFinished(class UUMGSequencePlayer& Player);
 	
 public:
 	UPROPERTY(EditAnywhere)
@@ -34,7 +41,16 @@ public:
 
 private:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UCommonVisibilitySwitcher> Switcher_Slots;
+	TObjectPtr<UOverlay> Overlay_OneSlot_Unselected;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UOverlay> Overlay_OneSlot_Selected;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UOverlay> Overlay_TwoSlot_Unselected;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UOverlay> Overlay_TwoSlot_Selected;
 	
 private:
 	UPROPERTY(meta=(BindWidget))
@@ -76,6 +92,13 @@ private:
 	TObjectPtr<UTextBlock> Text_OneSlot_Selected_Count;
 
 private:
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> Animation_Highlight_In_OneSlot;
+	
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> Animation_Highlight_In_TwoSlot;
+
+private:
 	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
 	
@@ -86,4 +109,7 @@ private:
 	FDelegateHandle EntryChangedDelegateHandle;
 	FDelegateHandle EquipStateChangedDelegateHandle;
 	bool bIsSelected = false;
+
+	int32 CurrentWidgetIndex = 0;
+	int32 PendingWidgetIndex = 0;
 };
