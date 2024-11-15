@@ -55,7 +55,6 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	Text_IsEquipped->SetColorAndOpacity(RarityColor);
 	
 	// Default Visibility
-	Text_WeaponHandType->SetVisibility(ESlateVisibility::Collapsed);
 	Text_AttributeModifiers->SetVisibility(ESlateVisibility::Collapsed);
 	Text_AdditionalAttributeModifiers->SetVisibility(ESlateVisibility::Collapsed);
 	Text_Description->SetVisibility(ESlateVisibility::Collapsed);
@@ -115,17 +114,6 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			case EWeaponType::Staff:			WeaponTypeText = LOCTEXT("WeaponType-Staff",		"Staff");			break;
 			}
 			Text_ItemType->SetText(WeaponTypeText);
-
-			// Weapon Hand Type
-			FText WeaponHandTypeText;
-			switch (WeaponFragment->WeaponHandType)
-			{
-			case EWeaponHandType::LeftHand:		WeaponHandTypeText = LOCTEXT("WeaponHandType-LeftHand",		"Left Hand");	break;
-			case EWeaponHandType::RightHand:	WeaponHandTypeText = LOCTEXT("WeaponHandType-RightHand",	"Right Hand");	break;
-			case EWeaponHandType::TwoHand:		WeaponHandTypeText = LOCTEXT("WeaponHandType-TwoHand",		"Two Hand");	break;
-			}
-			Text_WeaponHandType->SetText(WeaponHandTypeText);
-			Text_WeaponHandType->SetVisibility(ESlateVisibility::Visible);
 		}
 		else if (EquippableFragment->EquipmentType == EEquipmentType::Utility)
 		{

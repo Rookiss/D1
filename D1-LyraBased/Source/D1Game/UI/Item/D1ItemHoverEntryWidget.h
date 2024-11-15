@@ -52,9 +52,6 @@ protected:
 	TObjectPtr<UTextBlock> Text_Gold;
 	
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_WeaponHandType;
-	
-	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_DisplayName_Background;
 
 	UPROPERTY(meta=(BindWidgetAnim), Transient)
