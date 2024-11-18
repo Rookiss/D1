@@ -36,10 +36,9 @@ class UD1AssetData : public UPrimaryDataAsset
 public:
 	static const UD1AssetData& Get();
 	
-public:
-	virtual void PreSave(FObjectPreSaveContext ObjectSaveContext) override;
-
+protected:
 #if WITH_EDITOR
+	virtual void PreSave(FObjectPreSaveContext ObjectSaveContext) override;
 	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
 #endif
 	

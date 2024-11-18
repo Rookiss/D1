@@ -168,6 +168,18 @@ enum class ECharacterSkinType : uint8
 };
 
 UENUM(BlueprintType)
+enum class ECharacterClassType : uint8
+{
+	Fighter,
+	Swordmaster,
+	Barbarian,
+	Wizard,
+	Archer,
+	
+	Count	UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
 enum class ED1TeamID : uint8
 {
 	NoTeam,

@@ -15,6 +15,7 @@ const UD1AssetData& UD1AssetData::Get()
 	return ULyraAssetManager::Get().GetAssetData();
 }
 
+#if WITH_EDITOR
 void UD1AssetData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
 	Super::PreSave(ObjectSaveContext);
@@ -41,7 +42,6 @@ void UD1AssetData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 	}
 }
 
-#if WITH_EDITOR
 EDataValidationResult UD1AssetData::IsDataValid(FDataValidationContext& Context) const
 {
 	EDataValidationResult Result = Super::IsDataValid(Context);

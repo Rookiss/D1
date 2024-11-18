@@ -1,15 +1,13 @@
 ﻿#include "D1ClassEntryWidget.h"
 
-#include "AbilitySystemBlueprintLibrary.h"
-#include "CommonUIUtils.h"
 #include "D1ClassSelectionWidget.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "D1ClassSkillEntryWidget.h"
 #include "AbilitySystem/LyraAbilitySet.h"
-#include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Components/Button.h"
+#include "Data/D1ClassData.h"
 #include "Player/LyraPlayerState.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ClassEntryWidget)
@@ -20,12 +18,12 @@ UD1ClassEntryWidget::UD1ClassEntryWidget(const FObjectInitializer& ObjectInitial
     
 }
 
-void UD1ClassEntryWidget::InitializeUI(UD1ClassSelectionWidget* OwnerWidget, int32 ClassIndex)
+void UD1ClassEntryWidget::InitializeUI(UD1ClassSelectionWidget* OwnerWidget, ECharacterClassType ClassType)
 {
-	CachedClassIndex = ClassIndex;
+	CachedClassType = ClassType;
 	CachedOwnerWidget = OwnerWidget;
 
-	const FClassEntry& ClassEntry = UD1ClassData::Get().GetClassEntry(ClassIndex);
+	const FD1ClassInfoEntry& ClassEntry = UD1ClassData::Get().GetClassEntry(ClassType);
 	
 	Text_ClassName->SetText(ClassEntry.ClassName);
 	VerticalBox_SkillElements->ClearChildren();
@@ -52,7 +50,7 @@ void UD1ClassEntryWidget::OnButtonClicked()
 {
 	if (ALyraPlayerState* LyraPlayerState = Cast<ALyraPlayerState>(GetOwningPlayerState()))
 	{
-		LyraPlayerState->Server_SelectClass(CachedClassIndex);
+		LyraPlayerState->Server_SelectClass(CachedClassType);
 	}
 
 	if (UD1ClassSelectionWidget* ClassSelectionWidget = CachedOwnerWidget.Get())

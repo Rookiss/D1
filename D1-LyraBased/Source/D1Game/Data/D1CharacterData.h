@@ -55,8 +55,10 @@ public:
 	static const UD1CharacterData& Get();
 
 public:
+#if WITH_EDITORONLY_DATA
 	virtual void PreSave(FObjectPreSaveContext ObjectSaveContext) override;
-
+#endif // WITH_EDITORONLY_DATA
+	
 public:
 	const FD1DefaultArmorMeshSet& GetDefaultArmorMeshSet(ECharacterSkinType CharacterSkinType) const;
 	

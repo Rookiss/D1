@@ -139,11 +139,12 @@ void ALyraPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MyPlayerConnectionType, SharedParams)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MyTeamID, SharedParams);
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MySquadID, SharedParams);
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, StatTags, SharedParams);
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CharacterClassType, SharedParams);
 
 	SharedParams.Condition = ELifetimeCondition::COND_SkipOwner;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, ReplicatedViewRotation, SharedParams);
 
-	DOREPLIFETIME(ThisClass, StatTags);
 }
 
 FRotator ALyraPlayerState::GetReplicatedViewRotation() const
@@ -235,7 +236,6 @@ void ALyraPlayerState::SetSquadID(int32 NewSquadId)
 	if (HasAuthority())
 	{
 		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, MySquadID, this);
-
 		MySquadID = NewSquadId;
 	}
 }
@@ -276,19 +276,24 @@ void ALyraPlayerState::OnRep_MySquadID()
 	//@TODO: Let the squad subsystem know (once that exists)
 }
 
-void ALyraPlayerState::Server_SelectClass_Implementation(int32 ClassIndex)
+void ALyraPlayerState::Server_SelectClass_Implementation(ECharacterClassType ClassType)
 {
-	const TArray<FClassEntry>& ClassEntries = UD1ClassData::Get().GetClassEntries();
+	if (HasAuthority() == false)
+		return;
+	
+	const int32 ClassIndex = (int32)ClassType;
+	const TArray<FD1ClassInfoEntry>& ClassEntries = UD1ClassData::Get().GetClassEntries();
 	
 	if (ClassEntries.IsValidIndex(ClassIndex))
 	{
-		const FClassEntry& ClassEntry = ClassEntries[ClassIndex];
+		CharacterClassType = ClassType;
+		const FD1ClassInfoEntry& ClassEntry = ClassEntries[ClassIndex];
 		
 		if (ALyraCharacter* LyraCharacter = GetPawn<ALyraCharacter>())
 		{
 			if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->GetComponentByClass<UD1EquipmentManagerComponent>())
 			{
-				for (const FDefaultItemEntry& DefaultItemEntry : ClassEntry.DefaultItemEntries)
+				for (const FD1DefaultItemEntry& DefaultItemEntry : ClassEntry.DefaultItemEntries)
 				{
 					EquipmentManager->SetEquipment(DefaultItemEntry.EquipmentSlotType, DefaultItemEntry.ItemTemplateClass, DefaultItemEntry.ItemRarity, DefaultItemEntry.ItemCount);
 				}
@@ -305,21 +310,25 @@ void ALyraPlayerState::Server_SelectClass_Implementation(int32 ClassIndex)
 
 void ALyraPlayerState::AddStatTagStack(FGameplayTag Tag, int32 StackCount)
 {
+	MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, StatTags, this);
 	StatTags.AddStack(Tag, StackCount);
 }
 
 void ALyraPlayerState::SetStatTagStack(FGameplayTag Tag, int32 StackCount)
 {
+	MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, StatTags, this);
 	StatTags.SetStack(Tag, StackCount);
 }
 
 void ALyraPlayerState::RemoveStatTagStack(FGameplayTag Tag, int32 StackCount)
 {
+	MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, StatTags, this);
 	StatTags.RemoveStack(Tag, StackCount);
 }
 
 void ALyraPlayerState::RemoveStatTag(FGameplayTag Tag)
 {
+	MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, StatTags, this);
 	StatTags.RemoveStack(Tag);
 }
 

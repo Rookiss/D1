@@ -27,6 +27,7 @@ const UD1CharacterData& UD1CharacterData::Get()
 	return ULyraAssetManager::Get().GetCharacterData();
 }
 
+#if WITH_EDITORONLY_DATA
 void UD1CharacterData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
 	Super::PreSave(ObjectSaveContext);
@@ -36,6 +37,7 @@ void UD1CharacterData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 		return (A < B);
 	});
 }
+#endif // WITH_EDITORONLY_DATA
 
 const FD1DefaultArmorMeshSet& UD1CharacterData::GetDefaultArmorMeshSet(ECharacterSkinType CharacterSkinType) const
 {

@@ -8,8 +8,8 @@ class ULyraAbilitySet;
 class UTexture2D;
 class ULyraGameplayAbility;
 
-USTRUCT()
-struct FDefaultItemEntry
+USTRUCT(BlueprintType)
+struct FD1DefaultItemEntry
 {
 	GENERATED_BODY()
 
@@ -27,23 +27,33 @@ public:
 	int32 ItemCount = 1;
 };
 
-USTRUCT()
-struct FClassEntry
+USTRUCT(BlueprintType)
+struct FD1ClassInfoEntry
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	FText ClassName;
+	ECharacterClassType ClassType = ECharacterClassType::Count;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UTexture2D> ClassIcon;
+	FText ClassName;
 
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FDefaultItemEntry> DefaultItemEntries;
+	TArray<FD1DefaultItemEntry> DefaultItemEntries;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<ULyraAbilitySet> ClassAbilitySet;
+};
+
+USTRUCT(BlueprintType)
+struct FD1ClassInfoSet
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FD1ClassInfoEntry> ClassInfoEntries;
 };
 
 UCLASS(BlueprintType, Const)
@@ -54,11 +64,17 @@ class UD1ClassData : public UPrimaryDataAsset
 public:
 	static const UD1ClassData& Get();
 
+protected:
+#if WITH_EDITOR
+	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
+	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
+#endif // WITH_EDITOR
+
 public:
-	const TArray<FClassEntry>& GetClassEntries() const { return ClassEntries; }
-	const FClassEntry& GetClassEntry(int32 ClassIndex) const;
+	const FD1ClassInfoEntry& GetClassEntry(ECharacterClassType ClassType) const;
+	const TArray<FD1ClassInfoEntry>& GetClassEntries() const { return ClassInfoSet.ClassInfoEntries; }
 	
 private:
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FClassEntry> ClassEntries;
+	FD1ClassInfoSet ClassInfoSet;
 };

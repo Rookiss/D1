@@ -1,14 +1,14 @@
 ﻿#pragma once
 
+#include "D1Define.h"
 #include "Blueprint/UserWidget.h"
-#include "Data/D1ClassData.h"
 #include "D1ClassEntryWidget.generated.h"
 
-class UD1ClassSelectionWidget;
 class UImage;
 class UButton;
 class UTextBlock;
 class UVerticalBox;
+class UD1ClassSelectionWidget;
 class UD1ClassSkillEntryWidget;
 
 UCLASS()
@@ -21,7 +21,7 @@ public:
 
 public:
 	UFUNCTION()
-	void InitializeUI(UD1ClassSelectionWidget* OwnerWidget, int32 ClassIndex);
+	void InitializeUI(UD1ClassSelectionWidget* OwnerWidget, ECharacterClassType ClassType);
 
 private:
 	UFUNCTION()
@@ -43,7 +43,7 @@ protected:
 
 private:
 	UPROPERTY()
-	int32 CachedClassIndex = INDEX_NONE;
+	ECharacterClassType CachedClassType = ECharacterClassType::Count;
 
 	UPROPERTY()
 	TWeakObjectPtr<UD1ClassSelectionWidget> CachedOwnerWidget;

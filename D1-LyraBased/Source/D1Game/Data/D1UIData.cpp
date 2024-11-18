@@ -8,8 +8,8 @@
 FD1ItemRarityInfoSet::FD1ItemRarityInfoSet()
 {
 	const int32 ItemRarityCount = (int32)EItemRarity::Count;
-	
 	RarityInfoEntries.SetNum(ItemRarityCount);
+	
 	for (int32 i = 0; i < ItemRarityCount; i++)
 	{
 		RarityInfoEntries[i].Rarity = (EItemRarity)i;
@@ -55,7 +55,7 @@ const UD1UIData& UD1UIData::Get()
 void UD1UIData::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);
-
+	
 	const int32 ItemRarityCount = (int32)EItemRarity::Count;
 	TArray<FD1ItemRarityInfoEntry>& RarityInfoEntries = RarityInfoSet.RarityInfoEntries;
 	RarityInfoEntries.SetNum(ItemRarityCount);

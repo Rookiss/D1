@@ -185,10 +185,12 @@ private:
 	void OnRep_MySquadID();
 
 public:
-	// TODO: Temp
 	UFUNCTION(Server, Reliable)
-	void Server_SelectClass(int32 ClassIndex);
+	void Server_SelectClass(ECharacterClassType ClassType);
 	
 public:
+	UPROPERTY(Replicated)
+	ECharacterClassType CharacterClassType = ECharacterClassType::Count;
+	
 	FLyraAbilitySet_GrantedHandles AbilitySetGrantedHandles;
 };

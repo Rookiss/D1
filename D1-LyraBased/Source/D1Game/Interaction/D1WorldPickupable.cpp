@@ -25,13 +25,13 @@ void AD1WorldPickupable::OnRep_PickupInfo()
 	if (const UD1ItemInstance* ItemInstance = PickupInfo.PickupInstance.ItemInstance)
 	{
 		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
-		InteractionInfo.Title = ItemTemplate.DisplayName;
+		InteractionInfo.Content = ItemTemplate.DisplayName;
 	}
 	else if (TSubclassOf<UD1ItemTemplate> ItemTemplateClass = PickupInfo.PickupTemplate.ItemTemplateClass)
 	{
 		if (const UD1ItemTemplate* ItemTemplate = ItemTemplateClass->GetDefaultObject<UD1ItemTemplate>())
 		{
-			InteractionInfo.Title = ItemTemplate->DisplayName;
+			InteractionInfo.Content = ItemTemplate->DisplayName;
 		}
 	}
 }
