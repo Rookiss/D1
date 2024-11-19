@@ -23,7 +23,7 @@ void UD1ClassEntryWidget::InitializeUI(UD1ClassSelectionWidget* OwnerWidget, ECh
 	CachedClassType = ClassType;
 	CachedOwnerWidget = OwnerWidget;
 
-	const FD1ClassInfoEntry& ClassEntry = UD1ClassData::Get().GetClassEntry(ClassType);
+	const FD1ClassInfoEntry& ClassEntry = UD1ClassData::Get().GetClassInfoEntry(ClassType);
 	
 	Text_ClassName->SetText(ClassEntry.ClassName);
 	VerticalBox_SkillElements->ClearChildren();

@@ -4,7 +4,7 @@
 #include "Character/LyraCharacter.h"
 #include "Components/AudioComponent.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -39,7 +39,7 @@ void UD1AnimNotifyState_PlayWeaponSound::NotifyBegin(USkeletalMeshComponent* Mes
 	if (WeaponActor == nullptr)
 		return;
 	
-	const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+	const UD1ItemFragment_Equipable_Weapon* WeaponFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Weapon>();
 	if (WeaponFragment == nullptr)
 		return;
 

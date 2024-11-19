@@ -18,14 +18,17 @@ protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
-public:
-	UFUNCTION(BlueprintCallable)
+protected:
 	void StartDeath();
-	
-	UFUNCTION(BlueprintCallable)
 	void FinishDeath();
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "D1|Death")
-	bool bAutoStartDeath;
+	UPROPERTY(EditDefaultsOnly, Category="D1|Death")
+	bool bAutoStartDeath = true;
+
+	UPROPERTY(EditDefaultsOnly, Category="D1|Death")
+	TSubclassOf<ULyraCameraMode> DeathCameraModeClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="D1|Death")
+	float EndDelay = 1.5f;
 };

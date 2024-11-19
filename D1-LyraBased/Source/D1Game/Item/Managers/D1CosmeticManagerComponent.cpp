@@ -4,7 +4,7 @@
 #include "Actors/D1ArmorBase.h"
 #include "Character/LyraCharacter.h"
 #include "Data/D1CharacterData.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Armor.h"
 #include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1CosmeticManagerComponent)
@@ -40,7 +40,7 @@ void UD1CosmeticManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReas
 	Super::EndPlay(EndPlayReason);
 }
 
-void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const UD1ItemFragment_Equippable_Armor* ArmorFragment)
+void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const UD1ItemFragment_Equipable_Armor* ArmorFragment)
 {
 	if (ArmorType == EArmorType::Count)
 		return;
@@ -187,7 +187,7 @@ void UD1CosmeticManagerComponent::InitializeManager()
 					SkinMaterial = DefaultArmorMeshSet.LowerBodySkinMaterial;
 				}
 				
-				CosmeticSlots[i] = SpawnCosmeticSlotActor(DefaultArmorMeshSet.DefaultMeshEntries[i].ArmorMesh, DefaultArmorMeshSet.SecondaryMeshEntries[i].ArmorMesh, SkinMaterialSlotName, SkinMaterial);
+				CosmeticSlots[i] = SpawnCosmeticSlotActor(DefaultArmorMeshSet.DefaultMeshEntries[i], DefaultArmorMeshSet.SecondaryMeshEntries[i], SkinMaterialSlotName, SkinMaterial);
 			}
 		}
 	}

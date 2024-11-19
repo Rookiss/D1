@@ -5,7 +5,7 @@
 #include "Data/D1ItemData.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/D1ItemTemplate.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Utility.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Utility.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 
@@ -26,7 +26,7 @@ void UD1GameplayAbility_Utility_Drink::ApplyUtilityGameplayEffect()
 	int32 ItemTemplateID = WeaponActor->GetTemplateID();
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
 
-	const UD1ItemFragment_Equippable_Utility* UtilityFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Utility>();
+	const UD1ItemFragment_Equipable_Utility* UtilityFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Utility>();
 	if (UtilityFragment == nullptr)
 		return;
 

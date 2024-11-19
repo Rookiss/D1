@@ -16,7 +16,6 @@ protected:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 	
 protected:
-	UFUNCTION(BlueprintCallable)
 	UAnimMontage* SelectDirectionalMontage(const AActor* Source, const AActor* Target) const;
 
 private:
@@ -38,6 +37,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="D1|Knockback")
 	float StunApplyDelay = 0.3f;
+
+	UPROPERTY(EditDefaultsOnly, Category="D1|Knockback")
+	float ForwardThreshold = 50.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="D1|Knockback")
+	float BackwardThreshold = 130.f;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="D1|Knockback")

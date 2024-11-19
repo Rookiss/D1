@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "D1ItemFragment_Equippable.h"
-#include "D1ItemFragment_Equippable_Attachment.generated.h"
+#include "D1ItemFragment_Equipable.h"
+#include "D1ItemFragment_Equipable_Attachment.generated.h"
 
 class AD1WeaponBase;
 
@@ -22,12 +22,12 @@ public:
 };
 
 UCLASS(Abstract, Const)
-class UD1ItemFragment_Equippable_Attachment : public UD1ItemFragment_Equippable
+class UD1ItemFragment_Equipable_Attachment : public UD1ItemFragment_Equipable
 {
 	GENERATED_BODY()
 	
 public:
-	UD1ItemFragment_Equippable_Attachment(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UD1ItemFragment_Equipable_Attachment(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
 	UPROPERTY(EditDefaultsOnly)

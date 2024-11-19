@@ -3,14 +3,18 @@
 #include "D1ItemEntryWidget.h"
 #include "GameplayEffect.h"
 #include "Components/Image.h"
+#include "Components/RichTextBlock.h"
 #include "Components/TextBlock.h"
+#include "Data/D1ClassData.h"
 #include "Data/D1ItemData.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Utility.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Utility.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "Player/LyraPlayerState.h"
 #include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemHoverEntryWidget)
@@ -80,11 +84,11 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	Text_ItemRarity->SetColorAndOpacity(RarityColor);
 
 	// Item Specifics
-	if (const UD1ItemFragment_Equippable* EquippableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable>())
+	if (const UD1ItemFragment_Equipable* EquipableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable>())
 	{
-		if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
+		if (EquipableFragment->EquipmentType == EEquipmentType::Armor)
 		{
-			const UD1ItemFragment_Equippable_Armor* ArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(EquippableFragment);
+			const UD1ItemFragment_Equipable_Armor* ArmorFragment = Cast<UD1ItemFragment_Equipable_Armor>(EquipableFragment);
 
 			// Item Type
 			FText ArmorTypeText;
@@ -98,9 +102,9 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			}
 			Text_ItemType->SetText(ArmorTypeText);
 		}
-		else if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
+		else if (EquipableFragment->EquipmentType == EEquipmentType::Weapon)
 		{
-			const UD1ItemFragment_Equippable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(EquippableFragment);
+			const UD1ItemFragment_Equipable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equipable_Weapon>(EquipableFragment);
 
 			// Item Type
 			FText WeaponTypeText;
@@ -115,9 +119,9 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			}
 			Text_ItemType->SetText(WeaponTypeText);
 		}
-		else if (EquippableFragment->EquipmentType == EEquipmentType::Utility)
+		else if (EquipableFragment->EquipmentType == EEquipmentType::Utility)
 		{
-			const UD1ItemFragment_Equippable_Utility* UtilityFragment = Cast<UD1ItemFragment_Equippable_Utility>(EquippableFragment);
+			const UD1ItemFragment_Equipable_Utility* UtilityFragment = Cast<UD1ItemFragment_Equipable_Utility>(EquipableFragment);
 
 			// Item Type
 			FText UtilityTypeText;
@@ -191,6 +195,33 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			Text_AttributeModifiers->SetText(FText::FromString(AttributeString));
 			Text_AttributeModifiers->SetVisibility(ESlateVisibility::Visible);
 		}
+
+		// Equipable Class List
+		FString EquipableClassString;
+
+		if (EquipableFragment->EquipableClassFlags >= ((1 << (uint32)ECharacterClassType::Count) - 1))
+		{
+			EquipableClassString.Append(TEXT("<Hover.Class.Valid>") + LOCTEXT("EquipableClass-All", "All Classes").ToString() + TEXT(" </>"));
+		}
+		else
+		{
+			for (int32 i = 0; i < (int32)ECharacterClassType::Count; i++)
+			{
+				ECharacterClassType CharacterClassType = (ECharacterClassType)i;
+				const FD1ClassInfoEntry& ClassInfoEntry = UD1ClassData::Get().GetClassInfoEntry(CharacterClassType);
+
+				if (EquipableFragment->IsEquipableClassType(CharacterClassType))
+				{
+					EquipableClassString.Append(TEXT("<Hover.Class.Valid>") + ClassInfoEntry.ClassName.ToString() + TEXT(" </>"));
+				}
+				else
+				{
+					EquipableClassString.Append(TEXT("<Hover.Class.Invalid>") + ClassInfoEntry.ClassName.ToString() + TEXT(" </>"));
+				}
+			}
+		}
+		
+		Text_UsableClassList->SetText(FText::FromString(EquipableClassString));
 	}
 
 	if (Text_ItemType->GetText().IsEmpty())

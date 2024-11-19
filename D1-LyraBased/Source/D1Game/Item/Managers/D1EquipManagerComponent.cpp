@@ -6,9 +6,9 @@
 #include "D1GameplayTags.h"
 #include "Engine/ActorChannel.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Equippable.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
+#include "Item/Fragments/D1ItemFragment_Equipable.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
 #include "Net/UnrealNetwork.h"
 #include "Actors/D1WeaponBase.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
@@ -41,7 +41,7 @@ void FD1EquipEntry::Equip()
 	if (Character == nullptr)
 		return;
 
-	const UD1ItemFragment_Equippable* EquippableFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
+	const UD1ItemFragment_Equipable* EquippableFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable>();
 	if (EquippableFragment == nullptr)
 		return;
 
@@ -92,7 +92,7 @@ void FD1EquipEntry::Equip()
 			}
 
 			// Spawn Current Real Weapon
-			const UD1ItemFragment_Equippable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Attachment>();
+			const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
 			const FD1WeaponAttachInfo& AttachInfo = AttachmentFragment->WeaponAttachInfo;
 			if (AttachInfo.SpawnWeaponClass)
 			{
@@ -119,7 +119,7 @@ void FD1EquipEntry::Equip()
 				}
 
 				// Spawn Current Pocket Weapon
-				const UD1ItemFragment_Equippable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Attachment>();
+				const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
 				if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 				{
 					if (APlayerController* PC = Character->GetLyraPlayerController())
@@ -153,7 +153,7 @@ void FD1EquipEntry::Equip()
 		else if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
 		{
 			// Refresh Real Armor Mesh
-			const UD1ItemFragment_Equippable_Armor* ArmorFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
+			const UD1ItemFragment_Equipable_Armor* ArmorFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Armor>();
 			if (UD1CosmeticManagerComponent* CharacterCosmetics = Character->FindComponentByClass<UD1CosmeticManagerComponent>())
 			{
 				CharacterCosmetics->RefreshArmorMesh(ArmorFragment->ArmorType, ArmorFragment);
@@ -186,7 +186,7 @@ void FD1EquipEntry::Equip()
 
 	if (EquippableFragment->EquipmentType == EEquipmentType::Weapon || EquippableFragment->EquipmentType == EEquipmentType::Utility)
 	{
-		const UD1ItemFragment_Equippable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Attachment>();
+		const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
 		if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
 		{
 			if (AttachmentFragment->AnimInstanceClass)
@@ -465,7 +465,7 @@ void UD1EquipManagerComponent::EquipCurrentSlots()
 	
 	if (UD1EquipmentManagerComponent* EquipmentManager = GetEquipmentManager())
 	{
-		for (EEquipmentSlotType EquipmentSlotType : Item::EquipmentSlotsByEquipState[(int32)CurrentEquipState])
+		for (EEquipmentSlotType EquipmentSlotType : UD1EquipManagerComponent::GetEquipmentSlotsByEquipState(CurrentEquipState))
 		{
 			Equip(EquipmentSlotType, EquipmentManager->GetItemInstance(EquipmentSlotType));
 		}
@@ -479,7 +479,7 @@ void UD1EquipManagerComponent::UnequipCurrentSlots()
 	if (CurrentEquipState == EEquipState::Count)
 		return;
 	
-	for (EEquipmentSlotType EquipmentSlotType : Item::EquipmentSlotsByEquipState[(int32)CurrentEquipState])
+	for (EEquipmentSlotType EquipmentSlotType : UD1EquipManagerComponent::GetEquipmentSlotsByEquipState(CurrentEquipState))
 	{
 		Unequip(EquipmentSlotType);
 	}
@@ -870,6 +870,26 @@ bool UD1EquipManagerComponent::IsWeaponEquipState(EEquipState EquipState)
 bool UD1EquipManagerComponent::IsUtilityEquipState(EEquipState EquipState)
 {
 	return (EEquipState::Utility_Primary <= EquipState && EquipState <= EEquipState::Utility_Quaternary);
+}
+
+const TArray<EEquipmentSlotType>& UD1EquipManagerComponent::GetEquipmentSlotsByEquipState(EEquipState EquipState)
+{
+	static const TArray<TArray<EEquipmentSlotType>> EquipmentSlotsByEquipState = {
+		{ EEquipmentSlotType::Unarmed_LeftHand,    EEquipmentSlotType::Unarmed_RightHand                                            },
+		{ EEquipmentSlotType::Primary_LeftHand,    EEquipmentSlotType::Primary_RightHand,    EEquipmentSlotType::Primary_TwoHand    },
+		{ EEquipmentSlotType::Secondary_LeftHand,  EEquipmentSlotType::Secondary_RightHand,  EEquipmentSlotType::Secondary_TwoHand  },
+		{ EEquipmentSlotType::Utility_Primary }, { EEquipmentSlotType::Utility_Secondary }, { EEquipmentSlotType::Utility_Tertiary }, { EEquipmentSlotType::Utility_Quaternary },
+	};
+
+	if (EquipmentSlotsByEquipState.IsValidIndex((int32)EquipState))
+	{
+		return EquipmentSlotsByEquipState[(int32)EquipState];
+	}
+	else
+	{
+		static const TArray<EEquipmentSlotType> EmptyEquipmentSlots;
+		return EmptyEquipmentSlots;
+	}
 }
 
 EWeaponSlotType UD1EquipManagerComponent::ConvertToWeaponSlotType(EEquipmentSlotType EquipmentSlotType)

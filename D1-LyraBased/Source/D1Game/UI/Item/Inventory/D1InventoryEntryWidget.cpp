@@ -6,7 +6,7 @@
 #include "Data/D1ItemData.h"
 #include "Data/D1UIData.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Equippable.h"
+#include "Item/Fragments/D1ItemFragment_Equipable.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
 #include "UI/Item/D1ItemDragDrop.h"

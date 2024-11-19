@@ -167,7 +167,7 @@ enum class ECharacterSkinType : uint8
 	Count	UMETA(Hidden)
 };
 
-UENUM(BlueprintType)
+UENUM(BlueprintType, meta=(Bitflags))
 enum class ECharacterClassType : uint8
 {
 	Fighter,
@@ -185,13 +185,3 @@ enum class ED1TeamID : uint8
 	NoTeam,
 	Monster = 1,
 };
-
-namespace Item
-{
-	const TArray<TArray<EEquipmentSlotType>> EquipmentSlotsByEquipState = {
-		{ EEquipmentSlotType::Unarmed_LeftHand,    EEquipmentSlotType::Unarmed_RightHand                                            },
-		{ EEquipmentSlotType::Primary_LeftHand,    EEquipmentSlotType::Primary_RightHand,    EEquipmentSlotType::Primary_TwoHand    },
-		{ EEquipmentSlotType::Secondary_LeftHand,  EEquipmentSlotType::Secondary_RightHand,  EEquipmentSlotType::Secondary_TwoHand  },
-		{ EEquipmentSlotType::Utility_Primary }, { EEquipmentSlotType::Utility_Secondary }, { EEquipmentSlotType::Utility_Tertiary }, { EEquipmentSlotType::Utility_Quaternary },
-	};
-}

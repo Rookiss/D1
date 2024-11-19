@@ -1,26 +1,21 @@
-﻿#include "D1ItemFragment_Equippable_Armor.h"
+﻿#include "D1ItemFragment_Equipable_Weapon.h"
 
 #include "Item/D1ItemInstance.h"
 #include "UObject/ObjectSaveContext.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemFragment_Equippable_Armor)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemFragment_Equipable_Weapon)
 
-UD1ItemFragment_Equippable_Armor::UD1ItemFragment_Equippable_Armor(const FObjectInitializer& ObjectInitializer)
+UD1ItemFragment_Equipable_Weapon::UD1ItemFragment_Equipable_Weapon(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    EquipmentType = EEquipmentType::Armor;
+    EquipmentType = EEquipmentType::Weapon;
 }
 
 #if WITH_EDITORONLY_DATA
-void UD1ItemFragment_Equippable_Armor::PreSave(FObjectPreSaveContext SaveContext)
+void UD1ItemFragment_Equipable_Weapon::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);
 
-	if (ArmorType != EArmorType::Chest)
-	{
-		bIsFullBody = false;
-	}
-	
 	for (int i = 0; i < RarityStatRangeSets.Num(); i++)
 	{
 		TArray<FRarityStatRange>& RarityStatRanges = RarityStatRangeSets[i].RarityStatRanges;
@@ -33,7 +28,7 @@ void UD1ItemFragment_Equippable_Armor::PreSave(FObjectPreSaveContext SaveContext
 }
 #endif // WITH_EDITORONLY_DATA
 
-void UD1ItemFragment_Equippable_Armor::OnInstanceCreated(UD1ItemInstance* ItemInstance) const
+void UD1ItemFragment_Equipable_Weapon::OnInstanceCreated(UD1ItemInstance* ItemInstance) const
 {
 	Super::OnInstanceCreated(ItemInstance);
 	

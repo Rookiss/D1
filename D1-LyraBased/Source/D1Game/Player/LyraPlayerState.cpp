@@ -280,31 +280,28 @@ void ALyraPlayerState::Server_SelectClass_Implementation(ECharacterClassType Cla
 {
 	if (HasAuthority() == false)
 		return;
+
+	if (ClassType == ECharacterClassType::Count || ClassType == CharacterClassType)
+		return;
 	
-	const int32 ClassIndex = (int32)ClassType;
-	const TArray<FD1ClassInfoEntry>& ClassEntries = UD1ClassData::Get().GetClassEntries();
+	CharacterClassType = ClassType;
+	const FD1ClassInfoEntry& ClassEntry = UD1ClassData::Get().GetClassInfoEntry(CharacterClassType);
 	
-	if (ClassEntries.IsValidIndex(ClassIndex))
+	if (ALyraCharacter* LyraCharacter = GetPawn<ALyraCharacter>())
 	{
-		CharacterClassType = ClassType;
-		const FD1ClassInfoEntry& ClassEntry = ClassEntries[ClassIndex];
-		
-		if (ALyraCharacter* LyraCharacter = GetPawn<ALyraCharacter>())
+		if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->GetComponentByClass<UD1EquipmentManagerComponent>())
 		{
-			if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->GetComponentByClass<UD1EquipmentManagerComponent>())
+			for (const FD1DefaultItemEntry& DefaultItemEntry : ClassEntry.DefaultItemEntries)
 			{
-				for (const FD1DefaultItemEntry& DefaultItemEntry : ClassEntry.DefaultItemEntries)
-				{
-					EquipmentManager->SetEquipment(DefaultItemEntry.EquipmentSlotType, DefaultItemEntry.ItemTemplateClass, DefaultItemEntry.ItemRarity, DefaultItemEntry.ItemCount);
-				}
+				EquipmentManager->SetEquipment(DefaultItemEntry.EquipmentSlotType, DefaultItemEntry.ItemTemplateClass, DefaultItemEntry.ItemRarity, DefaultItemEntry.ItemCount);
 			}
 		}
+	}
 	
-		AbilitySetGrantedHandles.TakeFromAbilitySystem(AbilitySystemComponent);
-		if (ULyraAbilitySet* AbilitySet = ClassEntry.ClassAbilitySet)
-		{
-			AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, &AbilitySetGrantedHandles, this);
-		}
+	AbilitySetGrantedHandles.TakeFromAbilitySystem(AbilitySystemComponent);
+	if (ULyraAbilitySet* AbilitySet = ClassEntry.ClassAbilitySet)
+	{
+		AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, &AbilitySetGrantedHandles, this);
 	}
 }
 

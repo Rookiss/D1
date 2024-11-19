@@ -25,7 +25,7 @@ void UD1GameplayAbility_Knockback::ActivateAbility(const FGameplayAbilitySpecHan
 
 	if (TriggerEventData == nullptr || TriggerEventData->Instigator == nullptr)
 	{
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
 		return;
 	}
 
@@ -85,11 +85,11 @@ UAnimMontage* UD1GameplayAbility_Knockback::SelectDirectionalMontage(const AActo
 
 	UAnimMontage* SelectedMontage;
 	
-	if (YawAbs < 50.f)
+	if (YawAbs < ForwardThreshold)
 	{
 		SelectedMontage = KnockbackBackwardMontage;
 	}
-	else if (YawAbs > 130.f)
+	else if (YawAbs > BackwardThreshold)
 	{
 		SelectedMontage = KnockbackForwardMontage;
 	}

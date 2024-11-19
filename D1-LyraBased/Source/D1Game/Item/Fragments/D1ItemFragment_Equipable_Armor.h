@@ -1,16 +1,16 @@
 ﻿#pragma once
 
 #include "D1Define.h"
-#include "D1ItemFragment_Equippable.h"
-#include "D1ItemFragment_Equippable_Armor.generated.h"
+#include "D1ItemFragment_Equipable.h"
+#include "D1ItemFragment_Equipable_Armor.generated.h"
 
 UCLASS()
-class UD1ItemFragment_Equippable_Armor : public UD1ItemFragment_Equippable
+class UD1ItemFragment_Equipable_Armor : public UD1ItemFragment_Equipable
 {
 	GENERATED_BODY()
 	
 public:
-	UD1ItemFragment_Equippable_Armor(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UD1ItemFragment_Equipable_Armor(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 #if WITH_EDITORONLY_DATA

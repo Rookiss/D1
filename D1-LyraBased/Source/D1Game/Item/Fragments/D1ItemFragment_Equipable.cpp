@@ -1,8 +1,8 @@
-﻿#include "D1ItemFragment_Equippable.h"
+﻿#include "D1ItemFragment_Equipable.h"
 
 #include "Item/D1ItemInstance.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemFragment_Equippable)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemFragment_Equipable)
 
 FRarityStatSet::FRarityStatSet()
 {
@@ -22,13 +22,13 @@ FRarityStatRangeSet::FRarityStatRangeSet()
 	}
 }
 
-UD1ItemFragment_Equippable::UD1ItemFragment_Equippable(const FObjectInitializer& ObjectInitializer)
+UD1ItemFragment_Equipable::UD1ItemFragment_Equipable(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1ItemFragment_Equippable::AddStatTagStack(UD1ItemInstance* ItemInstance, const TArray<FRarityStatSet>& RarityStatSets) const
+void UD1ItemFragment_Equipable::AddStatTagStack(UD1ItemInstance* ItemInstance, const TArray<FRarityStatSet>& RarityStatSets) const
 {
 	if (ItemInstance == nullptr)
 		return;
@@ -41,7 +41,7 @@ void UD1ItemFragment_Equippable::AddStatTagStack(UD1ItemInstance* ItemInstance, 
 	}
 }
 
-void UD1ItemFragment_Equippable::AddStatTagStack(UD1ItemInstance* ItemInstance, const TArray<FRarityStatRangeSet>& RarityStatRangeSets) const
+void UD1ItemFragment_Equipable::AddStatTagStack(UD1ItemInstance* ItemInstance, const TArray<FRarityStatRangeSet>& RarityStatRangeSets) const
 {
 	if (ItemInstance == nullptr)
 		return;
@@ -53,4 +53,9 @@ void UD1ItemFragment_Equippable::AddStatTagStack(UD1ItemInstance* ItemInstance, 
 		const int32 StatValue = FMath::RandRange(StatRange.MinValue, StatRange.MaxValue);
 		ItemInstance->AddStatTagStack(StatTag, StatValue);
 	}
+}
+
+bool UD1ItemFragment_Equipable::IsEquipableClassType(ECharacterClassType ClassType) const
+{
+	return (EquipableClassFlags & (1 << (uint32)ClassType)) != 0;
 }

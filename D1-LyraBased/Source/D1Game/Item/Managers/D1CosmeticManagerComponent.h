@@ -5,7 +5,7 @@
 #include "D1CosmeticManagerComponent.generated.h"
 
 class AD1ArmorBase;
-class UD1ItemFragment_Equippable_Armor;
+class UD1ItemFragment_Equipable_Armor;
 
 
 UCLASS(BlueprintType, Blueprintable)
@@ -21,7 +21,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 public:
-	void RefreshArmorMesh(EArmorType ArmorType, const UD1ItemFragment_Equippable_Armor* ArmorFragment);
+	void RefreshArmorMesh(EArmorType ArmorType, const UD1ItemFragment_Equipable_Armor* ArmorFragment);
 	void GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const;
 
 private:

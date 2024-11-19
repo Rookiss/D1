@@ -18,8 +18,8 @@ void UD1ClassSelectionWidget::NativeConstruct()
 
 	VerticalBox_ClassElements->ClearChildren();
 
-	const TArray<FD1ClassInfoEntry>& ClassEntries = UD1ClassData::Get().GetClassEntries();
-	for (int i = 0; i < ClassEntries.Num(); i++)
+	const int32 ClassCount = (int32)ECharacterClassType::Count;
+	for (int i = 0; i < ClassCount; i++)
 	{
 		UD1ClassEntryWidget* ClassEntryWidget = CreateWidget<UD1ClassEntryWidget>(this, ClassEntryWidgetClass);
 		ClassEntryWidget->InitializeUI(this, (ECharacterClassType)i);

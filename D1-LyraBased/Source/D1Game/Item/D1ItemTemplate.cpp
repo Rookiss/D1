@@ -4,10 +4,10 @@
 #include "Misc/DataValidation.h"
 #endif // WITH_EDITOR
 
-#include "Fragments/D1ItemFragment_Equippable.h"
-#include "Fragments/D1ItemFragment_Equippable_Armor.h"
-#include "Fragments/D1ItemFragment_Equippable_Utility.h"
-#include "Fragments/D1ItemFragment_Equippable_Weapon.h"
+#include "Fragments/D1ItemFragment_Equipable.h"
+#include "Fragments/D1ItemFragment_Equipable_Armor.h"
+#include "Fragments/D1ItemFragment_Equipable_Utility.h"
+#include "Fragments/D1ItemFragment_Equipable_Weapon.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemTemplate)
 
@@ -34,32 +34,32 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 		Result = EDataValidationResult::Invalid;
 	}
 	
-	const UD1ItemFragment_Equippable* FoundEquippable = nullptr;
+	const UD1ItemFragment_Equipable* FoundEquipable = nullptr;
 	for (UD1ItemFragment* Fragment : Fragments)
 	{
-		if (UD1ItemFragment_Equippable* CurrentEquippable = Cast<UD1ItemFragment_Equippable>(Fragment))
+		if (UD1ItemFragment_Equipable* CurrentEquippable = Cast<UD1ItemFragment_Equipable>(Fragment))
 		{
-			if (FoundEquippable)
+			if (FoundEquipable)
 			{
 				Context.AddError(FText::FromString(FString::Printf(TEXT("Duplicated Equippable Fragment"))));
 				return EDataValidationResult::Invalid;
 			}
 
-			FoundEquippable = CurrentEquippable;
+			FoundEquipable = CurrentEquippable;
 		}
 	}
 	
-	if (FoundEquippable)
+	if (FoundEquipable)
 	{
-		if (FoundEquippable->EquipmentType == EEquipmentType::Count)
+		if (FoundEquipable->EquipmentType == EEquipmentType::Count)
 		{
 			Context.AddError(FText::FromString(FString::Printf(TEXT("Equipment Type is Invalid : [EEquipmentType::Count]"))));
 			return EDataValidationResult::Invalid;
 		}
 		
-		if (FoundEquippable->EquipmentType == EEquipmentType::Armor)
+		if (FoundEquipable->EquipmentType == EEquipmentType::Armor)
 		{
-			const UD1ItemFragment_Equippable_Armor* ArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(FoundEquippable);
+			const UD1ItemFragment_Equipable_Armor* ArmorFragment = Cast<UD1ItemFragment_Equipable_Armor>(FoundEquipable);
 			
 			if (ArmorFragment->ArmorType == EArmorType::Count)
 			{
@@ -67,9 +67,9 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 				Result = EDataValidationResult::Invalid;
 			}
 		}
-		else if (FoundEquippable->EquipmentType == EEquipmentType::Weapon)
+		else if (FoundEquipable->EquipmentType == EEquipmentType::Weapon)
 		{
-			const UD1ItemFragment_Equippable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(FoundEquippable);
+			const UD1ItemFragment_Equipable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equipable_Weapon>(FoundEquipable);
 			
 			if (WeaponFragment->WeaponType == EWeaponType::Count)
 			{
@@ -83,9 +83,9 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 				Result = EDataValidationResult::Invalid;
 			}
 		}
-		else if (FoundEquippable->EquipmentType == EEquipmentType::Utility)
+		else if (FoundEquipable->EquipmentType == EEquipmentType::Utility)
 		{
-			const UD1ItemFragment_Equippable_Utility* UtilityFragment = Cast<UD1ItemFragment_Equippable_Utility>(FoundEquippable);
+			const UD1ItemFragment_Equipable_Utility* UtilityFragment = Cast<UD1ItemFragment_Equipable_Utility>(FoundEquipable);
 
 			if (UtilityFragment->UtilityType == EUtilityType::Count)
 			{
@@ -94,7 +94,7 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 			}
 		}
 
-		if (FoundEquippable->EquipmentType == EEquipmentType::Armor || FoundEquippable->EquipmentType == EEquipmentType::Weapon)
+		if (FoundEquipable->EquipmentType == EEquipmentType::Armor || FoundEquipable->EquipmentType == EEquipmentType::Weapon)
 		{
 			if (MaxStackCount != 1)
 			{

@@ -6,7 +6,7 @@
 #include "Data/D1ItemData.h"
 #include "Interaction/D1Pickupable.h"
 #include "Item/D1ItemTemplate.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Utility.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Utility.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -32,7 +32,7 @@ FTransform UD1GameplayAbility_Utility_Throw::GetSpawnTransform()
 		int32 ItemTemplateID = WeaponActor->GetTemplateID();
 		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
 
-		if (const UD1ItemFragment_Equippable_Utility* UtilityFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Utility>())
+		if (const UD1ItemFragment_Equipable_Utility* UtilityFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Utility>())
 		{
 			SpawnTransform = UtilityFragment->WeaponAttachInfo.AttachTransform;
 			const FTransform& SocketTransform = LyraCharacter->GetMesh()->GetSocketTransform(UtilityFragment->WeaponAttachInfo.AttachSocket);

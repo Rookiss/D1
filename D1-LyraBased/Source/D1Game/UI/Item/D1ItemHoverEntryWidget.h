@@ -6,6 +6,7 @@
 class UImage;
 class UTextBlock;
 class UHorizontalBox;
+class URichTextBlock;
 class UD1ItemInstance;
 
 UCLASS()
@@ -48,6 +49,9 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_Description;
 
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<URichTextBlock> Text_UsableClassList;
+	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_Gold;
 	

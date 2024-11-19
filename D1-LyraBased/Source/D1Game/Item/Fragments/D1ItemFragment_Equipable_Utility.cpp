@@ -1,17 +1,17 @@
-﻿#include "D1ItemFragment_Equippable_Utility.h"
+﻿#include "D1ItemFragment_Equipable_Utility.h"
 
 #include "UObject/ObjectSaveContext.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemFragment_Equippable_Utility)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemFragment_Equipable_Utility)
 
-UD1ItemFragment_Equippable_Utility::UD1ItemFragment_Equippable_Utility(const FObjectInitializer& ObjectInitializer)
+UD1ItemFragment_Equipable_Utility::UD1ItemFragment_Equipable_Utility(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     EquipmentType = EEquipmentType::Utility;
 }
 
 #if WITH_EDITORONLY_DATA
-void UD1ItemFragment_Equippable_Utility::PreSave(FObjectPreSaveContext SaveContext)
+void UD1ItemFragment_Equipable_Utility::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);
 
@@ -27,7 +27,7 @@ void UD1ItemFragment_Equippable_Utility::PreSave(FObjectPreSaveContext SaveConte
 }
 #endif // WITH_EDITORONLY_DATA
 
-void UD1ItemFragment_Equippable_Utility::OnInstanceCreated(UD1ItemInstance* ItemInstance) const
+void UD1ItemFragment_Equipable_Utility::OnInstanceCreated(UD1ItemInstance* ItemInstance) const
 {
 	Super::OnInstanceCreated(ItemInstance);
 	

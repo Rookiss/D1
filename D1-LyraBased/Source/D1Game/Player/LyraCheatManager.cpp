@@ -22,8 +22,8 @@
 #include "Development/D1DeveloperSettings.h"
 #include "Item/D1ItemInstance.h"
 #include "Item/D1ItemTemplate.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "UI/Cheat/D1CheatMenuWidget.h"
@@ -469,7 +469,7 @@ void ULyraCheatManager::EquipWeapon(EWeaponSlotType WeaponSlotType, TSubclassOf<
 	if (ItemTemplate == nullptr)
 		return;
 	
-	const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>();
+	const UD1ItemFragment_Equipable_Weapon* WeaponFragment = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equipable_Weapon>();
 	if (WeaponFragment == nullptr)
 		return;
 	
@@ -561,7 +561,7 @@ void ULyraCheatManager::EquipArmor(TSubclassOf<UD1ItemTemplate> ItemTemplateClas
 	if (ItemTemplate == nullptr)
 		return;
 	
-	const UD1ItemFragment_Equippable_Armor* ArmorFragment = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();
+	const UD1ItemFragment_Equipable_Armor* ArmorFragment = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equipable_Armor>();
 	if (ArmorFragment == nullptr)
 		return;
 

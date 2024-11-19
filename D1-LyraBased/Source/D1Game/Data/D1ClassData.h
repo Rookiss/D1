@@ -5,8 +5,6 @@
 
 class UD1ItemTemplate;
 class ULyraAbilitySet;
-class UTexture2D;
-class ULyraGameplayAbility;
 
 USTRUCT(BlueprintType)
 struct FD1DefaultItemEntry
@@ -34,9 +32,6 @@ struct FD1ClassInfoEntry
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	ECharacterClassType ClassType = ECharacterClassType::Count;
-	
-	UPROPERTY(EditDefaultsOnly)
 	FText ClassName;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -44,16 +39,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<ULyraAbilitySet> ClassAbilitySet;
-};
-
-USTRUCT(BlueprintType)
-struct FD1ClassInfoSet
-{
-	GENERATED_BODY()
-	
-public:
-	UPROPERTY(EditDefaultsOnly)
-	TArray<FD1ClassInfoEntry> ClassInfoEntries;
 };
 
 UCLASS(BlueprintType, Const)
@@ -64,17 +49,10 @@ class UD1ClassData : public UPrimaryDataAsset
 public:
 	static const UD1ClassData& Get();
 
-protected:
-#if WITH_EDITOR
-	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
-	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
-#endif // WITH_EDITOR
-
 public:
-	const FD1ClassInfoEntry& GetClassEntry(ECharacterClassType ClassType) const;
-	const TArray<FD1ClassInfoEntry>& GetClassEntries() const { return ClassInfoSet.ClassInfoEntries; }
+	const FD1ClassInfoEntry& GetClassInfoEntry(ECharacterClassType ClassType) const;
 	
 private:
-	UPROPERTY(EditDefaultsOnly)
-	FD1ClassInfoSet ClassInfoSet;
+	UPROPERTY(EditDefaultsOnly, meta=(ArraySizeNum="ECharacterClassType"))
+	FD1ClassInfoEntry ClassInfoEntries[(int32)ECharacterClassType::Count];
 };

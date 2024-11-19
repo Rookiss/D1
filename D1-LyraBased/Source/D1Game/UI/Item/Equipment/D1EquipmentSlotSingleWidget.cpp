@@ -6,8 +6,8 @@
 #include "Components/OverlaySlot.h"
 #include "Components/SizeBox.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Utility.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Utility.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
 #include "Item/Managers/D1InventoryManagerComponent.h"
@@ -142,8 +142,8 @@ bool UD1EquipmentSlotSingleWidget::NativeOnDrop(const FGeometry& InGeometry, con
 	const UD1ItemFragment* FromItemFragment = nullptr;
 	switch (EquipmentSingleSlotType)
 	{
-	case EEquipmentSingleSlotType::Armor:	FromItemFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Armor>();	break;
-	case EEquipmentSingleSlotType::Utility:	FromItemFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Utility>();	break;
+	case EEquipmentSingleSlotType::Armor:	FromItemFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Armor>();	break;
+	case EEquipmentSingleSlotType::Utility:	FromItemFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Utility>();	break;
 	}
 	if (FromItemFragment == nullptr)
 		return false;

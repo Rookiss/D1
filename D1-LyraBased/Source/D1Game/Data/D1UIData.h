@@ -19,10 +19,7 @@ struct FD1ItemRarityInfoEntry
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleDefaultsOnly)
-	EItemRarity Rarity = EItemRarity::Poor;
-
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta=(HideAlphaChannel))
 	FColor Color = FColor::Black;
 	
 	UPROPERTY(EditDefaultsOnly)
@@ -30,24 +27,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UTexture2D> HoverTexture;
-};
-
-USTRUCT(BlueprintType)
-struct FD1ItemRarityInfoSet
-{
-	GENERATED_BODY()
-
-public:
-	FD1ItemRarityInfoSet();
-
-public:
-	UTexture2D* GetEntryTexture(EItemRarity ItemRarity) const;
-	UTexture2D* GetHoverTexture(EItemRarity ItemRarity) const;
-	FColor GetRarityColor(EItemRarity ItemRarity) const;
-	
-public:
-	UPROPERTY(EditDefaultsOnly, EditFixedSize)
-	TArray<FD1ItemRarityInfoEntry> RarityInfoEntries;
 };
 
 USTRUCT(BlueprintType)
@@ -73,11 +52,6 @@ class UD1UIData : public UPrimaryDataAsset
 	
 public:
 	static const UD1UIData& Get();
-
-protected:
-#if WITH_EDITORONLY_DATA
-	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
-#endif // WITH_EDITORONLY_DATA
 	
 public:
 	UTexture2D* GetEntryRarityTexture(EItemRarity ItemRarity) const;
@@ -113,8 +87,8 @@ public:
 	TSubclassOf<UD1InventoryValidWidget> InventoryValidWidgetClass;
 	
 private:
-	UPROPERTY(EditDefaultsOnly)
-	FD1ItemRarityInfoSet RarityInfoSet;
+	UPROPERTY(EditDefaultsOnly, meta=(ArraySizeEnum="EItemRarity"))
+	FD1ItemRarityInfoEntry RarityInfoEntries[(int32)EItemRarity::Count];
 
 	UPROPERTY(EditDefaultsOnly, meta=(DisplayName="Tag UI Infos"))
 	TMap<FGameplayTag, FD1UIInfo> TagUIInfos;

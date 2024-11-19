@@ -7,7 +7,7 @@
 #include "Data/D1ItemData.h"
 #include "GameFramework/Character.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Equippable.h"
+#include "Item/Fragments/D1ItemFragment_Equipable.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "System/LyraAssetManager.h"
 
@@ -148,7 +148,7 @@ void UD1ItemManagerComponent::Server_QuickFromInventory_Implementation(UD1Invent
 	if (FromItemInstance == nullptr)
 		return;
 
-	if (FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>())
+	if (FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable>())
 	{
 		// 1. [장비]
 		// 1-1. [내 인벤토리] -> 내 장비 교체 -> 내 장비 장착 

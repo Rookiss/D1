@@ -158,6 +158,8 @@ public:
 	static bool IsWeaponEquipState(EEquipState EquipState);
 	static bool IsUtilityEquipState(EEquipState EquipState);
 
+	static const TArray<EEquipmentSlotType>& GetEquipmentSlotsByEquipState(EEquipState EquipState);
+	
 	UFUNCTION(BlueprintCallable)
 	void ChangeShouldHiddenEquipments(bool bNewShouldHiddenEquipments);
 

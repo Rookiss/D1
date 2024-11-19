@@ -6,7 +6,7 @@
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Data/D1ItemData.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
@@ -117,7 +117,7 @@ void AD1WeaponBase::ChangeSkill(int32 AbilitySetIndex)
 	SkillAbilitySetHandles.TakeFromAbilitySystem(ASC);
 
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-	if (const UD1ItemFragment_Equippable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
+	if (const UD1ItemFragment_Equipable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Weapon>())
 	{
 		if (WeaponFragment->SkillAbilitySets.IsValidIndex(AbilitySetIndex))
 		{
@@ -188,7 +188,7 @@ UAnimMontage* AD1WeaponBase::GetEquipMontage()
 	if (TemplateID > 0)
 	{
 		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-		if (const UD1ItemFragment_Equippable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Attachment>())
+		if (const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>())
 		{
 			EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->EquipMontage);
 		}
@@ -204,7 +204,7 @@ UAnimMontage* AD1WeaponBase::GetHitMontage(AActor* InstigatorActor, const FVecto
 	if (InstigatorActor && TemplateID > 0)
 	{
 		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-		if (const UD1ItemFragment_Equippable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable_Attachment>())
+		if (const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>())
 		{
 			if (IsBlocked)
 			{

@@ -9,7 +9,7 @@
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Data/D1UIData.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Item/Managers/D1ItemManagerComponent.h"
 #include "UI/Item/D1ItemDragDrop.h"
@@ -61,7 +61,7 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDragOver(const FGeometry& InGeometry,
 	bool bIsValid = false;
 	UImage* TargetImage = Image_Red_TwoHand;
 	
-	if (const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
+	if (const UD1ItemFragment_Equipable_Weapon* FromWeaponFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Weapon>())
 	{
 		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, WeaponSlotType);
 	
@@ -124,7 +124,7 @@ bool UD1EquipmentSlotWeaponWidget::NativeOnDrop(const FGeometry& InGeometry, con
 	if (ItemManager == nullptr)
 		return false;
 	
-	if (const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
+	if (const UD1ItemFragment_Equipable_Weapon* FromWeaponFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Weapon>())
 	{
 		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, WeaponSlotType);
 	

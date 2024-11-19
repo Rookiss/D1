@@ -5,29 +5,12 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1CharacterData)
 
-FD1DefaultArmorMeshSet::FD1DefaultArmorMeshSet()
-{
-	const int32 ArmorTypeCount = (int32)EArmorType::Count;
-
-	DefaultMeshEntries.SetNum(ArmorTypeCount);
-	for (int32 i = 0; i < ArmorTypeCount; i++)
-	{
-		DefaultMeshEntries[i].ArmorType = (EArmorType)i;
-	}
-
-	SecondaryMeshEntries.SetNum(ArmorTypeCount);
-	for (int32 i = 0; i < ArmorTypeCount; i++)
-	{
-		SecondaryMeshEntries[i].ArmorType = (EArmorType)i;
-	}
-}
-
 const UD1CharacterData& UD1CharacterData::Get()
 {
 	return ULyraAssetManager::Get().GetCharacterData();
 }
 
-#if WITH_EDITORONLY_DATA
+#if WITH_EDITOR
 void UD1CharacterData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
 	Super::PreSave(ObjectSaveContext);
@@ -37,7 +20,7 @@ void UD1CharacterData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 		return (A < B);
 	});
 }
-#endif // WITH_EDITORONLY_DATA
+#endif // WITH_EDITOR
 
 const FD1DefaultArmorMeshSet& UD1CharacterData::GetDefaultArmorMeshSet(ECharacterSkinType CharacterSkinType) const
 {

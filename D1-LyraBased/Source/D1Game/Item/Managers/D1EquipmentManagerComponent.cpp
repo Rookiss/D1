@@ -7,8 +7,8 @@
 #include "Data/D1ItemData.h"
 #include "Engine/ActorChannel.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equippable_Weapon.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Armor.h"
+#include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/LyraPlayerController.h"
 #include "Player/LyraPlayerState.h"
@@ -23,7 +23,7 @@ void FD1EquipmentEntry::Init(UD1ItemInstance* InItemInstance, int32 InItemCount)
 	if (EquipManager == nullptr)
 		return;
 
-	const UD1ItemFragment_Equippable* EquippableFragment = InItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
+	const UD1ItemFragment_Equipable* EquippableFragment = InItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable>();
 	if (EquippableFragment == nullptr)
 		return;
 	
@@ -258,13 +258,13 @@ int32 UD1EquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(int32 FromItem
 		return 0;
 
 	const UD1ItemTemplate& FromItemTemplate = UD1ItemData::Get().FindItemTemplateByID(FromItemTemplateID);
-	const UD1ItemFragment_Equippable* FromEquippableFragment = FromItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable>();
+	const UD1ItemFragment_Equipable* FromEquippableFragment = FromItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable>();
 	if (FromEquippableFragment == nullptr)
 		return 0;
 	
 	if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
 	{
-		const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(FromEquippableFragment);
+		const UD1ItemFragment_Equipable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equipable_Weapon>(FromEquippableFragment);
 
 		for (int32 i = 0; i < (int32)EWeaponSlotType::Count; i++)
 		{
@@ -279,7 +279,7 @@ int32 UD1EquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(int32 FromItem
 	}
 	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
 	{
-		const UD1ItemFragment_Equippable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(FromEquippableFragment);
+		const UD1ItemFragment_Equipable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equipable_Armor>(FromEquippableFragment);
 
 		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
 		int32 MovableCount = CanAddEquipment(FromItemTemplateID, FromItemRarity, FromItemCount, ToEquipmentSlotType);
@@ -340,7 +340,7 @@ bool UD1EquipmentManagerComponent::CanSwapEquipment(UD1EquipmentManagerComponent
 	if (FromItemInstance == nullptr)
 		return false;
 
-	const UD1ItemFragment_Equippable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
+	const UD1ItemFragment_Equipable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable>();
 	if (FromEquippableFragment == nullptr)
 		return false;
 
@@ -353,7 +353,7 @@ bool UD1EquipmentManagerComponent::CanSwapEquipment(UD1EquipmentManagerComponent
 
 	if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
 	{
-		const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(FromEquippableFragment);
+		const UD1ItemFragment_Equipable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equipable_Weapon>(FromEquippableFragment);
 		if (FromWeaponFragment == nullptr)
 			return false;
 
@@ -401,13 +401,13 @@ bool UD1EquipmentManagerComponent::CanSwapEquipment(UD1InventoryManagerComponent
 	if (ToItemInstance == nullptr)
 		return false;
 
-	const UD1ItemFragment_Equippable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
+	const UD1ItemFragment_Equipable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable>();
 	if (FromEquippableFragment == nullptr)
 		return false;
 
 	if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
 	{
-		const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(FromEquippableFragment);
+		const UD1ItemFragment_Equipable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equipable_Weapon>(FromEquippableFragment);
 		if (FromWeaponFragment == nullptr)
 			return false;
 
@@ -417,7 +417,7 @@ bool UD1EquipmentManagerComponent::CanSwapEquipment(UD1InventoryManagerComponent
 	}
 	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
 	{
-		const UD1ItemFragment_Equippable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(FromEquippableFragment);
+		const UD1ItemFragment_Equipable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equipable_Armor>(FromEquippableFragment);
 		EEquipmentSlotType FromEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
 
 		if (FromEquipmentSlotType != ToEquipmentSlotType)
@@ -483,13 +483,13 @@ bool UD1EquipmentManagerComponent::CanSwapEquipment_Quick(UD1EquipmentManagerCom
 	if (FromItemInstance == nullptr)
 		return false;
 
-	const UD1ItemFragment_Equippable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
+	const UD1ItemFragment_Equipable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable>();
 	if (FromEquippableFragment == nullptr)
 		return false;
 
 	if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
 	{
-		const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(FromEquippableFragment);
+		const UD1ItemFragment_Equipable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equipable_Weapon>(FromEquippableFragment);
 		if (FromWeaponFragment == nullptr)
 			return false;
 		
@@ -498,7 +498,7 @@ bool UD1EquipmentManagerComponent::CanSwapEquipment_Quick(UD1EquipmentManagerCom
 	}
 	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
 	{
-		const UD1ItemFragment_Equippable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(FromEquippableFragment);
+		const UD1ItemFragment_Equipable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equipable_Armor>(FromEquippableFragment);
 		EEquipmentSlotType ToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
 		
 		if (GetItemInstance(ToEquipmentSlotType))
@@ -526,7 +526,7 @@ bool UD1EquipmentManagerComponent::CanSwapEquipment_Quick(UD1InventoryManagerCom
 	if (FromItemInstance == nullptr)
 		return false;
 
-	const UD1ItemFragment_Equippable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
+	const UD1ItemFragment_Equipable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable>();
 	if (FromEquippableFragment == nullptr)
 		return false;
 	
@@ -534,7 +534,7 @@ bool UD1EquipmentManagerComponent::CanSwapEquipment_Quick(UD1InventoryManagerCom
 
 	if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
 	{
-		const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(FromEquippableFragment);
+		const UD1ItemFragment_Equipable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equipable_Weapon>(FromEquippableFragment);
 		if (FromWeaponFragment == nullptr)
 			return false;
 
@@ -542,7 +542,7 @@ bool UD1EquipmentManagerComponent::CanSwapEquipment_Quick(UD1InventoryManagerCom
 	}
 	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
 	{
-		const UD1ItemFragment_Equippable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(FromEquippableFragment);
+		const UD1ItemFragment_Equipable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equipable_Armor>(FromEquippableFragment);
 		OutToEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
 
 		ToItemInstance = GetItemInstance(OutToEquipmentSlotType);
@@ -600,7 +600,7 @@ int32 UD1EquipmentManagerComponent::CanAddEquipment(int32 ItemTemplateID, EItemR
 		return 0;
 	
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
-	const UD1ItemFragment_Equippable* FromEquippableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable>();
+	const UD1ItemFragment_Equipable* FromEquippableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable>();
 	if (FromEquippableFragment == nullptr)
 		return 0;
 	
@@ -625,7 +625,7 @@ int32 UD1EquipmentManagerComponent::CanAddEquipment(int32 ItemTemplateID, EItemR
 	{
 		if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
 		{
-			const UD1ItemFragment_Equippable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(FromEquippableFragment);
+			const UD1ItemFragment_Equipable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equipable_Weapon>(FromEquippableFragment);
 			EWeaponHandType FromWeaponHandType = FromWeaponFragment->WeaponHandType;
 
 			if (IsSameWeaponHandType(ToEquipmentSlotType, FromWeaponHandType) == false)
@@ -656,7 +656,7 @@ int32 UD1EquipmentManagerComponent::CanAddEquipment(int32 ItemTemplateID, EItemR
 		}
 		else if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
 		{
-			const UD1ItemFragment_Equippable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(FromEquippableFragment);
+			const UD1ItemFragment_Equipable_Armor* FromArmorFragment = Cast<UD1ItemFragment_Equipable_Armor>(FromEquippableFragment);
 			return IsSameArmorType(ToEquipmentSlotType, FromArmorFragment->ArmorType) ? ItemCount : 0;
 		}
 		else if (FromEquippableFragment->EquipmentType == EEquipmentType::Utility)
@@ -718,7 +718,7 @@ void UD1EquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlot
 
 	ItemCount = FMath::Clamp(ItemCount, 1, ItemTemplate.MaxStackCount);
 	
-	const UD1ItemFragment_Equippable* EquippableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equippable>();
+	const UD1ItemFragment_Equipable* EquippableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable>();
 	if (EquippableFragment == nullptr)
 		return;
 
@@ -727,7 +727,7 @@ void UD1EquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlot
 	
 	if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
 	{
-		const UD1ItemFragment_Equippable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(EquippableFragment);
+		const UD1ItemFragment_Equipable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equipable_Weapon>(EquippableFragment);
 		EWeaponHandType WeaponHandType = WeaponFragment->WeaponHandType;
 
 		if (IsPrimaryWeaponSlot(EquipmentSlotType))
@@ -857,7 +857,7 @@ const UD1ItemInstance* UD1EquipmentManagerComponent::FindPairItemInstance(const 
 	if (InBaseItemInstance == nullptr)
 		return nullptr;
 
-	const UD1ItemFragment_Equippable* BaseEquippableFragment = InBaseItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable>();
+	const UD1ItemFragment_Equipable* BaseEquippableFragment = InBaseItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable>();
 	if (BaseEquippableFragment == nullptr)
 		return nullptr;
 	
@@ -865,7 +865,7 @@ const UD1ItemInstance* UD1EquipmentManagerComponent::FindPairItemInstance(const 
 
 	if (BaseEquippableFragment->EquipmentType == EEquipmentType::Weapon)
 	{
-		const UD1ItemFragment_Equippable_Weapon* BaseWeaponFragment = Cast<UD1ItemFragment_Equippable_Weapon>(BaseEquippableFragment);
+		const UD1ItemFragment_Equipable_Weapon* BaseWeaponFragment = Cast<UD1ItemFragment_Equipable_Weapon>(BaseEquippableFragment);
 		
 		const TArray<FD1EquipmentEntry>& Entries = EquipmentList.GetAllEntries();
 		for (int32 i = 0; i < (int32)EEquipmentSlotType::Count; i++)
@@ -876,7 +876,7 @@ const UD1ItemInstance* UD1EquipmentManagerComponent::FindPairItemInstance(const 
 			const FD1EquipmentEntry& Entry = Entries[i];
 			if (UD1ItemInstance* ItemInstance = Entry.ItemInstance)
 			{
-				if (const UD1ItemFragment_Equippable_Weapon* EquippedWeaponFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equippable_Weapon>())
+				if (const UD1ItemFragment_Equipable_Weapon* EquippedWeaponFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Weapon>())
 				{
 					if ((BaseWeaponFragment->WeaponType == EquippedWeaponFragment->WeaponType) && (BaseWeaponFragment->WeaponHandType == EquippedWeaponFragment->WeaponHandType))
 					{
@@ -898,7 +898,7 @@ const UD1ItemInstance* UD1EquipmentManagerComponent::FindPairItemInstance(const 
 	}
 	else if (BaseEquippableFragment->EquipmentType == EEquipmentType::Armor)
 	{
-		const UD1ItemFragment_Equippable_Armor* BaseArmorFragment = Cast<UD1ItemFragment_Equippable_Armor>(BaseEquippableFragment);
+		const UD1ItemFragment_Equipable_Armor* BaseArmorFragment = Cast<UD1ItemFragment_Equipable_Armor>(BaseEquippableFragment);
 		OutEquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(BaseArmorFragment->ArmorType);
 		SelectedItemInstance = GetItemInstance(OutEquipmentSlotType);
 	}
@@ -920,7 +920,7 @@ bool UD1EquipmentManagerComponent::IsAllEmpty(EEquipState EquipState) const
 		return false;
 
 	bool bAllEmpty = true;
-	for (EEquipmentSlotType SlotType : Item::EquipmentSlotsByEquipState[(int32)EquipState])
+	for (EEquipmentSlotType SlotType : UD1EquipManagerComponent::GetEquipmentSlotsByEquipState(EquipState))
 	{
 		const FD1EquipmentEntry& Entry = EquipmentList.Entries[(int32)SlotType];
 		if (Entry.ItemInstance)

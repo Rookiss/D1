@@ -4,25 +4,9 @@
 #include "D1CharacterData.generated.h"
 
 USTRUCT(BlueprintType)
-struct FD1ArmorMeshEntry
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(VisibleDefaultsOnly)
-	EArmorType ArmorType = EArmorType::Count;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<USkeletalMesh> ArmorMesh = nullptr;
-};
-
-USTRUCT(BlueprintType)
 struct FD1DefaultArmorMeshSet
 {
 	GENERATED_BODY()
-
-public:
-	FD1DefaultArmorMeshSet();
 	
 public:
 	UPROPERTY(EditDefaultsOnly)
@@ -39,11 +23,11 @@ public:
 	TSoftObjectPtr<USkeletalMesh> HeadSecondaryMesh;
 
 public:
-	UPROPERTY(EditDefaultsOnly, EditFixedSize)
-	TArray<FD1ArmorMeshEntry> DefaultMeshEntries;
+	UPROPERTY(EditDefaultsOnly, meta=(ArraySizeEnum="EArmorType"))
+	TSoftObjectPtr<USkeletalMesh> DefaultMeshEntries[(int32)EArmorType::Count];
 
-	UPROPERTY(EditDefaultsOnly, EditFixedSize)
-	TArray<FD1ArmorMeshEntry> SecondaryMeshEntries;
+	UPROPERTY(EditDefaultsOnly, meta=(ArraySizeEnum="EArmorType"))
+	TSoftObjectPtr<USkeletalMesh> SecondaryMeshEntries[(int32)EArmorType::Count];
 };
 
 UCLASS(BlueprintType, Const)
@@ -55,9 +39,9 @@ public:
 	static const UD1CharacterData& Get();
 
 public:
-#if WITH_EDITORONLY_DATA
+#if WITH_EDITOR
 	virtual void PreSave(FObjectPreSaveContext ObjectSaveContext) override;
-#endif // WITH_EDITORONLY_DATA
+#endif // WITH_EDITOR
 	
 public:
 	const FD1DefaultArmorMeshSet& GetDefaultArmorMeshSet(ECharacterSkinType CharacterSkinType) const;

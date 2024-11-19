@@ -4,7 +4,7 @@
 #include "Data/D1ItemData.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Equippable.h"
+#include "Item/Fragments/D1ItemFragment_Equipable.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "System/LyraAssetManager.h"
 

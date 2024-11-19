@@ -3,7 +3,7 @@
 #include "D1Define.h"
 #include "GameplayTags.h"
 #include "Item/D1ItemTemplate.h"
-#include "D1ItemFragment_Equippable.generated.h"
+#include "D1ItemFragment_Equipable.generated.h"
 
 class ULyraAbilitySet;
 class UD1ItemInstance;
@@ -70,20 +70,26 @@ public:
 };
 
 UCLASS(Abstract, Const)
-class UD1ItemFragment_Equippable : public UD1ItemFragment
+class UD1ItemFragment_Equipable : public UD1ItemFragment
 {
 	GENERATED_BODY()
 	
 public:
-	UD1ItemFragment_Equippable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
+	UD1ItemFragment_Equipable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	
 protected:
 	void AddStatTagStack(UD1ItemInstance* ItemInstance, const TArray<FRarityStatSet>& RarityStatSets) const;
 	void AddStatTagStack(UD1ItemInstance* ItemInstance, const TArray<FRarityStatRangeSet>& RarityStatRangeSets) const;
+
+public:
+	bool IsEquipableClassType(ECharacterClassType ClassType) const;
 	
 public:
 	EEquipmentType EquipmentType = EEquipmentType::Count;
-
+	
+	UPROPERTY(EditDefaultsOnly, meta=(Bitmask, BitmaskEnum="ECharacterClassType"))
+	uint32 EquipableClassFlags = ((1 << (uint32)ECharacterClassType::Count) - 1);
+	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<const ULyraAbilitySet> BaseAbilitySet;
 };
