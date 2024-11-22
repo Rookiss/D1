@@ -31,8 +31,6 @@ void UD1EnhancedPlayerInput::FlushPressedInput(UInputAction* InputAction)
 					}
 				}
 			}
-
-			// bExecutingBindCommand = true;
 			
 			UWorld* World = GetWorld();
 			check(World);

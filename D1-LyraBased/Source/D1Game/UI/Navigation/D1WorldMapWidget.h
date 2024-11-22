@@ -4,7 +4,7 @@
 #include "D1WorldMapWidget.generated.h"
 
 class AD1ElectricField;
-class UD1CompassBarWidget;
+class UD1CompassWidget;
 class UD1MiniMapWidget;
 class UImage;
 class UBorder;
@@ -39,7 +39,7 @@ private:
 
 public:
 	void SetMiniMapWidget(UD1MiniMapWidget* Widget) { MiniMapWidget = Widget; }
-	void SetCompassBarWidget(UD1CompassBarWidget* Widget) { CompassBarWidget = Widget; }
+	void SetCompassWidget(UD1CompassWidget* Widget) { CompassWidget = Widget; }
 
 private:
 	AD1ElectricField* GetElectricFieldActor();
@@ -65,7 +65,7 @@ private:
 	TObjectPtr<UD1MiniMapWidget> MiniMapWidget;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UD1CompassBarWidget> CompassBarWidget;
+	TObjectPtr<UD1CompassWidget> CompassWidget;
 	
 private:
 	UPROPERTY(meta=(BindWidget))

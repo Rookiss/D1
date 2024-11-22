@@ -41,17 +41,32 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void TriggerInteraction();
 
+private:
+	void WaitInputStart();
+	
+	UFUNCTION()
+	void OnInputStart();
+
 protected:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FD1InteractionInfo> CurrentInteractionInfos;
 	
 protected:
-	UPROPERTY(EditDefaultsOnly)
-	float InteractionScanRate = 0.1f;
+	UPROPERTY(EditDefaultsOnly, Category="D1|Interaction")
+	float InteractionTraceRange = 150.f;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Interaction")
+	float InteractionTraceRate = 0.1f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="D1|Interaction")
 	float InteractionScanRange = 500.f;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Interaction")
+	float InteractionScanRate = 0.1f;
+
+	UPROPERTY(EditDefaultsOnly, Category="D1|Interaction")
+	bool bShowTraceDebug = false;
+	
+	UPROPERTY(EditDefaultsOnly, Category="D1|Interaction")
 	TSoftClassPtr<UUserWidget> DefaultInteractionWidgetClass;
 };

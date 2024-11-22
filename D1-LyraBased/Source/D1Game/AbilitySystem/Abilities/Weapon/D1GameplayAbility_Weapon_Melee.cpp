@@ -2,6 +2,8 @@
 
 #include "AbilitySystemGlobals.h"
 #include "D1GameplayTags.h"
+#include "D1LogChannels.h"
+#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Actors/D1WeaponBase.h"
 #include "Development/D1DeveloperSettings.h"
@@ -22,6 +24,13 @@ void UD1GameplayAbility_Weapon_Melee::ActivateAbility(const FGameplayAbilitySpec
 	ResetHitActors();
 	
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
+void UD1GameplayAbility_Weapon_Melee::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	GetWorld()->GetTimerManager().ClearTimer(BackwardTimerHandle);
+	
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UD1GameplayAbility_Weapon_Melee::ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutCharacterHitIndexes, TArray<int32>& OutBlockHitIndexes)
@@ -74,32 +83,48 @@ void UD1GameplayAbility_Weapon_Melee::ProcessHitResult(FHitResult HitResult, flo
 	ULyraAbilitySystemComponent* SourceASC = GetLyraAbilitySystemComponentFromActorInfo();
 	if (SourceASC == nullptr)
 		return;
-	
-	FScopedPredictionWindow	ScopedPrediction(SourceASC, GetCurrentActivationInfo().GetActivationPredictionKey());
-	
-	FGameplayCueParameters SourceCueParams;
-	SourceCueParams.Location = HitResult.ImpactPoint;
-	SourceCueParams.Normal = HitResult.ImpactNormal;
-	SourceCueParams.PhysicalMaterial = bBlockingHit ? nullptr : HitResult.PhysMaterial;
-	SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
-	
+
+		FScopedPredictionWindow	ScopedPrediction(SourceASC, GetCurrentActivationInfo().GetActivationPredictionKey());
+	// {
+	// 	
+	// 	FGameplayCueParameters SourceCueParams;
+	// 	SourceCueParams.Location = HitResult.ImpactPoint;
+	// 	SourceCueParams.Normal = HitResult.ImpactNormal;
+	// 	SourceCueParams.PhysicalMaterial = bBlockingHit ? nullptr : HitResult.PhysMaterial;
+	// 	SourceASC->ExecuteGameplayCue(D1GameplayTags::GameplayCue_Weapon_Impact, SourceCueParams);
+	// }
+
+	////////////////////////////////////////////
 	if (BackwardMontage)
 	{
-		SourceASC->BlockAnimMontageForSeconds(BackwardMontage);
+		if (CurrentMontage && CurrentMontage != BackwardMontage)
+		{
+			LOG_SCREEN_CONTEXT(this, TEXT("Play Montage"));
+			
+			UAnimInstance* AnimInstance = GetCurrentActorInfo()->GetAnimInstance();
+			float EffectivePlayRate = AnimInstance->Montage_GetEffectivePlayRate(CurrentMontage);
+			float StartPosition = AnimInstance->Montage_GetPosition(CurrentMontage);
+			float PlayRate = EffectivePlayRate / 5.f;
+			float MontageLength = CurrentMontage->GetPlayLength();
+			float MontageDuration = MontageLength / EffectivePlayRate;
+		
+			if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this,
+				TEXT("BlockingMontage"), BackwardMontage, PlayRate, NAME_None, false, 1.f, StartPosition, true))
+			{
+				PlayMontageTask->ReadyForActivation();
+			
+				GetWorld()->GetTimerManager().SetTimer(BackwardTimerHandle, [this]()
+				{
+					LOG_SCREEN_CONTEXT(this, TEXT("End Montage"));
+					EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+				}, 0.5f , false);
+			}
+		}
 	}
+	//////////////////////////////////////////////
 	
 	if (HasAuthority(&CurrentActivationInfo))
 	{
-		if (BackwardMontage)
-		{
-			FOnMontageEnded MontageEnded = FOnMontageEnded::CreateWeakLambda(this, [this](UAnimMontage* AnimMontage, bool bInterrupted)
-			{
-				EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
-			});
-			UAnimInstance* AnimInstance = SourceASC->AbilityActorInfo->GetAnimInstance();
-			AnimInstance->Montage_SetEndDelegate(MontageEnded, BackwardMontage);
-		}
-		
 		FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
 		const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
 		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);

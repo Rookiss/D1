@@ -113,12 +113,18 @@ void UD1AbilityTask_WaitForInteractableTraceHit::AimWithPlayerController(const A
 
 	const FVector CameraDirection = CameraRotation.Vector();
 	FVector CameraEnd = CameraStart + (CameraDirection * MaxRange);
-	
+
+	// 카메라 방향의 Ray를 플레이어 위치 기준의 인터렉션 가능 범위(Sphere) 이내로 제한한다
 	ClipCameraRayToAbilityRange(CameraStart, CameraDirection, TraceStart, MaxRange, CameraEnd);
 
 	FHitResult HitResult;
 	LineTrace(CameraStart, CameraEnd, Params, HitResult);
 
+	// 1. Hit된 물체가 인터렉션 가능 범위(Sphere) 이내라면, Hit 위치를 TraceEnd 위치로 정한다.
+	// - 이후에 Hit된 물체와 플레이어 사이에 또 다른 물체가 있다면 해당 물체의 우선순위가 더 높다.
+	
+	// 2. Hit된 물체가 없거나 Hit된 물체가 인터렉션 가능 범위(Sphere)를 벗어 났다면, Hit 위치를 무시하고 CameraEnd를 TraceEnd로 정한다.
+	// - 이후에 플레이어와 CameraEnd 사이의 물체를 체크한다.
 	const bool bUseTraceResult = HitResult.bBlockingHit && (FVector::DistSquared(TraceStart, HitResult.Location) <= (MaxRange * MaxRange));
 	const FVector AdjustedEnd = bUseTraceResult ? HitResult.Location : CameraEnd;
 
@@ -128,21 +134,7 @@ void UD1AbilityTask_WaitForInteractableTraceHit::AimWithPlayerController(const A
 		AdjustedAimDir = CameraDirection;
 	}
 
-	if (bTraceAffectsAimPitch == false && bUseTraceResult)
-	{
-		FVector OriginalAimDir = (CameraEnd - TraceStart).GetSafeNormal();
-
-		if (OriginalAimDir.IsZero() == false)
-		{
-			const FRotator OriginalAimRot = OriginalAimDir.Rotation();
-
-			FRotator AdjustedAimRot = AdjustedAimDir.Rotation();
-			AdjustedAimRot.Pitch = OriginalAimRot.Pitch;
-
-			AdjustedAimDir = AdjustedAimRot.Vector();
-		}
-	}
-
+	// TraceEnd를 최대 인터렉션 가능 위치(Sphere의 표면)까지 확장한다.
 	OutTraceEnd = TraceStart + (AdjustedAimDir * MaxRange);
 }
 

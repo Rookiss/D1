@@ -11,7 +11,7 @@ UD1GameplayAbility_Interact_Info::UD1GameplayAbility_Interact_Info(const FObject
     
 }
 
-void UD1GameplayAbility_Interact_Info::InitializeAbility(AActor* TargetActor)
+bool UD1GameplayAbility_Interact_Info::InitializeAbility(AActor* TargetActor)
 {
 	TScriptInterface<ID1Interactable> TargetInteractable(TargetActor);
 	if (TargetInteractable)
@@ -27,9 +27,9 @@ void UD1GameplayAbility_Interact_Info::InitializeAbility(AActor* TargetActor)
 		FD1InteractionInfoBuilder InteractionInfoBuilder(Interactable, InteractionInfos);
 		Interactable->GatherPostInteractionInfos(InteractionQuery, InteractionInfoBuilder);
 		InteractionInfo = InteractionInfos[0];
+
+		return true;
 	}
-	else
-	{
-		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-	}
+
+	return false;
 }

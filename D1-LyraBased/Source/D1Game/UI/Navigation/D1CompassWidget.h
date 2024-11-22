@@ -43,6 +43,10 @@ protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
+public:
+	void ShowPinIcon(const FVector& WorldPos);
+	void HidePinIcon();
+
 protected:
 	UPROPERTY(EditAnywhere)
 	float NumberStepDegree = 15.f;

@@ -1,6 +1,6 @@
 ﻿#include "D1WorldMapWidget.h"
 
-#include "D1CompassBarWidget.h"
+#include "D1CompassWidget.h"
 #include "D1ElectricFieldCircleWidget.h"
 #include "D1MiniMapWidget.h"
 #include "Actors/D1ElectricField.h"
@@ -194,9 +194,9 @@ FReply UD1WorldMapWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, c
 			MiniMapWidget->ShowPinIcon(WorldPos);
 		}
 
-		if (CompassBarWidget)
+		if (CompassWidget)
 		{
-			CompassBarWidget->ShowPinIcon(WorldPos);
+			CompassWidget->ShowPinIcon(WorldPos);
 		}
 		
 		return FReply::Handled();
@@ -216,9 +216,9 @@ bool UD1WorldMapWidget::PinIconOnMouseButtonDown(const FGeometry& MyGeometry, co
 			MiniMapWidget->HidePinIcon();
 		}
 
-		if (CompassBarWidget)
+		if (CompassWidget)
 		{
-			CompassBarWidget->HidePinIcon();
+			CompassWidget->HidePinIcon();
 		}
 		return true;
 	}

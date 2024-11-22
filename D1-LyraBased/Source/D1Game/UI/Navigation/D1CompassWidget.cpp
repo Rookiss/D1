@@ -27,7 +27,7 @@ void UD1CompassWidget::NativeConstruct()
 	UCanvasPanelSlot* SampleNumberSlot = Cast<UCanvasPanelSlot>(Text_Sample_Number->Slot);
 	UCanvasPanelSlot* SampleAlphabetSlot = Cast<UCanvasPanelSlot>(Text_Sample_Alphabet->Slot);
 	
-	for (int i = 0; i < NumberStepCount; i++)
+	for (int32 i = 0; i < NumberStepCount; i++)
 	{
 		if (FMath::IsNearlyEqual(UKismetMathLibrary::GenericPercent_FloatFloat(i * NumberStepDegree, AlphabetStepDegree), 0.f))
 			continue;
@@ -41,7 +41,7 @@ void UD1CompassWidget::NativeConstruct()
 		CompassTextEntries.Emplace(i * NumberIntervalRatio, NewTextSlot, NewText);
 	}
 
-	for (int i = 0; i < AlphabetStepCount; i++)
+	for (int32 i = 0; i < AlphabetStepCount; i++)
 	{
 		UTextBlock* NewText = DuplicateObject<UTextBlock>(Text_Sample_Alphabet, this);
 		NewText->SetText(FText::FromString(Alphabets[i]));
@@ -72,4 +72,14 @@ void UD1CompassWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 		CompassTextEntry.CompassTextSlot->SetPosition(FVector2D(CanvasLocalSize.X * FinalRatio, 0.f));
 		CompassTextEntry.CompassText->SetVisibility(ESlateVisibility::HitTestInvisible);
 	}
+}
+
+void UD1CompassWidget::ShowPinIcon(const FVector& WorldPos)
+{
+	
+}
+
+void UD1CompassWidget::HidePinIcon()
+{
+	
 }

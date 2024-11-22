@@ -507,7 +507,7 @@ void ULyraAbilitySystemComponent::InvokeBlockAnimMontageForSeconds(UAnimMontage*
 		return;
 
 	UAnimMontage* CurrentMontage = AnimInstance->GetCurrentActiveMontage();
-	if (CurrentMontage == nullptr)
+	if (CurrentMontage == nullptr || CurrentMontage == BackwardMontage)
 		return;
 	
 	float EffectivePlayRate = AnimInstance->Montage_GetEffectivePlayRate(CurrentMontage);

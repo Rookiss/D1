@@ -54,7 +54,7 @@ void UD1AbilityTask_WaitForInvalidInteraction::PerformCheck()
 			return;
 	}
 
-	InvalidInteraction.Broadcast();
+	OnInvalidInteraction.Broadcast();
 	EndTask();
 }
 

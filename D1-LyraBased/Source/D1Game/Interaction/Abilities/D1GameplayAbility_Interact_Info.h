@@ -14,7 +14,7 @@ public:
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	void InitializeAbility(AActor* TargetActor);
+	bool InitializeAbility(AActor* TargetActor);
 
 protected:
 	UPROPERTY(BlueprintReadOnly)

@@ -32,11 +32,11 @@ void UD1GameplayAbility_Knockback::ActivateAbility(const FGameplayAbilitySpecHan
 	if (ALyraPlayerController* LyraPC = GetLyraPlayerControllerFromActorInfo())
 	{
 		LyraPC->SetIgnoreMoveInput(true);
-	}
 
-	if (ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo())
-	{
-		LyraCharacter->bUseControllerRotationYaw = false;
+		if (ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo())
+		{
+			LyraCharacter->bUseControllerRotationYaw = false;
+		}
 	}
 
 	CachedStunDuration = TriggerEventData->EventMagnitude;
@@ -62,11 +62,11 @@ void UD1GameplayAbility_Knockback::EndAbility(const FGameplayAbilitySpecHandle H
 	if (ALyraPlayerController* LyraPC = GetLyraPlayerControllerFromActorInfo())
 	{
 		LyraPC->SetIgnoreMoveInput(false);
-	}
 
-	if (ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo())
-	{
-		LyraCharacter->bUseControllerRotationYaw = true;
+		if (ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo())
+		{
+			LyraCharacter->bUseControllerRotationYaw = true;
+		}
 	}
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
