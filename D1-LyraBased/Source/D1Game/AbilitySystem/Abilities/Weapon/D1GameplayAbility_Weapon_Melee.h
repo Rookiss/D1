@@ -15,8 +15,7 @@ public:
 
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
-	
+
 protected:
 	UFUNCTION(BlueprintCallable)
 	void ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutCharacterHitIndexes, TArray<int32>& OutBlockHitIndexes);
@@ -47,6 +46,4 @@ protected:
 protected:
 	UPROPERTY()
 	TSet<TWeakObjectPtr<AActor>> CachedHitActors;
-
-	FTimerHandle BackwardTimerHandle;
 };
