@@ -518,10 +518,7 @@ void ULyraAbilitySystemComponent::InvokeBlockAnimMontageForSeconds(UAnimMontage*
 	AnimInstance->Montage_PlayWithBlendSettings(BackwardMontage, FMontageBlendSettings(0.f), EffectivePlayRate / 5.f, EMontagePlayReturnType::MontageLength, Position);
 	GetWorld()->GetTimerManager().SetTimer(BlockAnimMontageTimerHandle, [AnimInstance, BackwardMontage, MontageDuration]()
 	{
-		if (AnimInstance->GetCurrentActiveMontage() == BackwardMontage)
-		{
-			AnimInstance->Montage_Stop(FMath::Min(MontageDuration / 5.f, 0.35f), BackwardMontage);
-		}
+		AnimInstance->Montage_Stop(FMath::Min(MontageDuration / 5.f, 0.35f), BackwardMontage);
 	}, 0.25f, false);
 }
 
