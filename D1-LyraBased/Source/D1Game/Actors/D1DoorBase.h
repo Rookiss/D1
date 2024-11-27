@@ -39,6 +39,9 @@ protected:
 private:
 	UFUNCTION()
 	void OnRep_DoorState();
+
+public:
+	EDoorState GetDoorState() const { return DoorState; }
 	
 protected:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_DoorState)

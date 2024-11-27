@@ -109,39 +109,40 @@ void UD1GameplayAbility_Interact_Active::ActivateAbility(const FGameplayAbilityS
 
 void UD1GameplayAbility_Interact_Active::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo();
-	
-	if (bWasCancelled)
+	if (ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo())
 	{
-		if (UD1EquipManagerComponent* EquipManager = LyraCharacter->GetComponentByClass<UD1EquipManagerComponent>())
+		if (bWasCancelled)
 		{
-			EquipManager->ChangeShouldHiddenEquipments(false);
-
-			if (EquipManager->GetCurrentEquipState() != EEquipState::Unarmed)
+			if (UD1EquipManagerComponent* EquipManager = LyraCharacter->GetComponentByClass<UD1EquipManagerComponent>())
 			{
-				if (AD1WeaponBase* EquippedActor = EquipManager->GetFirstEquippedActor())
+				EquipManager->ChangeShouldHiddenEquipments(false);
+
+				if (EquipManager->GetCurrentEquipState() != EEquipState::Unarmed)
 				{
-					if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("EquipMontage"), EquippedActor->GetEquipMontage(), 1.f, NAME_None, false, 1.f, 0.f, false))
+					if (AD1WeaponBase* EquippedActor = EquipManager->GetFirstEquippedActor())
 					{
-						PlayMontageTask->ReadyForActivation();
+						if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("EquipMontage"), EquippedActor->GetEquipMontage(), 1.f, NAME_None, false, 1.f, 0.f, false))
+						{
+							PlayMontageTask->ReadyForActivation();
+						}
 					}
 				}
 			}
 		}
-	}
 
-	if (AD1WorldInteractable* WorldInteractable = Cast<AD1WorldInteractable>(InteractableActor))
-	{
-		WorldInteractable->OnInteractActiveEnded(LyraCharacter);
-	}
+		if (AD1WorldInteractable* WorldInteractable = Cast<AD1WorldInteractable>(InteractableActor))
+		{
+			WorldInteractable->OnInteractActiveEnded(LyraCharacter);
+		}
 	
-	FD1InteractionMessage Message;
-	Message.Instigator = LyraCharacter;
-	Message.bShouldRefresh = false;
-	Message.bSwitchActive = true;
+		FD1InteractionMessage Message;
+		Message.Instigator = LyraCharacter;
+		Message.bShouldRefresh = false;
+		Message.bSwitchActive = true;
 			
-	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Interaction_Notice, Message);
+		UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
+		MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Interaction_Notice, Message);
+	}
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

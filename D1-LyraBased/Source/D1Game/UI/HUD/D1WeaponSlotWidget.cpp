@@ -23,10 +23,10 @@ void UD1WeaponSlotWidget::NativePreConstruct()
 	Super::NativePreConstruct();
 
 	FText SlotNumber = FText::AsNumber((int32)WidgetWeaponSlotType + 1);
-	Text_OneSlot_Unselected_Number->SetText(SlotNumber);
-	Text_OneSlot_Selected_Number->SetText(SlotNumber);
-	Text_TwoSlot_Unselected_Number->SetText(SlotNumber);
-	Text_TwoSlot_Selected_Number->SetText(SlotNumber);
+	if (Text_SlotNumber)
+	{
+		Text_SlotNumber->SetText(SlotNumber);
+	}
 }
 
 void UD1WeaponSlotWidget::NativeConstruct()
@@ -87,19 +87,18 @@ void UD1WeaponSlotWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSl
 		if (ItemInstance)
 		{
 			const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
+			Image_TwoSlot_Left->SetBrushFromTexture(ItemTemplate.IconTexture, true);
+			Image_TwoSlot_Left->SetVisibility(ESlateVisibility::HitTestInvisible);
 
-			Image_TwoSlot_Unselected_1->SetBrushFromTexture(ItemTemplate.IconTexture, true);
-			Image_TwoSlot_Unselected_1->SetVisibility(ESlateVisibility::HitTestInvisible);
-
-			Image_TwoSlot_Selected_1->SetBrushFromTexture(ItemTemplate.IconTexture, true);
-			Image_TwoSlot_Selected_1->SetVisibility(ESlateVisibility::HitTestInvisible);
-			
-			SetActiveWidgetIndex(bIsSelected ? 3 : 2);
+			if (Switcher_Slots->GetActiveWidgetIndex() != 1)
+			{
+				PlayAnimationForward(Animation_ShowCrossLine);
+				Switcher_Slots->SetActiveWidgetIndex(1);
+			}
 		}
 		else
 		{
-			Image_TwoSlot_Unselected_1->SetVisibility(ESlateVisibility::Hidden);
-			Image_TwoSlot_Selected_1->SetVisibility(ESlateVisibility::Hidden);
+			Image_TwoSlot_Left->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 	else if (EntryWeaponHandType == EWeaponHandType::RightHand)
@@ -107,19 +106,18 @@ void UD1WeaponSlotWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSl
 		if (ItemInstance)
 		{
 			const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
+			Image_TwoSlot_Right->SetBrushFromTexture(ItemTemplate.IconTexture, true);
+			Image_TwoSlot_Right->SetVisibility(ESlateVisibility::HitTestInvisible);
 
-			Image_TwoSlot_Unselected_2->SetBrushFromTexture(ItemTemplate.IconTexture, true);
-			Image_TwoSlot_Unselected_2->SetVisibility(ESlateVisibility::HitTestInvisible);
-
-			Image_TwoSlot_Selected_2->SetBrushFromTexture(ItemTemplate.IconTexture, true);
-			Image_TwoSlot_Selected_2->SetVisibility(ESlateVisibility::HitTestInvisible);
-			
-			SetActiveWidgetIndex(bIsSelected ? 3 : 2);
+			if (Switcher_Slots->GetActiveWidgetIndex() != 1)
+			{
+				PlayAnimationForward(Animation_ShowCrossLine);
+				Switcher_Slots->SetActiveWidgetIndex(1);
+			}
 		}
 		else
 		{
-			Image_TwoSlot_Unselected_2->SetVisibility(ESlateVisibility::Hidden);
-			Image_TwoSlot_Selected_2->SetVisibility(ESlateVisibility::Hidden);
+			Image_TwoSlot_Right->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 	else if (EntryWeaponHandType == EWeaponHandType::TwoHand)
@@ -127,19 +125,18 @@ void UD1WeaponSlotWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSl
 		if (ItemInstance)
 		{
 			const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
+			Image_OneSlot->SetBrushFromTexture(ItemTemplate.IconTexture, true);
+			Image_OneSlot->SetVisibility(ESlateVisibility::HitTestInvisible);
 
-			Image_OneSlot_Unselected->SetBrushFromTexture(ItemTemplate.IconTexture, true);
-			Image_OneSlot_Unselected->SetVisibility(ESlateVisibility::HitTestInvisible);
-
-			Image_OneSlot_Selected->SetBrushFromTexture(ItemTemplate.IconTexture, true);
-			Image_OneSlot_Selected->SetVisibility(ESlateVisibility::HitTestInvisible);
-
-			SetActiveWidgetIndex(bIsSelected ? 1 : 0);
+			if (Switcher_Slots->GetActiveWidgetIndex() != 0)
+			{
+				PlayAnimationReverse(Animation_ShowCrossLine);
+				Switcher_Slots->SetActiveWidgetIndex(0);
+			}
 		}
 		else
 		{
-			Image_OneSlot_Unselected->SetVisibility(ESlateVisibility::Hidden);
-			Image_OneSlot_Selected->SetVisibility(ESlateVisibility::Hidden);
+			Image_OneSlot->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 }
@@ -147,69 +144,13 @@ void UD1WeaponSlotWidget::OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSl
 void UD1WeaponSlotWidget::OnEquipStateChanged(EEquipState PrevEquipState, EEquipState NewEquipState)
 {
 	EEquipState SlotEquipState = UD1EquipManagerComponent::ConvertToEquipState(WidgetWeaponSlotType);
-	bIsSelected = (NewEquipState == SlotEquipState);
 	
-	if (bIsSelected)
+	if (NewEquipState == SlotEquipState)
 	{
-		if (GetActiveWidgetIndex() == 0)
-		{
-			Overlay_OneSlot_Selected->SetVisibility(ESlateVisibility::HitTestInvisible);
-
-			UUMGSequencePlayer* SequencePlayer = PlayAnimationForward(Animation_Highlight_In_OneSlot);
-			PendingWidgetIndex = 1;
-			SequencePlayer->OnSequenceFinishedPlaying().AddUObject(this, &ThisClass::OnSequenceFinished);
-		}
-		else if (GetActiveWidgetIndex() == 2)
-		{
-			Overlay_TwoSlot_Selected->SetVisibility(ESlateVisibility::HitTestInvisible);
-
-			UUMGSequencePlayer* SequencePlayer = PlayAnimationForward(Animation_Highlight_In_TwoSlot);
-			PendingWidgetIndex = 3;
-			SequencePlayer->OnSequenceFinishedPlaying().AddUObject(this, &ThisClass::OnSequenceFinished);
-		}
+		PlayAnimationForward(Animation_ExpandSlot);
 	}
 	else if (PrevEquipState == SlotEquipState)
 	{
-		if (GetActiveWidgetIndex() == 1)
-		{
-			UUMGSequencePlayer* SequencePlayer = PlayAnimationReverse(Animation_Highlight_In_OneSlot);
-			Overlay_OneSlot_Unselected->SetVisibility(ESlateVisibility::HitTestInvisible);
-			PendingWidgetIndex = 0;
-			SequencePlayer->OnSequenceFinishedPlaying().AddUObject(this, &ThisClass::OnSequenceFinished);
-		}
-		else if (GetActiveWidgetIndex() == 3)
-		{
-			UUMGSequencePlayer* SequencePlayer = PlayAnimationReverse(Animation_Highlight_In_TwoSlot);
-			Overlay_TwoSlot_Unselected->SetVisibility(ESlateVisibility::HitTestInvisible);
-			PendingWidgetIndex = 2;
-			SequencePlayer->OnSequenceFinishedPlaying().AddUObject(this, &ThisClass::OnSequenceFinished);
-		}
+		PlayAnimationReverse(Animation_ExpandSlot);
 	}
 }
-
-void UD1WeaponSlotWidget::SetActiveWidgetIndex(int32 Index)
-{
-	if (CurrentWidgetIndex == Index)
-		return;
-
-	CurrentWidgetIndex = Index;
-	
-	Overlay_OneSlot_Unselected->SetVisibility(ESlateVisibility::Hidden);
-	Overlay_OneSlot_Selected->SetVisibility(ESlateVisibility::Hidden);
-	Overlay_TwoSlot_Unselected->SetVisibility(ESlateVisibility::Hidden);
-	Overlay_TwoSlot_Selected->SetVisibility(ESlateVisibility::Hidden);
-	
-	switch (Index)
-	{
-	case 0: Overlay_OneSlot_Unselected->SetVisibility(ESlateVisibility::HitTestInvisible); break;
-	case 1: Overlay_OneSlot_Selected->SetVisibility(ESlateVisibility::HitTestInvisible); break;
-	case 2: Overlay_TwoSlot_Unselected->SetVisibility(ESlateVisibility::HitTestInvisible); break;
-	case 3: Overlay_TwoSlot_Selected->SetVisibility(ESlateVisibility::HitTestInvisible); break;
-	}
-}
-
-void UD1WeaponSlotWidget::OnSequenceFinished(class UUMGSequencePlayer& Player)
-{
-	SetActiveWidgetIndex(PendingWidgetIndex);
-}
-

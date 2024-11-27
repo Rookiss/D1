@@ -8,6 +8,7 @@
 class UImage;
 class UOverlay;
 class UTextBlock;
+class UCommonVisibilitySwitcher;
 class UD1EquipManagerComponent;
 class UD1EquipmentManagerComponent;
 
@@ -27,13 +28,6 @@ protected:
 private:
 	void OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount);
 	void OnEquipStateChanged(EEquipState PrevEquipState, EEquipState NewEquipState);
-
-private:
-	void SetActiveWidgetIndex(int32 Index);
-	int32 GetActiveWidgetIndex() const { return CurrentWidgetIndex; }
-
-private:
-	void OnSequenceFinished(class UUMGSequencePlayer& Player);
 	
 public:
 	UPROPERTY(EditAnywhere)
@@ -41,62 +35,30 @@ public:
 
 private:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UOverlay> Overlay_OneSlot_Unselected;
+	TObjectPtr<UCommonVisibilitySwitcher> Switcher_Slots;
 	
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UOverlay> Overlay_OneSlot_Selected;
+	TObjectPtr<UTextBlock> Text_SlotNumber;
 
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UOverlay> Overlay_TwoSlot_Unselected;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UOverlay> Overlay_TwoSlot_Selected;
-	
 private:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_OneSlot_Unselected_Number;
+	TObjectPtr<UImage> Image_OneSlot;
 	
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_OneSlot_Selected_Number;
+	TObjectPtr<UTextBlock> Text_OneSlot_Count;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_TwoSlot_Unselected_Number;
+	TObjectPtr<UImage> Image_TwoSlot_Left;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_TwoSlot_Selected_Number;
-	
-private:
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_OneSlot_Unselected;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_OneSlot_Selected;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_TwoSlot_Unselected_1;
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_TwoSlot_Selected_1;
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_TwoSlot_Unselected_2;
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_TwoSlot_Selected_2;
-	
-private:
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_OneSlot_Unselected_Count;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_OneSlot_Selected_Count;
+	TObjectPtr<UImage> Image_TwoSlot_Right;
 
 private:
 	UPROPERTY(meta=(BindWidgetAnim), Transient)
-	TObjectPtr<UWidgetAnimation> Animation_Highlight_In_OneSlot;
+	TObjectPtr<UWidgetAnimation> Animation_ExpandSlot;
 	
 	UPROPERTY(meta=(BindWidgetAnim), Transient)
-	TObjectPtr<UWidgetAnimation> Animation_Highlight_In_TwoSlot;
+	TObjectPtr<UWidgetAnimation> Animation_ShowCrossLine;
 
 private:
 	UPROPERTY()
@@ -108,8 +70,4 @@ private:
 private:
 	FDelegateHandle EntryChangedDelegateHandle;
 	FDelegateHandle EquipStateChangedDelegateHandle;
-	bool bIsSelected = false;
-
-	int32 CurrentWidgetIndex = 0;
-	int32 PendingWidgetIndex = 0;
 };
