@@ -1,5 +1,6 @@
 ﻿#include "D1GameplayAbility_HitReact.h"
 
+#include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_NetworkSyncPoint.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Actors/D1WeaponBase.h"
@@ -12,7 +13,22 @@
 UD1GameplayAbility_HitReact::UD1GameplayAbility_HitReact(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+    ActivationPolicy = ELyraAbilityActivationPolicy::Manual;
+	ActivationGroup = ELyraAbilityActivationGroup::Exclusive_Replaceable;
+	bServerRespectsRemoteAbilityCancellation = true;
+	bRetriggerInstancedAbility = true;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
+
+	AbilityTags.AddTag(D1GameplayTags::Ability_HitReact);
+	ActivationOwnedTags.AddTag(D1GameplayTags::Status_HitReact);
+
+	if (HasAnyFlags(RF_ClassDefaultObject))
+	{
+		FAbilityTriggerData TriggerData;
+		TriggerData.TriggerTag = D1GameplayTags::GameplayEvent_HitReact;
+		TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+		AbilityTriggers.Add(TriggerData);
+	}
 }
 
 void UD1GameplayAbility_HitReact::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -76,13 +92,13 @@ void UD1GameplayAbility_HitReact::OnNetSync()
 	AActor* InstigatorActor = CurrentEventData.ContextHandle.GetInstigator();
 	UAnimMontage* HitMontage = EquippedActor->GetHitMontage(InstigatorActor, HitResultPtr->ImpactPoint, HitResultPtr->bBlockingHit);
 	
-	if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("HitReactMontage"), HitMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* HitReactMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("HitReactMontage"), HitMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
 	{
-		PlayMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->ReadyForActivation();
+		HitReactMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
+		HitReactMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
+		HitReactMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
+		HitReactMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
+		HitReactMontageTask->ReadyForActivation();
 	}
 }
 

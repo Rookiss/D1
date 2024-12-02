@@ -35,13 +35,13 @@ protected:
 	
 private:
 	UFUNCTION()
-	void OnCastStartMontageBegin(FGameplayEventData Payload);
+	void OnCastStartBegin(FGameplayEventData Payload);
 
 	UFUNCTION()
-	void OnSpellMontageBegin(FGameplayEventData Payload);
+	void OnSpellBegin(FGameplayEventData Payload);
 	
 	UFUNCTION()
-	void OnSpellMontageEnd(FGameplayEventData Payload);
+	void OnSpellEnd(FGameplayEventData Payload);
 
 	UFUNCTION()
 	void OnMontageFinished();
@@ -55,23 +55,23 @@ private:
 
 private:
 	UFUNCTION()
-	void OnValidData(const FGameplayAbilityTargetDataHandle& Data);
+	void OnValidTargetData(const FGameplayAbilityTargetDataHandle& Data);
 
 	UFUNCTION()
-	void OnCancelled(const FGameplayAbilityTargetDataHandle& Data);
+	void OnTargetCancelled(const FGameplayAbilityTargetDataHandle& Data);
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="D1|AOE")
+	UPROPERTY(EditDefaultsOnly, Category="D1|AOE")
 	UAnimMontage* CastStartMontage = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="D1|AOE")
+	UPROPERTY(EditDefaultsOnly, Category="D1|AOE")
 	UAnimMontage* CastEndMontage = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="D1|AOE")
+	UPROPERTY(EditDefaultsOnly, Category="D1|AOE")
 	UAnimMontage* SpellMontage = nullptr;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="D1|AOE", meta=(Categories="GameplayCue"))
+	UPROPERTY(EditDefaultsOnly, Category="D1|AOE", meta=(Categories="GameplayCue"))
 	FGameplayTag CastGameplayCueTag;
 	
 	UPROPERTY(EditDefaultsOnly, Category="D1|AOE", DisplayName="AOE Spawner Class")
@@ -105,7 +105,7 @@ protected:
 
 private:
 	UPROPERTY()
-	TObjectPtr<UAbilityTask_WaitGameplayEvent> CastStartMontageBeginEventTask;
+	TObjectPtr<UAbilityTask_WaitGameplayEvent> CastStartBeginEventTask;
 
 	UPROPERTY()
 	TObjectPtr<UAbilityTask_WaitConfirmCancel> SkillConfirmCancelTask;

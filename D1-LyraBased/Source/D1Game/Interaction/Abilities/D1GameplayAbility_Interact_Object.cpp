@@ -1,5 +1,6 @@
 ﻿#include "D1GameplayAbility_Interact_Object.h"
 
+#include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Actors/D1WeaponBase.h"
 #include "Character/LyraCharacter.h"
@@ -13,7 +14,10 @@
 UD1GameplayAbility_Interact_Object::UD1GameplayAbility_Interact_Object(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+    ActivationPolicy = ELyraAbilityActivationPolicy::Manual;
+
+	AbilityTags.AddTag(D1GameplayTags::Ability_Interact_Object);
+	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Interact);
 }
 
 void UD1GameplayAbility_Interact_Object::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

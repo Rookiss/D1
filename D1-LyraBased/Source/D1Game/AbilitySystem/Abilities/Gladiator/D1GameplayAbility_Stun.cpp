@@ -1,6 +1,7 @@
 ﻿#include "D1GameplayAbility_Stun.h"
 
 #include "AIController.h"
+#include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Character/LyraCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -11,7 +12,22 @@
 UD1GameplayAbility_Stun::UD1GameplayAbility_Stun(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+    ActivationPolicy = ELyraAbilityActivationPolicy::Manual;
+	ActivationGroup = ELyraAbilityActivationGroup::Exclusive_Replaceable;
+	bRetriggerInstancedAbility = true;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
+	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ServerOnlyTermination;
+
+	AbilityTags.AddTag(D1GameplayTags::Ability_Stun);
+	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Stun);
+
+	if (HasAnyFlags(RF_ClassDefaultObject))
+	{
+		FAbilityTriggerData TriggerData;
+		TriggerData.TriggerTag = D1GameplayTags::GameplayEvent_Stun;
+		TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+		AbilityTriggers.Add(TriggerData);
+	}
 }
 
 void UD1GameplayAbility_Stun::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -51,9 +67,9 @@ void UD1GameplayAbility_Stun::ActivateAbility(const FGameplayAbilitySpecHandle H
 		LyraCharacter->bUseControllerRotationYaw = false;
 	}
 
-	if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("StunMontage"), StunMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* StunMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("StunMontage"), StunMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
 	{
-		PlayMontageTask->ReadyForActivation();
+		StunMontageTask->ReadyForActivation();
 	}
 
 	FTimerHandle TimerHandle;

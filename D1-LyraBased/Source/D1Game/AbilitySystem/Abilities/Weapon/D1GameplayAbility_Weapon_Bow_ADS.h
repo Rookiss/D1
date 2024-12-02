@@ -5,6 +5,7 @@
 
 class ULyraCameraMode;
 class UAbilityTask_WaitInputRelease;
+class UAbilityTask_WaitGameplayEvent;
 
 UCLASS()
 class UD1GameplayAbility_Weapon_Bow_ADS : public UD1GameplayAbility_Weapon
@@ -20,13 +21,35 @@ protected:
 
 protected:
 	UFUNCTION()
-	void OnInputRelease(float TimeHeld);
+	void OnADSEvent(FGameplayEventData Payload);
+
+	UFUNCTION()
+	void OnADSStartBegin(FGameplayEventData Payload);
 	
-protected:
-	UPROPERTY(EditDefaultsOnly, Category="Asset")
-	TSubclassOf<ULyraCameraMode> CameraMode;
+	UFUNCTION()
+	void OnInputRelease(float TimeHeld);
+
+	UFUNCTION()
+	void OnAttackEnd();
 
 private:
+	void StartADS();
+	void ResetADS();
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="D1|Bow ADS")
+	TObjectPtr<UAnimMontage> ADSStartMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category="D1|Bow ADS")
+	TObjectPtr<UAnimMontage> ADSEndMontage;
+	
+private:
 	UPROPERTY()
-	TObjectPtr<UAbilityTask_WaitInputRelease> WaitInputReleaseTask;
+	TObjectPtr<UAbilityTask_WaitGameplayEvent> ADSEventTask;
+
+	UPROPERTY()
+	TObjectPtr<UAbilityTask_WaitGameplayEvent> ADSStartBeginEventTask;
+	
+	UPROPERTY()
+	TObjectPtr<UAbilityTask_WaitInputRelease> InputReleaseTask;
 };

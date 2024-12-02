@@ -1,6 +1,7 @@
 ﻿#include "D1GameplayAbility_Sprint_Active.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
 #include "AbilitySystem/Abilities/Tasks/D1AbilityTask_WaitForTick.h"
 #include "Character/LyraCharacter.h"
@@ -12,7 +13,20 @@
 UD1GameplayAbility_Sprint_Active::UD1GameplayAbility_Sprint_Active(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+    ActivationPolicy = ELyraAbilityActivationPolicy::Manual;
+	bServerRespectsRemoteAbilityCancellation = false;
+	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ServerOnlyTermination;
+
+	AbilityTags.AddTag(D1GameplayTags::Ability_Sprint_Active);
+	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Sprint);
+
+	if (HasAnyFlags(RF_ClassDefaultObject))
+	{
+		FAbilityTriggerData TriggerData;
+		TriggerData.TriggerTag = D1GameplayTags::Ability_Sprint_Active;
+		TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+		AbilityTriggers.Add(TriggerData);
+	}
 }
 
 void UD1GameplayAbility_Sprint_Active::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

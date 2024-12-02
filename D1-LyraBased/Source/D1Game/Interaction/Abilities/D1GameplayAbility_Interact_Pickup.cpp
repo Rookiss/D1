@@ -9,7 +9,8 @@
 UD1GameplayAbility_Interact_Pickup::UD1GameplayAbility_Interact_Pickup(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+    bServerRespectsRemoteAbilityCancellation = false;
+	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ServerOnlyTermination;
 }
 
 void UD1GameplayAbility_Interact_Pickup::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

@@ -17,20 +17,19 @@ protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 protected:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutCharacterHitIndexes, TArray<int32>& OutBlockHitIndexes);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BackwardMontage, AD1WeaponBase* WeaponActor);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void ResetHitActors();
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void DrawDebugHitPoint(const FHitResult& HitResult);
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsCharacterBlockingHit(ALyraCharacter* TargetCharacter);
 	
 protected:

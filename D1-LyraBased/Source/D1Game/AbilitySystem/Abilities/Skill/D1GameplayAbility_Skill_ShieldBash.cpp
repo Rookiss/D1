@@ -1,11 +1,9 @@
 ﻿#include "D1GameplayAbility_Skill_ShieldBash.h"
 
 #include "D1GameplayTags.h"
-#include "D1LogChannels.h"
 #include "Abilities/Async/AbilityAsync_WaitGameplayEvent.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
-#include "Camera/LyraCameraMode.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -18,45 +16,64 @@
 UD1GameplayAbility_Skill_ShieldBash::UD1GameplayAbility_Skill_ShieldBash(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+	bServerRespectsRemoteAbilityCancellation = true;
+	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ClientOrServer;
+
+	AbilityTags.AddTag(D1GameplayTags::Ability_Attack_Skill_1);
+	BlockAbilitiesWithTag.AddTag(D1GameplayTags::Ability_Jump);
+	ActivationOwnedTags.AddTag(D1GameplayTags::Status_RejectHitReact);
+	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
+	
+	FD1WeaponInfo WeaponInfo;
+	WeaponInfo.WeaponHandType = EWeaponHandType::LeftHand;
+	WeaponInfo.bShouldCheckWeaponType = true;
+	WeaponInfo.RequiredWeaponType = EWeaponType::Shield;
+	WeaponInfos.Add(WeaponInfo);
 }
 
 void UD1GameplayAbility_Skill_ShieldBash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-	
-	ALyraCharacter* SourceCharacter = GetLyraCharacterFromActorInfo();
-	if (SourceCharacter == nullptr || SourceCharacter->GetCharacterMovement()->IsFalling() || K2_CheckAbilityCooldown() == false || K2_CheckAbilityCost() == false)
+
+	if (K2_CheckAbilityCooldown() == false || K2_CheckAbilityCost() == false)
 	{
 		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
 		return;
 	}
 	
-	CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
-
-	if (CameraModeClass)
+	ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo();
+	if (LyraCharacter == nullptr || LyraCharacter->GetCharacterMovement()->IsFalling())
 	{
-		SetCameraMode(CameraModeClass);
+		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
+		return;
+	}
+	
+	if (CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo) == false)
+	{
+		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
+		return;
 	}
 
-	if (ALyraPlayerController* SourcePlayerController = GetLyraPlayerControllerFromActorInfo())
+	SetCameraMode(CameraModeClass);
+
+	if (ALyraPlayerController* LyraPlayerController = GetLyraPlayerControllerFromActorInfo())
 	{
-		SourcePlayerController->SetIgnoreLookInput(true);
+		LyraPlayerController->SetIgnoreLookInput(true);
 	}
 
-	if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ShieldBashMontage"), ShieldBashMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* ShieldBashMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ShieldBashMontage"), ShieldBashMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
 	{
-		PlayMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->ReadyForActivation();
+		ShieldBashMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
+		ShieldBashMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
+		ShieldBashMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
+		ShieldBashMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
+		ShieldBashMontageTask->ReadyForActivation();
 	}
 
-	if (UAbilityTask_WaitGameplayEvent* WaitGameplayEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, D1GameplayTags::GameplayEvent_Montage_Begin, nullptr, true, true))
+	if (UAbilityTask_WaitGameplayEvent* ShieldBashBeginTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, D1GameplayTags::GameplayEvent_Montage_Begin, nullptr, true, true))
 	{
-		WaitGameplayEventTask->EventReceived.AddDynamic(this, &ThisClass::OnMontageBegin);
-		WaitGameplayEventTask->ReadyForActivation();
+		ShieldBashBeginTask->EventReceived.AddDynamic(this, &ThisClass::OnShieldBashBegin);
+		ShieldBashBeginTask->ReadyForActivation();
 	}
 }
 
@@ -64,9 +81,9 @@ void UD1GameplayAbility_Skill_ShieldBash::EndAbility(const FGameplayAbilitySpecH
 {
 	ClearCameraMode();
 
-	if (ALyraPlayerController* SourcePlayerController = GetLyraPlayerControllerFromActorInfo())
+	if (ALyraPlayerController* LyraPlayerController = GetLyraPlayerControllerFromActorInfo())
 	{
-		SourcePlayerController->SetIgnoreLookInput(false);
+		LyraPlayerController->SetIgnoreLookInput(false);
 	}
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
@@ -77,7 +94,7 @@ void UD1GameplayAbility_Skill_ShieldBash::OnMontageFinished()
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
-void UD1GameplayAbility_Skill_ShieldBash::OnMontageBegin(FGameplayEventData Payload)
+void UD1GameplayAbility_Skill_ShieldBash::OnShieldBashBegin(FGameplayEventData Payload)
 {
 	ALyraCharacter* SourceCharacter = GetLyraCharacterFromActorInfo();
 	if (SourceCharacter == nullptr)

@@ -6,6 +6,7 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitConfirmCancel.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
+#include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Actors/D1AOEBase.h"
 #include "Actors/D1WeaponBase.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
@@ -16,29 +17,36 @@
 UD1GameplayAbility_Skill_AOE::UD1GameplayAbility_Skill_AOE(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+    AbilityTags.AddTag(D1GameplayTags::Ability_Attack_Skill_1);
+	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
+
+	FD1WeaponInfo WeaponInfo;
+	WeaponInfo.WeaponHandType = EWeaponHandType::TwoHand;
+	WeaponInfo.bShouldCheckWeaponType = true;
+	WeaponInfo.RequiredWeaponType = EWeaponType::Staff;
+	WeaponInfos.Add(WeaponInfo);
 }
 
 void UD1GameplayAbility_Skill_AOE::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
+	
 	if (K2_CheckAbilityCooldown() == false || K2_CheckAbilityCost() == false)
 	{
 		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
 		return;
 	}
 	
-	if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastStartMontage"), CastStartMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* CastStartMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastStartMontage"), CastStartMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
 	{
-		PlayMontageTask->ReadyForActivation();
+		CastStartMontageTask->ReadyForActivation();
 	}
 
-	CastStartMontageBeginEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, D1GameplayTags::GameplayEvent_Montage_Begin, nullptr, true, true);
-	if (CastStartMontageBeginEventTask)
+	CastStartBeginEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, D1GameplayTags::GameplayEvent_Montage_Begin, nullptr, true, true);
+	if (CastStartBeginEventTask)
 	{
-		CastStartMontageBeginEventTask->EventReceived.AddDynamic(this, &ThisClass::OnCastStartMontageBegin);
-		CastStartMontageBeginEventTask->ReadyForActivation();
+		CastStartBeginEventTask->EventReceived.AddDynamic(this, &ThisClass::OnCastStartBegin);
+		CastStartBeginEventTask->ReadyForActivation();
 	}
 
 	SkillConfirmCancelTask = UAbilityTask_WaitConfirmCancel::WaitConfirmCancel(this);
@@ -63,7 +71,75 @@ void UD1GameplayAbility_Skill_AOE::EndAbility(const FGameplayAbilitySpecHandle H
 	FlushPressedInput(OffHandInputAction);
 }
 
-void UD1GameplayAbility_Skill_AOE::OnCastStartMontageBegin(FGameplayEventData Payload)
+void UD1GameplayAbility_Skill_AOE::ConfirmSkill()
+{
+	ResetSkill();
+
+	if (UAbilityTask_PlayMontageAndWait* SpellMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("SpellMontage"), SpellMontage, 1.f, NAME_None, false, 1.f, 0.f, false))
+	{
+		SpellMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
+		SpellMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
+		SpellMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
+		SpellMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
+		SpellMontageTask->ReadyForActivation();
+	}
+
+	if (HasAuthority(&CurrentActivationInfo))
+	{
+		if (UAbilityTask_WaitGameplayEvent* SpellBeginEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, D1GameplayTags::GameplayEvent_Montage_Begin, nullptr, true, true))
+		{
+			SpellBeginEventTask->EventReceived.AddDynamic(this, &ThisClass::OnSpellBegin);
+			SpellBeginEventTask->ReadyForActivation();
+		}
+
+		if (UAbilityTask_WaitGameplayEvent* SpellEndEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, D1GameplayTags::GameplayEvent_Montage_End, nullptr, true, true))
+		{
+			SpellEndEventTask->EventReceived.AddDynamic(this, &ThisClass::OnSpellEnd);
+			SpellEndEventTask->ReadyForActivation();
+		}
+	}
+}
+
+void UD1GameplayAbility_Skill_AOE::CancelSkill()
+{
+	ResetSkill();
+	
+	FGameplayCueParameters Parameters;
+	UGameplayCueFunctionLibrary::RemoveGameplayCueOnActor(GetAvatarActorFromActorInfo(), CastGameplayCueTag, Parameters);
+
+	if (UAbilityTask_PlayMontageAndWait* CastEndMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastEndMontage"), CastEndMontage, 1.f, NAME_None, false, 1.f, 0.f, false))
+	{
+		CastEndMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
+		CastEndMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
+		CastEndMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
+		CastEndMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
+		CastEndMontageTask->ReadyForActivation();
+	}
+}
+
+void UD1GameplayAbility_Skill_AOE::ResetSkill()
+{
+	if (UGameplayMessageSubsystem::HasInstance(this))
+	{
+		UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
+
+		FSkillInputInitializeMessage Message;
+		Message.bShouldShow = false;
+		MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_HUD_Spell_Input, Message);
+	}
+
+	if (CastStartBeginEventTask)
+	{
+		CastStartBeginEventTask->EndTask();
+	}
+
+	if (SkillConfirmCancelTask)
+	{
+		SkillConfirmCancelTask->EndTask();
+	}
+}
+
+void UD1GameplayAbility_Skill_AOE::OnCastStartBegin(FGameplayEventData Payload)
 {
 	FGameplayCueParameters Parameters;
 	Parameters.EffectCauser = GetFirstWeaponActor();
@@ -75,10 +151,28 @@ void UD1GameplayAbility_Skill_AOE::OnCastStartMontageBegin(FGameplayEventData Pa
 	Message.bShouldShow = true;
 	MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_HUD_Spell_Input, Message);
 
+#if 1
 	WaitTargetData();
+#else
+	AGameplayAbilityTargetActor_GroundTrace* TargetActor = GetWorld()->SpawnActorDeferred<AGameplayAbilityTargetActor_GroundTrace>(TargetActorClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	TargetActor->CollisionRadius = CollisionRadius;
+	TargetActor->CollisionHeight = CollisionHeight;
+	TargetActor->MaxRange = MaxRange;
+	TargetActor->TraceProfile = TraceProfile;
+	TargetActor->StartLocation = MakeTargetLocationInfoFromOwnerSkeletalMeshComponent("head");
+	TargetActor->ReticleClass = AOEReticleClass;
+	TargetActor->FinishSpawning(FTransform::Identity);
+	
+	if (UAbilityTask_WaitTargetData* TargetDataTask = UAbilityTask_WaitTargetData::WaitTargetDataUsingActor(this, TEXT("TargetDataTask"), EGameplayTargetingConfirmation::UserConfirmed, TargetActor))
+	{
+		TargetDataTask->ValidData.AddDynamic(this, &ThisClass::OnValidData);
+		TargetDataTask->Cancelled.AddDynamic(this, &ThisClass::OnCancelled);
+		TargetDataTask->ReadyForActivation();
+	}
+#endif
 }
 
-void UD1GameplayAbility_Skill_AOE::OnSpellMontageBegin(FGameplayEventData Payload)
+void UD1GameplayAbility_Skill_AOE::OnSpellBegin(FGameplayEventData Payload)
 {
 	if (HasAuthority(&CurrentActivationInfo) == false)
 		return;
@@ -93,7 +187,7 @@ void UD1GameplayAbility_Skill_AOE::OnSpellMontageBegin(FGameplayEventData Payloa
 				const FVector HitLocation = HitResult.Location;
 				const FVector StartLocation = GetActorInfo().SkeletalMeshComponent->GetSocketLocation("head");
 				
-				if (FVector::DistSquared(HitLocation, StartLocation) > MaxRange * MaxRange)
+				if (FVector::DistSquared(HitLocation, StartLocation) > FMath::Square(MaxRange * 1.25f))
 					return;
 
 				FTransform SpawnTransform = FTransform::Identity;
@@ -115,7 +209,7 @@ void UD1GameplayAbility_Skill_AOE::OnSpellMontageBegin(FGameplayEventData Payloa
 	TargetDataHandle.Clear();
 }
 
-void UD1GameplayAbility_Skill_AOE::OnSpellMontageEnd(FGameplayEventData Payload)
+void UD1GameplayAbility_Skill_AOE::OnSpellEnd(FGameplayEventData Payload)
 {
 	FGameplayCueParameters Parameters;
 	UGameplayCueFunctionLibrary::RemoveGameplayCueOnActor(GetAvatarActorFromActorInfo(), CastGameplayCueTag, Parameters);
@@ -136,75 +230,7 @@ void UD1GameplayAbility_Skill_AOE::OnInputCancel()
 	CancelSkill();
 }
 
-void UD1GameplayAbility_Skill_AOE::ConfirmSkill()
-{
-	ResetSkill();
-
-	if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("SpellMontage"), SpellMontage, 1.f, NAME_None, false, 1.f, 0.f, false))
-	{
-		PlayMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->ReadyForActivation();
-	}
-
-	if (HasAuthority(&CurrentActivationInfo))
-	{
-		if (UAbilityTask_WaitGameplayEvent* SpellMontageBeginEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, D1GameplayTags::GameplayEvent_Montage_Begin, nullptr, true, true))
-		{
-			SpellMontageBeginEvent->EventReceived.AddDynamic(this, &ThisClass::OnSpellMontageBegin);
-			SpellMontageBeginEvent->ReadyForActivation();
-		}
-
-		if (UAbilityTask_WaitGameplayEvent* SpellMontageEndEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, D1GameplayTags::GameplayEvent_Montage_End, nullptr, true, true))
-		{
-			SpellMontageEndEvent->EventReceived.AddDynamic(this, &ThisClass::OnSpellMontageEnd);
-			SpellMontageEndEvent->ReadyForActivation();
-		}
-	}
-}
-
-void UD1GameplayAbility_Skill_AOE::CancelSkill()
-{
-	ResetSkill();
-	
-	FGameplayCueParameters Parameters;
-	UGameplayCueFunctionLibrary::RemoveGameplayCueOnActor(GetAvatarActorFromActorInfo(), CastGameplayCueTag, Parameters);
-
-	if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastEndMontage"), CastEndMontage, 1.f, NAME_None, false, 1.f, 0.f, false))
-	{
-		PlayMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->ReadyForActivation();
-	}
-}
-
-void UD1GameplayAbility_Skill_AOE::ResetSkill()
-{
-	if (UGameplayMessageSubsystem::HasInstance(this))
-	{
-		UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
-
-		FSkillInputInitializeMessage Message;
-		Message.bShouldShow = false;
-		MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_HUD_Spell_Input, Message);
-	}
-
-	if (CastStartMontageBeginEventTask)
-	{
-		CastStartMontageBeginEventTask->EndTask();
-	}
-
-	if (SkillConfirmCancelTask)
-	{
-		SkillConfirmCancelTask->EndTask();
-	}
-}
-
-void UD1GameplayAbility_Skill_AOE::OnValidData(const FGameplayAbilityTargetDataHandle& Data)
+void UD1GameplayAbility_Skill_AOE::OnValidTargetData(const FGameplayAbilityTargetDataHandle& Data)
 {
 	TargetDataHandle = Data;
 
@@ -212,7 +238,7 @@ void UD1GameplayAbility_Skill_AOE::OnValidData(const FGameplayAbilityTargetDataH
 	bCommitted ? ConfirmSkill() : CancelSkill();
 }
 
-void UD1GameplayAbility_Skill_AOE::OnCancelled(const FGameplayAbilityTargetDataHandle& Data)
+void UD1GameplayAbility_Skill_AOE::OnTargetCancelled(const FGameplayAbilityTargetDataHandle& Data)
 {
 	CancelSkill();
 }

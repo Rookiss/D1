@@ -1,5 +1,6 @@
 ﻿#include "D1GameplayAbility_Crouch.h"
 
+#include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
 #include "AbilitySystem/Abilities/Tasks/D1AbilityTask_WaitForTick.h"
 #include "Character/LyraCharacter.h"
@@ -10,7 +11,8 @@
 UD1GameplayAbility_Crouch::UD1GameplayAbility_Crouch(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+    AbilityTags.AddTag(D1GameplayTags::Ability_Crouch);
+	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Crouch);
 }
 
 void UD1GameplayAbility_Crouch::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

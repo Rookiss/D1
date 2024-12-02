@@ -17,10 +17,10 @@ protected:
 	
 private:
 	UFUNCTION()
-	void OnMontageFinished();
+	void OnShieldBashBegin(FGameplayEventData Payload);
 	
 	UFUNCTION()
-	void OnMontageBegin(FGameplayEventData Payload);
+	void OnMontageFinished();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="D1|Shield Bash")

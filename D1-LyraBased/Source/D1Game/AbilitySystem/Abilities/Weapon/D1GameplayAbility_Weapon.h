@@ -13,16 +13,16 @@ struct FD1WeaponInfo
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, Category="D1|Weapon")
+	UPROPERTY(EditAnywhere, Category="D1|Weapon")
 	EWeaponHandType WeaponHandType = EWeaponHandType::Count;
 	
-	UPROPERTY(EditDefaultsOnly, Category="D1|Weapon")
+	UPROPERTY(EditAnywhere, Category="D1|Weapon")
 	bool bShouldCheckWeaponType = true;
 	
-	UPROPERTY(EditDefaultsOnly, Category="D1|Weapon", meta=(EditCondition="bShouldCheckWeaponType", EditConditionHides))
+	UPROPERTY(EditAnywhere, Category="D1|Weapon", meta=(EditCondition="bShouldCheckWeaponType", EditConditionHides))
 	EWeaponType RequiredWeaponType = EWeaponType::Count;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY()
 	TObjectPtr<AD1WeaponBase> WeaponActor;
 };
 

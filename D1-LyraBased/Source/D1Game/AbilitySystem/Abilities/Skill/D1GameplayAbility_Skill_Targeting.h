@@ -3,7 +3,10 @@
 #include "AbilitySystem/Abilities/Weapon/D1GameplayAbility_Weapon.h"
 #include "D1GameplayAbility_Skill_Targeting.generated.h"
 
+class AD1GameplayAbilityTargetActor_LineTraceHighlight;
 class AGameplayAbilityWorldReticle;
+class UAbilityTask_WaitConfirmCancel;
+class UAbilityTask_WaitGameplayEvent;
 
 UCLASS()
 class UD1GameplayAbility_Skill_Targeting : public UD1GameplayAbility_Weapon
@@ -14,30 +17,83 @@ public:
 	UD1GameplayAbility_Skill_Targeting(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	UFUNCTION(BlueprintCallable)
-	void ApplyTarget();
-	
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell", meta=(Categories="GameplayCue"))
-	FGameplayTag CastGameplayCueTag;
+	UFUNCTION(BlueprintCallable)
+	void ConfirmSkill();
+
+	UFUNCTION(BlueprintCallable)
+	void CancelSkill();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetSkill();
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell")
+	UFUNCTION(BlueprintImplementableEvent)
+	void WaitTargetData();
+	
+private:
+	UFUNCTION()
+	void OnCastStartBegin(FGameplayEventData Payload);
+
+	UFUNCTION()
+	void OnSpellBegin(FGameplayEventData Payload);
+	
+	UFUNCTION()
+	void OnMontageFinished();
+
+private:
+	UFUNCTION()
+	void OnInputConfirm();
+	
+	UFUNCTION()
+	void OnInputCancel();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="D1|Targeting")
 	UAnimMontage* CastStartMontage = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell")
+	UPROPERTY(EditDefaultsOnly, Category="D1|Targeting")
 	UAnimMontage* CastEndMontage = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spell")
+	UPROPERTY(EditDefaultsOnly, Category="D1|Targeting")
 	UAnimMontage* SpellMontage = nullptr;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, meta=(Categories="GameplayCue"))
+	UPROPERTY(EditDefaultsOnly, Category="D1|Targeting", meta=(Categories="GameplayCue"))
+	FGameplayTag CastGameplayCueTag;
+
+	UPROPERTY(EditDefaultsOnly, Category="D1|Targeting", meta=(Categories="GameplayCue"))
 	FGameplayTag BurstGameplayCueTag;
-	
-	UPROPERTY(EditDefaultsOnly)
+
+	UPROPERTY(EditDefaultsOnly, Category="D1|Targeting")
 	TArray<TSubclassOf<UGameplayEffect>> GameplayEffectClasses;
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="D1|Targeting")
+	TObjectPtr<UInputAction> MainHandInputAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="D1|Targeting")
+	TObjectPtr<UInputAction> OffHandInputAction;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="D1|Targeting")
+	TSubclassOf<AD1GameplayAbilityTargetActor_LineTraceHighlight> TargetActorClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="D1|Targeting", DisplayName="Targeting Reticle Class")
+	TSubclassOf<AGameplayAbilityWorldReticle> TargetingReticleClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="D1|Targeting")
+	float MaxRange = 1000.f;
 
 private:
+	UPROPERTY()
+	TObjectPtr<UAbilityTask_WaitGameplayEvent> CastStartBeginEventTask;
+
+	UPROPERTY()
+	TObjectPtr<UAbilityTask_WaitConfirmCancel> SkillConfirmCancelTask;
+	
 	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess="true"))
 	FGameplayAbilityTargetDataHandle TargetDataHandle;
 };

@@ -1,6 +1,7 @@
 ﻿#include "D1GameplayAbility_Dash_Active.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_ApplyRootMotionConstantForce.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Character/LyraCharacter.h"
@@ -11,7 +12,18 @@
 UD1GameplayAbility_Dash_Active::UD1GameplayAbility_Dash_Active(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+    ActivationPolicy = ELyraAbilityActivationPolicy::Manual;
+
+	AbilityTags.AddTag(D1GameplayTags::Ability_Dash_Active);
+	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Dash);
+
+	if (HasAnyFlags(RF_ClassDefaultObject))
+	{
+		FAbilityTriggerData TriggerData;
+		TriggerData.TriggerTag = D1GameplayTags::Ability_Dash_Active;
+		TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+		AbilityTriggers.Add(TriggerData);
+	}
 }
 
 void UD1GameplayAbility_Dash_Active::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -39,11 +51,11 @@ void UD1GameplayAbility_Dash_Active::ActivateAbility(const FGameplayAbilitySpecH
 	ED1Direction Direction = (ED1Direction)HitResult.Item;
 	
 	UAnimMontage* SelectedMontage = SelectDirectionalMontage(Direction);
-	if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("DashMontage"), SelectedMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* DashMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("DashMontage"), SelectedMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
 	{
-		PlayMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
-		PlayMontageTask->ReadyForActivation();
+		DashMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
+		DashMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
+		DashMontageTask->ReadyForActivation();
 	}
 
 	FVector MovementVector = HitResult.Normal;

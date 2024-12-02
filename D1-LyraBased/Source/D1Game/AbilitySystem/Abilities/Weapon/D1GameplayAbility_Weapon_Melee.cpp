@@ -19,9 +19,9 @@ UD1GameplayAbility_Weapon_Melee::UD1GameplayAbility_Weapon_Melee(const FObjectIn
 
 void UD1GameplayAbility_Weapon_Melee::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	ResetHitActors();
-	
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	
+	ResetHitActors();
 }
 
 void UD1GameplayAbility_Weapon_Melee::ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutCharacterHitIndexes, TArray<int32>& OutBlockHitIndexes)

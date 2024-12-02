@@ -10,6 +10,8 @@ UD1GameplayAbility_Dash_Check::UD1GameplayAbility_Dash_Check(const FObjectInitia
 	: Super(ObjectInitializer)
 {
     ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
+
+	AbilityTags.AddTag(D1GameplayTags::Ability_Dash_Check);
 }
 
 void UD1GameplayAbility_Dash_Check::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

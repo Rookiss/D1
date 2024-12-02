@@ -1,5 +1,6 @@
 #include "D1GameplayAbility_Jump.h"
 
+#include "D1GameplayTags.h"
 #include "AbilitySystem/Abilities/LyraGameplayAbility.h"
 #include "Character/LyraCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -9,8 +10,12 @@
 UD1GameplayAbility_Jump::UD1GameplayAbility_Jump(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
+
+	AbilityTags.AddTag(D1GameplayTags::Ability_Jump);
+	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Jump);
 }
 
 void UD1GameplayAbility_Jump::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

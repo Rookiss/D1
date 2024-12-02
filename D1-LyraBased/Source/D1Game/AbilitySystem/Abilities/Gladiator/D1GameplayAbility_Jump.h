@@ -24,7 +24,4 @@ protected:
 protected:
 	UFUNCTION()
 	void StartJump();
-
-protected:
-	
 };

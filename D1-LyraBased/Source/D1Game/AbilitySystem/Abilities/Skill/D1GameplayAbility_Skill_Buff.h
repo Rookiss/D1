@@ -14,16 +14,26 @@ public:
 	UD1GameplayAbility_Skill_Buff(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	UFUNCTION(BlueprintCallable)
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+	
+protected:
+	UFUNCTION()
 	void ApplyEffect();
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void AdditionalEffects();
+	UFUNCTION(BlueprintNativeEvent)
+	void ApplyAdditionalEffects();
 
+	UFUNCTION()
+	void OnMontageFinished();
+	
 protected:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Buff")
+	TObjectPtr<UAnimMontage> BuffMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category="D1|Buff")
 	TSubclassOf<UGameplayEffect> BuffGameplayEffectClass;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Buff")
 	TObjectPtr<UNiagaraSystem> BuffEffect;
 };

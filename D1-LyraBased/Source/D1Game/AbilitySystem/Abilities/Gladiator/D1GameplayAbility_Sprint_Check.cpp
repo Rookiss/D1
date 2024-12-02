@@ -10,6 +10,8 @@ UD1GameplayAbility_Sprint_Check::UD1GameplayAbility_Sprint_Check(const FObjectIn
 	: Super(ObjectInitializer)
 {
     ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
+
+	AbilityTags.AddTag(D1GameplayTags::Ability_Sprint_Check);
 }
 
 void UD1GameplayAbility_Sprint_Check::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

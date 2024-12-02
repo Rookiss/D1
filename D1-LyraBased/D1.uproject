@@ -362,7 +362,8 @@
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/fd24d23ca57b4c59a4e4b7368da250bd",
 			"SupportedTargetPlatforms": [
 				"Win64",
-				"Android"
+				"Android",
+				"Linux"
 			]
 		},
 		{
@@ -386,7 +387,9 @@
 		"Linux",
 		"LinuxArm64",
 		"Mac",
-		"Windows"
+		"Windows",
+		"Android",
+		"IOS"
 	],
 	"EpicSampleNameHash": "451731683"
 }

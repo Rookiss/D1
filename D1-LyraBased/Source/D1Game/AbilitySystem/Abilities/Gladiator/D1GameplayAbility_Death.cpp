@@ -15,6 +15,8 @@ UD1GameplayAbility_Death::UD1GameplayAbility_Death(const FObjectInitializer& Obj
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
 
+	AbilityTags.AddTag(D1GameplayTags::Ability_Death);
+
 	if (HasAnyFlags(RF_ClassDefaultObject))
 	{
 		FAbilityTriggerData TriggerData;

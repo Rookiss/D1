@@ -1,5 +1,6 @@
 ﻿#include "D1GameplayAbility_ChangeEquip.h"
 
+#include "D1GameplayTags.h"
 #include "Character/LyraCharacter.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 
@@ -8,7 +9,20 @@
 UD1GameplayAbility_ChangeEquip::UD1GameplayAbility_ChangeEquip(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-    
+    ActivationPolicy = ELyraAbilityActivationPolicy::Manual;
+	ActivationGroup = ELyraAbilityActivationGroup::Exclusive_Blocking;
+	bServerRespectsRemoteAbilityCancellation = false;
+
+	AbilityTags.AddTag(D1GameplayTags::Ability_ChangeEquip);
+	ActivationOwnedTags.AddTag(D1GameplayTags::Status_ChangeEquip);
+
+	if (HasAnyFlags(RF_ClassDefaultObject))
+	{
+		FAbilityTriggerData TriggerData;
+		TriggerData.TriggerTag = D1GameplayTags::GameplayEvent_ChangeEquip;
+		TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+		AbilityTriggers.Add(TriggerData);
+	}
 }
 
 void UD1GameplayAbility_ChangeEquip::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
