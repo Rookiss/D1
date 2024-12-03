@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-#include "AbilitySystem/Abilities/Weapon/D1GameplayAbility_Weapon_Range.h"
+#include "AbilitySystem/Abilities/Weapon/D1GameplayAbility_Weapon_Bow_Projectile.h"
 #include "D1GameplayAbility_Skill_PiercingShot.generated.h"
 
 class UAbilityTask_WaitGameplayEvent;
 class UAbilityTask_WaitConfirmCancel;
 
 UCLASS()
-class UD1GameplayAbility_Skill_PiercingShot : public UD1GameplayAbility_Weapon_Range
+class UD1GameplayAbility_Skill_PiercingShot : public UD1GameplayAbility_Weapon_Bow_Projectile
 {
 	GENERATED_BODY()
 	
