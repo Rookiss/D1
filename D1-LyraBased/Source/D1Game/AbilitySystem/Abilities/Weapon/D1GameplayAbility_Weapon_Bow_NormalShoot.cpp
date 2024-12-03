@@ -1,4 +1,4 @@
-﻿#include "D1GameplayAbility_Weapon_Bow_Shoot.h"
+﻿#include "D1GameplayAbility_Weapon_Bow_NormalShoot.h"
 
 #include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
@@ -6,9 +6,9 @@
 #include "Actors/D1WeaponBase.h"
 #include "Player/LyraPlayerController.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_Bow_Shoot)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_Bow_NormalShoot)
 
-UD1GameplayAbility_Weapon_Bow_Shoot::UD1GameplayAbility_Weapon_Bow_Shoot(const FObjectInitializer& ObjectInitializer)
+UD1GameplayAbility_Weapon_Bow_NormalShoot::UD1GameplayAbility_Weapon_Bow_NormalShoot(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     AbilityTags.AddTag(D1GameplayTags::Ability_Attack_Bow);
@@ -16,7 +16,7 @@ UD1GameplayAbility_Weapon_Bow_Shoot::UD1GameplayAbility_Weapon_Bow_Shoot(const F
 	ActivationRequiredTags.AddTag(D1GameplayTags::Status_ADS_Ready);
 }
 
-void UD1GameplayAbility_Weapon_Bow_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UD1GameplayAbility_Weapon_Bow_NormalShoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
@@ -52,7 +52,7 @@ void UD1GameplayAbility_Weapon_Bow_Shoot::ActivateAbility(const FGameplayAbility
 	}
 }
 
-void UD1GameplayAbility_Weapon_Bow_Shoot::OnMontageFinished()
+void UD1GameplayAbility_Weapon_Bow_NormalShoot::OnMontageFinished()
 {
 	if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo())
 	{

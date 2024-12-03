@@ -1,4 +1,4 @@
-﻿#include "D1GameplayAbility_Weapon_Range.h"
+﻿#include "D1GameplayAbility_Weapon_Bow_Projectile.h"
 
 #include "Actors/D1WeaponBase.h"
 #include "Character//LyraCharacter.h"
@@ -7,15 +7,15 @@
 #include "Physics/LyraCollisionChannels.h"
 #include "Player/LyraPlayerController.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_Range)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_Bow_Projectile)
 
-UD1GameplayAbility_Weapon_Range::UD1GameplayAbility_Weapon_Range(const FObjectInitializer& ObjectInitializer)
+UD1GameplayAbility_Weapon_Bow_Projectile::UD1GameplayAbility_Weapon_Bow_Projectile(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1GameplayAbility_Weapon_Range::SpawnProjectileWithAssist()
+void UD1GameplayAbility_Weapon_Bow_Projectile::SpawnProjectileWithAssist()
 {
 	if (HasAuthority(&CurrentActivationInfo) == false)
 		return;

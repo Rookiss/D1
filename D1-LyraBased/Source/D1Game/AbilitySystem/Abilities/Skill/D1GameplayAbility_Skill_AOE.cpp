@@ -6,7 +6,6 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitConfirmCancel.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
-#include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Actors/D1AOEBase.h"
 #include "Actors/D1WeaponBase.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
