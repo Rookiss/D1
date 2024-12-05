@@ -45,7 +45,7 @@ void UD1GameplayAbility_Weapon_Bow_ADS::EndAbility(const FGameplayAbilitySpecHan
 
 	if (bWasCancelled)
 	{
-		if (UAbilityTask_PlayMontageAndWait* ADSEndMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ADSEndMontage"), ADSEndMontage, 1.f, NAME_None, false, 1.f, 0.f, false))
+		if (UAbilityTask_PlayMontageAndWait* ADSEndMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ADSEndMontage"), ADSEndMontage, 1.f, NAME_None, false))
 		{
 			ADSEndMontageTask->ReadyForActivation();
 		}
@@ -91,7 +91,7 @@ void UD1GameplayAbility_Weapon_Bow_ADS::OnAttackEnd()
 
 void UD1GameplayAbility_Weapon_Bow_ADS::StartADS()
 {
-	if (UAbilityTask_PlayMontageAndWait* ADSStartMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ADSStartMontage"), ADSStartMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* ADSStartMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ADSStartMontage"), ADSStartMontage, 1.f, NAME_None, true))
 	{
 		ADSStartMontageTask->ReadyForActivation();
 	}

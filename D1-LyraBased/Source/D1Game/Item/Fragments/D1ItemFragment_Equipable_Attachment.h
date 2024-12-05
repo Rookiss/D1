@@ -3,7 +3,7 @@
 #include "D1ItemFragment_Equipable.h"
 #include "D1ItemFragment_Equipable_Attachment.generated.h"
 
-class AD1WeaponBase;
+class AD1EquipmentBase;
 
 USTRUCT(BlueprintType)
 struct FD1WeaponAttachInfo
@@ -12,7 +12,7 @@ struct FD1WeaponAttachInfo
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AD1WeaponBase> SpawnWeaponClass;
+	TSubclassOf<AD1EquipmentBase> SpawnWeaponClass;
 
 	UPROPERTY(EditDefaultsOnly)
 	FName AttachSocket;

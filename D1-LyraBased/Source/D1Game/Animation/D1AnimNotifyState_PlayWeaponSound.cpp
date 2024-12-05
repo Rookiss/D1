@@ -1,6 +1,6 @@
 ﻿#include "D1AnimNotifyState_PlayWeaponSound.h"
 
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "Character/LyraCharacter.h"
 #include "Components/AudioComponent.h"
 #include "Item/D1ItemInstance.h"
@@ -35,7 +35,7 @@ void UD1AnimNotifyState_PlayWeaponSound::NotifyBegin(USkeletalMeshComponent* Mes
 	if (ItemInstance == nullptr)
 		return;
 
-	AD1WeaponBase* WeaponActor = EquipManager->GetEquippedActor(WeaponHandType);
+	AD1EquipmentBase* WeaponActor = EquipManager->GetEquippedActor(WeaponHandType);
 	if (WeaponActor == nullptr)
 		return;
 	
@@ -53,7 +53,7 @@ void UD1AnimNotifyState_PlayWeaponSound::NotifyBegin(USkeletalMeshComponent* Mes
 
 	if (SelectedSound)
 	{
-		AudioComponent = UGameplayStatics::SpawnSoundAttached(SelectedSound, WeaponActor->WeaponMeshComponent, NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true, 1.f, 1.f, 0.f);
+		AudioComponent = UGameplayStatics::SpawnSoundAttached(SelectedSound, WeaponActor->MeshComponent, NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true, 1.f, 1.f, 0.f);
 	}
 }
 

@@ -3,7 +3,7 @@
 #include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_Block)
 
@@ -20,14 +20,14 @@ void UD1GameplayAbility_Weapon_Block::ActivateAbility(const FGameplayAbilitySpec
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (UAbilityTask_PlayMontageAndWait* BlockStartMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("BlockStartMontage"), BlockStartMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* BlockStartMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("BlockStartMontage"), BlockStartMontage, 1.f, NAME_None, true))
 	{
 		BlockStartMontageTask->ReadyForActivation();
 	}
 
 	if (HasAuthority(&CurrentActivationInfo))
 	{
-		if (AD1WeaponBase* WeaponActor = GetFirstWeaponActor())
+		if (AD1EquipmentBase* WeaponActor = GetFirstEquipmentActor())
 		{
 			WeaponActor->ChangeBlockState(true);
 		}
@@ -42,7 +42,7 @@ void UD1GameplayAbility_Weapon_Block::ActivateAbility(const FGameplayAbilitySpec
 
 void UD1GameplayAbility_Weapon_Block::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	if (AD1WeaponBase* WeaponActor = GetFirstWeaponActor())
+	if (AD1EquipmentBase* WeaponActor = GetFirstEquipmentActor())
 	{
 		WeaponActor->ChangeBlockState(false);
 	}
@@ -52,14 +52,14 @@ void UD1GameplayAbility_Weapon_Block::EndAbility(const FGameplayAbilitySpecHandl
 
 void UD1GameplayAbility_Weapon_Block::OnInputRelease(float TimeHeld)
 {
-	if (UAbilityTask_PlayMontageAndWait* BlockEndMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("BlockEndMontage"), BlockEndMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* BlockEndMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("BlockEndMontage"), BlockEndMontage, 1.f, NAME_None, true))
 	{
 		BlockEndMontageTask->ReadyForActivation();
 	}
 
 	if (HasAuthority(&CurrentActivationInfo))
 	{
-		if (AD1WeaponBase* WeaponActor = GetFirstWeaponActor())
+		if (AD1EquipmentBase* WeaponActor = GetFirstEquipmentActor())
 		{
 			WeaponActor->ChangeBlockState(false);
 		}

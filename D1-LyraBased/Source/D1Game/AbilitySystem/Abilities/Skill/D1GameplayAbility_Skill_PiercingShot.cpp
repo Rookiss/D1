@@ -19,11 +19,10 @@ UD1GameplayAbility_Skill_PiercingShot::UD1GameplayAbility_Skill_PiercingShot(con
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_RejectHitReact);
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
 
-	FD1WeaponInfo WeaponInfo;
-	WeaponInfo.WeaponHandType = EWeaponHandType::TwoHand;
-	WeaponInfo.bShouldCheckWeaponType = true;
-	WeaponInfo.RequiredWeaponType = EWeaponType::Bow;
-	WeaponInfos.Add(WeaponInfo);
+	FD1EquipmentInfo EquipmentInfo;
+	EquipmentInfo.WeaponHandType = EWeaponHandType::TwoHand;
+	EquipmentInfo.RequiredWeaponType = EWeaponType::Bow;
+	EquipmentInfos.Add(EquipmentInfo);
 }
 
 void UD1GameplayAbility_Skill_PiercingShot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -43,7 +42,7 @@ void UD1GameplayAbility_Skill_PiercingShot::ActivateAbility(const FGameplayAbili
 		LyraPlayerController->SetIgnoreMoveInput(true);
 	}
 
-	if (UAbilityTask_PlayMontageAndWait* ADSStartMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ADSStartMontage"), ADSStartMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* ADSStartMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ADSStartMontage"), ADSStartMontage, 1.f, NAME_None, true))
 	{
 		ADSStartMontageTask->ReadyForActivation();
 	}
@@ -93,7 +92,7 @@ void UD1GameplayAbility_Skill_PiercingShot::ConfirmSkill()
 {
 	ResetSkill();
 
-	if (UAbilityTask_PlayMontageAndWait* ReleaseMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ReleaseMontage"), ReleaseMontage, 1.f, NAME_None, false, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* ReleaseMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ReleaseMontage"), ReleaseMontage, 1.f, NAME_None, false))
 	{
 		ReleaseMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		ReleaseMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
@@ -104,7 +103,7 @@ void UD1GameplayAbility_Skill_PiercingShot::ConfirmSkill()
 
 	if (HasAuthority(&CurrentActivationInfo))
 	{
-		SpawnProjectileWithAssist();
+		SpawnProjectile();
 	}
 }
 
@@ -112,7 +111,7 @@ void UD1GameplayAbility_Skill_PiercingShot::CancelSkill()
 {
 	ResetSkill();
 
-	if (UAbilityTask_PlayMontageAndWait* ADSEndMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ADSEndMontage"), ADSEndMontage, 1.f, NAME_None, false, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* ADSEndMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ADSEndMontage"), ADSEndMontage, 1.f, NAME_None, false))
 	{
 		ADSEndMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		ADSEndMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);

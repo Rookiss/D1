@@ -1,6 +1,6 @@
 ﻿#include "D1NumberPopComponent_ScreenWidget.h"
 
-#include "D1DamagePopStyleScreenWidget.h"
+#include "D1NumberPopStyleScreenWidget.h"
 #include "D1LogChannels.h"
 #include "Components/WidgetComponent.h"
 #include "UI/HUD/D1NumberPopWidgetBase.h"
@@ -106,7 +106,7 @@ void UD1NumberPopComponent_ScreenWidget::ReleaseNextWidgets()
 
 FLinearColor UD1NumberPopComponent_ScreenWidget::DetermineColor(const FD1NumberPopRequest& Request)
 {
-	for (UD1DamagePopStyleScreenWidget* Style : Styles)
+	for (UD1NumberPopStyleScreenWidget* Style : Styles)
 	{
 		if (Style && Style->bOverrideColor)
 		{
@@ -122,7 +122,7 @@ FLinearColor UD1NumberPopComponent_ScreenWidget::DetermineColor(const FD1NumberP
 
 TSubclassOf<UD1NumberPopWidgetBase> UD1NumberPopComponent_ScreenWidget::DetermineWidgetClass(const FD1NumberPopRequest& Request)
 {
-	for (UD1DamagePopStyleScreenWidget* Style : Styles)
+	for (UD1NumberPopStyleScreenWidget* Style : Styles)
 	{
 		if (Style && Style->bOverrideWidget)
 		{

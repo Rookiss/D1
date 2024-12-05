@@ -1,7 +1,7 @@
 #include "D1NumberPopComponent_NiagaraText.h"
 
 #include "Feedback/NumberPops/D1NumberPopComponent.h"
-#include "D1DamagePopStyleNiagara.h"
+#include "D1NumberPopStyleNiagara.h"
 #include "NiagaraComponent.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 

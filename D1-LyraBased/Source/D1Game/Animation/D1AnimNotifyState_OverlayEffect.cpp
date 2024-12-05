@@ -1,6 +1,6 @@
 ﻿#include "D1AnimNotifyState_OverlayEffect.h"
 
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "Character/LyraCharacter.h"
 #include "Curves/CurveLinearColor.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
@@ -87,9 +87,9 @@ void UD1AnimNotifyState_OverlayEffect::ApplyWeaponMeshComponent(FOverlayEffectPr
 	{
 		if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
 		{
-			if (AD1WeaponBase* WeaponActor = EquipManager->GetEquippedActor(WeaponHandType))
+			if (AD1EquipmentBase* WeaponActor = EquipManager->GetEquippedActor(WeaponHandType))
 			{
-				USkeletalMeshComponent* WeaponMeshComponent = WeaponActor->WeaponMeshComponent;
+				USkeletalMeshComponent* WeaponMeshComponent = WeaponActor->MeshComponent;
 				WeaponMeshComponent->SetOverlayMaterial(ProgressInfo.OverlayMaterialInstance);
 				ProgressInfo.MeshComponents.Add(WeaponMeshComponent);
 			}
@@ -103,12 +103,12 @@ void UD1AnimNotifyState_OverlayEffect::ApplyAllWeaponMeshComponents(FOverlayEffe
 	{
 		if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
 		{
-			TArray<AD1WeaponBase*> WeaponActors;
+			TArray<AD1EquipmentBase*> WeaponActors;
 			EquipManager->GetAllEquippedActors(WeaponActors);
 
-			for (AD1WeaponBase* WeaponActor : WeaponActors)
+			for (AD1EquipmentBase* WeaponActor : WeaponActors)
 			{
-				USkeletalMeshComponent* WeaponMeshComponent = WeaponActor->WeaponMeshComponent;
+				USkeletalMeshComponent* WeaponMeshComponent = WeaponActor->MeshComponent;
 				WeaponMeshComponent->SetOverlayMaterial(ProgressInfo.OverlayMaterialInstance);
 				ProgressInfo.MeshComponents.Add(WeaponMeshComponent);
 			}

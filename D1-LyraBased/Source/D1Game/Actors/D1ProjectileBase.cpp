@@ -3,7 +3,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "D1GameplayTags.h"
-#include "D1WeaponBase.h"
+#include "D1EquipmentBase.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Character/LyraCharacter.h"
@@ -141,7 +141,7 @@ void AD1ProjectileBase::HandleCollisionDetection(AActor* OtherActor, UPrimitiveC
 	
 	if (HasAuthority())
 	{
-		AD1WeaponBase* TargetWeapon = Cast<AD1WeaponBase>(OtherActor);
+		AD1EquipmentBase* TargetWeapon = Cast<AD1EquipmentBase>(OtherActor);
 		ALyraCharacter* TargetCharacter = Cast<ALyraCharacter>(OtherActor);
 		if (TargetCharacter == nullptr)
 		{

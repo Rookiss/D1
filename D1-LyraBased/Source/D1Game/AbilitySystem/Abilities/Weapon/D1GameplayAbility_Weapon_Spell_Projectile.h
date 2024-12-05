@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "D1GameplayAbility_Weapon.h"
+#include "AbilitySystem/Abilities/Gladiator/D1GameplayAbility_Equipment.h"
 #include "D1GameplayAbility_Weapon_Spell_Projectile.generated.h"
 
 class AD1ProjectileBase;
@@ -8,7 +8,7 @@ class UAbilityTask_WaitGameplayEvent;
 class UAbilityTask_WaitConfirmCancel;
 
 UCLASS()
-class UD1GameplayAbility_Weapon_Spell_Projectile : public UD1GameplayAbility_Weapon
+class UD1GameplayAbility_Weapon_Spell_Projectile : public UD1GameplayAbility_Equipment
 {
 	GENERATED_BODY()
 	

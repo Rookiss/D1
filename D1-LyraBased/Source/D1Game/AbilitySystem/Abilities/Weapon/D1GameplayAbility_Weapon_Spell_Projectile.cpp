@@ -6,8 +6,9 @@
 #include "Abilities/Tasks/AbilityTask_WaitConfirmCancel.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Actors/D1ProjectileBase.h"
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Player/LyraPlayerController.h"
 #include "UI/HUD/D1SkillInputWidget.h"
 #include "UI/HUD/D1SkillProgressWidget.h"
@@ -148,7 +149,7 @@ void UD1GameplayAbility_Weapon_Spell_Projectile::OnCastStartBegin(FGameplayEvent
 	}
 
 	FGameplayCueParameters Parameters;
-	Parameters.EffectCauser = GetFirstWeaponActor();
+	Parameters.EffectCauser = GetFirstEquipmentActor();
 	UGameplayCueFunctionLibrary::AddGameplayCueOnActor(GetAvatarActorFromActorInfo(), CastGameplayCueTag, Parameters);
 
 	TotalCastTime = 0.f;
@@ -158,7 +159,7 @@ void UD1GameplayAbility_Weapon_Spell_Projectile::OnCastStartBegin(FGameplayEvent
 		TotalCastTime += PhaseTime;
 	}
 
-	TotalCastTime += TotalCastTime * (1.f - GetSnapshottedAttackRate());
+	TotalCastTime *= UKismetMathLibrary::SafeDivide(1.f, GetSnapshottedAttackRate());
 
 	FSkillProgressInitializeMessage ProgressMessage;
 	ProgressMessage.bShouldShow = true;
@@ -168,9 +169,8 @@ void UD1GameplayAbility_Weapon_Spell_Projectile::OnCastStartBegin(FGameplayEvent
 	MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_HUD_Spell_Progress_Construct, ProgressMessage);
 
 	float PhaseTime = PhaseTimes[CurrentIndex];
-	PhaseTime += PhaseTime * (1.f - GetSnapshottedAttackRate());
-	
-	GetWorld()->GetTimerManager().SetTimer(PhaseTimerHandle, this, &ThisClass::OnPhaseTimePassed, PhaseTime, true);
+	PhaseTime *= UKismetMathLibrary::SafeDivide(1.f, GetSnapshottedAttackRate());
+	GetWorld()->GetTimerManager().SetTimer(PhaseTimerHandle, this, &ThisClass::OnPhaseTimePassed, PhaseTime, false);
 }
 
 void UD1GameplayAbility_Weapon_Spell_Projectile::OnSpellStart(FGameplayEventData Payload)
@@ -210,14 +210,16 @@ void UD1GameplayAbility_Weapon_Spell_Projectile::OnPhaseTimePassed()
 		FSkillProgressRefreshMessage Message;
 		Message.PhaseColor = PhaseColors[CurrentIndex];
 		MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_HUD_Spell_Progress_Refresh, Message);
+		
+		float PhaseTime = PhaseTimes[CurrentIndex];
+		PhaseTime *= UKismetMathLibrary::SafeDivide(1.f, GetSnapshottedAttackRate());
+		GetWorld()->GetTimerManager().SetTimer(PhaseTimerHandle, this, &ThisClass::OnPhaseTimePassed, PhaseTime, false);
 	}
 	else
 	{
 		FSkillProgressRefreshMessage Message;
 		Message.PhaseColor = PhaseColors.Last();
 		MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_HUD_Spell_Progress_Refresh, Message);
-
-		GetWorld()->GetTimerManager().ClearTimer(PhaseTimerHandle);
 	}
 }
 
@@ -226,11 +228,11 @@ void UD1GameplayAbility_Weapon_Spell_Projectile::SpawnProjectile()
 	if (HasAuthority(&CurrentActivationInfo) == false)
 		return;
 	
-	AD1WeaponBase* WeaponActor = GetFirstWeaponActor();
+	AD1EquipmentBase* WeaponActor = GetFirstEquipmentActor();
 	if (WeaponActor == nullptr)
 		return;
 	
-	USkeletalMeshComponent* WeaponMeshComponent = WeaponActor->WeaponMeshComponent;
+	USkeletalMeshComponent* WeaponMeshComponent = WeaponActor->MeshComponent;
 	if (WeaponMeshComponent == nullptr)
 		return;
 

@@ -1,4 +1,4 @@
-﻿#include "D1WeaponBase.h"
+﻿#include "D1EquipmentBase.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
@@ -13,9 +13,9 @@
 #include "Physics/LyraCollisionChannels.h"
 #include "System/LyraAssetManager.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1WeaponBase)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentBase)
 
-AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
+AD1EquipmentBase::AD1EquipmentBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -27,12 +27,12 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 	ArrowComponent->PrimaryComponentTick.bStartWithTickEnabled = false;
 	SetRootComponent(ArrowComponent);
 	
-	WeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
-	WeaponMeshComponent->SetCollisionProfileName("Weapon");
-	WeaponMeshComponent->SetGenerateOverlapEvents(false);
-	WeaponMeshComponent->SetupAttachment(GetRootComponent());
-	WeaponMeshComponent->PrimaryComponentTick.bStartWithTickEnabled = false;
-	WeaponMeshComponent->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
+	MeshComponent->SetCollisionProfileName("Weapon");
+	MeshComponent->SetGenerateOverlapEvents(false);
+	MeshComponent->SetupAttachment(GetRootComponent());
+	MeshComponent->PrimaryComponentTick.bStartWithTickEnabled = false;
+	MeshComponent->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 	
 	TraceDebugCollision = CreateDefaultSubobject<UBoxComponent>("TraceDebugCollision");
 	TraceDebugCollision->SetCollisionProfileName("NoCollision");
@@ -41,7 +41,7 @@ AD1WeaponBase::AD1WeaponBase(const FObjectInitializer& ObjectInitializer)
 	TraceDebugCollision->PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
-void AD1WeaponBase::BeginPlay()
+void AD1EquipmentBase::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -54,7 +54,7 @@ void AD1WeaponBase::BeginPlay()
 	}
 }
 
-void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AD1EquipmentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -66,7 +66,7 @@ void AD1WeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ThisClass, bCanBlock);
 }
 
-void AD1WeaponBase::Destroyed()
+void AD1EquipmentBase::Destroyed()
 {
 	if (bOnlyUseForLocal)
 		return;
@@ -81,9 +81,9 @@ void AD1WeaponBase::Destroyed()
 		if (UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>())
 		{
 			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-			if (Entries[(int32)EquipmentSlotType].SpawnedWeaponActor == this)
+			if (Entries[(int32)EquipmentSlotType].GetEquipmentActor() == this)
 			{
-				Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = nullptr;
+				Entries[(int32)EquipmentSlotType].SetEquipmentActor(nullptr);
 			}
 		}
 	}
@@ -91,7 +91,7 @@ void AD1WeaponBase::Destroyed()
 	Super::Destroyed();
 }
 
-void AD1WeaponBase::Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSlotType)
+void AD1EquipmentBase::Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSlotType)
 {
 	if (bOnlyUseForLocal)
 		return;
@@ -100,36 +100,7 @@ void AD1WeaponBase::Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSlotT
 	EquipmentSlotType = InEquipmentSlotType;
 }
 
-void AD1WeaponBase::ChangeSkill(int32 AbilitySetIndex)
-{
-	if (bOnlyUseForLocal)
-		return;
-	
-	if (HasAuthority() == false)
-		return;
-	
-	ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner());
-	check(Character);
-	
-	ULyraAbilitySystemComponent* ASC = Cast<ULyraAbilitySystemComponent>(Character->GetAbilitySystemComponent());
-	check(ASC);
-
-	SkillAbilitySetHandles.TakeFromAbilitySystem(ASC);
-
-	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-	if (const UD1ItemFragment_Equipable_Weapon* WeaponFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Weapon>())
-	{
-		if (WeaponFragment->SkillAbilitySets.IsValidIndex(AbilitySetIndex))
-		{
-			if (const ULyraAbilitySet* SkillAbilitySet = WeaponFragment->SkillAbilitySets[AbilitySetIndex])
-			{
-				SkillAbilitySet->GiveToAbilitySystem(ASC, &SkillAbilitySetHandles, this);
-			}
-		}
-	}
-}
-
-void AD1WeaponBase::ChangeBlockState(bool bShouldBlock)
+void AD1EquipmentBase::ChangeBlockState(bool bShouldBlock)
 {
 	if (bOnlyUseForLocal)
 		return;
@@ -141,15 +112,15 @@ void AD1WeaponBase::ChangeBlockState(bool bShouldBlock)
 	}
 }
 
-void AD1WeaponBase::OnRep_CanBlock()
+void AD1EquipmentBase::OnRep_CanBlock()
 {
 	if (bOnlyUseForLocal)
 		return;
 	
-	WeaponMeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Projectile, bCanBlock ? ECR_Block : ECR_Ignore);
+	MeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Projectile, bCanBlock ? ECR_Block : ECR_Ignore);
 }
 
-void AD1WeaponBase::OnRep_EquipmentSlotType()
+void AD1EquipmentBase::OnRep_EquipmentSlotType()
 {
 	if (bOnlyUseForLocal)
 		return;
@@ -161,7 +132,7 @@ void AD1WeaponBase::OnRep_EquipmentSlotType()
 			if (UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>())
 			{
 				TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-				Entries[(int32)EquipmentSlotType].SpawnedWeaponActor = this;
+				Entries[(int32)EquipmentSlotType].SetEquipmentActor(this);
 			}
 		}
 	}
@@ -171,7 +142,7 @@ void AD1WeaponBase::OnRep_EquipmentSlotType()
 	}
 }
 
-UAbilitySystemComponent* AD1WeaponBase::GetAbilitySystemComponent() const
+UAbilitySystemComponent* AD1EquipmentBase::GetAbilitySystemComponent() const
 {
 	UAbilitySystemComponent* ASC = nullptr;
 	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetOwner()))
@@ -181,7 +152,7 @@ UAbilitySystemComponent* AD1WeaponBase::GetAbilitySystemComponent() const
 	return ASC;
 }
 
-UAnimMontage* AD1WeaponBase::GetEquipMontage()
+UAnimMontage* AD1EquipmentBase::GetEquipMontage()
 {
 	UAnimMontage* EquipMontage = nullptr;
 	
@@ -197,7 +168,7 @@ UAnimMontage* AD1WeaponBase::GetEquipMontage()
 	return EquipMontage;
 }
 
-UAnimMontage* AD1WeaponBase::GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked)
+UAnimMontage* AD1EquipmentBase::GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked)
 {
 	UAnimMontage* SelectedMontage = nullptr;
 	

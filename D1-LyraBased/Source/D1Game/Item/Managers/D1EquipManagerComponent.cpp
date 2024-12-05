@@ -10,7 +10,7 @@
 #include "Item/Fragments/D1ItemFragment_Equipable_Armor.h"
 #include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
 #include "Net/UnrealNetwork.h"
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/D1CombatSet.h"
 #include "Character/LyraCharacter.h"
@@ -86,9 +86,9 @@ void FD1EquipEntry::Equip()
 		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon || EquippableFragment->EquipmentType == EEquipmentType::Utility)
 		{
 			// Despawn Previous Real Weapon
-			if (IsValid(SpawnedWeaponActor))
+			if (IsValid(SpawnedEquipmentActor))
 			{
-				SpawnedWeaponActor->Destroy();
+				SpawnedEquipmentActor->Destroy();
 			}
 
 			// Spawn Current Real Weapon
@@ -97,7 +97,7 @@ void FD1EquipEntry::Equip()
 			if (AttachInfo.SpawnWeaponClass)
 			{
 				UWorld* World = EquipManager->GetWorld();
-				AD1WeaponBase* NewWeaponActor = World->SpawnActorDeferred<AD1WeaponBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
+				AD1EquipmentBase* NewWeaponActor = World->SpawnActorDeferred<AD1EquipmentBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
 				NewWeaponActor->Init(ItemInstance->GetItemTemplateID(), EquipmentSlotType);
 				NewWeaponActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 				NewWeaponActor->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
@@ -113,9 +113,9 @@ void FD1EquipEntry::Equip()
 			if (Character->IsLocallyControlled())
 			{
 				// Despawn Previous Pocket Weapon
-				if (IsValid(SpawnedPocketWorldWeaponActor))
+				if (IsValid(SpawnedPocketWorldActor))
 				{
-					SpawnedPocketWorldWeaponActor->Destroy();
+					SpawnedPocketWorldActor->Destroy();
 				}
 
 				// Spawn Current Pocket Weapon
@@ -133,11 +133,11 @@ void FD1EquipEntry::Equip()
 									const FD1WeaponAttachInfo& AttachInfo = AttachmentFragment->WeaponAttachInfo;
 									
 									UWorld* World = EquipManager->GetWorld();
-									SpawnedPocketWorldWeaponActor = World->SpawnActorDeferred<AD1WeaponBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
-									SpawnedPocketWorldWeaponActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
-									SpawnedPocketWorldWeaponActor->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
-									SpawnedPocketWorldWeaponActor->bOnlyUseForLocal = true;
-									SpawnedPocketWorldWeaponActor->FinishSpawning(FTransform::Identity, true);
+									SpawnedPocketWorldActor = World->SpawnActorDeferred<AD1EquipmentBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
+									SpawnedPocketWorldActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
+									SpawnedPocketWorldActor->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
+									SpawnedPocketWorldActor->bOnlyUseForLocal = true;
+									SpawnedPocketWorldActor->FinishSpawning(FTransform::Identity, true);
 
 									PocketStage->RefreshLightingChannelToActors();
 									
@@ -227,9 +227,9 @@ void FD1EquipEntry::Unequip()
 		// Despawn Real Weapon
 		if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType) || UD1EquipmentManagerComponent::IsUtilitySlot(EquipmentSlotType))
 		{
-			if (IsValid(SpawnedWeaponActor))
+			if (IsValid(SpawnedEquipmentActor))
 			{
-				SpawnedWeaponActor->Destroy();
+				SpawnedEquipmentActor->Destroy();
 			}
 		}
 	}
@@ -251,9 +251,9 @@ void FD1EquipEntry::Unequip()
 								{
 									if (IsValid(PocketStage))
 									{
-										if (IsValid(SpawnedPocketWorldWeaponActor))
+										if (IsValid(SpawnedPocketWorldActor))
 										{
-											SpawnedPocketWorldWeaponActor->Destroy();
+											SpawnedPocketWorldActor->Destroy();
 										}
 									}
 								})
@@ -520,109 +520,142 @@ bool UD1EquipManagerComponent::CanChangeEquipState(EEquipState NewEquipState) co
 	return (EquipmentManager->IsAllEmpty(NewEquipState) == false);
 }
 
-AD1WeaponBase* UD1EquipManagerComponent::GetEquippedActor(EWeaponHandType WeaponHandType) const
+AD1EquipmentBase* UD1EquipManagerComponent::GetFirstEquippedActor() const
 {
+	AD1EquipmentBase* EquipmentActor = nullptr;
 	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
-	int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType, CurrentEquipState);
-	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].SpawnedWeaponActor : nullptr;
-}
-
-void UD1EquipManagerComponent::GetAllEquippedActors(TArray<AD1WeaponBase*>& OutEquippedActors) const
-{
-	OutEquippedActors.Reset();
-
-	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
-	
-	if (IsWeaponEquipState(CurrentEquipState))
-	{
-		for (int32 i = 0; i < (int32)EWeaponHandType::Count; i++)
-		{
-			int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentEquipState);
-			if (Entries.IsValidIndex(EntryIndex) && Entries[EntryIndex].SpawnedWeaponActor)
-			{
-				OutEquippedActors.Add(Entries[EntryIndex].SpawnedWeaponActor);
-			}
-		}
-	}
-	else if (IsUtilityEquipState(CurrentEquipState))
-	{
-		int32 EntryIndex = (int32)ConvertToEquipmentSlotType(EWeaponHandType::Count, CurrentEquipState);
-		if (Entries.IsValidIndex(EntryIndex) && Entries[EntryIndex].SpawnedWeaponActor)
-		{
-			OutEquippedActors.Add(Entries[EntryIndex].SpawnedWeaponActor);
-		}
-	}
-}
-
-UD1ItemInstance* UD1EquipManagerComponent::GetEquippedItemInstance(EWeaponHandType WeaponHandType) const
-{
-	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
-	int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType, CurrentEquipState);
-	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].GetItemInstance() : nullptr;
-}
-
-void UD1EquipManagerComponent::GetAllEquippedItemInstances(TArray<UD1ItemInstance*>& OutItemInstances) const
-{
-	OutItemInstances.Reset();
-
-	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
-
-	if (IsWeaponEquipState(CurrentEquipState))
-	{
-		for (int32 i = 0; i < (int32)EWeaponHandType::Count; i++)
-		{
-			int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentEquipState);
-			if (Entries.IsValidIndex(EntryIndex))
-			{
-				if (UD1ItemInstance* ItemInstance = Entries[EntryIndex].GetItemInstance())
-				{
-					OutItemInstances.Add(ItemInstance);
-				}
-			}
-		}
-	}
-	else if (IsUtilityEquipState(CurrentEquipState))
-	{
-		int32 EntryIndex = (int32)ConvertToEquipmentSlotType(EWeaponHandType::Count, CurrentEquipState);
-		if (Entries.IsValidIndex(EntryIndex))
-		{
-			if (UD1ItemInstance* ItemInstance = Entries[EntryIndex].GetItemInstance())
-			{
-				OutItemInstances.Add(ItemInstance);
-			}
-		}
-	}
-}
-
-AD1WeaponBase* UD1EquipManagerComponent::GetFirstEquippedActor() const
-{
-	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
-	
-	AD1WeaponBase* WeaponActor = nullptr;
 
 	if (IsWeaponEquipState(CurrentEquipState))
 	{
 		for (int i = 0; i < (int32)EWeaponHandType::Count; i++)
 		{
-			int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentEquipState);
+			const int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentEquipState);
 			if (Entries.IsValidIndex(EntryIndex) == false)
 				continue;
 
-			WeaponActor = Entries[EntryIndex].SpawnedWeaponActor;
-			if (WeaponActor)
+			EquipmentActor = Entries[EntryIndex].GetEquipmentActor();
+			if (EquipmentActor)
 				break;
 		}
 	}
 	else if (IsUtilityEquipState(CurrentEquipState))
 	{
-		int32 EntryIndex = (int32)ConvertToEquipmentSlotType(EWeaponHandType::Count, CurrentEquipState);
+		const int32 EntryIndex = (int32)ConvertToEquipmentSlotType(EWeaponHandType::Count, CurrentEquipState);
 		if (Entries.IsValidIndex(EntryIndex))
 		{
-			WeaponActor = Entries[EntryIndex].SpawnedWeaponActor;
+			EquipmentActor = Entries[EntryIndex].GetEquipmentActor();
 		}
 	}
 	
-	return WeaponActor;
+	return EquipmentActor;
+}
+
+AD1EquipmentBase* UD1EquipManagerComponent::GetEquippedActor(EWeaponHandType WeaponHandType) const
+{
+	if (WeaponHandType == EWeaponHandType::Count)
+		return GetFirstEquippedActor();
+	
+	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	const int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType, CurrentEquipState);
+	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].GetEquipmentActor() : nullptr;
+}
+
+void UD1EquipManagerComponent::GetAllEquippedActors(TArray<AD1EquipmentBase*>& OutActors) const
+{
+	OutActors.Reset();
+	
+	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	
+	if (IsWeaponEquipState(CurrentEquipState))
+	{
+		for (int32 i = 0; i < (int32)EWeaponHandType::Count; i++)
+		{
+			const int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentEquipState);
+			if (Entries.IsValidIndex(EntryIndex) && Entries[EntryIndex].GetEquipmentActor())
+			{
+				OutActors.Add(Entries[EntryIndex].GetEquipmentActor());
+			}
+		}
+	}
+	else if (IsUtilityEquipState(CurrentEquipState))
+	{
+		const int32 EntryIndex = (int32)ConvertToEquipmentSlotType(EWeaponHandType::Count, CurrentEquipState);
+		if (Entries.IsValidIndex(EntryIndex) && Entries[EntryIndex].GetEquipmentActor())
+		{
+			OutActors.Add(Entries[EntryIndex].GetEquipmentActor());
+		}
+	}
+}
+
+UD1ItemInstance* UD1EquipManagerComponent::GetFirstEquippedItemInstance(bool bIgnoreArmor) const
+{
+	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+
+	if (bIgnoreArmor == false)
+	{
+		for (int i = 0; i < (int32)EArmorType::Count; i++)
+		{
+			const int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EArmorType)i);
+			if (Entries.IsValidIndex(EntryIndex) == false)
+				continue;
+
+			if (UD1ItemInstance* ItemInstance = Entries[EntryIndex].GetItemInstance())
+				return ItemInstance;
+		}
+	}
+
+	UD1ItemInstance* ItemInstance = nullptr;
+	
+	if (IsWeaponEquipState(CurrentEquipState))
+	{
+		for (int i = 0; i < (int32)EWeaponHandType::Count; i++)
+		{
+			const int32 EntryIndex = (int32)ConvertToEquipmentSlotType((EWeaponHandType)i, CurrentEquipState);
+			if (Entries.IsValidIndex(EntryIndex) == false)
+				continue;
+
+			ItemInstance = Entries[EntryIndex].GetItemInstance();
+			if (ItemInstance)
+				break;
+		}
+	}
+	else if (IsUtilityEquipState(CurrentEquipState))
+	{
+		const int32 EntryIndex = (int32)ConvertToEquipmentSlotType(EWeaponHandType::Count, CurrentEquipState);
+		if (Entries.IsValidIndex(EntryIndex))
+		{
+			ItemInstance = Entries[EntryIndex].GetItemInstance();
+		}
+	}
+	
+	return ItemInstance;
+}
+
+UD1ItemInstance* UD1EquipManagerComponent::GetEquippedItemInstance(EArmorType ArmorType) const
+{
+	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	const int32 EntryIndex = (int32)ConvertToEquipmentSlotType(ArmorType);
+	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].GetItemInstance() : nullptr;
+}
+
+UD1ItemInstance* UD1EquipManagerComponent::GetEquippedItemInstance(EWeaponHandType WeaponHandType) const
+{
+	if (WeaponHandType == EWeaponHandType::Count)
+		return GetFirstEquippedItemInstance();
+	
+	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	const int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType, CurrentEquipState);
+	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].GetItemInstance() : nullptr;
+}
+
+UD1ItemInstance* UD1EquipManagerComponent::GetEquippedItemInstance(EEquipmentSlotType EquipmentSlotType) const
+{
+	if (EquipmentSlotType == EEquipmentSlotType::Count)
+		return nullptr;
+
+	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	const int32 EntryIndex = (int32)EquipmentSlotType;
+	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].GetItemInstance() : nullptr;
 }
 
 void UD1EquipManagerComponent::OnRep_CurrentEquipState(EEquipState PrevEquipState)
@@ -917,10 +950,10 @@ void UD1EquipManagerComponent::ChangeShouldHiddenEquipments(bool bNewShouldHidde
 {
 	bShouldHiddenEquipments = bNewShouldHiddenEquipments;
 
-	TArray<AD1WeaponBase*> OutEquippedActors;
+	TArray<AD1EquipmentBase*> OutEquippedActors;
 	GetAllEquippedActors(OutEquippedActors);
 
-	for (AD1WeaponBase* WeaponActor : OutEquippedActors)
+	for (AD1EquipmentBase* WeaponActor : OutEquippedActors)
 	{
 		if (IsValid(WeaponActor))
 		{

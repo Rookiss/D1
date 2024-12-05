@@ -3,7 +3,7 @@
 #include "AbilitySystemInterface.h"
 #include "D1Define.h"
 #include "AbilitySystem/LyraAbilitySet.h"
-#include "D1WeaponBase.generated.h"
+#include "D1EquipmentBase.generated.h"
 
 class UAbilitySystemComponent;
 class USkeletalMeshComponent;
@@ -11,12 +11,12 @@ class UArrowComponent;
 class UBoxComponent;
 
 UCLASS(BlueprintType, Abstract)
-class AD1WeaponBase : public AActor, public IAbilitySystemInterface
+class AD1EquipmentBase : public AActor, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 	
 public:
-	AD1WeaponBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	AD1EquipmentBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	virtual void BeginPlay() override;
@@ -25,9 +25,6 @@ protected:
 
 public:
 	void Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSlotType);
-	
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void ChangeSkill(int32 AbilitySetIndex);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void ChangeBlockState(bool bShouldBlock);
@@ -55,7 +52,7 @@ public:
 	TObjectPtr<UArrowComponent> ArrowComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USkeletalMeshComponent> WeaponMeshComponent;
+	TObjectPtr<USkeletalMeshComponent> MeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UBoxComponent> TraceDebugCollision;

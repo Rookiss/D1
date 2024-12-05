@@ -19,11 +19,10 @@ UD1GameplayAbility_Skill_WhirlwindSlash::UD1GameplayAbility_Skill_WhirlwindSlash
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_RejectHitReact);
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
 	
-	FD1WeaponInfo WeaponInfo;
-	WeaponInfo.WeaponHandType = EWeaponHandType::TwoHand;
-	WeaponInfo.bShouldCheckWeaponType = true;
-	WeaponInfo.RequiredWeaponType = EWeaponType::TwoHandSword;
-	WeaponInfos.Add(WeaponInfo);
+	FD1EquipmentInfo EquipmentInfo;
+	EquipmentInfo.WeaponHandType = EWeaponHandType::TwoHand;
+	EquipmentInfo.RequiredWeaponType = EWeaponType::TwoHandSword;
+	EquipmentInfos.Add(EquipmentInfo);
 }
 
 void UD1GameplayAbility_Skill_WhirlwindSlash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -58,7 +57,7 @@ void UD1GameplayAbility_Skill_WhirlwindSlash::ActivateAbility(const FGameplayAbi
 
 	LyraCharacter->bUseControllerRotationYaw = false;
 
-	if (UAbilityTask_PlayMontageAndWait* WhirlwindSlashMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("WhirlwindSlashMontage"), WhirlwindSlashMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* WhirlwindSlashMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("WhirlwindSlashMontage"), WhirlwindSlashMontage, 1.f, NAME_None, true))
 	{
 		WhirlwindSlashMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		WhirlwindSlashMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
@@ -116,8 +115,8 @@ void UD1GameplayAbility_Skill_WhirlwindSlash::OnTrace(FGameplayEventData Payload
 	if (SourceASC == nullptr)
 		return;
 
-	AD1WeaponBase* WeaponActor = GetFirstWeaponActor();
-	check(WeaponActor);
+	AD1EquipmentBase* EquipmentActor = GetFirstEquipmentActor();
+	check(EquipmentActor);
 
 	if (SourceASC->FindAbilitySpecFromHandle(CurrentSpecHandle))
 	{
@@ -130,13 +129,13 @@ void UD1GameplayAbility_Skill_WhirlwindSlash::OnTrace(FGameplayEventData Payload
 		for (int32 BlockHitIndex : BlockHitIndexes)
 		{
 			FHitResult HitResult = *(LocalTargetDataHandle.Data[BlockHitIndex]->GetHitResult());
-			ProcessHitResult(HitResult, Damage, true, nullptr, WeaponActor);
+			ProcessHitResult(HitResult, Damage, true, nullptr, EquipmentActor);
 		}
 
 		for (int32 CharacterHitIndex : CharacterHitIndexes)
 		{
 			FHitResult HitResult = *LocalTargetDataHandle.Data[CharacterHitIndex]->GetHitResult();
-			ProcessHitResult(HitResult, Damage, false, nullptr, WeaponActor);
+			ProcessHitResult(HitResult, Damage, false, nullptr, EquipmentActor);
 		}
 	}
 }

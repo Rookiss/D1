@@ -1,7 +1,7 @@
 ﻿#include "D1AnimNotify_SendWeaponEvent.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "Character/LyraCharacter.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 
@@ -24,7 +24,7 @@ void UD1AnimNotify_SendWeaponEvent::Notify(USkeletalMeshComponent* MeshComponent
 	{
 		if (UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>())
 		{
-			AD1WeaponBase* WeaponActor = EquipManager->GetEquippedActor(WeaponHandType);
+			AD1EquipmentBase* WeaponActor = EquipManager->GetEquippedActor(WeaponHandType);
 			if (WeaponActor && EventData.EventTag.IsValid())
 			{
 				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(WeaponActor, EventData.EventTag, EventData);

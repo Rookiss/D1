@@ -5,7 +5,7 @@
 
 class UWidgetComponent;
 class UD1NumberPopWidgetBase;
-class UD1DamagePopStyleScreenWidget;
+class UD1NumberPopStyleScreenWidget;
 
 USTRUCT()
 struct FPooledNumberPopWidgetList
@@ -57,7 +57,7 @@ private:
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
-	TArray<TObjectPtr<UD1DamagePopStyleScreenWidget>> Styles;
+	TArray<TObjectPtr<UD1NumberPopStyleScreenWidget>> Styles;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UD1NumberPopWidgetBase> DefaultWidgetClass;

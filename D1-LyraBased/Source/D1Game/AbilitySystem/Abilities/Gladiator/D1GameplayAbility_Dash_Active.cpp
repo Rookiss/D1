@@ -51,7 +51,7 @@ void UD1GameplayAbility_Dash_Active::ActivateAbility(const FGameplayAbilitySpecH
 	ED1Direction Direction = (ED1Direction)HitResult.Item;
 	
 	UAnimMontage* SelectedMontage = SelectDirectionalMontage(Direction);
-	if (UAbilityTask_PlayMontageAndWait* DashMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("DashMontage"), SelectedMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* DashMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("DashMontage"), SelectedMontage, 1.f, NAME_None, true))
 	{
 		DashMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		DashMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
@@ -60,8 +60,7 @@ void UD1GameplayAbility_Dash_Active::ActivateAbility(const FGameplayAbilitySpecH
 
 	FVector MovementVector = HitResult.Normal;
 	if (UAbilityTask_ApplyRootMotionConstantForce* RootMotionForceTask = UAbilityTask_ApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
-		this, TEXT("DashForce"), MovementVector, DashStrength, DashDuration,
-		true, nullptr, ERootMotionFinishVelocityMode::ClampVelocity, FVector::ZeroVector, 100.f, true))
+		this, TEXT("DashForce"), MovementVector, DashStrength, DashDuration, true, nullptr, ERootMotionFinishVelocityMode::ClampVelocity, FVector::ZeroVector, 100.f, true))
 	{
 		RootMotionForceTask->OnFinish.AddDynamic(this, &ThisClass::OnDashFinished);
 		RootMotionForceTask->ReadyForActivation();

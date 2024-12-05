@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "AbilitySystem/Abilities/Weapon/D1GameplayAbility_Weapon.h"
+#include "AbilitySystem/Abilities/Gladiator/D1GameplayAbility_Equipment.h"
 #include "D1GameplayAbility_Skill_Targeting.generated.h"
 
 class AD1GameplayAbilityTargetActor_LineTraceHighlight;
@@ -9,7 +9,7 @@ class UAbilityTask_WaitConfirmCancel;
 class UAbilityTask_WaitGameplayEvent;
 
 UCLASS()
-class UD1GameplayAbility_Skill_Targeting : public UD1GameplayAbility_Weapon
+class UD1GameplayAbility_Skill_Targeting : public UD1GameplayAbility_Equipment
 {
 	GENERATED_BODY()
 	

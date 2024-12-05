@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Abilities/GameplayAbilityWorldReticle.h"
-#include "AbilitySystem/Abilities/Weapon/D1GameplayAbility_Weapon.h"
+#include "AbilitySystem/Abilities/Gladiator/D1GameplayAbility_Equipment.h"
 #include "D1GameplayAbility_Skill_AOE.generated.h"
 
 class AGameplayAbilityTargetActor_GroundTrace;
@@ -9,7 +9,7 @@ class UAbilityTask_WaitConfirmCancel;
 class UAbilityTask_WaitGameplayEvent;
 
 UCLASS()
-class UD1GameplayAbility_Skill_AOE : public UD1GameplayAbility_Weapon
+class UD1GameplayAbility_Skill_AOE : public UD1GameplayAbility_Equipment
 {
 	GENERATED_BODY()
 	
@@ -99,6 +99,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="D1|AOE")
 	float MaxRange = 1000.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="D1|AOE")
+	float AcceptanceMultiplier = 1.25f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="D1|AOE")
 	FCollisionProfileName TraceProfile;

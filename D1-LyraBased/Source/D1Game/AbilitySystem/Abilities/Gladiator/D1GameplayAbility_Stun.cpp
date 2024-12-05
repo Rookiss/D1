@@ -67,7 +67,7 @@ void UD1GameplayAbility_Stun::ActivateAbility(const FGameplayAbilitySpecHandle H
 		LyraCharacter->bUseControllerRotationYaw = false;
 	}
 
-	if (UAbilityTask_PlayMontageAndWait* StunMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("StunMontage"), StunMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* StunMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("StunMontage"), StunMontage, 1.f, NAME_None, true))
 	{
 		StunMontageTask->ReadyForActivation();
 	}

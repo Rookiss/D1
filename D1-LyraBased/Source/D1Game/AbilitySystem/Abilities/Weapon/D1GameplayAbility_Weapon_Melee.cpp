@@ -3,7 +3,7 @@
 #include "AbilitySystemGlobals.h"
 #include "D1GameplayTags.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "Development/D1DeveloperSettings.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "System/LyraAssetManager.h"
@@ -46,7 +46,7 @@ void UD1GameplayAbility_Weapon_Melee::ParseTargetData(const FGameplayAbilityTarg
 				
 				bool bIsCharacterBlockingHit = TargetCharacter ? IsCharacterBlockingHit(TargetCharacter) : false;
 				
-				AD1WeaponBase* HitWeaponActor = Cast<AD1WeaponBase>(HitActor);
+				AD1EquipmentBase* HitWeaponActor = Cast<AD1EquipmentBase>(HitActor);
 				if (HitWeaponActor && (HitWeaponActor->bCanBlock == false || bIsCharacterBlockingHit == false))
 					continue;
 				
@@ -69,7 +69,7 @@ void UD1GameplayAbility_Weapon_Melee::ParseTargetData(const FGameplayAbilityTarg
 	}
 }
 
-void UD1GameplayAbility_Weapon_Melee::ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BackwardMontage, AD1WeaponBase* WeaponActor)
+void UD1GameplayAbility_Weapon_Melee::ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BackwardMontage, AD1EquipmentBase* WeaponActor)
 {
 	ULyraAbilitySystemComponent* SourceASC = GetLyraAbilitySystemComponentFromActorInfo();
 	if (SourceASC == nullptr)

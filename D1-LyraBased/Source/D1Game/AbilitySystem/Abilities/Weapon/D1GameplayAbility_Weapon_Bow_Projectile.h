@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include "D1GameplayAbility_Weapon.h"
+#include "AbilitySystem/Abilities/Gladiator/D1GameplayAbility_Equipment.h"
 #include "D1GameplayAbility_Weapon_Bow_Projectile.generated.h"
 
 class AD1ProjectileBase;
 
 UCLASS()
-class UD1GameplayAbility_Weapon_Bow_Projectile : public UD1GameplayAbility_Weapon
+class UD1GameplayAbility_Weapon_Bow_Projectile : public UD1GameplayAbility_Equipment
 {
 	GENERATED_BODY()
 	
@@ -14,7 +14,7 @@ public:
 	UD1GameplayAbility_Weapon_Bow_Projectile(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	void SpawnProjectileWithAssist();
+	void SpawnProjectile();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="D1|Bow Projectile")

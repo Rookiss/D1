@@ -5,7 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "Character/LyraCharacter.h"
 #include "Development/D1DeveloperSettings.h"
 
@@ -34,12 +34,12 @@ void UD1AnimNotifyState_PerformTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 			if (WeaponActor.IsValid() == false)
 				return;
 			
-			PreviousTraceTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
+			PreviousTraceTransform = WeaponActor->MeshComponent->GetComponentTransform();
 			PreviousDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
-			PreviousSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceParams.TraceSocketName);
+			PreviousSocketTransform = WeaponActor->MeshComponent->GetSocketTransform(TraceParams.TraceSocketName);
 
 #if UE_EDITOR
-	check(WeaponActor->WeaponMeshComponent->DoesSocketExist(TraceParams.TraceSocketName));
+	check(WeaponActor->MeshComponent->DoesSocketExist(TraceParams.TraceSocketName));
 #endif
 		}
 	}
@@ -75,7 +75,7 @@ void UD1AnimNotifyState_PerformTrace::NotifyEnd(USkeletalMeshComponent* MeshComp
 
 void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshComponent)
 {
-	FTransform CurrentSocketTransform = WeaponActor->WeaponMeshComponent->GetSocketTransform(TraceParams.TraceSocketName);
+	FTransform CurrentSocketTransform = WeaponActor->MeshComponent->GetSocketTransform(TraceParams.TraceSocketName);
 	float Distance = (PreviousSocketTransform.GetLocation() - CurrentSocketTransform.GetLocation()).Length();
 		
 	int SubStepCount = FMath::CeilToInt(Distance / TraceParams.TargetDistance);
@@ -84,7 +84,7 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 	
 	float SubstepRatio = 1.f / SubStepCount;
 
-	const FTransform& CurrentTraceTransform = WeaponActor->WeaponMeshComponent->GetComponentTransform();
+	const FTransform& CurrentTraceTransform = WeaponActor->MeshComponent->GetComponentTransform();
 	const FTransform& CurrentDebugTransform = WeaponActor->TraceDebugCollision->GetComponentTransform();
 
 	TArray<FHitResult> FinalHitResults;
@@ -102,7 +102,7 @@ void UD1AnimNotifyState_PerformTrace::PerformTrace(USkeletalMeshComponent* MeshC
 		Params.AddIgnoredActors(IgnoredActors);
 
 		TArray<FHitResult> HitResults;
-		MeshComponent->GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->WeaponMeshComponent, StartTraceTransform.GetLocation(), EndTraceTransform.GetLocation(), AverageTraceTransform.GetRotation(), Params);
+		MeshComponent->GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->MeshComponent, StartTraceTransform.GetLocation(), EndTraceTransform.GetLocation(), AverageTraceTransform.GetRotation(), Params);
 
 		for (const FHitResult& HitResult : HitResults)
 		{
