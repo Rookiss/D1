@@ -3,7 +3,7 @@
 #include "D1NumberPopComponent.h"
 #include "D1NumberPopComponent_NiagaraText.generated.h"
 
-class UD1DamagePopStyleNiagara;
+class UD1NumberPopStyleNiagara;
 class UNiagaraComponent;
 
 UCLASS(Blueprintable)
@@ -21,7 +21,7 @@ protected:
 	TArray<int32> DamageNumberArray;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Number Pop|Style")
-	TObjectPtr<UD1DamagePopStyleNiagara> Style;
+	TObjectPtr<UD1NumberPopStyleNiagara> Style;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Number Pop|Style")
 	TObjectPtr<UNiagaraComponent> NiagaraComp;
