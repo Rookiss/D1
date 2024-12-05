@@ -1,6 +1,6 @@
 ﻿#include "D1GameplayAbility_Weapon_Bow_Projectile.h"
 
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "Character//LyraCharacter.h"
 #include "Actors/D1ProjectileBase.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -15,12 +15,12 @@ UD1GameplayAbility_Weapon_Bow_Projectile::UD1GameplayAbility_Weapon_Bow_Projecti
     
 }
 
-void UD1GameplayAbility_Weapon_Bow_Projectile::SpawnProjectileWithAssist()
+void UD1GameplayAbility_Weapon_Bow_Projectile::SpawnProjectile()
 {
 	if (HasAuthority(&CurrentActivationInfo) == false)
 		return;
 	
-	AD1WeaponBase* WeaponActor = GetFirstWeaponActor();
+	AD1EquipmentBase* WeaponActor = GetFirstEquipmentActor();
 	if (WeaponActor == nullptr)
 		return;
 	

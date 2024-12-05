@@ -9,7 +9,7 @@
 class AD1PocketWorldAttachment;
 class ALyraCharacter;
 class ALyraPlayerController;
-class AD1WeaponBase;
+class AD1EquipmentBase;
 class UD1ItemInstance;
 class UD1EquipManagerComponent;
 class UD1EquipmentManagerComponent;
@@ -29,23 +29,27 @@ private:
 
 public:
 	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
+
+	void SetEquipmentActor(AD1EquipmentBase* InEquipmentActor) { SpawnedEquipmentActor = InEquipmentActor; }
+	AD1EquipmentBase* GetEquipmentActor() const { return SpawnedEquipmentActor; }
 	
 private:
 	friend struct FD1EquipList;
 	friend class UD1EquipManagerComponent;
-
+	
 	UPROPERTY()
 	TObjectPtr<UD1ItemInstance> ItemInstance;
 
-public:
+private:
 	UPROPERTY(NotReplicated)
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
-	
+
+private:
 	UPROPERTY(NotReplicated)
-	TObjectPtr<AD1WeaponBase> SpawnedWeaponActor;
+	TObjectPtr<AD1EquipmentBase> SpawnedEquipmentActor;
 
 	UPROPERTY(NotReplicated)
-	TObjectPtr<AD1WeaponBase> SpawnedPocketWorldWeaponActor;
+	TObjectPtr<AD1EquipmentBase> SpawnedPocketWorldActor;
 
 private:
 	UPROPERTY(NotReplicated)
@@ -162,27 +166,18 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void ChangeShouldHiddenEquipments(bool bNewShouldHiddenEquipments);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool ShouldHiddenEquipments() const { return bShouldHiddenEquipments; }
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool ShouldHiddenEquipments() const { return bShouldHiddenEquipments; }
 	EEquipState GetCurrentEquipState() const { return CurrentEquipState; }
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	AD1WeaponBase* GetEquippedActor(EWeaponHandType WeaponHandType) const;
+	AD1EquipmentBase* GetFirstEquippedActor() const;
+	AD1EquipmentBase* GetEquippedActor(EWeaponHandType WeaponHandType) const;
+	void GetAllEquippedActors(TArray<AD1EquipmentBase*>& OutActors) const;
 
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	void GetAllEquippedActors(TArray<AD1WeaponBase*>& OutEquippedActors) const;
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UD1ItemInstance* GetFirstEquippedItemInstance(bool bIgnoreArmor = true) const;
+	UD1ItemInstance* GetEquippedItemInstance(EArmorType ArmorType) const;
 	UD1ItemInstance* GetEquippedItemInstance(EWeaponHandType WeaponHandType) const;
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	void GetAllEquippedItemInstances(TArray<UD1ItemInstance*>& OutItemInstances) const;
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	AD1WeaponBase* GetFirstEquippedActor() const;
+	UD1ItemInstance* GetEquippedItemInstance(EEquipmentSlotType EquipmentSlotType) const;
 
 public:
 	FOnEquipStateChanged OnEquipStateChanged;

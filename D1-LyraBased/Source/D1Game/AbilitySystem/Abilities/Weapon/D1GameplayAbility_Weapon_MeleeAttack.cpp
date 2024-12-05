@@ -4,7 +4,7 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_MeleeAttack)
 
@@ -44,7 +44,7 @@ void UD1GameplayAbility_Weapon_MeleeAttack::OnTargetDataReady(FGameplayEventData
 	if (bBlocked)
 		return;
 
-	AD1WeaponBase* WeaponActor = const_cast<AD1WeaponBase*>(Cast<AD1WeaponBase>(Payload.Instigator));
+	AD1EquipmentBase* WeaponActor = const_cast<AD1EquipmentBase*>(Cast<AD1EquipmentBase>(Payload.Instigator));
 	if (WeaponActor == nullptr)
 		return;
 	
@@ -60,7 +60,7 @@ void UD1GameplayAbility_Weapon_MeleeAttack::OnTargetDataReady(FGameplayEventData
 		TArray<int32> BlockHitIndexes;
 		ParseTargetData(LocalTargetDataHandle, CharacterHitIndexes, BlockHitIndexes);
 
-		float Damage = GetWeaponStatValue(D1GameplayTags::SetByCaller_BaseDamage, WeaponActor);
+		float Damage = GetEquipmentStatValue(D1GameplayTags::SetByCaller_BaseDamage, WeaponActor);
 		
 		if (BlockHitIndexes.Num() > 0)
 		{

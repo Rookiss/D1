@@ -34,7 +34,7 @@ public:
 	FColor HitColor = FColor::Green;
 };
 
-class AD1WeaponBase;
+class AD1EquipmentBase;
 
 UCLASS()
 class UD1AnimNotifyState_PerformTrace : public UAnimNotifyState
@@ -70,7 +70,7 @@ public:
 
 private:
 	UPROPERTY()
-	TWeakObjectPtr<AD1WeaponBase> WeaponActor;
+	TWeakObjectPtr<AD1EquipmentBase> WeaponActor;
 
 	UPROPERTY()
 	TSet<TWeakObjectPtr<AActor>> HitActors;

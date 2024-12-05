@@ -4,7 +4,7 @@
 #include "Abilities/GameplayAbilityTypes.h"
 #include "D1AnimNotify_SendWeaponEvent.generated.h"
 
-class AD1WeaponBase;
+class AD1EquipmentBase;
 
 UCLASS(meta=(DisplayName="Send Weapon Event"))
 class UD1AnimNotify_SendWeaponEvent : public UAnimNotify

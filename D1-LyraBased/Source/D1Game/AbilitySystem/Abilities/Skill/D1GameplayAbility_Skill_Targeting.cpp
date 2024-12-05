@@ -7,7 +7,7 @@
 #include "Abilities/Tasks/AbilityTask_WaitConfirmCancel.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "AbilitySystem/D1GameplayAbilityTargetActor_LineTraceHighlight.h"
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "Character/LyraCharacter.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "UI/HUD/D1SkillInputWidget.h"
@@ -20,11 +20,10 @@ UD1GameplayAbility_Skill_Targeting::UD1GameplayAbility_Skill_Targeting(const FOb
     AbilityTags.AddTag(D1GameplayTags::Ability_Attack_Skill_2);
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
 
-	FD1WeaponInfo WeaponInfo;
-	WeaponInfo.WeaponHandType = EWeaponHandType::TwoHand;
-	WeaponInfo.bShouldCheckWeaponType = true;
-	WeaponInfo.RequiredWeaponType = EWeaponType::Staff;
-	WeaponInfos.Add(WeaponInfo);
+	FD1EquipmentInfo EquipmentInfo;
+	EquipmentInfo.WeaponHandType = EWeaponHandType::TwoHand;
+	EquipmentInfo.RequiredWeaponType = EWeaponType::Staff;
+	EquipmentInfos.Add(EquipmentInfo);
 }
 
 void UD1GameplayAbility_Skill_Targeting::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -37,7 +36,7 @@ void UD1GameplayAbility_Skill_Targeting::ActivateAbility(const FGameplayAbilityS
 		return;
 	}
 	
-	if (UAbilityTask_PlayMontageAndWait* CastStartMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastStartMontage"), CastStartMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* CastStartMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastStartMontage"), CastStartMontage, 1.f, NAME_None, true))
 	{
 		CastStartMontageTask->ReadyForActivation();
 	}
@@ -72,7 +71,7 @@ void UD1GameplayAbility_Skill_Targeting::ConfirmSkill()
 {
 	ResetSkill();
 
-	if (UAbilityTask_PlayMontageAndWait* SpellMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("SpellMontage"), SpellMontage, 1.f, NAME_None, false, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* SpellMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("SpellMontage"), SpellMontage, 1.f, NAME_None, false))
 	{
 		SpellMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		SpellMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
@@ -95,7 +94,7 @@ void UD1GameplayAbility_Skill_Targeting::CancelSkill()
 {
 	ResetSkill();
 
-	if (UAbilityTask_PlayMontageAndWait* CastEndMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastEndMontage"), CastEndMontage, 1.f, NAME_None, false, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* CastEndMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastEndMontage"), CastEndMontage, 1.f, NAME_None, false))
 	{
 		CastEndMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		CastEndMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
@@ -133,7 +132,7 @@ void UD1GameplayAbility_Skill_Targeting::ResetSkill()
 void UD1GameplayAbility_Skill_Targeting::OnCastStartBegin(FGameplayEventData Payload)
 {
 	FGameplayCueParameters Parameters;
-	Parameters.EffectCauser = GetFirstWeaponActor();
+	Parameters.EffectCauser = GetFirstEquipmentActor();
 	UGameplayCueFunctionLibrary::AddGameplayCueOnActor(GetAvatarActorFromActorInfo(), CastGameplayCueTag, Parameters);
 
 	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
@@ -154,8 +153,8 @@ void UD1GameplayAbility_Skill_Targeting::OnSpellBegin(FGameplayEventData Payload
 	if (SourceASC == nullptr)
 		return;
 
-	AD1WeaponBase* WeaponActor = GetFirstWeaponActor();
-	check(WeaponActor);
+	AD1EquipmentBase* EquipmentActor = GetFirstEquipmentActor();
+	check(EquipmentActor);
 	
 	if (TargetDataHandle.Data.IsValidIndex(0))
 	{
@@ -172,7 +171,7 @@ void UD1GameplayAbility_Skill_Targeting::OnSpellBegin(FGameplayEventData Payload
 						FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(GameplayEffectClass);
 						FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
 						EffectContextHandle.AddHitResult(HitResult);
-						EffectContextHandle.AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), WeaponActor);
+						EffectContextHandle.AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), EquipmentActor);
 						EffectSpecHandle.Data->SetContext(EffectContextHandle);
 						ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
 					}

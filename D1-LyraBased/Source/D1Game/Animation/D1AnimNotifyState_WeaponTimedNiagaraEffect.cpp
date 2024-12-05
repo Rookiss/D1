@@ -1,6 +1,6 @@
 ﻿#include "D1AnimNotifyState_WeaponTimedNiagaraEffect.h"
 
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "Character/LyraCharacter.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 
@@ -38,9 +38,9 @@ USkeletalMeshComponent* UD1AnimNotifyState_WeaponTimedNiagaraEffect::GetWeaponMe
 	{
 		if (UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>())
 		{
-			if (AD1WeaponBase* WeaponActor = EquipManager->GetEquippedActor(WeaponHandType))
+			if (AD1EquipmentBase* WeaponActor = EquipManager->GetEquippedActor(WeaponHandType))
 			{
-				WeaponMeshComponent = WeaponActor->WeaponMeshComponent;
+				WeaponMeshComponent = WeaponActor->MeshComponent;
 			}
 		}
 	}

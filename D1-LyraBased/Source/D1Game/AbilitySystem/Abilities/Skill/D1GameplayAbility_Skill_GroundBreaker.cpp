@@ -20,11 +20,10 @@ UD1GameplayAbility_Skill_GroundBreaker::UD1GameplayAbility_Skill_GroundBreaker(c
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_RejectHitReact);
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
 
-	FD1WeaponInfo WeaponInfo;
-	WeaponInfo.WeaponHandType = EWeaponHandType::TwoHand;
-	WeaponInfo.bShouldCheckWeaponType = true;
-	WeaponInfo.RequiredWeaponType = EWeaponType::GreatSword;
-	WeaponInfos.Add(WeaponInfo);
+	FD1EquipmentInfo EquipmentInfo;
+	EquipmentInfo.WeaponHandType = EWeaponHandType::TwoHand;
+	EquipmentInfo.RequiredWeaponType = EWeaponType::GreatSword;
+	EquipmentInfos.Add(EquipmentInfo);
 }
 
 void UD1GameplayAbility_Skill_GroundBreaker::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -52,7 +51,7 @@ void UD1GameplayAbility_Skill_GroundBreaker::ActivateAbility(const FGameplayAbil
 
 	SetCameraMode(CameraModeClass);
 
-	if (UAbilityTask_PlayMontageAndWait* GroundBreakerMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("GroundBreakerMontage"), GroundBreakerMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* GroundBreakerMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("GroundBreakerMontage"), GroundBreakerMontage, 1.f, NAME_None, true))
 	{
 		GroundBreakerMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		GroundBreakerMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
@@ -100,8 +99,8 @@ void UD1GameplayAbility_Skill_GroundBreaker::ExecuteGroundBreaker()
 	if (HasAuthority(&CurrentActivationInfo) == false)
 		return;
 
-	AD1WeaponBase* WeaponActor = GetFirstWeaponActor();
-	check(WeaponActor);
+	AD1EquipmentBase* EquipmentActor = GetFirstEquipmentActor();
+	check(EquipmentActor);
 	
 	ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo();
 	float ScaledCapsuleRadius = LyraCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius();
@@ -148,7 +147,7 @@ void UD1GameplayAbility_Skill_GroundBreaker::ExecuteGroundBreaker()
 		{
 			const int32 HitResultIndex = HitInfo.Value.Key;
 			const FHitResult& HitResult = OutHitResults[HitResultIndex];
-			ProcessHitResult(HitResult, Damage, IsCharacterBlockingHit(Cast<ALyraCharacter>(HitResult.GetActor())), nullptr, WeaponActor);
+			ProcessHitResult(HitResult, Damage, IsCharacterBlockingHit(Cast<ALyraCharacter>(HitResult.GetActor())), nullptr, EquipmentActor);
 
 			FGameplayEventData EventData;
 			EventData.EventMagnitude = StunDruation;

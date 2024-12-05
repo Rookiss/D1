@@ -52,7 +52,7 @@ void UD1GameplayAbility_Skill_Buff::ActivateAbility(const FGameplayAbilitySpecHa
 		LyraPlayerController->SetIgnoreLookInput(true);
 	}
 
-	if (UAbilityTask_PlayMontageAndWait* BuffMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("BuffMontage"), BuffMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* BuffMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("BuffMontage"), BuffMontage, 1.f, NAME_None, true))
 	{
 		BuffMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		BuffMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);

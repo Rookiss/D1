@@ -2,7 +2,7 @@
 
 #include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "Character/LyraCharacter.h"
 #include "Interaction/D1Interactable.h"
 #include "Interaction/D1WorldInteractable.h"
@@ -89,7 +89,7 @@ void UD1GameplayAbility_Interact_Object::EndAbility(const FGameplayAbilitySpecHa
 
 				if (EquipManager->GetCurrentEquipState() != EEquipState::Unarmed)
 				{
-					if (AD1WeaponBase* EquippedActor = EquipManager->GetFirstEquippedActor())
+					if (AD1EquipmentBase* EquippedActor = EquipManager->GetFirstEquippedActor())
 					{
 						if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("EquipMontage"), EquippedActor->GetEquipMontage(), 1.f, NAME_None, false, 1.f, 0.f, false))
 						{

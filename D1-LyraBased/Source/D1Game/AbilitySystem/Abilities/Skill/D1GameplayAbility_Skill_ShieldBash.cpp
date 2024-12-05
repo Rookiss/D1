@@ -24,11 +24,10 @@ UD1GameplayAbility_Skill_ShieldBash::UD1GameplayAbility_Skill_ShieldBash(const F
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_RejectHitReact);
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
 	
-	FD1WeaponInfo WeaponInfo;
-	WeaponInfo.WeaponHandType = EWeaponHandType::LeftHand;
-	WeaponInfo.bShouldCheckWeaponType = true;
-	WeaponInfo.RequiredWeaponType = EWeaponType::Shield;
-	WeaponInfos.Add(WeaponInfo);
+	FD1EquipmentInfo EquipmentInfo;
+	EquipmentInfo.WeaponHandType = EWeaponHandType::LeftHand;
+	EquipmentInfo.RequiredWeaponType = EWeaponType::Shield;
+	EquipmentInfos.Add(EquipmentInfo);
 }
 
 void UD1GameplayAbility_Skill_ShieldBash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -61,7 +60,7 @@ void UD1GameplayAbility_Skill_ShieldBash::ActivateAbility(const FGameplayAbility
 		LyraPlayerController->SetIgnoreLookInput(true);
 	}
 
-	if (UAbilityTask_PlayMontageAndWait* ShieldBashMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ShieldBashMontage"), ShieldBashMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* ShieldBashMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ShieldBashMontage"), ShieldBashMontage, 1.f, NAME_None, true))
 	{
 		ShieldBashMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		ShieldBashMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);

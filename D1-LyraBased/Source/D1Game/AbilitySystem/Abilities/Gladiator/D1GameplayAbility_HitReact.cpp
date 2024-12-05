@@ -3,7 +3,7 @@
 #include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_NetworkSyncPoint.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "Character/LyraCharacter.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Player/LyraPlayerController.h"
@@ -75,7 +75,7 @@ void UD1GameplayAbility_HitReact::OnNetSync()
 		return;
 	}
 	
-	AD1WeaponBase* EquippedActor = EquipManager->GetFirstEquippedActor();
+	AD1EquipmentBase* EquippedActor = EquipManager->GetFirstEquippedActor();
 	if (EquippedActor == nullptr)
 	{
 		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
@@ -92,7 +92,7 @@ void UD1GameplayAbility_HitReact::OnNetSync()
 	AActor* InstigatorActor = CurrentEventData.ContextHandle.GetInstigator();
 	UAnimMontage* HitMontage = EquippedActor->GetHitMontage(InstigatorActor, HitResultPtr->ImpactPoint, HitResultPtr->bBlockingHit);
 	
-	if (UAbilityTask_PlayMontageAndWait* HitReactMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("HitReactMontage"), HitMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* HitReactMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("HitReactMontage"), HitMontage, 1.f, NAME_None, true))
 	{
 		HitReactMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		HitReactMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);

@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include "D1GameplayAbility_Weapon.h"
+#include "AbilitySystem/Abilities/Gladiator/D1GameplayAbility_Equipment.h"
 #include "D1GameplayAbility_Weapon_Melee.generated.h"
 
-class AD1WeaponBase;
+class AD1EquipmentBase;
 
 UCLASS()
-class UD1GameplayAbility_Weapon_Melee : public UD1GameplayAbility_Weapon
+class UD1GameplayAbility_Weapon_Melee : public UD1GameplayAbility_Equipment
 {
 	GENERATED_BODY()
 	
@@ -21,7 +21,7 @@ protected:
 	void ParseTargetData(const FGameplayAbilityTargetDataHandle& InTargetDataHandle, TArray<int32>& OutCharacterHitIndexes, TArray<int32>& OutBlockHitIndexes);
 
 	UFUNCTION()
-	void ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BackwardMontage, AD1WeaponBase* WeaponActor);
+	void ProcessHitResult(FHitResult HitResult, float Damage, bool bBlockingHit, UAnimMontage* BackwardMontage, AD1EquipmentBase* WeaponActor);
 
 	UFUNCTION()
 	void ResetHitActors();

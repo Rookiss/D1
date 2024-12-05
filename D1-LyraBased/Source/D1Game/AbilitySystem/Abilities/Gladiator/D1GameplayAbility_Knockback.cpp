@@ -40,9 +40,9 @@ void UD1GameplayAbility_Knockback::ActivateAbility(const FGameplayAbilitySpecHan
 		return;
 	}
 
-	if (ALyraPlayerController* LyraPC = GetLyraPlayerControllerFromActorInfo())
+	if (ALyraPlayerController* LyraPlayerController = GetLyraPlayerControllerFromActorInfo())
 	{
-		LyraPC->SetIgnoreMoveInput(true);
+		LyraPlayerController->SetIgnoreMoveInput(true);
 
 		if (ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo())
 		{
@@ -62,7 +62,7 @@ void UD1GameplayAbility_Knockback::ActivateAbility(const FGameplayAbilitySpecHan
 	}
 
 	UAnimMontage* SelectedMontage = SelectDirectionalMontage(TriggerEventData->Instigator, GetAvatarActorFromActorInfo());
-	if (UAbilityTask_PlayMontageAndWait* KnockbackMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("KnockbackMontage"), SelectedMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* KnockbackMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("KnockbackMontage"), SelectedMontage, 1.f, NAME_None, true))
 	{
 		KnockbackMontageTask->ReadyForActivation();
 	}

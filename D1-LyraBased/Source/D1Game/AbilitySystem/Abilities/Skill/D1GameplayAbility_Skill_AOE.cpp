@@ -7,7 +7,7 @@
 #include "Abilities/Tasks/AbilityTask_WaitConfirmCancel.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Actors/D1AOEBase.h"
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "UI/HUD/D1SkillInputWidget.h"
 
@@ -19,11 +19,10 @@ UD1GameplayAbility_Skill_AOE::UD1GameplayAbility_Skill_AOE(const FObjectInitiali
     AbilityTags.AddTag(D1GameplayTags::Ability_Attack_Skill_1);
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
 
-	FD1WeaponInfo WeaponInfo;
-	WeaponInfo.WeaponHandType = EWeaponHandType::TwoHand;
-	WeaponInfo.bShouldCheckWeaponType = true;
-	WeaponInfo.RequiredWeaponType = EWeaponType::Staff;
-	WeaponInfos.Add(WeaponInfo);
+	FD1EquipmentInfo EquipmentInfo;
+	EquipmentInfo.WeaponHandType = EWeaponHandType::TwoHand;
+	EquipmentInfo.RequiredWeaponType = EWeaponType::Staff;
+	EquipmentInfos.Add(EquipmentInfo);
 }
 
 void UD1GameplayAbility_Skill_AOE::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -36,7 +35,7 @@ void UD1GameplayAbility_Skill_AOE::ActivateAbility(const FGameplayAbilitySpecHan
 		return;
 	}
 	
-	if (UAbilityTask_PlayMontageAndWait* CastStartMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastStartMontage"), CastStartMontage, 1.f, NAME_None, true, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* CastStartMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastStartMontage"), CastStartMontage, 1.f, NAME_None, true))
 	{
 		CastStartMontageTask->ReadyForActivation();
 	}
@@ -74,7 +73,7 @@ void UD1GameplayAbility_Skill_AOE::ConfirmSkill()
 {
 	ResetSkill();
 
-	if (UAbilityTask_PlayMontageAndWait* SpellMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("SpellMontage"), SpellMontage, 1.f, NAME_None, false, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* SpellMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("SpellMontage"), SpellMontage, 1.f, NAME_None, false))
 	{
 		SpellMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		SpellMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
@@ -106,7 +105,7 @@ void UD1GameplayAbility_Skill_AOE::CancelSkill()
 	FGameplayCueParameters Parameters;
 	UGameplayCueFunctionLibrary::RemoveGameplayCueOnActor(GetAvatarActorFromActorInfo(), CastGameplayCueTag, Parameters);
 
-	if (UAbilityTask_PlayMontageAndWait* CastEndMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastEndMontage"), CastEndMontage, 1.f, NAME_None, false, 1.f, 0.f, false))
+	if (UAbilityTask_PlayMontageAndWait* CastEndMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastEndMontage"), CastEndMontage, 1.f, NAME_None, false))
 	{
 		CastEndMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		CastEndMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
@@ -141,7 +140,7 @@ void UD1GameplayAbility_Skill_AOE::ResetSkill()
 void UD1GameplayAbility_Skill_AOE::OnCastStartBegin(FGameplayEventData Payload)
 {
 	FGameplayCueParameters Parameters;
-	Parameters.EffectCauser = GetFirstWeaponActor();
+	Parameters.EffectCauser = GetFirstEquipmentActor();
 	UGameplayCueFunctionLibrary::AddGameplayCueOnActor(GetAvatarActorFromActorInfo(), CastGameplayCueTag, Parameters);
 
 	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
@@ -186,7 +185,7 @@ void UD1GameplayAbility_Skill_AOE::OnSpellBegin(FGameplayEventData Payload)
 				const FVector HitLocation = HitResult.Location;
 				const FVector StartLocation = GetActorInfo().SkeletalMeshComponent->GetSocketLocation("head");
 				
-				if (FVector::DistSquared(HitLocation, StartLocation) > FMath::Square(MaxRange * 1.25f))
+				if (FVector::DistSquared(HitLocation, StartLocation) > FMath::Square(MaxRange * AcceptanceMultiplier))
 					return;
 
 				FTransform SpawnTransform = FTransform::Identity;

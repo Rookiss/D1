@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "D1GameplayAbility_Weapon.h"
+#include "AbilitySystem/Abilities/Gladiator/D1GameplayAbility_Equipment.h"
 #include "D1GameplayAbility_Weapon_Bow_ADS.generated.h"
 
 class ULyraCameraMode;
@@ -8,7 +8,7 @@ class UAbilityTask_WaitInputRelease;
 class UAbilityTask_WaitGameplayEvent;
 
 UCLASS()
-class UD1GameplayAbility_Weapon_Bow_ADS : public UD1GameplayAbility_Weapon
+class UD1GameplayAbility_Weapon_Bow_ADS : public UD1GameplayAbility_Equipment
 {
 	GENERATED_BODY()
 	

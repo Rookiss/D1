@@ -3,7 +3,7 @@
 #include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Actors/D1ProjectileBase.h"
-#include "Actors/D1WeaponBase.h"
+#include "Actors/D1EquipmentBase.h"
 #include "Player/LyraPlayerController.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Weapon_Bow_NormalShoot)
@@ -34,7 +34,7 @@ void UD1GameplayAbility_Weapon_Bow_NormalShoot::ActivateAbility(const FGameplayA
 
 	if (HasAuthority(&CurrentActivationInfo))
 	{
-		SpawnProjectileWithAssist();
+		SpawnProjectile();
 	}
 
 	FGameplayTagContainer TagContainer;
