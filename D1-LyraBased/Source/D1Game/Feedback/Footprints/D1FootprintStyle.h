@@ -3,6 +3,8 @@
 #include "GameplayTagContainer.h"
 #include "D1FootprintStyle.generated.h"
 
+class AD1FootprintActor;
+
 UCLASS()
 class UD1FootprintStyle : public UDataAsset
 {
@@ -17,5 +19,5 @@ public:
 	bool bOverrideFootprint = false;
 
 	UPROPERTY(EditDefaultsOnly, Category="Footprint", meta=(EditCondition=bOverrideFootprint))
-	TSubclassOf<AActor> FootprintClass;
+	TSubclassOf<AD1FootprintActor> FootprintClass;
 };

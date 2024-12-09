@@ -1,12 +1,12 @@
 ﻿#pragma once
 
 #include "GameplayTagContainer.h"
-#include "D1NumberPopStyleScreenWidget.generated.h"
+#include "D1NumberPopStyle.generated.h"
 
-class UD1NumberPopWidgetBase;
+class UD1NumberPopWidget;
 
 UCLASS()
-class UD1NumberPopStyleScreenWidget : public UDataAsset
+class UD1NumberPopStyle : public UDataAsset
 {
 	GENERATED_BODY()
 
@@ -29,5 +29,5 @@ public:
 	bool bOverrideWidget = false;
 
 	UPROPERTY(EditDefaultsOnly, Category="NumberPop", meta=(EditCondition=bOverrideWidget))
-	TSubclassOf<UD1NumberPopWidgetBase> WidgetClass;
+	TSubclassOf<UD1NumberPopWidget> WidgetClass;
 };
