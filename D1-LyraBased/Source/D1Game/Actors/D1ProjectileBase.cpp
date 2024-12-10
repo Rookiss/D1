@@ -6,10 +6,12 @@
 #include "D1EquipmentBase.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "AbilitySystem/LyraGameplayEffectContext.h"
 #include "Character/LyraCharacter.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Physics/PhysicalMaterialWithTags.h"
 #include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
 
@@ -46,10 +48,35 @@ AD1ProjectileBase::AD1ProjectileBase(const FObjectInitializer& ObjectInitializer
 	ProjectileMovementComponent->bInterpRotation = true;
 }
 
+float AD1ProjectileBase::GetDistanceAttenuation(float Distance, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags) const
+{
+	const FRichCurve* Curve = DistanceDamageFalloff.GetRichCurveConst();
+	return Curve->HasAnyData() ? Curve->Eval(Distance) : 1.f;
+}
+
+float AD1ProjectileBase::GetPhysicalMaterialAttenuation(const UPhysicalMaterial* PhysicalMaterial, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags) const
+{
+	float CombinedMultiplier = 1.f;
+	
+	if (const UPhysicalMaterialWithTags* PhysMatWithTags = Cast<const UPhysicalMaterialWithTags>(PhysicalMaterial))
+	{
+		for (const FGameplayTag MaterialTag : PhysMatWithTags->Tags)
+		{
+			if (const float* Multiplier = MaterialTagMultiplier.Find(MaterialTag))
+			{
+				CombinedMultiplier *= *Multiplier;
+			}
+		}
+	}
+
+	return CombinedMultiplier;
+}
+
 void AD1ProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	OriginLocation = GetActorLocation();
 	SphereCollisionComponent->IgnoreActorWhenMoving(GetInstigator(), true);
 
 	switch (CollisionDetectionType)
@@ -188,13 +215,17 @@ void AD1ProjectileBase::HandleCollisionDetection(AActor* OtherActor, UPrimitiveC
 		if (TargetASC && GetOwner() != OtherActor && GetOwner() != OtherComponent->GetOwner() && GetInstigator() != OtherActor)
 		{
 			const TSubclassOf<UGameplayEffect> DamageGEClass = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
-
+			
 			FHitResult HitResultCopy = HitResult;
 			HitResultCopy.bBlockingHit = bBlockingHit;
 			
 			FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
-			EffectContextHandle.AddHitResult(HitResultCopy);
-			EffectContextHandle.AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), this);
+			FLyraGameplayEffectContext* EffectContext = FLyraGameplayEffectContext::ExtractEffectContext(EffectContextHandle);
+			
+			EffectContext->AddOrigin(OriginLocation);
+			EffectContext->SetAbilitySource(this, 0.f);
+			EffectContext->AddHitResult(HitResultCopy);
+			EffectContext->AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), this);
 
 			FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageGEClass, 1.f, EffectContextHandle);
 			EffectSpecHandle.Data->SetSetByCallerMagnitude(D1GameplayTags::SetByCaller_BaseDamage, bBlockingHit ? Damage / 3.f : Damage);

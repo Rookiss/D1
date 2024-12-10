@@ -103,8 +103,8 @@ void UD1GameplayAbility_Weapon_Melee::ProcessHitResult(FHitResult HitResult, flo
 		FGameplayAbilityTargetDataHandle TargetDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor());
 		const TSubclassOf<UGameplayEffect> DamageGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().DamageGameplayEffect_SetByCaller);
 		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageGE);
-
-		FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
+		
+		FGameplayEffectContextHandle EffectContextHandle = MakeEffectContext(CurrentSpecHandle, CurrentActorInfo);
 		HitResult.bBlockingHit = bBlockingHit;
 		EffectContextHandle.AddHitResult(HitResult);
 		EffectContextHandle.AddInstigator(SourceASC->AbilityActorInfo->OwnerActor.Get(), WeaponActor);

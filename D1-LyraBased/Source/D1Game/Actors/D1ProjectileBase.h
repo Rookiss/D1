@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "GameplayTagContainer.h"
+#include "AbilitySystem/D1AbilitySourceInterface.h"
 #include "D1ProjectileBase.generated.h"
 
 class UGameplayEffect;
@@ -18,7 +19,7 @@ enum class ECollisionDetectionType : uint8
 };
 
 UCLASS(BlueprintType, Abstract)
-class AD1ProjectileBase : public AActor
+class AD1ProjectileBase : public AActor, public ID1AbilitySourceInterface
 {
 	GENERATED_BODY()
 	
@@ -32,6 +33,10 @@ protected:
 protected:
 	UFUNCTION(BlueprintCallable)
 	void SetSpeed(float Speed);
+
+public:
+	virtual float GetDistanceAttenuation(float Distance, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr) const;
+	virtual float GetPhysicalMaterialAttenuation(const UPhysicalMaterial* PhysicalMaterial, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr) const override;
 	
 private:
 	UFUNCTION()
@@ -47,20 +52,26 @@ private:
 	void HandleCollisionDetection(AActor* OtherActor, UPrimitiveComponent* OtherComponent, const FHitResult& HitResult);
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Projectile", BlueprintReadOnly)
 	float Damage = 0.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="GameplayCue"))
+	UPROPERTY(EditDefaultsOnly, Category="D1|Projectile", BlueprintReadOnly, meta=(Categories="GameplayCue"))
 	FGameplayTag HitGameplayCueTag;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Projectile", BlueprintReadOnly)
 	TObjectPtr<UNiagaraSystem> HitEffect;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Projectile", BlueprintReadOnly)
 	bool bAttachToHitComponent = false;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, Category="D1|Projectile", BlueprintReadOnly)
 	ECollisionDetectionType CollisionDetectionType = ECollisionDetectionType::None;
+
+	UPROPERTY(EditDefaultsOnly, Category="D1|Projectile", BlueprintReadOnly)
+	FRuntimeFloatCurve DistanceDamageFalloff;
+	
+	UPROPERTY(EditDefaultsOnly, Category="D1|Projectile", meta=(ForceInlineRow))
+	TMap<FGameplayTag, float> MaterialTagMultiplier;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -81,4 +92,6 @@ private:
 
 	UPROPERTY()
 	TSet<TWeakObjectPtr<AActor>> HitActors;
+
+	FVector OriginLocation = FVector::ZeroVector;
 };

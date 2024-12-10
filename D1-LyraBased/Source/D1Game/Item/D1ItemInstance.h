@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "D1Define.h"
-#include "AbilitySystem/LyraAbilitySourceInterface.h"
 #include "System/D1GameplayTagStack.h"
 #include "D1ItemInstance.generated.h"
 
@@ -19,7 +18,7 @@ public:
 };
 
 UCLASS(BlueprintType)
-class UD1ItemInstance : public UObject, public ILyraAbilitySourceInterface
+class UD1ItemInstance : public UObject
 {
 	GENERATED_BODY()
 	
@@ -29,9 +28,7 @@ public:
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool IsSupportedForNetworking() const override { return true; }
-	virtual float GetDistanceAttenuation(float Distance, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr) const override;
-	virtual float GetPhysicalMaterialAttenuation(const UPhysicalMaterial* PhysicalMaterial, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr) const override;
-	
+
 public:
 	void Init(int32 InItemTemplateID, EItemRarity InItemRarity);
 

@@ -17,7 +17,7 @@ class ALyraCharacter;
 class ALyraPlayerController;
 class APlayerController;
 class FText;
-class ILyraAbilitySourceInterface;
+class ID1AbilitySourceInterface;
 class UAnimMontage;
 class ULyraAbilityCost;
 class ULyraAbilitySystemComponent;
@@ -180,7 +180,7 @@ protected:
 
 	virtual void OnPawnAvatarSet();
 
-	virtual void GetAbilitySource(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, float& OutSourceLevel, const ILyraAbilitySourceInterface*& OutAbilitySource, AActor*& OutEffectCauser) const;
+	virtual void GetAbilitySource(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, float& OutSourceLevel, const ID1AbilitySourceInterface*& OutAbilitySource, AActor*& OutEffectCauser) const;
 
 	/** Called when this ability is granted to the ability system component. */
 	UFUNCTION(BlueprintImplementableEvent, Category = Ability, DisplayName = "OnAbilityAdded")

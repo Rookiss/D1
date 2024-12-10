@@ -5,9 +5,10 @@
 #endif // UE_WITH_IRIS
 
 #include "D1ItemTemplate.h"
-#include "D1LogChannels.h"
 #include "Data/D1ItemData.h"
+#include "Fragments/D1ItemFragment_Equipable_Attachment.h"
 #include "Net/UnrealNetwork.h"
+#include "Physics/PhysicalMaterialWithTags.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemInstance)
 
@@ -24,16 +25,6 @@ void UD1ItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(ThisClass, ItemTemplateID);
 	DOREPLIFETIME(ThisClass, ItemRarity);
 	DOREPLIFETIME(ThisClass, StatContainer);
-}
-
-float UD1ItemInstance::GetDistanceAttenuation(float Distance, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags) const
-{
-	return 0;
-}
-
-float UD1ItemInstance::GetPhysicalMaterialAttenuation(const UPhysicalMaterial* PhysicalMaterial, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags) const
-{
-	return 0;
 }
 
 void UD1ItemInstance::Init(int32 InItemTemplateID, EItemRarity InItemRarity)
