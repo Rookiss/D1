@@ -62,7 +62,7 @@ private:
 	TObjectPtr<UAbilityTask_WaitGameplayEvent> PiercingShotBeginEventTask;
 
 	UPROPERTY()
-	TObjectPtr<UAbilityTask_WaitConfirmCancel> SkillConfirmTask;
+	TObjectPtr<UAbilityTask_WaitConfirmCancel> SkillConfirmCancelTask;
 	
 	UPROPERTY()
 	TObjectPtr<UAbilityTask_WaitConfirmCancel> SkillCancelTask;

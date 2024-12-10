@@ -1,6 +1,7 @@
 ﻿#include "D1GameplayAbility_Skill_PiercingShot.h"
 
 #include "D1GameplayTags.h"
+#include "D1LogChannels.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitConfirmCancel.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
@@ -53,7 +54,7 @@ void UD1GameplayAbility_Skill_PiercingShot::ActivateAbility(const FGameplayAbili
 		PiercingShotBeginEventTask->EventReceived.AddDynamic(this, &ThisClass::OnPiercingShotBegin);
 		PiercingShotBeginEventTask->ReadyForActivation();
 	}
-
+	
 	SkillCancelTask = UAbilityTask_WaitConfirmCancel::WaitConfirmCancel(this);
 	if (SkillCancelTask)
 	{
@@ -80,11 +81,17 @@ void UD1GameplayAbility_Skill_PiercingShot::OnPiercingShotBegin(FGameplayEventDa
 	Message.bShouldShow = true;
 	MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_HUD_Spell_Input, Message);
 
-	SkillConfirmTask = UAbilityTask_WaitConfirmCancel::WaitConfirmCancel(this);
-	if (SkillConfirmTask)
+	if (SkillCancelTask)
 	{
-		SkillConfirmTask->OnConfirm.AddDynamic(this, &ThisClass::OnInputConfirm);
-		SkillConfirmTask->ReadyForActivation();
+		SkillCancelTask->EndTask();
+	}
+	
+	SkillConfirmCancelTask = UAbilityTask_WaitConfirmCancel::WaitConfirmCancel(this);
+	if (SkillConfirmCancelTask)
+	{
+		SkillConfirmCancelTask->OnConfirm.AddDynamic(this, &ThisClass::OnInputConfirm);
+		SkillConfirmCancelTask->OnCancel.AddDynamic(this, &ThisClass::OnInputCancel);
+		SkillConfirmCancelTask->ReadyForActivation();
 	}
 }
 
@@ -144,9 +151,9 @@ void UD1GameplayAbility_Skill_PiercingShot::ResetSkill()
 		PiercingShotBeginEventTask->EndTask();
 	}
 	
-	if (SkillConfirmTask)
+	if (SkillConfirmCancelTask)
 	{
-		SkillConfirmTask->EndTask();
+		SkillConfirmCancelTask->EndTask();
 	}
 
 	if (SkillCancelTask)
