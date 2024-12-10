@@ -55,7 +55,7 @@ void FD1EquipEntry::Equip()
 			// Add Current Ability
 			if (const ULyraAbilitySet* BaseAbilitySet = EquippableFragment->BaseAbilitySet)
 			{
-				BaseAbilitySet->GiveToAbilitySystem(ASC, &BaseAbilitySetHandles, ItemInstance);
+				BaseAbilitySet->GiveToAbilitySystem(ASC, &BaseAbilitySetHandles, const_cast<UD1ItemFragment_Equipable*>(EquippableFragment));
 			}
 
 			// Remove Previous Stat

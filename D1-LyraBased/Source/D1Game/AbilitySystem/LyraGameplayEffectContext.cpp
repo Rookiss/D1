@@ -2,7 +2,7 @@
 
 #include "LyraGameplayEffectContext.h"
 
-#include "AbilitySystem/LyraAbilitySourceInterface.h"
+#include "AbilitySystem/D1AbilitySourceInterface.h"
 #include "Engine/HitResult.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 
@@ -45,15 +45,15 @@ namespace UE::Net
 }
 #endif
 
-void FLyraGameplayEffectContext::SetAbilitySource(const ILyraAbilitySourceInterface* InObject, float InSourceLevel)
+void FLyraGameplayEffectContext::SetAbilitySource(const ID1AbilitySourceInterface* InObject, float InSourceLevel)
 {
 	AbilitySourceObject = MakeWeakObjectPtr(Cast<const UObject>(InObject));
 	//SourceLevel = InSourceLevel;
 }
 
-const ILyraAbilitySourceInterface* FLyraGameplayEffectContext::GetAbilitySource() const
+const ID1AbilitySourceInterface* FLyraGameplayEffectContext::GetAbilitySource() const
 {
-	return Cast<ILyraAbilitySourceInterface>(AbilitySourceObject.Get());
+	return Cast<ID1AbilitySourceInterface>(AbilitySourceObject.Get());
 }
 
 const UPhysicalMaterial* FLyraGameplayEffectContext::GetPhysicalMaterial() const

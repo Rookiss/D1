@@ -15,7 +15,7 @@
 #include "LyraAbilitySimpleFailureMessage.h"
 #include "NavigationSystem.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
-#include "AbilitySystem/LyraAbilitySourceInterface.h"
+#include "AbilitySystem/D1AbilitySourceInterface.h"
 #include "AbilitySystem/LyraGameplayEffectContext.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Physics/PhysicalMaterialWithTags.h"
@@ -339,12 +339,11 @@ FGameplayEffectContextHandle ULyraGameplayAbility::MakeEffectContext(const FGame
 	check(ActorInfo);
 
 	AActor* EffectCauser = nullptr;
-	const ILyraAbilitySourceInterface* AbilitySource = nullptr;
+	const ID1AbilitySourceInterface* AbilitySource = nullptr;
 	float SourceLevel = 0.0f;
 	GetAbilitySource(Handle, ActorInfo, /*out*/ SourceLevel, /*out*/ AbilitySource, /*out*/ EffectCauser);
 
 	UObject* SourceObject = GetSourceObject(Handle, ActorInfo);
-
 	AActor* Instigator = ActorInfo ? ActorInfo->OwnerActor.Get() : nullptr;
 
 	EffectContext->SetAbilitySource(AbilitySource, SourceLevel);
@@ -479,7 +478,7 @@ void ULyraGameplayAbility::OnPawnAvatarSet()
 	K2_OnPawnAvatarSet();
 }
 
-void ULyraGameplayAbility::GetAbilitySource(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, float& OutSourceLevel, const ILyraAbilitySourceInterface*& OutAbilitySource, AActor*& OutEffectCauser) const
+void ULyraGameplayAbility::GetAbilitySource(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, float& OutSourceLevel, const ID1AbilitySourceInterface*& OutAbilitySource, AActor*& OutEffectCauser) const
 {
 	OutSourceLevel = 0.0f;
 	OutAbilitySource = nullptr;
@@ -490,7 +489,7 @@ void ULyraGameplayAbility::GetAbilitySource(FGameplayAbilitySpecHandle Handle, c
 	// If we were added by something that's an ability info source, use it
 	UObject* SourceObject = GetSourceObject(Handle, ActorInfo);
 
-	OutAbilitySource = Cast<ILyraAbilitySourceInterface>(SourceObject);
+	OutAbilitySource = Cast<ID1AbilitySourceInterface>(SourceObject);
 }
 
 void ULyraGameplayAbility::GetMovementDirection(ED1Direction& OutDirection, FVector& OutMovementVector) const

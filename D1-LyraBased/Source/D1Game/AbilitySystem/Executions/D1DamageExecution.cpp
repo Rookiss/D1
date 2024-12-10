@@ -1,6 +1,6 @@
 #include "D1DamageExecution.h"
 
-#include "AbilitySystem/LyraAbilitySourceInterface.h"
+#include "AbilitySystem/D1AbilitySourceInterface.h"
 #include "AbilitySystem/Attributes/D1VitalSet.h"
 #include "AbilitySystem/Attributes/D1CombatSet.h"
 #include "AbilitySystem/LyraGameplayEffectContext.h"
@@ -76,15 +76,29 @@ void UD1DamageExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 	const AActor* EffectCauser = TypedContext->GetEffectCauser();
 	const FHitResult* HitActorResult = TypedContext->GetHitResult();
 	AActor* HitActor = nullptr;
+	FVector ImpactLocation = FVector::ZeroVector;
 	
 	if (HitActorResult)
 	{
 		const FHitResult& CurrHitResult = *HitActorResult;
 		HitActor = CurrHitResult.HitObjectHandle.FetchActor();
+		if (HitActor)
+		{
+			ImpactLocation = CurrHitResult.ImpactPoint;
+		}
+	}
+
+	// Handle case of no hit result or hit actor
+	UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
+	if (HitActor == nullptr)
+	{
+		HitActor = TargetASC ? TargetASC->GetAvatarActor_Direct() : nullptr;
+		if (HitActor)
+		{
+			ImpactLocation = HitActor->GetActorLocation();
+		}
 	}
 	
-	float Damage = UKismetMathLibrary::SafeDivide(BaseDamage + Strength, FMath::Pow(FMath::Max(Defense, 1.f), 0.3f));
-
 	// Apply rules for team damage
 	float DamageInteractionAllowedMultiplier = 0.0f;
 	if (HitActor)
@@ -95,18 +109,27 @@ void UD1DamageExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 			DamageInteractionAllowedMultiplier = TeamSubsystem->CanCauseDamage(EffectCauser, HitActor) ? 1.f : 0.f;
 		}
 	}
-	
-	// Weak point damage calculation
+
+	// Weak point & Distance damage calculation
 	float PhysicalMaterialAttenuation = 1.0f;
-	if (const ILyraAbilitySourceInterface* AbilitySource = TypedContext->GetAbilitySource())
+	float DistanceAttenuation = 1.0f;
+	if (const ID1AbilitySourceInterface* AbilitySource = TypedContext->GetAbilitySource())
 	{
 		if (const UPhysicalMaterial* PhysicalMaterial = TypedContext->GetPhysicalMaterial())
 		{
 			PhysicalMaterialAttenuation = AbilitySource->GetPhysicalMaterialAttenuation(PhysicalMaterial, SourceTags, TargetTags);
 		}
+
+		if (TypedContext->HasOrigin())
+		{
+			double Distance = FVector::Dist(TypedContext->GetOrigin(), ImpactLocation);
+			DistanceAttenuation = AbilitySource->GetDistanceAttenuation(Distance, SourceTags, TargetTags);
+		}
 	}
-	
-	float DamageDone = FMath::Max(Damage * PhysicalMaterialAttenuation * DamageInteractionAllowedMultiplier, 0.0f);
+	DistanceAttenuation = FMath::Max(DistanceAttenuation, 0.f);
+
+	float Damage = UKismetMathLibrary::SafeDivide(BaseDamage + Strength, FMath::Pow(FMath::Max(Defense, 1.f), 0.3f));
+	float DamageDone = FMath::Max(Damage * DistanceAttenuation * PhysicalMaterialAttenuation * DamageInteractionAllowedMultiplier, 0.0f);
 	DamageDone -= DamageDone * (DamageReductionPercent / 100.f);
 	
 	if (DamageDone > 0.0f)

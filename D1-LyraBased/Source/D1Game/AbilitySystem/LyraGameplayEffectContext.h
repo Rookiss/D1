@@ -8,7 +8,7 @@
 
 class AActor;
 class FArchive;
-class ILyraAbilitySourceInterface;
+class ID1AbilitySourceInterface;
 class UObject;
 class UPhysicalMaterial;
 
@@ -31,10 +31,10 @@ struct FLyraGameplayEffectContext : public FGameplayEffectContext
 	static D1GAME_API FLyraGameplayEffectContext* ExtractEffectContext(struct FGameplayEffectContextHandle Handle);
 
 	/** Sets the object used as the ability source */
-	void SetAbilitySource(const ILyraAbilitySourceInterface* InObject, float InSourceLevel);
+	void SetAbilitySource(const ID1AbilitySourceInterface* InObject, float InSourceLevel);
 
 	/** Returns the ability source interface associated with the source object. Only valid on the authority. */
-	const ILyraAbilitySourceInterface* GetAbilitySource() const;
+	const ID1AbilitySourceInterface* GetAbilitySource() const;
 
 	virtual FGameplayEffectContext* Duplicate() const override
 	{

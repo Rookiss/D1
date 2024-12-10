@@ -1,0 +1,9 @@
+#include "D1AbilitySourceInterface.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(D1AbilitySourceInterface)
+
+UD1AbilitySourceInterface::UD1AbilitySourceInterface(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	
+}
