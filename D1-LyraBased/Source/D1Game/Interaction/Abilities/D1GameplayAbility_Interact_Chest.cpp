@@ -97,7 +97,7 @@ void UD1GameplayAbility_Interact_Chest::OnAfterPushWidget(UCommonActivatableWidg
 	OtherInventoryInitMessage.InventoryManager = InteractableActor->GetComponentByClass<UD1InventoryManagerComponent>();
 	MessageSubsystem.BroadcastMessage(D1GameplayTags::Message_Initialize_OtherInventory, OtherInventoryInitMessage);
 
-	InPushedWidget->OnDeactivated().AddLambda([this]()
+	InPushedWidget->OnDeactivated().AddWeakLambda(this, [this]()
 	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 	});

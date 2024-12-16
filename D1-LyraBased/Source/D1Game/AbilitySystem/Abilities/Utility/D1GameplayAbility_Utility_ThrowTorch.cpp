@@ -150,7 +150,7 @@ FTransform UD1GameplayAbility_Utility_ThrowTorch::GetSpawnTransform()
 	
 	if (ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo())
 	{
-		int32 ItemTemplateID = WeaponActor->GetTemplateID();
+		int32 ItemTemplateID = WeaponActor->GetItemTemplateID();
 		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
 
 		if (const UD1ItemFragment_Equipable_Utility* UtilityFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Utility>())

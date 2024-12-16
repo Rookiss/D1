@@ -49,28 +49,28 @@ void UD1CosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const U
 	
 	if (ArmorFragment)
 	{
-		if (ArmorFragment == nullptr || ArmorFragment->ArmorType != ArmorType)
-			return;
-		
-		SetPrimaryArmorMesh(ArmorType, ArmorFragment->ArmorMesh);
-		
-		if (ArmorType == EArmorType::Chest)
+		if (ArmorFragment->ArmorType == ArmorType)
 		{
-			if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)EArmorType::Legs])
+			SetPrimaryArmorMesh(ArmorType, ArmorFragment->ArmorMesh);
+		
+			if (ArmorType == EArmorType::Chest)
 			{
-				if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
+				if (UChildActorComponent* CosmeticSlot = CosmeticSlots[(int32)EArmorType::Legs])
 				{
-					CosmeticActor->ShouldUseSecondaryMesh(ArmorFragment->bIsFullBody);
+					if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(CosmeticSlot->GetChildActor()))
+					{
+						CosmeticActor->ShouldUseSecondaryMesh(ArmorFragment->bIsFullBody);
+					}
 				}
 			}
-		}
-		else if (ArmorType == EArmorType::Helmet)
-		{
-			if (HeadSlot)
+			else if (ArmorType == EArmorType::Helmet)
 			{
-				if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(HeadSlot->GetChildActor()))
+				if (HeadSlot)
 				{
-					CosmeticActor->ShouldUseSecondaryMesh(true);
+					if (AD1ArmorBase* CosmeticActor = Cast<AD1ArmorBase>(HeadSlot->GetChildActor()))
+					{
+						CosmeticActor->ShouldUseSecondaryMesh(true);
+					}
 				}
 			}
 		}

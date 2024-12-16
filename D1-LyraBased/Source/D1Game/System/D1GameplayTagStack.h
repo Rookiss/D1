@@ -44,7 +44,9 @@ public:
 	FD1GameplayTagStackContainer() { }
 
 public:
+	void AddOrRemoveStack(FGameplayTag Tag, int32 StackCount);
 	void AddStack(FGameplayTag Tag, int32 StackCount);
+	void RemoveStack(FGameplayTag Tag, int32 StackCount);
 	void RemoveStack(FGameplayTag Tag);
 
 public:
@@ -52,6 +54,7 @@ public:
 	
 	int32 GetStackCount(FGameplayTag Tag) const { return TagToCountMap.FindRef(Tag); }
 	bool ContainsTag(FGameplayTag Tag) const { return TagToCountMap.Contains(Tag); }
+	FGameplayTagContainer GetTags() const { return TagContainer; }
 	
 	void PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize);
 	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
@@ -68,6 +71,9 @@ private:
 
 	UPROPERTY(NotReplicated)
 	TMap<FGameplayTag, int32> TagToCountMap;
+
+	UPROPERTY(NotReplicated)
+	FGameplayTagContainer TagContainer;
 };
 
 template<>

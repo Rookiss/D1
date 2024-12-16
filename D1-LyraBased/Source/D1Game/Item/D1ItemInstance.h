@@ -34,7 +34,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	void AddStatTagStack(FGameplayTag StatTag, int32 StackCount);
+	void AddOrRemoveStatTagStack(FGameplayTag StatTag, int32 StackCount);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void RemoveStatTagStack(FGameplayTag StatTag);
@@ -57,6 +57,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	const FD1GameplayTagStackContainer& GetStatContainer() const { return StatContainer; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	const FD1GameplayTagStackContainer& GetOwnedTagContainer() const { return OwnedTagContainer; }
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure="false", meta=(DeterminesOutputType="FragmentClass"))
@@ -82,4 +85,7 @@ private:
 	
 	UPROPERTY(Replicated)
 	FD1GameplayTagStackContainer StatContainer;
+
+	UPROPERTY(Replicated)
+	FD1GameplayTagStackContainer OwnedTagContainer;
 };

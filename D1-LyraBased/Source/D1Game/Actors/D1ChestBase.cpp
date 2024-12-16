@@ -44,7 +44,7 @@ void AD1ChestBase::BeginPlay()
 		if (ItemAddRule.ItemAddType == EItemAddType::None)
 			continue;
 
-		if (FMath::RandRange(0.f, 100.f) > ItemAddRule.ItemAddTypeRate)
+		if (FMath::RandRange(0.f, 100.f) > ItemAddRule.ItemAddProbability)
 			continue;
 
 		const TArray<TSubclassOf<UD1ItemTemplate>>* SelectedItemTemplateClasses = nullptr;
@@ -60,11 +60,16 @@ void AD1ChestBase::BeginPlay()
 		{
 			int32 SelectedItemTemplateIndex = FMath::RandRange(0, SelectedItemTemplateClasses->Num() - 1);
 			TSubclassOf<UD1ItemTemplate> SelectedItemTemplateClass = (*SelectedItemTemplateClasses)[SelectedItemTemplateIndex];
+
+			int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(SelectedItemTemplateClass);
+			const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
+
+			int32 ItemCount = FMath::Min(ItemAddRule.ItemCount, ItemTemplate.MaxStackCount);
 			
 			int32 SelectedItemRarityIndex = FMath::RandRange(0, ItemAddRule.ItemRarities.Num() - 1);
 			EItemRarity SelectedItemRarity = ItemAddRule.ItemRarities[SelectedItemRarityIndex];
 			
-			InventoryManager->TryAddItemByRarity(SelectedItemTemplateClass, SelectedItemRarity, 1);
+			InventoryManager->TryAddItemByRarity(SelectedItemTemplateClass, SelectedItemRarity, ItemCount);
 			bItemAdded = true;
 		}
 	}

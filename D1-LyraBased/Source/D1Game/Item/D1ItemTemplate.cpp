@@ -4,6 +4,7 @@
 #include "Misc/DataValidation.h"
 #endif // WITH_EDITOR
 
+#include "Fragments/D1ItemFragment_Ammo.h"
 #include "Fragments/D1ItemFragment_Equipable.h"
 #include "Fragments/D1ItemFragment_Equipable_Armor.h"
 #include "Fragments/D1ItemFragment_Equipable_Utility.h"
@@ -51,6 +52,12 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 	
 	if (FoundEquipable)
 	{
+		if (const UD1ItemFragment_Ammo* AmmoFragment = FindFragmentByClass<UD1ItemFragment_Ammo>())
+		{
+			Context.AddError(FText::FromString(FString::Printf(TEXT("Conflict Fragments : [Equipable <-> Ammo]"))));
+			return EDataValidationResult::Invalid;
+		}
+		
 		if (FoundEquipable->EquipmentType == EEquipmentType::Count)
 		{
 			Context.AddError(FText::FromString(FString::Printf(TEXT("Equipment Type is Invalid : [EEquipmentType::Count]"))));

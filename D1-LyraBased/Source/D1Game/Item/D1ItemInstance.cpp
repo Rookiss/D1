@@ -53,9 +53,9 @@ void UD1ItemInstance::RegisterReplicationFragments(UE::Net::FFragmentRegistratio
 }
 #endif // UE_WITH_IRIS
 
-void UD1ItemInstance::AddStatTagStack(FGameplayTag StatTag, int32 StackCount)
+void UD1ItemInstance::AddOrRemoveStatTagStack(FGameplayTag StatTag, int32 StackCount)
 {
-	StatContainer.AddStack(StatTag, StackCount);
+	StatContainer.AddOrRemoveStack(StatTag, StackCount);
 }
 
 void UD1ItemInstance::RemoveStatTagStack(FGameplayTag StatTag)

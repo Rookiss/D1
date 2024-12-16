@@ -24,16 +24,19 @@ struct FItemAddRule
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float ItemAddProbability = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EItemAddType ItemAddType = EItemAddType::None;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition="ItemAddType == EItemAddType::Custom", EditConditionHides))
 	TArray<TSubclassOf<UD1ItemTemplate>> CustomItemTemplateClasses;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float ItemAddTypeRate = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<EItemRarity> ItemRarities;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ClampMin="1"))
+	int32 ItemCount = 1;
 };
 
 UENUM(BlueprintType)
@@ -71,10 +74,10 @@ protected:
 	UPROPERTY(BlueprintReadWrite, ReplicatedUsing=OnRep_ChestState)
 	EChestState ChestState = EChestState::Close;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Info")
+	UPROPERTY(EditAnywhere, Category="Info")
 	FD1InteractionInfo OpenedInteractionInfo;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Info")
+	UPROPERTY(EditAnywhere, Category="Info")
 	FD1InteractionInfo ClosedInteractionInfo;
 
 	UPROPERTY(EditDefaultsOnly, Category="Info")
@@ -84,16 +87,16 @@ protected:
 	TObjectPtr<UAnimMontage> CloseMontage;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category="Info")
+	UPROPERTY(EditAnywhere, Category="Info")
 	TArray<FItemAddRule> ItemAddRules;
 
-	UPROPERTY(EditDefaultsOnly, Category="Info")
+	UPROPERTY(EditAnywhere, Category="Info")
 	bool bShouldFallback = false;
 
-	UPROPERTY(EditDefaultsOnly, Category="Info", meta=(EditCondition="bShouldFallback", EditConditionHides))
+	UPROPERTY(EditAnywhere, Category="Info", meta=(EditCondition="bShouldFallback", EditConditionHides))
 	TSubclassOf<UD1ItemTemplate> FallbackItemTemplateClass;
 
-	UPROPERTY(EditDefaultsOnly, Category="Info", meta=(EditCondition="bShouldFallback", EditConditionHides))
+	UPROPERTY(EditAnywhere, Category="Info", meta=(EditCondition="bShouldFallback", EditConditionHides))
 	EItemRarity FallbackItemItemRarity = EItemRarity::Poor;
 	
 protected:

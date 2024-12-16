@@ -140,7 +140,7 @@ private:
 	void BroadcastChangedMessage(EEquipState PrevEquipState, EEquipState NewEquipState);
 
 public:
-	ALyraCharacter* GetCharacter() const;
+	ALyraCharacter* GetLyraCharacter() const;
 	ALyraPlayerController* GetPlayerController() const;
 	
 	TArray<FD1EquipEntry>& GetAllEntries();

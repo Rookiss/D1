@@ -128,6 +128,14 @@ enum class EUtilitySlotType : uint8
 };
 
 UENUM(BlueprintType)
+enum class EAmmoType : uint8
+{
+	Arrow,
+
+	Count	UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
 enum class EItemRarity : uint8
 {
 	Poor,

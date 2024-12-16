@@ -71,6 +71,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS,										"Ability.ADS");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS_Bow,									"Ability.ADS.Bow");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_ADS_Throw,								"Ability.ADS.Throw");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Reload,									"Ability.Reload");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Reload_Bow,								"Ability.Reload.Bow");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact,								"Ability.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact_Active,							"Ability.Interact.Active");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Interact_Object,							"Ability.Interact.Object");
@@ -97,6 +99,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS_Bow,									"Status.ADS.Bow");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS_Ready,								"Status.ADS.Ready");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS_Throw,								"Status.ADS.Throw");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Reload,									"Status.Reload");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Dash,										"Status.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Sprint,									"Status.Sprint");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Succeeded,								"Status.Succeeded");
@@ -194,6 +197,9 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_PreGame,								"GamePhase.PreGame");
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_Game,									"GamePhase.Game");
 	UE_DEFINE_GAMEPLAY_TAG(GamePhase_PostGame,								"GamePhase.PostGame");
+
+	// Ammo
+	UE_DEFINE_GAMEPLAY_TAG(Ammo_Arrow,										"Ammo.Arrow");
 
 	// HUD
 	UE_DEFINE_GAMEPLAY_TAG(HUD_Slot_Reticle,								"HUD.Slot.Reticle");

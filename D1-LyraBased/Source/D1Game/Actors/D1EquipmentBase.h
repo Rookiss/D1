@@ -38,7 +38,7 @@ private:
 
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	int32 GetTemplateID() const { return TemplateID; }
+	int32 GetItemTemplateID() const { return ItemTemplateID; }
 	EEquipmentSlotType GetEquipmentSlotType() const { return EquipmentSlotType; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -59,7 +59,7 @@ public:
 	
 protected:
 	UPROPERTY(Replicated)
-	int32 TemplateID;
+	int32 ItemTemplateID;
 	
 	UPROPERTY(ReplicatedUsing=OnRep_EquipmentSlotType)
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;

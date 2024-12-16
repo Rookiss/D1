@@ -9,14 +9,25 @@ FString FD1GameplayTagStack::GetDebugString() const
 	return FString::Printf(TEXT("%sx%d"), *Tag.ToString(), StackCount);
 }
 
-void FD1GameplayTagStackContainer::AddStack(FGameplayTag Tag, int32 StackCount)
+void FD1GameplayTagStackContainer::AddOrRemoveStack(FGameplayTag Tag, int32 StackCount)
 {
-	if (!Tag.IsValid())
+	if (Tag.IsValid() == false || StackCount == 0)
 	{
-		FFrame::KismetExecutionMessage(TEXT("An invalid tag was passed to AddStack"), ELogVerbosity::Warning);
+		FFrame::KismetExecutionMessage(TEXT("An invalid tag or count was passed to AddOrRemoveStack"), ELogVerbosity::Warning);
 		return;
 	}
 
+	(StackCount > 0) ? AddStack(Tag, StackCount) : RemoveStack(Tag, FMath::Abs(StackCount));
+}
+
+void FD1GameplayTagStackContainer::AddStack(FGameplayTag Tag, int32 StackCount)
+{
+	if (Tag.IsValid() == false || StackCount <= 0)
+	{
+		FFrame::KismetExecutionMessage(TEXT("An invalid tag or count was passed to AddStack"), ELogVerbosity::Warning);
+		return;
+	}
+	
 	for (FD1GameplayTagStack& Stack : Stacks)
 	{
 		if (Stack.Tag == Tag)
@@ -32,11 +43,44 @@ void FD1GameplayTagStackContainer::AddStack(FGameplayTag Tag, int32 StackCount)
 	FD1GameplayTagStack& NewStack = Stacks.Emplace_GetRef(Tag, StackCount);
 	MarkItemDirty(NewStack);
 	TagToCountMap.Add(Tag, StackCount);
+	TagContainer.AddTag(Tag);
+}
+
+void FD1GameplayTagStackContainer::RemoveStack(FGameplayTag Tag, int32 StackCount)
+{
+	if (Tag.IsValid() == false || StackCount <= 0)
+	{
+		FFrame::KismetExecutionMessage(TEXT("An invalid tag or count was passed to RemoveStack"), ELogVerbosity::Warning);
+		return;
+	}
+
+	for (auto It = Stacks.CreateIterator(); It; ++It)
+	{
+		FD1GameplayTagStack& Stack = *It;
+		if (Stack.Tag == Tag)
+		{
+			if (Stack.StackCount <= StackCount)
+			{
+				It.RemoveCurrent();
+				TagToCountMap.Remove(Tag);
+				TagContainer.RemoveTag(Tag);
+				MarkArrayDirty();
+			}
+			else
+			{
+				const int32 NewCount = Stack.StackCount - StackCount;
+				Stack.StackCount = NewCount;
+				TagToCountMap[Tag] = NewCount;
+				MarkItemDirty(Stack);
+			}
+			return;
+		}
+	}
 }
 
 void FD1GameplayTagStackContainer::RemoveStack(FGameplayTag Tag)
 {
-	if (!Tag.IsValid())
+	if (Tag.IsValid() == false)
 	{
 		FFrame::KismetExecutionMessage(TEXT("An invalid tag was passed to RemoveStack"), ELogVerbosity::Warning);
 		return;
@@ -49,6 +93,7 @@ void FD1GameplayTagStackContainer::RemoveStack(FGameplayTag Tag)
 		{
 			It.RemoveCurrent();
 			TagToCountMap.Remove(Tag);
+			TagContainer.RemoveTag(Tag);
 			MarkArrayDirty();
 			return;
 		}

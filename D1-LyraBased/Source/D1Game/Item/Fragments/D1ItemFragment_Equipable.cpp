@@ -38,7 +38,7 @@ void UD1ItemFragment_Equipable::AddStatTagStack(UD1ItemInstance* ItemInstance, c
 	{
 		const FGameplayTag& StatTag = RarityStatSet.StatTag;
 		const FRarityStat& Stat = RarityStatSet.RarityStats[(int32)ItemInstance->GetItemRarity()];
-		ItemInstance->AddStatTagStack(StatTag, Stat.Value);
+		ItemInstance->AddOrRemoveStatTagStack(StatTag, Stat.Value);
 	}
 }
 
@@ -52,7 +52,7 @@ void UD1ItemFragment_Equipable::AddStatTagStack(UD1ItemInstance* ItemInstance, c
 		const FGameplayTag& StatTag = RarityStatRangeSet.StatTag;
 		const FRarityStatRange& StatRange = RarityStatRangeSet.RarityStatRanges[(int32)ItemInstance->GetItemRarity()];
 		const int32 StatValue = FMath::RandRange(StatRange.MinValue, StatRange.MaxValue);
-		ItemInstance->AddStatTagStack(StatTag, StatValue);
+		ItemInstance->AddOrRemoveStatTagStack(StatTag, StatValue);
 	}
 }
 

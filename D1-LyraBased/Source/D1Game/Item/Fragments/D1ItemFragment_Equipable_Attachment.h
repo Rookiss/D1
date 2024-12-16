@@ -21,6 +21,20 @@ public:
 	FTransform AttachTransform;
 };
 
+USTRUCT(BlueprintType)
+struct FD1EquipStyle
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTagQuery MatchPattern;
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UAnimMontage> EquipMontage;
+};
+
 UCLASS(Abstract, Const)
 class UD1ItemFragment_Equipable_Attachment : public UD1ItemFragment_Equipable
 {
@@ -30,6 +44,9 @@ public:
 	UD1ItemFragment_Equipable_Attachment(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
+	TSoftObjectPtr<UAnimMontage> DetermineEquipMontage(const FGameplayTagContainer& ContextTags) const;
+	
+public:
 	UPROPERTY(EditDefaultsOnly)
 	EWeaponHandType WeaponHandType = EWeaponHandType::Count;
 
@@ -37,7 +54,7 @@ public:
 	FD1WeaponAttachInfo WeaponAttachInfo;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UAnimMontage> EquipMontage;
+	TArray<FD1EquipStyle> EquipStyles;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UAnimMontage> FrontHitMontage;

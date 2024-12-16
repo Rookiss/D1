@@ -13,7 +13,7 @@
 
 ULyraAbilityCost_EquippedItem::ULyraAbilityCost_EquippedItem()
 {
-	Quantity.SetValue(1.0f);
+	Quantity.SetValue(1.f);
 }
 
 bool ULyraAbilityCost_EquippedItem::CheckCost(const ULyraGameplayAbility* Ability, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, FGameplayTagContainer* OptionalRelevantTags) const
@@ -56,34 +56,34 @@ bool ULyraAbilityCost_EquippedItem::CheckCost(const ULyraGameplayAbility* Abilit
 
 void ULyraAbilityCost_EquippedItem::ApplyCost(const ULyraGameplayAbility* Ability, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	if (ActorInfo->IsNetAuthority())
+	if (ActorInfo->IsNetAuthority() == false)
+		return;
+
+	ALyraCharacter* LyraCharacter = Ability->GetLyraCharacterFromActorInfo();
+	if (LyraCharacter == nullptr)
+		return;
+
+	UD1EquipManagerComponent* EquipManager = LyraCharacter->GetComponentByClass<UD1EquipManagerComponent>();
+	UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->GetComponentByClass<UD1EquipmentManagerComponent>();
+	if (EquipManager == nullptr || EquipmentManager == nullptr)
+		return;
+
+	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
+
+	switch (EquipmentType)
 	{
-		ALyraCharacter* LyraCharacter = Ability->GetLyraCharacterFromActorInfo();
-		if (LyraCharacter == nullptr)
-			return;
-
-		UD1EquipManagerComponent* EquipManager = LyraCharacter->GetComponentByClass<UD1EquipManagerComponent>();
-		UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->GetComponentByClass<UD1EquipmentManagerComponent>();
-		if (EquipManager == nullptr || EquipmentManager == nullptr)
-			return;
-
-		EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
-
-		switch (EquipmentType)
-		{
-		case EEquipmentType::Armor:
-			EquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType);
-			break;
-		case EEquipmentType::Weapon:
-		case EEquipmentType::Utility:
-			EquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponHandType, EquipManager->GetCurrentEquipState());
-			break;
-		}
-	
-		const int32 AbilityLevel = Ability->GetAbilityLevel(Handle, ActorInfo);
-		const float NumItemsToConsumeReal = Quantity.GetValueAtLevel(AbilityLevel);
-		const int32 NumItemsToConsume = FMath::TruncToInt(NumItemsToConsumeReal);
-		
-		EquipmentManager->RemoveEquipment_Unsafe(EquipmentSlotType, NumItemsToConsume);
+	case EEquipmentType::Armor:
+		EquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(ArmorType);
+		break;
+	case EEquipmentType::Weapon:
+	case EEquipmentType::Utility:
+		EquipmentSlotType = UD1EquipManagerComponent::ConvertToEquipmentSlotType(WeaponHandType, EquipManager->GetCurrentEquipState());
+		break;
 	}
+	
+	const int32 AbilityLevel = Ability->GetAbilityLevel(Handle, ActorInfo);
+	const float NumItemsToConsumeReal = Quantity.GetValueAtLevel(AbilityLevel);
+	const int32 NumItemsToConsume = FMath::TruncToInt(NumItemsToConsumeReal);
+		
+	EquipmentManager->RemoveEquipment_Unsafe(EquipmentSlotType, NumItemsToConsume);
 }

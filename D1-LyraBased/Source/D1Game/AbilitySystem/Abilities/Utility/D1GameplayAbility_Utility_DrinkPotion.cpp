@@ -71,7 +71,7 @@ void UD1GameplayAbility_Utility_DrinkPotion::ApplyUtilityGameplayEffect()
 	if (EquipmentActor == nullptr)
 		return;
 	
-	const int32 ItemTemplateID = EquipmentActor->GetTemplateID();
+	const int32 ItemTemplateID = EquipmentActor->GetItemTemplateID();
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
 
 	const UD1ItemFragment_Equipable_Utility* UtilityFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Utility>();

@@ -6,6 +6,7 @@
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Data/D1ItemData.h"
+#include "Item/D1ItemInstance.h"
 #include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -61,7 +62,7 @@ void AD1EquipmentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	if (bOnlyUseForLocal)
 		return;
 	
-	DOREPLIFETIME(ThisClass, TemplateID);
+	DOREPLIFETIME(ThisClass, ItemTemplateID);
 	DOREPLIFETIME(ThisClass, EquipmentSlotType);
 	DOREPLIFETIME(ThisClass, bCanBlock);
 }
@@ -96,7 +97,7 @@ void AD1EquipmentBase::Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSl
 	if (bOnlyUseForLocal)
 		return;
 	
-	TemplateID = InTemplateID;
+	ItemTemplateID = InTemplateID;
 	EquipmentSlotType = InEquipmentSlotType;
 }
 
@@ -125,90 +126,106 @@ void AD1EquipmentBase::OnRep_EquipmentSlotType()
 	if (bOnlyUseForLocal)
 		return;
 	
-	if (GetOwner() && GetOwner()->FindComponentByClass<UD1EquipManagerComponent>())
+	if (GetOwner())
 	{
-		if (ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner()))
+		if (UD1EquipManagerComponent* EquipManager = GetOwner()->FindComponentByClass<UD1EquipManagerComponent>())
 		{
-			if (UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>())
-			{
-				TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-				Entries[(int32)EquipmentSlotType].SetEquipmentActor(this);
-			}
+			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
+			Entries[(int32)EquipmentSlotType].SetEquipmentActor(this);
+			return;
 		}
 	}
-	else
-	{
-		GetWorldTimerManager().SetTimerForNextTick(this, &ThisClass::OnRep_EquipmentSlotType);
-	}
+	
+	GetWorldTimerManager().SetTimerForNextTick(this, &ThisClass::OnRep_EquipmentSlotType);
 }
 
 UAbilitySystemComponent* AD1EquipmentBase::GetAbilitySystemComponent() const
 {
-	UAbilitySystemComponent* ASC = nullptr;
 	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetOwner()))
 	{
-		ASC = LyraCharacter->GetAbilitySystemComponent();
+		return LyraCharacter->GetAbilitySystemComponent();
 	}
-	return ASC;
+	
+	return nullptr;
 }
 
 UAnimMontage* AD1EquipmentBase::GetEquipMontage()
 {
-	UAnimMontage* EquipMontage = nullptr;
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (GetOwner() == nullptr || ASC == nullptr)
+		return nullptr;
 	
-	if (TemplateID > 0)
-	{
-		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-		if (const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>())
-		{
-			EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->EquipMontage);
-		}
-	}
+	UD1EquipManagerComponent* EquipManager = GetOwner()->FindComponentByClass<UD1EquipManagerComponent>();
+	if (EquipManager == nullptr)
+		return nullptr;
+
+	const UD1ItemInstance* ItemInstance = EquipManager->GetEquippedItemInstance(EquipmentSlotType);
+	if (ItemInstance == nullptr)
+		return nullptr;
+
+	if (ItemTemplateID <= 0)
+		return nullptr;
 	
-	return EquipMontage;
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
+	const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
+	if (AttachmentFragment == nullptr)
+		return nullptr;
+	
+	FGameplayTagContainer TagContainer = ASC->GetOwnedGameplayTags();
+	TagContainer.AppendTags(ItemInstance->GetOwnedTagContainer().GetTags());
+	
+	TSoftObjectPtr<UAnimMontage> AnimMontagePath = AttachmentFragment->DetermineEquipMontage(TagContainer);
+	return ULyraAssetManager::GetAssetByPath<UAnimMontage>(AnimMontagePath);
 }
 
 UAnimMontage* AD1EquipmentBase::GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked)
 {
 	UAnimMontage* SelectedMontage = nullptr;
 	
-	if (InstigatorActor && TemplateID > 0)
+	if (InstigatorActor && ItemTemplateID > 0)
 	{
-		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
+		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
 		if (const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>())
 		{
+			TSoftObjectPtr<UAnimMontage> SelectedMontagePath = nullptr;
+			
 			if (IsBlocked)
 			{
-				SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->BlockHitMontage);
+				SelectedMontagePath = AttachmentFragment->BlockHitMontage;
 			}
 			else
 			{
 				AActor* CharacterActor = GetOwner();
-				const FVector& CharacterLocation = CharacterActor->GetActorLocation();
-				const FVector& CharacterDirection = CharacterActor->GetActorForwardVector();
+				FVector CharacterLocation = CharacterActor->GetActorLocation();
+				FVector CharacterDirection = CharacterActor->GetActorForwardVector();
 			
-				const FRotator& FacingRotator = UKismetMathLibrary::Conv_VectorToRotator(CharacterDirection);
-				const FRotator& CharacterToHitRotator = UKismetMathLibrary::Conv_VectorToRotator((HitLocation - CharacterLocation).GetSafeNormal());
+				FRotator FacingRotator = UKismetMathLibrary::Conv_VectorToRotator(CharacterDirection);
+				FRotator CharacterToHitRotator = UKismetMathLibrary::Conv_VectorToRotator((HitLocation - CharacterLocation).GetSafeNormal());
 			
-				const FRotator& DeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(CharacterToHitRotator, FacingRotator);
+				FRotator DeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(CharacterToHitRotator, FacingRotator);
 				float YawAbs = FMath::Abs(DeltaRotator.Yaw);
-
+				
 				if (YawAbs < 60.f)
 				{
-					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->FrontHitMontage);
+					SelectedMontagePath = AttachmentFragment->FrontHitMontage;
 				}
 				else if (YawAbs > 120.f)
 				{
-					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->BackHitMontage);
+					SelectedMontagePath = AttachmentFragment->BackHitMontage;
 				}
 				else if (DeltaRotator.Yaw < 0.f)
 				{
-					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->LeftHitMontage);
+					SelectedMontagePath = AttachmentFragment->LeftHitMontage;
 				}
 				else
 				{
-					SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->RightHitMontage);
+					SelectedMontagePath = AttachmentFragment->RightHitMontage;
 				}
+			}
+
+			if (SelectedMontagePath.IsNull() == false)
+			{
+				SelectedMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(SelectedMontagePath);
 			}
 		}
 	}

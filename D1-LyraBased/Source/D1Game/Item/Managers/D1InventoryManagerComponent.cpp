@@ -495,7 +495,8 @@ int32 UD1InventoryManagerComponent::TryAddItemByProbability(TSubclassOf<UD1ItemT
 
 bool UD1InventoryManagerComponent::TryRemoveItem(int32 ItemTemplateID, int32 ItemCount)
 {
-	check(GetOwner()->HasAuthority());
+	if (GetOwner()->HasAuthority() == false)
+		return false;
 
 	if (ItemTemplateID <= 0 || ItemCount <= 0)
 		return false;

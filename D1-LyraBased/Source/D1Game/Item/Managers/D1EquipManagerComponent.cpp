@@ -14,6 +14,7 @@
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "AbilitySystem/Attributes/D1CombatSet.h"
 #include "Character/LyraCharacter.h"
+#include "Character/LyraPawnExtensionComponent.h"
 #include "Player/LyraPlayerController.h"
 #include "PocketWorld/D1PocketStage.h"
 #include "PocketWorld/D1PocketWorldSubsystem.h"
@@ -37,39 +38,50 @@ void FD1EquipEntry::Equip()
 	if (ItemInstance == nullptr)
 		return;
 
-	ALyraCharacter* Character = EquipManager->GetCharacter();
+	ALyraCharacter* Character = EquipManager->GetLyraCharacter();
 	if (Character == nullptr)
 		return;
-
-	const UD1ItemFragment_Equipable* EquippableFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable>();
-	if (EquippableFragment == nullptr)
+	
+	ULyraPawnExtensionComponent* PawnExtensionComponent = Character->FindComponentByClass<ULyraPawnExtensionComponent>();
+	if (PawnExtensionComponent == nullptr)
 		return;
-
-	if (EquipManager->GetOwner()->HasAuthority())
+	
+	PawnExtensionComponent->OnAbilitySystemInitialized_RegisterAndCall(FSimpleMulticastDelegate::FDelegate::CreateLambda([this]()
 	{
-		if (ULyraAbilitySystemComponent* ASC = Cast<ULyraAbilitySystemComponent>(EquipManager->GetAbilitySystemComponent()))
+		ALyraCharacter* LyraCharacter = EquipManager->GetLyraCharacter();
+		if (LyraCharacter == nullptr || ItemInstance == nullptr)
+			return;
+
+		const UD1ItemFragment_Equipable* EquippableFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable>();
+		if (EquippableFragment == nullptr)
+			return;
+		
+		ULyraAbilitySystemComponent* LyraASC = LyraCharacter->GetLyraAbilitySystemComponent();
+		check(LyraASC);
+
+		if (LyraCharacter->HasAuthority())
 		{
 			// Remove Previous Ability
-			BaseAbilitySetHandles.TakeFromAbilitySystem(ASC);
-	
+			BaseAbilitySetHandles.TakeFromAbilitySystem(LyraASC);
+		
 			// Add Current Ability
 			if (const ULyraAbilitySet* BaseAbilitySet = EquippableFragment->BaseAbilitySet)
 			{
-				BaseAbilitySet->GiveToAbilitySystem(ASC, &BaseAbilitySetHandles, const_cast<UD1ItemFragment_Equipable*>(EquippableFragment));
+				BaseAbilitySet->GiveToAbilitySystem(LyraASC, &BaseAbilitySetHandles, const_cast<UD1ItemFragment_Equipable*>(EquippableFragment));
 			}
 
 			// Remove Previous Stat
-			ASC->RemoveActiveGameplayEffect(BaseStatHandle);
+			LyraASC->RemoveActiveGameplayEffect(BaseStatHandle);
 			BaseStatHandle.Invalidate();
-	
+		
 			// Add Current Stat
 			const TSubclassOf<UGameplayEffect> AttributeModifierGE = ULyraAssetManager::GetSubclassByPath(ULyraGameData::Get().AttributeModifierGameplayEffect);
 			check(AttributeModifierGE);
-		
-			const FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
-			const FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(AttributeModifierGE, 1.f, ContextHandle);
-			const TSharedPtr<FGameplayEffectSpec>& SpecData = SpecHandle.Data;
 			
+			const FGameplayEffectContextHandle ContextHandle = LyraASC->MakeEffectContext();
+			const FGameplayEffectSpecHandle SpecHandle = LyraASC->MakeOutgoingSpec(AttributeModifierGE, 1.f, ContextHandle);
+			const TSharedPtr<FGameplayEffectSpec>& SpecData = SpecHandle.Data;
+				
 			for (const FGameplayModifierInfo& ModifierInfo : SpecData->Def->Modifiers)
 			{
 				SpecData->SetSetByCallerMagnitude(ModifierInfo.ModifierMagnitude.GetSetByCallerFloat().DataTag, 0);
@@ -80,37 +92,35 @@ void FD1EquipEntry::Equip()
 				SpecData->SetSetByCallerMagnitude(Stack.GetStackTag(), Stack.GetStackCount());
 			}
 			
-			BaseStatHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
-		}
-		
-		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon || EquippableFragment->EquipmentType == EEquipmentType::Utility)
-		{
-			// Despawn Previous Real Weapon
-			if (IsValid(SpawnedEquipmentActor))
+			BaseStatHandle = LyraASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+			
+			if (EquippableFragment->EquipmentType == EEquipmentType::Weapon || EquippableFragment->EquipmentType == EEquipmentType::Utility)
 			{
-				SpawnedEquipmentActor->Destroy();
-			}
+				// Despawn Previous Real Weapon
+				if (IsValid(SpawnedEquipmentActor))
+				{
+					SpawnedEquipmentActor->Destroy();
+				}
 
-			// Spawn Current Real Weapon
-			const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
-			const FD1WeaponAttachInfo& AttachInfo = AttachmentFragment->WeaponAttachInfo;
-			if (AttachInfo.SpawnWeaponClass)
-			{
-				UWorld* World = EquipManager->GetWorld();
-				AD1EquipmentBase* NewWeaponActor = World->SpawnActorDeferred<AD1EquipmentBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
-				NewWeaponActor->Init(ItemInstance->GetItemTemplateID(), EquipmentSlotType);
-				NewWeaponActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
-				NewWeaponActor->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
-				NewWeaponActor->SetActorHiddenInGame(EquipManager->ShouldHiddenEquipments());
-				NewWeaponActor->FinishSpawning(FTransform::Identity, true);
+				// Spawn Current Real Weapon
+				const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
+				const FD1WeaponAttachInfo& AttachInfo = AttachmentFragment->WeaponAttachInfo;
+				if (AttachInfo.SpawnWeaponClass)
+				{
+					UWorld* World = EquipManager->GetWorld();
+					AD1EquipmentBase* NewWeaponActor = World->SpawnActorDeferred<AD1EquipmentBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, LyraCharacter);
+					NewWeaponActor->Init(ItemInstance->GetItemTemplateID(), EquipmentSlotType);
+					NewWeaponActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
+					NewWeaponActor->AttachToComponent(LyraCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
+					NewWeaponActor->SetActorHiddenInGame(EquipManager->ShouldHiddenEquipments());
+					NewWeaponActor->FinishSpawning(FTransform::Identity, true);
+				}
 			}
 		}
-	}
-	else
-	{
+
 		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon || EquippableFragment->EquipmentType == EEquipmentType::Utility)
 		{
-			if (Character->IsLocallyControlled())
+			if (LyraCharacter->IsLocallyControlled())
 			{
 				// Despawn Previous Pocket Weapon
 				if (IsValid(SpawnedPocketWorldActor))
@@ -122,7 +132,7 @@ void FD1EquipEntry::Equip()
 				const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
 				if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 				{
-					if (APlayerController* PC = Character->GetLyraPlayerController())
+					if (APlayerController* PC = LyraCharacter->GetLyraPlayerController())
 					{
 						PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
 							FGetPocketStageDelegate::CreateLambda([this, AttachmentFragment](AD1PocketStage* PocketStage)
@@ -152,19 +162,23 @@ void FD1EquipEntry::Equip()
 		}
 		else if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
 		{
-			// Refresh Real Armor Mesh
 			const UD1ItemFragment_Equipable_Armor* ArmorFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Armor>();
-			if (UD1CosmeticManagerComponent* CharacterCosmetics = Character->FindComponentByClass<UD1CosmeticManagerComponent>())
+			
+			if (LyraCharacter->IsNetMode(NM_DedicatedServer) == false)
 			{
-				CharacterCosmetics->RefreshArmorMesh(ArmorFragment->ArmorType, ArmorFragment);
+				// Refresh Real Armor Mesh
+				if (UD1CosmeticManagerComponent* CharacterCosmetics = LyraCharacter->FindComponentByClass<UD1CosmeticManagerComponent>())
+				{
+					CharacterCosmetics->RefreshArmorMesh(ArmorFragment->ArmorType, ArmorFragment);
+				}
 			}
-
+			
 			// Refresh Pocket Armor Mesh
-			if (Character->IsLocallyControlled())
+			if (LyraCharacter->IsLocallyControlled())
 			{
 				if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 				{
-					if (APlayerController* PC = Character->GetLyraPlayerController())
+					if (APlayerController* PC = LyraCharacter->GetLyraPlayerController())
 					{
 						PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
 							FGetPocketStageDelegate::CreateLambda([ArmorFragment](AD1PocketStage* PocketStage)
@@ -182,121 +196,133 @@ void FD1EquipEntry::Equip()
 				}
 			}
 		}
-	}
-
-	if (EquippableFragment->EquipmentType == EEquipmentType::Weapon || EquippableFragment->EquipmentType == EEquipmentType::Utility)
-	{
-		const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
-		if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
+		
+		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon || EquippableFragment->EquipmentType == EEquipmentType::Utility)
 		{
-			if (AttachmentFragment->AnimInstanceClass)
+			const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
+			if (USkeletalMeshComponent* MeshComponent = LyraCharacter->GetMesh())
 			{
-				MeshComponent->LinkAnimClassLayers(AttachmentFragment->AnimInstanceClass);
-			}
-
-			UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent();
-			if (ASC && ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Interact) == false)
-			{
-				UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->EquipMontage);
-				if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
+				if (AttachmentFragment->AnimInstanceClass)
 				{
-					if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
+					MeshComponent->LinkAnimClassLayers(AttachmentFragment->AnimInstanceClass);
+				}
+				
+				if (LyraASC->HasMatchingGameplayTag(D1GameplayTags::Status_Interact) == false)
+				{
+					FGameplayTagContainer TagContainer = LyraASC->GetOwnedGameplayTags();
+					TagContainer.AppendTags(ItemInstance->GetOwnedTagContainer().GetTags());
+					
+					UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->DetermineEquipMontage(TagContainer));
+					if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
 					{
-						Character->PlayAnimMontage(EquipMontage);
+						if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
+						{
+							LyraCharacter->PlayAnimMontage(EquipMontage);
+						}
 					}
 				}
 			}
 		}
-	}
+	}));
 }
 
 void FD1EquipEntry::Unequip()
 {
-	if (EquipManager->GetOwner()->HasAuthority())
+	ALyraCharacter* Character = EquipManager->GetLyraCharacter();
+	if (Character == nullptr)
+		return;
+	
+	ULyraPawnExtensionComponent* PawnExtensionComponent = Character->FindComponentByClass<ULyraPawnExtensionComponent>();
+	if (PawnExtensionComponent == nullptr)
+		return;
+	
+	PawnExtensionComponent->OnAbilitySystemInitialized_RegisterAndCall(FSimpleMulticastDelegate::FDelegate::CreateLambda([this]()
 	{
-		if (ULyraAbilitySystemComponent* ASC = Cast<ULyraAbilitySystemComponent>(EquipManager->GetAbilitySystemComponent()))
+		ALyraCharacter* LyraCharacter = EquipManager->GetLyraCharacter();
+		if (LyraCharacter == nullptr)
+			return;
+		
+		ULyraAbilitySystemComponent* LyraASC = LyraCharacter->GetLyraAbilitySystemComponent();
+		check(LyraASC);
+		
+		if (LyraCharacter->HasAuthority())
 		{
 			// Remove Ability
-			BaseAbilitySetHandles.TakeFromAbilitySystem(ASC);
+			BaseAbilitySetHandles.TakeFromAbilitySystem(LyraASC);
 
 			// Remove Stat
-			ASC->RemoveActiveGameplayEffect(BaseStatHandle);
+			LyraASC->RemoveActiveGameplayEffect(BaseStatHandle);
 			BaseStatHandle.Invalidate();
-		}
-		
-		// Despawn Real Weapon
-		if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType) || UD1EquipmentManagerComponent::IsUtilitySlot(EquipmentSlotType))
-		{
+
+			// Destroy Real Weapon
 			if (IsValid(SpawnedEquipmentActor))
 			{
 				SpawnedEquipmentActor->Destroy();
 			}
 		}
-	}
-	else
-	{
-		if (ALyraCharacter* Character = EquipManager->GetCharacter())
+
+		if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType) || UD1EquipmentManagerComponent::IsUtilitySlot(EquipmentSlotType))
 		{
-			if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType) || UD1EquipmentManagerComponent::IsUtilitySlot(EquipmentSlotType))
+			// Destroy Pocket Weapon
+			if (LyraCharacter->IsLocallyControlled())
 			{
-				// Despawn Pocket Weapon
-				if (Character->IsLocallyControlled())
+				if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
 				{
-					if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
+					if (APlayerController* PC = LyraCharacter->GetLyraPlayerController())
 					{
-						if (APlayerController* PC = Character->GetLyraPlayerController())
-						{
-							PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
-								FGetPocketStageDelegate::CreateLambda([this](AD1PocketStage* PocketStage)
+						PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
+							FGetPocketStageDelegate::CreateLambda([this](AD1PocketStage* PocketStage)
+							{
+								if (IsValid(PocketStage))
 								{
-									if (IsValid(PocketStage))
+									if (IsValid(SpawnedPocketWorldActor))
 									{
-										if (IsValid(SpawnedPocketWorldActor))
-										{
-											SpawnedPocketWorldActor->Destroy();
-										}
+										SpawnedPocketWorldActor->Destroy();
 									}
-								})
-							);
-						}
-					}
-				}
-			}
-			else if (UD1EquipmentManagerComponent::IsArmorSlot(EquipmentSlotType))
-			{
-				// Refresh Real Armor Mesh
-				EArmorType ArmorType = EquipManager->ConvertToArmorType(EquipmentSlotType);
-		
-				if (UD1CosmeticManagerComponent* CharacterCosmetics = Character->FindComponentByClass<UD1CosmeticManagerComponent>())
-				{
-					CharacterCosmetics->RefreshArmorMesh(ArmorType, nullptr);
-				}
-				
-				// Refresh Pocket Armor Mesh
-				if (Character->IsLocallyControlled())
-				{
-					if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
-					{
-						if (APlayerController* PC = Character->GetLyraPlayerController())
-						{
-							PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
-								FGetPocketStageDelegate::CreateLambda([ArmorType](AD1PocketStage* PocketStage)
-								{
-									if (IsValid(PocketStage))
-									{
-										if (UD1CosmeticManagerComponent* CosmeticManager = PocketStage->GetCosmeticManager())
-										{
-											CosmeticManager->RefreshArmorMesh(ArmorType, nullptr);
-										}
-									}
-								})
-							);
-						}
+								}
+							})
+						);
 					}
 				}
 			}
 		}
-	}
+		else if (UD1EquipmentManagerComponent::IsArmorSlot(EquipmentSlotType))
+		{
+			EArmorType ArmorType = EquipManager->ConvertToArmorType(EquipmentSlotType);
+
+			if (LyraCharacter->IsNetMode(NM_DedicatedServer) == false)
+			{
+				// Refresh Real Armor Mesh
+				if (UD1CosmeticManagerComponent* CharacterCosmetics = LyraCharacter->FindComponentByClass<UD1CosmeticManagerComponent>())
+				{
+					CharacterCosmetics->RefreshArmorMesh(ArmorType, nullptr);
+				}
+			}
+			
+			// Refresh Pocket Armor Mesh
+			if (LyraCharacter->IsLocallyControlled())
+			{
+				if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
+				{
+					if (APlayerController* PC = LyraCharacter->GetLyraPlayerController())
+					{
+						PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
+							FGetPocketStageDelegate::CreateLambda([ArmorType](AD1PocketStage* PocketStage)
+							{
+								if (IsValid(PocketStage))
+								{
+									if (UD1CosmeticManagerComponent* CosmeticManager = PocketStage->GetCosmeticManager())
+									{
+										CosmeticManager->RefreshArmorMesh(ArmorType, nullptr);
+									}
+								}
+							})
+						);
+					}
+				}
+			}
+		}
+	}));
 }
 
 bool FD1EquipList::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
@@ -671,14 +697,14 @@ void UD1EquipManagerComponent::BroadcastChangedMessage(EEquipState PrevEquipStat
 	}
 }
 
-ALyraCharacter* UD1EquipManagerComponent::GetCharacter() const
+ALyraCharacter* UD1EquipManagerComponent::GetLyraCharacter() const
 {
 	return Cast<ALyraCharacter>(GetOwner());
 }
 
 ALyraPlayerController* UD1EquipManagerComponent::GetPlayerController() const
 {
-	if (ALyraCharacter* LyraCharacter = GetCharacter())
+	if (ALyraCharacter* LyraCharacter = GetLyraCharacter())
 	{
 		return LyraCharacter->GetLyraPlayerController();
 	}
@@ -697,7 +723,7 @@ UAbilitySystemComponent* UD1EquipManagerComponent::GetAbilitySystemComponent() c
 
 UD1EquipmentManagerComponent* UD1EquipManagerComponent::GetEquipmentManager() const
 {
-	if (ALyraCharacter* LyraCharacter = GetCharacter())
+	if (ALyraCharacter* LyraCharacter = GetLyraCharacter())
 	{
 		return LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>();
 	}
