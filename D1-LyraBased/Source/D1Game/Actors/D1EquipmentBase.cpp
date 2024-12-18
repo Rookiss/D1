@@ -1,6 +1,7 @@
 ﻿#include "D1EquipmentBase.h"
 
 #include "AbilitySystemComponent.h"
+#include "D1GameplayTags.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Character/LyraCharacter.h"
 #include "Components/ArrowComponent.h"
@@ -121,22 +122,14 @@ void AD1EquipmentBase::OnRep_CanBlock()
 	MeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Projectile, bCanBlock ? ECR_Block : ECR_Ignore);
 }
 
+void AD1EquipmentBase::OnRep_ItemTemplateID()
+{
+	CheckPropertyInitialization();
+}
+
 void AD1EquipmentBase::OnRep_EquipmentSlotType()
 {
-	if (bOnlyUseForLocal)
-		return;
-	
-	if (GetOwner())
-	{
-		if (UD1EquipManagerComponent* EquipManager = GetOwner()->FindComponentByClass<UD1EquipManagerComponent>())
-		{
-			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-			Entries[(int32)EquipmentSlotType].SetEquipmentActor(this);
-			return;
-		}
-	}
-	
-	GetWorldTimerManager().SetTimerForNextTick(this, &ThisClass::OnRep_EquipmentSlotType);
+	CheckPropertyInitialization();
 }
 
 UAbilitySystemComponent* AD1EquipmentBase::GetAbilitySystemComponent() const
@@ -149,33 +142,84 @@ UAbilitySystemComponent* AD1EquipmentBase::GetAbilitySystemComponent() const
 	return nullptr;
 }
 
-UAnimMontage* AD1EquipmentBase::GetEquipMontage()
+void AD1EquipmentBase::PlayEquipMontage()
 {
-	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
-	if (GetOwner() == nullptr || ASC == nullptr)
-		return nullptr;
+	ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetOwner());
+	if (LyraCharacter == nullptr)
+		return;
 	
-	UD1EquipManagerComponent* EquipManager = GetOwner()->FindComponentByClass<UD1EquipManagerComponent>();
-	if (EquipManager == nullptr)
-		return nullptr;
+	UAbilitySystemComponent* ASC = LyraCharacter->GetAbilitySystemComponent();
+	if (ASC == nullptr)
+		return;
 
-	const UD1ItemInstance* ItemInstance = EquipManager->GetEquippedItemInstance(EquipmentSlotType);
-	if (ItemInstance == nullptr)
-		return nullptr;
-
-	if (ItemTemplateID <= 0)
-		return nullptr;
+	check(ItemTemplateID > 0);
 	
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
 	const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
 	if (AttachmentFragment == nullptr)
-		return nullptr;
+		return;
+
+	if (USkeletalMeshComponent* CharacterMeshComponent = LyraCharacter->GetMesh())
+	{
+		if (AttachmentFragment->AnimInstanceClass)
+		{
+			CharacterMeshComponent->LinkAnimClassLayers(AttachmentFragment->AnimInstanceClass);
+		}
+		
+		if (ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Interact) == false)
+		{
+			UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(GetEquipMontage(ProcessEquip()));
+			if (UAnimInstance* AnimInstance = CharacterMeshComponent->GetAnimInstance())
+			{
+				if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
+				{
+					LyraCharacter->PlayAnimMontage(EquipMontage);
+				}
+			}
+		}
+	}
+}
+
+void AD1EquipmentBase::CheckPropertyInitialization()
+{
+	if (bOnlyUseForLocal)
+		return;
+
+	if (ItemTemplateID <= 0 || EquipmentSlotType == EEquipmentSlotType::Count)
+		return;
 	
-	FGameplayTagContainer TagContainer = ASC->GetOwnedGameplayTags();
-	TagContainer.AppendTags(ItemInstance->GetOwnedTagContainer().GetTags());
+	if (GetOwner())
+	{
+		UD1EquipManagerComponent* EquipManager = GetOwner()->FindComponentByClass<UD1EquipManagerComponent>();
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+		if (EquipManager && ASC)
+		{
+			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
+			Entries[(int32)EquipmentSlotType].SetEquipmentActor(this);
+			PlayEquipMontage();
+			return;
+		}
+	}
 	
-	TSoftObjectPtr<UAnimMontage> AnimMontagePath = AttachmentFragment->DetermineEquipMontage(TagContainer);
-	return ULyraAssetManager::GetAssetByPath<UAnimMontage>(AnimMontagePath);
+	GetWorldTimerManager().SetTimerForNextTick(this, &ThisClass::CheckPropertyInitialization);
+}
+
+FGameplayTagContainer AD1EquipmentBase::ProcessEquip_Implementation() const
+{
+	return FGameplayTagContainer();
+}
+
+TSoftObjectPtr<UAnimMontage> AD1EquipmentBase::GetEquipMontage(const FGameplayTagContainer& ContextTags)
+{
+	for (const FD1EquipStyle& EquipStyle : EquipStyles)
+	{
+		if (EquipStyle.MatchPattern.Matches(ContextTags) || EquipStyle.MatchPattern.IsEmpty())
+		{
+			return EquipStyle.EquipMontage;
+		}
+	}
+
+	return nullptr;
 }
 
 UAnimMontage* AD1EquipmentBase::GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked)

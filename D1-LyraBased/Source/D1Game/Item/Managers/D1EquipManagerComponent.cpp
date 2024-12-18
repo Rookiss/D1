@@ -196,33 +196,6 @@ void FD1EquipEntry::Equip()
 				}
 			}
 		}
-		
-		if (EquippableFragment->EquipmentType == EEquipmentType::Weapon || EquippableFragment->EquipmentType == EEquipmentType::Utility)
-		{
-			const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
-			if (USkeletalMeshComponent* MeshComponent = LyraCharacter->GetMesh())
-			{
-				if (AttachmentFragment->AnimInstanceClass)
-				{
-					MeshComponent->LinkAnimClassLayers(AttachmentFragment->AnimInstanceClass);
-				}
-				
-				if (LyraASC->HasMatchingGameplayTag(D1GameplayTags::Status_Interact) == false)
-				{
-					FGameplayTagContainer TagContainer = LyraASC->GetOwnedGameplayTags();
-					TagContainer.AppendTags(ItemInstance->GetOwnedTagContainer().GetTags());
-					
-					UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->DetermineEquipMontage(TagContainer));
-					if (UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance())
-					{
-						if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
-						{
-							LyraCharacter->PlayAnimMontage(EquipMontage);
-						}
-					}
-				}
-			}
-		}
 	}));
 }
 

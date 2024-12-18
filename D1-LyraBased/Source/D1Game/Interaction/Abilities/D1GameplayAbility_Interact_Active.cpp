@@ -132,10 +132,7 @@ void UD1GameplayAbility_Interact_Active::EndAbility(const FGameplayAbilitySpecHa
 				{
 					if (AD1EquipmentBase* EquippedActor = EquipManager->GetFirstEquippedActor())
 					{
-						if (UAbilityTask_PlayMontageAndWait* PlayMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("EquipMontage"), EquippedActor->GetEquipMontage(), 1.f, NAME_None, false, 1.f, 0.f, false))
-						{
-							PlayMontageTask->ReadyForActivation();
-						}
+						EquippedActor->PlayEquipMontage();
 					}
 				}
 			}

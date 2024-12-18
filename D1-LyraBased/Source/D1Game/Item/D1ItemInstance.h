@@ -39,6 +39,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void RemoveStatTagStack(FGameplayTag StatTag);
 
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void AddOrRemoveOwnedTagStack(FGameplayTag OwnedTag, int32 StackCount);
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void RemoveOwnedTagStack(FGameplayTag OwnedTag);
+
 public:
 	static EItemRarity DetermineItemRarity(const TArray<FD1ItemRarityProbability>& ItemProbabilities);
 	
@@ -53,11 +59,17 @@ public:
 	bool HasStatTag(FGameplayTag StatTag) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	int32 GetStackCountByTag(FGameplayTag StatTag) const;
+	int32 GetStatCountByTag(FGameplayTag StatTag) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	const FD1GameplayTagStackContainer& GetStatContainer() const { return StatContainer; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool HasOwnedTag(FGameplayTag OwnedTag) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int32 GetOwnedCountByTag(FGameplayTag OwnedTag) const;
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	const FD1GameplayTagStackContainer& GetOwnedTagContainer() const { return OwnedTagContainer; }
 

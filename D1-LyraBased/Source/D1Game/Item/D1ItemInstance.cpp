@@ -25,6 +25,7 @@ void UD1ItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(ThisClass, ItemTemplateID);
 	DOREPLIFETIME(ThisClass, ItemRarity);
 	DOREPLIFETIME(ThisClass, StatContainer);
+	DOREPLIFETIME(ThisClass, OwnedTagContainer);
 }
 
 void UD1ItemInstance::Init(int32 InItemTemplateID, EItemRarity InItemRarity)
@@ -63,6 +64,16 @@ void UD1ItemInstance::RemoveStatTagStack(FGameplayTag StatTag)
 	StatContainer.RemoveStack(StatTag);
 }
 
+void UD1ItemInstance::AddOrRemoveOwnedTagStack(FGameplayTag OwnedTag, int32 StackCount)
+{
+	OwnedTagContainer.AddOrRemoveStack(OwnedTag, StackCount);
+}
+
+void UD1ItemInstance::RemoveOwnedTagStack(FGameplayTag OwnedTag)
+{
+	OwnedTagContainer.RemoveStack(OwnedTag);
+}
+
 EItemRarity UD1ItemInstance::DetermineItemRarity(const TArray<FD1ItemRarityProbability>& ItemProbabilities)
 {
 	float TotalProbability = 0.f;
@@ -94,9 +105,19 @@ bool UD1ItemInstance::HasStatTag(FGameplayTag StatTag) const
 	return StatContainer.ContainsTag(StatTag);
 }
 
-int32 UD1ItemInstance::GetStackCountByTag(FGameplayTag StatTag) const
+int32 UD1ItemInstance::GetStatCountByTag(FGameplayTag StatTag) const
 {
 	return StatContainer.GetStackCount(StatTag);
+}
+
+bool UD1ItemInstance::HasOwnedTag(FGameplayTag OwnedTag) const
+{
+	return OwnedTagContainer.ContainsTag(OwnedTag);
+}
+
+int32 UD1ItemInstance::GetOwnedCountByTag(FGameplayTag OwnedTag) const
+{
+	return OwnedTagContainer.GetStackCount(OwnedTag);
 }
 
 const UD1ItemFragment* UD1ItemInstance::FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const

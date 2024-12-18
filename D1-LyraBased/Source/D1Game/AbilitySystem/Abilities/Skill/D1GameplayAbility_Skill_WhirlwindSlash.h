@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include "AbilitySystem/Abilities/Weapon/D1GameplayAbility_Weapon_Melee.h"
+#include "AbilitySystem/Abilities/Weapon/D1GameplayAbility_Melee.h"
 #include "D1GameplayAbility_Skill_WhirlwindSlash.generated.h"
 
 UCLASS()
-class UD1GameplayAbility_Skill_WhirlwindSlash : public UD1GameplayAbility_Weapon_Melee
+class UD1GameplayAbility_Skill_WhirlwindSlash : public UD1GameplayAbility_Melee
 {
 	GENERATED_BODY()
 	

@@ -111,7 +111,10 @@ public:
 	int32 TryAddItemByProbability(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount, const TArray<FD1ItemRarityProbability>& ItemProbabilities);
 	
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
-	bool TryRemoveItem(int32 ItemTemplateID, int32 ItemCount);
+	bool TryRemoveItemByID(int32 ItemTemplateID, int32 ItemCount);
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	bool TryRemoveItemByClass(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount);
 
 private:
 	void AddItem_Unsafe(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount);
@@ -130,7 +133,13 @@ public:
 	int32 GetItemCount(const FIntPoint& ItemSlotPos) const;
 	
 	const TArray<FD1InventoryEntry>& GetAllEntries() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int32 GetTotalCountByID(int32 ItemTemplateID) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int32 GetTotalCountByClass(TSubclassOf<UD1ItemTemplate> ItemTemplateClass) const;
+	
 	FIntPoint GetInventorySlotCount() const { return InventorySlotCount; }
 	TArray<bool>& GetSlotChecks() { return SlotChecks; }
 

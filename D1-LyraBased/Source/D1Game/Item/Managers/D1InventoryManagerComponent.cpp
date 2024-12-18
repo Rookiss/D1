@@ -493,7 +493,7 @@ int32 UD1InventoryManagerComponent::TryAddItemByProbability(TSubclassOf<UD1ItemT
 	return TryAddItemByRarity(ItemTemplateClass, UD1ItemInstance::DetermineItemRarity(ItemProbabilities), ItemCount);
 }
 
-bool UD1InventoryManagerComponent::TryRemoveItem(int32 ItemTemplateID, int32 ItemCount)
+bool UD1InventoryManagerComponent::TryRemoveItemByID(int32 ItemTemplateID, int32 ItemCount)
 {
 	if (GetOwner()->HasAuthority() == false)
 		return false;
@@ -543,6 +543,18 @@ bool UD1InventoryManagerComponent::TryRemoveItem(int32 ItemTemplateID, int32 Ite
 	}
 
 	return false;
+}
+
+bool UD1InventoryManagerComponent::TryRemoveItemByClass(TSubclassOf<UD1ItemTemplate> ItemTemplateClass, int32 ItemCount)
+{
+	if (GetOwner()->HasAuthority() == false)
+		return false;
+
+	if (ItemTemplateClass == nullptr || ItemCount <= 0)
+		return false;
+
+	const int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
+	return TryRemoveItemByID(ItemTemplateID, ItemCount);
 }
 
 void UD1InventoryManagerComponent::AddItem_Unsafe(const FIntPoint& ItemSlotPos, UD1ItemInstance* ItemInstance, int32 ItemCount)
@@ -699,6 +711,29 @@ const TArray<FD1InventoryEntry>& UD1InventoryManagerComponent::GetAllEntries() c
 
 int32 UD1InventoryManagerComponent::GetTotalCountByID(int32 ItemTemplateID) const
 {
+	int32 TotalCount = 0;
+	
+	for (const FD1InventoryEntry& Entry : GetAllEntries())
+	{
+		if (UD1ItemInstance* ItemInstance = Entry.ItemInstance)
+		{
+			if (ItemInstance->GetItemTemplateID() == ItemTemplateID)
+			{
+				TotalCount += Entry.ItemCount;
+			}
+		}
+	}
+	
+	return TotalCount;
+}
+
+int32 UD1InventoryManagerComponent::GetTotalCountByClass(TSubclassOf<UD1ItemTemplate> ItemTemplateClass) const
+{
+	if (ItemTemplateClass == nullptr)
+		return 0;
+	
+	const int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
+	
 	int32 TotalCount = 0;
 	
 	for (const FD1InventoryEntry& Entry : GetAllEntries())

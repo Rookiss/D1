@@ -65,5 +65,5 @@ void ULyraAbilityCost_InventoryItem::ApplyCost(const ULyraGameplayAbility* Abili
 		return;
 
 	const int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
- 	InventoryManager->TryRemoveItem(ItemTemplateID, NumItemsToConsume);
+ 	InventoryManager->TryRemoveItemByID(ItemTemplateID, NumItemsToConsume);
 }

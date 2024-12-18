@@ -10,6 +10,20 @@ class USkeletalMeshComponent;
 class UArrowComponent;
 class UBoxComponent;
 
+USTRUCT(BlueprintType)
+struct FD1EquipStyle
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTagQuery MatchPattern;
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UAnimMontage> EquipMontage;
+};
+
 UCLASS(BlueprintType, Abstract)
 class AD1EquipmentBase : public AActor, public IAbilitySystemInterface
 {
@@ -29,7 +43,15 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void ChangeBlockState(bool bShouldBlock);
 
+	UFUNCTION(BlueprintCallable)
+	void PlayEquipMontage();
+	
 private:
+	void CheckPropertyInitialization();
+	
+	UFUNCTION()
+	void OnRep_ItemTemplateID();
+	
 	UFUNCTION()
 	void OnRep_EquipmentSlotType();
 
@@ -40,13 +62,20 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	int32 GetItemTemplateID() const { return ItemTemplateID; }
 	EEquipmentSlotType GetEquipmentSlotType() const { return EquipmentSlotType; }
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UAnimMontage* GetEquipMontage();
+	
+	UFUNCTION(BlueprintCallable)
+	TSoftObjectPtr<UAnimMontage> GetEquipMontage(const FGameplayTagContainer& ContextTags);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UAnimMontage* GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked);
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	FGameplayTagContainer ProcessEquip() const;
 
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="D1|Equipment")
+	TArray<FD1EquipStyle> EquipStyles;
+	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UArrowComponent> ArrowComponent;
@@ -58,8 +87,8 @@ public:
 	TObjectPtr<UBoxComponent> TraceDebugCollision;
 	
 protected:
-	UPROPERTY(Replicated)
-	int32 ItemTemplateID;
+	UPROPERTY(ReplicatedUsing=OnRep_ItemTemplateID)
+	int32 ItemTemplateID = INDEX_NONE;
 	
 	UPROPERTY(ReplicatedUsing=OnRep_EquipmentSlotType)
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;

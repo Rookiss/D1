@@ -167,7 +167,7 @@ int32 UD1GameplayAbility_Equipment::GetEquipmentStatValue(FGameplayTag InStatTag
 		return 0;
 	
 	if (UD1ItemInstance* ItemInstance = GetEquipmentItemInstance(InEquipmentActor))
-		return ItemInstance->GetStackCountByTag(InStatTag);
+		return ItemInstance->GetStatCountByTag(InStatTag);
 
 	check(true);
 	

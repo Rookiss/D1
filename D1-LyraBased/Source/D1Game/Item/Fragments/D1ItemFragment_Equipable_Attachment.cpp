@@ -7,16 +7,3 @@ UD1ItemFragment_Equipable_Attachment::UD1ItemFragment_Equipable_Attachment(const
 {
     
 }
-
-TSoftObjectPtr<UAnimMontage> UD1ItemFragment_Equipable_Attachment::DetermineEquipMontage(const FGameplayTagContainer& ContextTags) const
-{
-	for (const FD1EquipStyle& EquipStyle : EquipStyles)
-	{
-		if (EquipStyle.MatchPattern.Matches(ContextTags) || EquipStyle.MatchPattern.IsEmpty())
-		{
-			return EquipStyle.EquipMontage;
-		}
-	}
-
-	return nullptr;
-}

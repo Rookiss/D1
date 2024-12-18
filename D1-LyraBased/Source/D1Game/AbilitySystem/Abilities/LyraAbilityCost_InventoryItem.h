@@ -17,7 +17,7 @@ protected:
 	virtual bool CheckCost(const ULyraGameplayAbility* Ability, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, FGameplayTagContainer* OptionalRelevantTags) const override;
 	virtual void ApplyCost(const ULyraGameplayAbility* Ability, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 
-protected:
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AbilityCost")
 	FScalableFloat Quantity;
 
