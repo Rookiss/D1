@@ -24,6 +24,7 @@ void UD1ItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	DOREPLIFETIME(ThisClass, ItemTemplateID);
 	DOREPLIFETIME(ThisClass, ItemRarity);
+	
 	DOREPLIFETIME(ThisClass, StatContainer);
 	DOREPLIFETIME(ThisClass, OwnedTagContainer);
 }

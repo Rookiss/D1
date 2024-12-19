@@ -130,9 +130,9 @@ void UD1GameplayAbility_Interact_Active::EndAbility(const FGameplayAbilitySpecHa
 
 				if (EquipManager->GetCurrentEquipState() != EEquipState::Unarmed)
 				{
-					if (AD1EquipmentBase* EquippedActor = EquipManager->GetFirstEquippedActor())
+					if (AD1EquipmentBase* EquipmentActor = EquipManager->GetFirstEquippedActor())
 					{
-						EquippedActor->PlayEquipMontage();
+						EquipmentActor->ProcessEquip();
 					}
 				}
 			}

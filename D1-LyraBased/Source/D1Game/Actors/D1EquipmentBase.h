@@ -10,20 +10,6 @@ class USkeletalMeshComponent;
 class UArrowComponent;
 class UBoxComponent;
 
-USTRUCT(BlueprintType)
-struct FD1EquipStyle
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly)
-	FGameplayTagQuery MatchPattern;
-
-public:
-	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UAnimMontage> EquipMontage;
-};
-
 UCLASS(BlueprintType, Abstract)
 class AD1EquipmentBase : public AActor, public IAbilitySystemInterface
 {
@@ -44,7 +30,7 @@ public:
 	void ChangeBlockState(bool bShouldBlock);
 
 	UFUNCTION(BlueprintCallable)
-	void PlayEquipMontage();
+	void ProcessEquip();
 	
 private:
 	void CheckPropertyInitialization();
@@ -63,18 +49,11 @@ public:
 	int32 GetItemTemplateID() const { return ItemTemplateID; }
 	EEquipmentSlotType GetEquipmentSlotType() const { return EquipmentSlotType; }
 	
-	UFUNCTION(BlueprintCallable)
-	TSoftObjectPtr<UAnimMontage> GetEquipMontage(const FGameplayTagContainer& ContextTags);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	TSoftObjectPtr<UAnimMontage> GetEquipMontage();
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UAnimMontage* GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked);
-	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	FGameplayTagContainer ProcessEquip() const;
-
-protected:
-	UPROPERTY(EditDefaultsOnly, Category="D1|Equipment")
-	TArray<FD1EquipStyle> EquipStyles;
 	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -99,6 +78,7 @@ public:
 
 public:
 	bool bOnlyUseForLocal = false;
+	bool bInitialized = false;
 	
 private:
 	FLyraAbilitySet_GrantedHandles SkillAbilitySetHandles;

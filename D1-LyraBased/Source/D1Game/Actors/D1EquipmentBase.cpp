@@ -142,7 +142,7 @@ UAbilitySystemComponent* AD1EquipmentBase::GetAbilitySystemComponent() const
 	return nullptr;
 }
 
-void AD1EquipmentBase::PlayEquipMontage()
+void AD1EquipmentBase::ProcessEquip()
 {
 	ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetOwner());
 	if (LyraCharacter == nullptr)
@@ -168,7 +168,7 @@ void AD1EquipmentBase::PlayEquipMontage()
 		
 		if (ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Interact) == false)
 		{
-			UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(GetEquipMontage(ProcessEquip()));
+			UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(GetEquipMontage());
 			if (UAnimInstance* AnimInstance = CharacterMeshComponent->GetAnimInstance())
 			{
 				if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
@@ -182,7 +182,7 @@ void AD1EquipmentBase::PlayEquipMontage()
 
 void AD1EquipmentBase::CheckPropertyInitialization()
 {
-	if (bOnlyUseForLocal)
+	if (bOnlyUseForLocal || bInitialized)
 		return;
 
 	if (ItemTemplateID <= 0 || EquipmentSlotType == EEquipmentSlotType::Count)
@@ -196,7 +196,8 @@ void AD1EquipmentBase::CheckPropertyInitialization()
 		{
 			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
 			Entries[(int32)EquipmentSlotType].SetEquipmentActor(this);
-			PlayEquipMontage();
+			ProcessEquip();
+			bInitialized = true;
 			return;
 		}
 	}
@@ -204,22 +205,17 @@ void AD1EquipmentBase::CheckPropertyInitialization()
 	GetWorldTimerManager().SetTimerForNextTick(this, &ThisClass::CheckPropertyInitialization);
 }
 
-FGameplayTagContainer AD1EquipmentBase::ProcessEquip_Implementation() const
+TSoftObjectPtr<UAnimMontage> AD1EquipmentBase::GetEquipMontage_Implementation()
 {
-	return FGameplayTagContainer();
-}
+	if (ItemTemplateID <= 0)
+		return nullptr;
+	
+	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemTemplateID);
+	const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
+	if (AttachmentFragment == nullptr)
+		return nullptr;
 
-TSoftObjectPtr<UAnimMontage> AD1EquipmentBase::GetEquipMontage(const FGameplayTagContainer& ContextTags)
-{
-	for (const FD1EquipStyle& EquipStyle : EquipStyles)
-	{
-		if (EquipStyle.MatchPattern.Matches(ContextTags) || EquipStyle.MatchPattern.IsEmpty())
-		{
-			return EquipStyle.EquipMontage;
-		}
-	}
-
-	return nullptr;
+	return AttachmentFragment->EquipMontage;
 }
 
 UAnimMontage* AD1EquipmentBase::GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked)

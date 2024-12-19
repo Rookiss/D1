@@ -51,7 +51,6 @@ public:
 
 public:
 	const TArray<FD1GameplayTagStack>& GetStacks() const { return Stacks; }
-	
 	int32 GetStackCount(FGameplayTag Tag) const { return TagToCountMap.FindRef(Tag); }
 	bool ContainsTag(FGameplayTag Tag) const { return TagToCountMap.Contains(Tag); }
 	FGameplayTagContainer GetTags() const { return TagContainer; }
@@ -68,11 +67,8 @@ public:
 private:
 	UPROPERTY()
 	TArray<FD1GameplayTagStack> Stacks;
-
-	UPROPERTY(NotReplicated)
+	
 	TMap<FGameplayTag, int32> TagToCountMap;
-
-	UPROPERTY(NotReplicated)
 	FGameplayTagContainer TagContainer;
 };
 

@@ -106,6 +106,7 @@ void FD1GameplayTagStackContainer::PreReplicatedRemove(const TArrayView<int32> R
 	{
 		const FGameplayTag Tag = Stacks[Index].Tag;
 		TagToCountMap.Remove(Tag);
+		TagContainer.RemoveTag(Tag);
 	}
 }
 
@@ -115,6 +116,7 @@ void FD1GameplayTagStackContainer::PostReplicatedAdd(const TArrayView<int32> Add
 	{
 		const FD1GameplayTagStack& Stack = Stacks[Index];
 		TagToCountMap.Add(Stack.Tag, Stack.StackCount);
+		TagContainer.AddTag(Stack.Tag);
 	}
 }
 
