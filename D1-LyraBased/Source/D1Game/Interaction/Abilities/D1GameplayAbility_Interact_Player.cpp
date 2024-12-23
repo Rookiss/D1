@@ -46,7 +46,8 @@ void UD1GameplayAbility_Interact_Player::ActivateAbility(const FGameplayAbilityS
 		MyItemManager->AddAllowedComponent(OtherInventoryManager);
 		MyItemManager->AddAllowedComponent(OtherEquipmentManager);
 	}
-	else
+
+	if (IsLocallyControlled())
 	{
 		if (UAsyncAction_PushContentToLayerForPlayer* PushWidgetAction = UAsyncAction_PushContentToLayerForPlayer::PushContentToLayerForPlayer(GetLyraPlayerControllerFromActorInfo(), WidgetClass, WidgetLayerTag, true))
 		{

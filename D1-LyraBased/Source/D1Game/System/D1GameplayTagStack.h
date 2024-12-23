@@ -51,9 +51,9 @@ public:
 
 public:
 	const TArray<FD1GameplayTagStack>& GetStacks() const { return Stacks; }
-	int32 GetStackCount(FGameplayTag Tag) const { return TagToCountMap.FindRef(Tag); }
-	bool ContainsTag(FGameplayTag Tag) const { return TagToCountMap.Contains(Tag); }
 	FGameplayTagContainer GetTags() const { return TagContainer; }
+	int32 GetStackCount(FGameplayTag Tag) const;
+	bool ContainsTag(FGameplayTag Tag) const;
 	
 	void PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize);
 	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
