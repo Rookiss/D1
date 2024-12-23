@@ -168,14 +168,27 @@ void AD1EquipmentBase::ProcessEquip()
 		
 		if (ASC->HasMatchingGameplayTag(D1GameplayTags::Status_Interact) == false)
 		{
-			UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(GetEquipMontage());
-			if (UAnimInstance* AnimInstance = CharacterMeshComponent->GetAnimInstance())
-			{
-				if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
-				{
-					LyraCharacter->PlayAnimMontage(EquipMontage);
-				}
-			}
+			PlayEquipMontage();
+		}
+	}
+}
+
+void AD1EquipmentBase::PlayEquipMontage()
+{
+	ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetOwner());
+	if (LyraCharacter == nullptr)
+		return;
+
+	USkeletalMeshComponent* CharacterMeshComponent = LyraCharacter->GetMesh();
+	if (CharacterMeshComponent == nullptr)
+		return;
+	
+	UAnimMontage* EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(GetEquipMontage());
+	if (UAnimInstance* AnimInstance = CharacterMeshComponent->GetAnimInstance())
+	{
+		if (AnimInstance->GetCurrentActiveMontage() != EquipMontage)
+		{
+			LyraCharacter->PlayAnimMontage(EquipMontage);
 		}
 	}
 }
@@ -205,7 +218,7 @@ void AD1EquipmentBase::CheckPropertyInitialization()
 	GetWorldTimerManager().SetTimerForNextTick(this, &ThisClass::CheckPropertyInitialization);
 }
 
-TSoftObjectPtr<UAnimMontage> AD1EquipmentBase::GetEquipMontage_Implementation()
+TSoftObjectPtr<UAnimMontage> AD1EquipmentBase::GetEquipMontage() const
 {
 	if (ItemTemplateID <= 0)
 		return nullptr;

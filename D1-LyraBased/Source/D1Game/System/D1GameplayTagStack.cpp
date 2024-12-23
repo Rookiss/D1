@@ -100,6 +100,16 @@ void FD1GameplayTagStackContainer::RemoveStack(FGameplayTag Tag)
 	}
 }
 
+int32 FD1GameplayTagStackContainer::GetStackCount(FGameplayTag Tag) const
+{
+	return TagToCountMap.FindRef(Tag);
+}
+
+bool FD1GameplayTagStackContainer::ContainsTag(FGameplayTag Tag) const
+{
+	return TagToCountMap.Contains(Tag);
+}
+
 void FD1GameplayTagStackContainer::PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize)
 {
 	for (int32 Index : RemovedIndices)
@@ -128,4 +138,3 @@ void FD1GameplayTagStackContainer::PostReplicatedChange(const TArrayView<int32> 
 		TagToCountMap[Stack.Tag] = Stack.StackCount;
 	}
 }
-

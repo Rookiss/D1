@@ -132,7 +132,7 @@ void UD1GameplayAbility_Interact_Active::EndAbility(const FGameplayAbilitySpecHa
 				{
 					if (AD1EquipmentBase* EquipmentActor = EquipManager->GetFirstEquippedActor())
 					{
-						EquipmentActor->ProcessEquip();
+						EquipmentActor->PlayEquipMontage();
 					}
 				}
 			}

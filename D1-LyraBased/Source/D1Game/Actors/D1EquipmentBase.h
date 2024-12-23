@@ -31,6 +31,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ProcessEquip();
+
+	UFUNCTION(BlueprintCallable)
+	void PlayEquipMontage();
 	
 private:
 	void CheckPropertyInitialization();
@@ -49,8 +52,8 @@ public:
 	int32 GetItemTemplateID() const { return ItemTemplateID; }
 	EEquipmentSlotType GetEquipmentSlotType() const { return EquipmentSlotType; }
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	TSoftObjectPtr<UAnimMontage> GetEquipMontage();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	TSoftObjectPtr<UAnimMontage> GetEquipMontage() const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UAnimMontage* GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked);
