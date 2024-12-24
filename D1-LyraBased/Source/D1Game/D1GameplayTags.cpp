@@ -21,6 +21,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Sprint,									"InputTag.Sprint");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Crouch,									"InputTag.Crouch");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Interact,								"InputTag.Interact");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Reload,									"InputTag.Reload");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Primary,					"InputTag.ChangeEquip.Primary");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Secondary,					"InputTag.ChangeEquip.Secondary");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_ChangeEquip_Tertiary,					"InputTag.ChangeEquip.Tertiary");
@@ -100,6 +101,8 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS_Ready,								"Status.ADS.Ready");
 	UE_DEFINE_GAMEPLAY_TAG(Status_ADS_Throw,								"Status.ADS.Throw");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Reload,									"Status.Reload");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Reload_Bow,								"Status.Reload.Bow");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Reload_Ready,								"Status.Reload.Ready");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Dash,										"Status.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Sprint,									"Status.Sprint");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Succeeded,								"Status.Succeeded");
@@ -127,6 +130,7 @@ namespace D1GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Knockback,							"GameplayEvent.Knockback");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Stun,								"GameplayEvent.Stun");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Bow_ADS,							"GameplayEvent.Bow.ADS");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Bow_Reload,						"GameplayEvent.Bow.Reload");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_HitReact,							"GameplayEvent.HitReact");
 	
 	// Cheat

@@ -47,10 +47,14 @@ public:
 
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const override;
 
 public:
+	UFUNCTION(BlueprintCallable)
 	AD1EquipmentBase* GetFirstEquipmentActor() const;
+
+	UFUNCTION(BlueprintCallable)
 	UD1ItemInstance* GetEquipmentItemInstance(const AD1EquipmentBase* InEquipmentActor) const;
 	
 	int32 GetEquipmentStatValue(FGameplayTag InStatTag, const AD1EquipmentBase* InEquipmentActor) const;

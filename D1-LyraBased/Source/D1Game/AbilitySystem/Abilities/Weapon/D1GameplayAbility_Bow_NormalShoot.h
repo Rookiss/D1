@@ -13,18 +13,16 @@ public:
 
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 	
 protected:
 	UFUNCTION()
 	void OnMontageFinished();
+
+private:
+	void NotifyToADS(bool bShouldCancel);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="D1|Bow NormalShoot")
 	TObjectPtr<UAnimMontage> ReleaseMontage;
-	
-	UPROPERTY(EditDefaultsOnly, Category="D1|Bow NormalShoot")
-	TObjectPtr<UAnimMontage> ReloadMontage;
-	
-	UPROPERTY(EditDefaultsOnly, Category="D1|Bow NormalShoot")
-	TObjectPtr<UAnimMontage> ReleaseReloadMontage;
 };

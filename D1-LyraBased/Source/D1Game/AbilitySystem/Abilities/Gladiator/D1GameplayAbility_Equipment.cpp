@@ -10,6 +10,10 @@
 #include "Item/Fragments/D1ItemFragment_Equipable_Utility.h"
 #include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
 #include "Item/Managers/D1EquipManagerComponent.h"
+#include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "Item/Managers/D1InventoryManagerComponent.h"
+#include "Item/Managers/D1ItemManagerComponent.h"
+#include "Player/LyraPlayerController.h"
 #include "System/LyraGameData.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayAbility_Equipment)
@@ -74,6 +78,38 @@ void UD1GameplayAbility_Equipment::ActivateAbility(const FGameplayAbilitySpecHan
 			SnapshottedAttackRate = DefaultAttackRate + (DefaultAttackRate * (AttackSpeedPercent / 100.f));
 		}
 	}
+
+	ALyraPlayerController* LyraPlayerController = GetLyraPlayerControllerFromActorInfo();
+	if (LyraPlayerController)
+	{
+		if (UD1ItemManagerComponent* ItemManager = LyraPlayerController->FindComponentByClass<UD1ItemManagerComponent>())
+		{
+			UD1InventoryManagerComponent* InventoryManager = LyraCharacter->FindComponentByClass<UD1InventoryManagerComponent>();
+			ItemManager->RemoveAllowedComponent(InventoryManager);
+			
+			UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>();
+			ItemManager->RemoveAllowedComponent(EquipmentManager);
+		}
+	}
+}
+
+void UD1GameplayAbility_Equipment::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	ALyraPlayerController* LyraPlayerController = GetLyraPlayerControllerFromActorInfo();
+	ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo();
+	if (LyraPlayerController && LyraCharacter)
+	{
+		if (UD1ItemManagerComponent* ItemManager = LyraPlayerController->FindComponentByClass<UD1ItemManagerComponent>())
+		{
+			UD1InventoryManagerComponent* InventoryManager = LyraCharacter->FindComponentByClass<UD1InventoryManagerComponent>();
+			ItemManager->AddAllowedComponent(InventoryManager);
+			
+			UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>();
+			ItemManager->AddAllowedComponent(EquipmentManager);
+		}
+	}
+	
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 bool UD1GameplayAbility_Equipment::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const

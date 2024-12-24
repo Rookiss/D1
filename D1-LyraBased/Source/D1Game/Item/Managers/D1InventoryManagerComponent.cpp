@@ -733,19 +733,5 @@ int32 UD1InventoryManagerComponent::GetTotalCountByClass(TSubclassOf<UD1ItemTemp
 		return 0;
 	
 	const int32 ItemTemplateID = UD1ItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
-	
-	int32 TotalCount = 0;
-	
-	for (const FD1InventoryEntry& Entry : GetAllEntries())
-	{
-		if (UD1ItemInstance* ItemInstance = Entry.ItemInstance)
-		{
-			if (ItemInstance->GetItemTemplateID() == ItemTemplateID)
-			{
-				TotalCount += Entry.ItemCount;
-			}
-		}
-	}
-	
-	return TotalCount;
+	return GetTotalCountByID(ItemTemplateID);
 }

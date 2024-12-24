@@ -39,12 +39,6 @@ void UD1GameplayAbility_Sprint_Active::ActivateAbility(const FGameplayAbilitySpe
 		return;
 	}
 	
-	if (K2_CheckAbilityCost() == false || K2_CheckAbilityCooldown() == false)
-	{
-		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
-		return;
-	}
-
 	if (UD1AbilityTask_WaitForTick* TickTask = UD1AbilityTask_WaitForTick::WaitForTick(this))
 	{
 		TickTask->OnTick.AddDynamic(this, &ThisClass::OnTick);

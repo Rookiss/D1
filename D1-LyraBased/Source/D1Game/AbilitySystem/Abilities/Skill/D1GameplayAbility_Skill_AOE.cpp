@@ -29,12 +29,6 @@ void UD1GameplayAbility_Skill_AOE::ActivateAbility(const FGameplayAbilitySpecHan
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
-	if (K2_CheckAbilityCooldown() == false || K2_CheckAbilityCost() == false)
-	{
-		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-		return;
-	}
-	
 	if (UAbilityTask_PlayMontageAndWait* CastStartMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("CastStartMontage"), CastStartMontage, 1.f, NAME_None, true))
 	{
 		CastStartMontageTask->ReadyForActivation();

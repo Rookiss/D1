@@ -30,12 +30,6 @@ void UD1GameplayAbility_Skill_PiercingShot::ActivateAbility(const FGameplayAbili
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (K2_CheckAbilityCooldown() == false || K2_CheckAbilityCost() == false)
-	{
-		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-		return;
-	}
-
 	SetCameraMode(ADSCameraModeClass);
 
 	if (ALyraPlayerController* LyraPlayerController = GetLyraPlayerControllerFromActorInfo())

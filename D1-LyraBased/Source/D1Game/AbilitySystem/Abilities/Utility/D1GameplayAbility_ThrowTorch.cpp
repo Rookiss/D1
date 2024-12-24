@@ -31,12 +31,6 @@ UD1GameplayAbility_ThrowTorch::UD1GameplayAbility_ThrowTorch(const FObjectInitia
 void UD1GameplayAbility_ThrowTorch::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	if (K2_CheckAbilityCost() == false)
-	{
-		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-		return;
-	}
 	
 	SetCameraMode(CameraModeClass);
 

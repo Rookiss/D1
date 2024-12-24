@@ -33,12 +33,6 @@ UD1GameplayAbility_Skill_ShieldBash::UD1GameplayAbility_Skill_ShieldBash(const F
 void UD1GameplayAbility_Skill_ShieldBash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	if (K2_CheckAbilityCooldown() == false || K2_CheckAbilityCost() == false)
-	{
-		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-		return;
-	}
 	
 	ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo();
 	if (LyraCharacter == nullptr || LyraCharacter->GetCharacterMovement()->IsFalling())

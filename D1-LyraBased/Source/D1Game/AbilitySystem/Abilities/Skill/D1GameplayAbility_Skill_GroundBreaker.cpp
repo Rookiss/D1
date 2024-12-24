@@ -30,12 +30,6 @@ void UD1GameplayAbility_Skill_GroundBreaker::ActivateAbility(const FGameplayAbil
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (K2_CheckAbilityCooldown() == false || K2_CheckAbilityCost() == false)
-	{
-		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-		return;
-	}
-
 	ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo();
 	if (LyraCharacter == nullptr || LyraCharacter->GetCharacterMovement()->IsFalling())
 	{

@@ -20,12 +20,6 @@ void UD1GameplayAbility_Bow_NormalShoot::ActivateAbility(const FGameplayAbilityS
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (K2_CheckAbilityCooldown() == false || K2_CheckAbilityCost() == false)
-	{
-		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-		return;
-	}
-
 	if (CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo) == false)
 	{
 		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
@@ -40,9 +34,8 @@ void UD1GameplayAbility_Bow_NormalShoot::ActivateAbility(const FGameplayAbilityS
 	FGameplayTagContainer TagContainer;
 	TagContainer.AddTag(D1GameplayTags::Status_ADS_Ready);
 	UAbilitySystemBlueprintLibrary::RemoveLooseGameplayTags(GetAvatarActorFromActorInfo(), TagContainer, true);
-
-	UAnimMontage* SelectedMontage = K2_CheckAbilityCost() ? ReleaseReloadMontage : ReleaseMontage;
-	if (UAbilityTask_PlayMontageAndWait* ShootMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ShootMontage"), SelectedMontage, GetSnapshottedAttackRate(), NAME_None, true, 1.f, 0.f, false))
+	
+	if (UAbilityTask_PlayMontageAndWait* ShootMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ShootMontage"), ReleaseMontage, GetSnapshottedAttackRate(), NAME_None, true, 1.f, 0.f, false))
 	{
 		ShootMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 		ShootMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
@@ -52,13 +45,24 @@ void UD1GameplayAbility_Bow_NormalShoot::ActivateAbility(const FGameplayAbilityS
 	}
 }
 
+void UD1GameplayAbility_Bow_NormalShoot::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	NotifyToADS(bWasCancelled);
+	
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
 void UD1GameplayAbility_Bow_NormalShoot::OnMontageFinished()
+{
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+}
+
+void UD1GameplayAbility_Bow_NormalShoot::NotifyToADS(bool bShouldCancel)
 {
 	if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo())
 	{
 		FGameplayEventData Payload;
+		Payload.EventMagnitude = bShouldCancel ? 0.f : 1.f;
 		ASC->HandleGameplayEvent(D1GameplayTags::GameplayEvent_Bow_ADS, &Payload);
 	}
-	
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
