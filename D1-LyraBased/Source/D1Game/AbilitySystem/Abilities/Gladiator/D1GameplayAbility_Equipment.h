@@ -31,10 +31,6 @@ public:
 public:
 	UPROPERTY(EditAnywhere, Category="D1|Equipment", meta=(EditCondition="EquipmentType==EEquipmentType::Utility", EditConditionHides))
 	EUtilityType RequiredUtilityType = EUtilityType::Count;
-
-public:
-	UPROPERTY()
-	TWeakObjectPtr<AD1EquipmentBase> EquipmentActor;
 };
 
 UCLASS(Blueprintable)

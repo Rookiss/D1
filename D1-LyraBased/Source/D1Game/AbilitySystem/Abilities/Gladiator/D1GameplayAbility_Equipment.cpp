@@ -29,46 +29,6 @@ void UD1GameplayAbility_Equipment::ActivateAbility(const FGameplayAbilitySpecHan
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
-	ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(ActorInfo->AvatarActor.Get());
-	if (LyraCharacter == nullptr)
-	{
-		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-		return;
-	}
-
-	UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>();
-	if (EquipManager == nullptr)
-	{
-		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-		return;
-	}
-
-	UD1ItemInstance* ItemInstance = nullptr;
-	
-	for (FD1EquipmentInfo& EquipmentInfo : EquipmentInfos)
-	{
-		switch (EquipmentInfo.EquipmentType)
-		{
-		case EEquipmentType::Armor:
-			ItemInstance = EquipManager->GetEquippedItemInstance(EquipmentInfo.RequiredArmorType);
-			break;
-		case EEquipmentType::Weapon:
-			ItemInstance = EquipManager->GetEquippedItemInstance(EquipmentInfo.WeaponHandType);
-			EquipmentInfo.EquipmentActor = EquipManager->GetEquippedActor(EquipmentInfo.WeaponHandType);
-			break;
-		case EEquipmentType::Utility:
-			ItemInstance = EquipManager->GetFirstEquippedItemInstance();
-			EquipmentInfo.EquipmentActor = EquipManager->GetFirstEquippedActor();
-			break;
-		}
-		
-		if ((ItemInstance == nullptr) || (EquipmentInfo.EquipmentType != EEquipmentType::Armor && EquipmentInfo.EquipmentActor == nullptr))
-		{
-			CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-			return;
-		}
-	}
-	
 	SnapshottedAttackRate = DefaultAttackRate;
 	if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo())
 	{
@@ -80,7 +40,8 @@ void UD1GameplayAbility_Equipment::ActivateAbility(const FGameplayAbilitySpecHan
 	}
 
 	ALyraPlayerController* LyraPlayerController = GetLyraPlayerControllerFromActorInfo();
-	if (LyraPlayerController)
+	ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo();
+	if (LyraPlayerController && LyraCharacter)
 	{
 		if (UD1ItemManagerComponent* ItemManager = LyraPlayerController->FindComponentByClass<UD1ItemManagerComponent>())
 		{
@@ -169,43 +130,56 @@ bool UD1GameplayAbility_Equipment::CanActivateAbility(const FGameplayAbilitySpec
 
 AD1EquipmentBase* UD1GameplayAbility_Equipment::GetFirstEquipmentActor() const
 {
-	for (const FD1EquipmentInfo& EquipmentInfo : EquipmentInfos)
+	ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo();
+	if (LyraCharacter == nullptr)
+		return nullptr;
+	
+	UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>();
+	if (EquipManager == nullptr)
+		return nullptr;
+
+	if (EquipmentInfos.Num() > 0)
 	{
-		if (AD1EquipmentBase* EquipmentActor = EquipmentInfo.EquipmentActor.Get())
-			return EquipmentActor;
+		for (const FD1EquipmentInfo& EquipmentInfo : EquipmentInfos)
+		{
+			if (EquipmentInfo.EquipmentType == EEquipmentType::Armor)
+				continue;
+
+			if (AD1EquipmentBase* EquipmentActor = EquipManager->GetEquippedActor(EquipmentInfo.WeaponHandType))
+				return EquipmentActor;
+		}
+		return nullptr;
 	}
-	return nullptr;
+	else
+	{
+		return EquipManager->GetFirstEquippedActor();
+	}
 }
 
 UD1ItemInstance* UD1GameplayAbility_Equipment::GetEquipmentItemInstance(const AD1EquipmentBase* InEquipmentActor) const
 {
 	if (InEquipmentActor == nullptr)
 		return nullptr;
-	
-	UD1EquipManagerComponent* EquipManager = GetLyraCharacterFromActorInfo()->FindComponentByClass<UD1EquipManagerComponent>();
-	if (EquipManager == nullptr)
+
+	ALyraCharacter* LyraCharacter = GetLyraCharacterFromActorInfo();
+	if (LyraCharacter == nullptr)
 		return nullptr;
 	
-	for (const FD1EquipmentInfo& EquipmentInfo : EquipmentInfos)
-	{
-		if (EquipmentInfo.EquipmentActor != InEquipmentActor)
-			continue;
-		
-		return EquipManager->GetEquippedItemInstance(InEquipmentActor->GetEquipmentSlotType());
-	}
+	UD1EquipManagerComponent* EquipManager = LyraCharacter->FindComponentByClass<UD1EquipManagerComponent>();
+	if (EquipManager == nullptr)
+		return nullptr;
 
-	return nullptr;
+	return EquipManager->GetEquippedItemInstance(InEquipmentActor->GetEquipmentSlotType());
 }
 
 int32 UD1GameplayAbility_Equipment::GetEquipmentStatValue(FGameplayTag InStatTag, const AD1EquipmentBase* InEquipmentActor) const
 {
-	if (InStatTag.IsValid() == false || InEquipmentActor == nullptr)
-		return 0;
-	
-	if (UD1ItemInstance* ItemInstance = GetEquipmentItemInstance(InEquipmentActor))
-		return ItemInstance->GetStatCountByTag(InStatTag);
-
-	check(true);
-	
+	if (InStatTag.IsValid() && InEquipmentActor)
+	{
+		if (UD1ItemInstance* ItemInstance = GetEquipmentItemInstance(InEquipmentActor))
+		{
+			return ItemInstance->GetStatCountByTag(InStatTag);
+		}
+	}
 	return 0;
 }

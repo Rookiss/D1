@@ -2,6 +2,7 @@
 
 #include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Actors/D1ProjectileBase.h"
 #include "Actors/D1EquipmentBase.h"
 #include "Player/LyraPlayerController.h"
@@ -26,6 +27,17 @@ void UD1GameplayAbility_Bow_NormalShoot::ActivateAbility(const FGameplayAbilityS
 		return;
 	}
 
+	if (UAbilityTask_PlayMontageAndWait* ShootMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ShootMontage"), ReleaseMontage, GetSnapshottedAttackRate(), NAME_None, true, 1.f, 0.f, false))
+	{
+		ShootMontageTask->ReadyForActivation();
+	}
+
+	if (UAbilityTask_WaitGameplayEvent* GameplayEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, D1GameplayTags::GameplayEvent_Montage_End, nullptr, true, true))
+	{
+		GameplayEventTask->EventReceived.AddDynamic(this, &ThisClass::OnMontageEnded);
+		GameplayEventTask->ReadyForActivation();
+	}
+	
 	if (HasAuthority(&CurrentActivationInfo))
 	{
 		SpawnProjectile();
@@ -34,15 +46,6 @@ void UD1GameplayAbility_Bow_NormalShoot::ActivateAbility(const FGameplayAbilityS
 	FGameplayTagContainer TagContainer;
 	TagContainer.AddTag(D1GameplayTags::Status_ADS_Ready);
 	UAbilitySystemBlueprintLibrary::RemoveLooseGameplayTags(GetAvatarActorFromActorInfo(), TagContainer, true);
-	
-	if (UAbilityTask_PlayMontageAndWait* ShootMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("ShootMontage"), ReleaseMontage, GetSnapshottedAttackRate(), NAME_None, true, 1.f, 0.f, false))
-	{
-		ShootMontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
-		ShootMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
-		ShootMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageFinished);
-		ShootMontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageFinished);
-		ShootMontageTask->ReadyForActivation();
-	}
 }
 
 void UD1GameplayAbility_Bow_NormalShoot::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
@@ -52,7 +55,7 @@ void UD1GameplayAbility_Bow_NormalShoot::EndAbility(const FGameplayAbilitySpecHa
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UD1GameplayAbility_Bow_NormalShoot::OnMontageFinished()
+void UD1GameplayAbility_Bow_NormalShoot::OnMontageEnded(FGameplayEventData Payload)
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }

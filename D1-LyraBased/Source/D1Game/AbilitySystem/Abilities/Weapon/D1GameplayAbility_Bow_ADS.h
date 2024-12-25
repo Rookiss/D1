@@ -21,7 +21,7 @@ protected:
 
 protected:
 	UFUNCTION()
-	void OnReloadEvent(FGameplayEventData Payload);
+	void OnADSEvent(FGameplayEventData Payload);
 
 	UFUNCTION()
 	void OnADSStartBegin(FGameplayEventData Payload);
@@ -30,12 +30,14 @@ protected:
 	void OnInputRelease(float TimeHeld);
 
 	UFUNCTION()
-	void OnAttackEnd();
+	void CheckEndADS();
 
-private:
+protected:
+	UFUNCTION()
 	void StartADS();
+
+	UFUNCTION()
 	void ResetADS();
-	bool TryReload(bool bInitialReload);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="D1|Bow ADS")
@@ -43,13 +45,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="D1|Bow ADS")
 	TObjectPtr<UAnimMontage> ADSEndMontage;
-
-	UPROPERTY(EditDefaultsOnly, Category="D1|Bow ADS")
-	TObjectPtr<UAnimMontage> ADSReloadMontage;
 	
 private:
 	UPROPERTY()
-	TObjectPtr<UAbilityTask_WaitGameplayEvent> ReloadEventTask;
+	TObjectPtr<UAbilityTask_WaitGameplayEvent> ADSEventTask;
 
 	UPROPERTY()
 	TObjectPtr<UAbilityTask_WaitGameplayEvent> ADSStartBeginEventTask;

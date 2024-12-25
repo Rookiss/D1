@@ -17,7 +17,7 @@ protected:
 	
 protected:
 	UFUNCTION()
-	void OnMontageFinished();
+	void OnMontageEnded(FGameplayEventData Payload);
 
 private:
 	void NotifyToADS(bool bShouldCancel);

@@ -171,10 +171,8 @@ public:
 	AD1EquipmentBase* GetFirstEquippedActor() const;
 	AD1EquipmentBase* GetEquippedActor(EWeaponHandType WeaponHandType) const;
 	void GetAllEquippedActors(TArray<AD1EquipmentBase*>& OutActors) const;
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	UD1ItemInstance* GetFirstEquippedItemInstance(bool bIgnoreArmor = true) const;
 	
+	UD1ItemInstance* GetFirstEquippedItemInstance(bool bIgnoreArmor = true) const;
 	UD1ItemInstance* GetEquippedItemInstance(EArmorType ArmorType) const;
 	UD1ItemInstance* GetEquippedItemInstance(EWeaponHandType WeaponHandType) const;
 	UD1ItemInstance* GetEquippedItemInstance(EEquipmentSlotType EquipmentSlotType) const;
