@@ -3,7 +3,6 @@
 #include "D1GameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
-#include "Actors/D1ProjectileBase.h"
 #include "Actors/D1EquipmentBase.h"
 #include "Player/LyraPlayerController.h"
 
@@ -12,9 +11,13 @@
 UD1GameplayAbility_Bow_NormalShoot::UD1GameplayAbility_Bow_NormalShoot(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	bServerRespectsRemoteAbilityCancellation = true;
+	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ClientOrServer;
+	
     AbilityTags.AddTag(D1GameplayTags::Ability_Attack_Bow);
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Attack);
 	ActivationRequiredTags.AddTag(D1GameplayTags::Status_ADS_Ready);
+	ActivationBlockedTags.AddTag(D1GameplayTags::Status_PiercingShot);
 }
 
 void UD1GameplayAbility_Bow_NormalShoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

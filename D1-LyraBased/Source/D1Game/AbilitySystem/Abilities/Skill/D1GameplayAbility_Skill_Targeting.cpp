@@ -21,6 +21,7 @@ UD1GameplayAbility_Skill_Targeting::UD1GameplayAbility_Skill_Targeting(const FOb
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
 
 	FD1EquipmentInfo EquipmentInfo;
+	EquipmentInfo.EquipmentType = EEquipmentType::Weapon;
 	EquipmentInfo.WeaponHandType = EWeaponHandType::TwoHand;
 	EquipmentInfo.RequiredWeaponType = EWeaponType::Staff;
 	EquipmentInfos.Add(EquipmentInfo);

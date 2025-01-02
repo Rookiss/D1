@@ -25,6 +25,7 @@ UD1GameplayAbility_Skill_ShieldBash::UD1GameplayAbility_Skill_ShieldBash(const F
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
 	
 	FD1EquipmentInfo EquipmentInfo;
+	EquipmentInfo.EquipmentType = EEquipmentType::Weapon;
 	EquipmentInfo.WeaponHandType = EWeaponHandType::LeftHand;
 	EquipmentInfo.RequiredWeaponType = EWeaponType::Shield;
 	EquipmentInfos.Add(EquipmentInfo);

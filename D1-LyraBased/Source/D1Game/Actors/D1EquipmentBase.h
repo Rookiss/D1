@@ -5,6 +5,7 @@
 #include "AbilitySystem/LyraAbilitySet.h"
 #include "D1EquipmentBase.generated.h"
 
+class UD1ItemInstance;
 class UAbilitySystemComponent;
 class USkeletalMeshComponent;
 class UArrowComponent;
@@ -29,8 +30,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void ChangeBlockState(bool bShouldBlock);
 
-	UFUNCTION(BlueprintCallable)
-	void ProcessEquip();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void ProcessEquip(UD1ItemInstance* ItemInstance);
 
 	UFUNCTION(BlueprintCallable)
 	void PlayEquipMontage();
@@ -80,7 +81,10 @@ public:
 	bool bCanBlock = false;
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bOnlyUseForLocal = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bInitialized = false;
 	
 private:

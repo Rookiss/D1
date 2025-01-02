@@ -91,7 +91,7 @@ public:
 	EEquipmentType EquipmentType = EEquipmentType::Count;
 	
 	UPROPERTY(EditDefaultsOnly, Category="D1|Equipable", meta=(Bitmask, BitmaskEnum="/Script/D1Game.ECharacterClassType"))
-	uint32 EquipableClassFlags = ((1 << (uint32)ECharacterClassType::Count) - 1);
+	uint32 EquipableClassFlags = (1 << (uint32)ECharacterClassType::Count) - 1;
 	
 	UPROPERTY(EditDefaultsOnly, Category="D1|Equipable")
 	TObjectPtr<const ULyraAbilitySet> BaseAbilitySet;

@@ -5,6 +5,7 @@
 #include "Item/D1ItemInstance.h"
 #include "D1WeaponSlotWidget.generated.h"
 
+class UD1InventoryManagerComponent;
 class UImage;
 class UOverlay;
 class UTextBlock;
@@ -23,6 +24,7 @@ public:
 protected:
 	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	virtual void NativeDestruct() override;
 
 private:

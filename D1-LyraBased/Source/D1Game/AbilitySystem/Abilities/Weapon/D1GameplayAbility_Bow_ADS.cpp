@@ -12,9 +12,20 @@
 UD1GameplayAbility_Bow_ADS::UD1GameplayAbility_Bow_ADS(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	FD1EquipmentInfo EquipmentInfo;
+	EquipmentInfo.EquipmentType = EEquipmentType::Weapon;
+	EquipmentInfo.WeaponHandType = EWeaponHandType::TwoHand;
+	EquipmentInfo.RequiredWeaponType = EWeaponType::Bow;
+	EquipmentInfos.Add(EquipmentInfo);
+	
+	bServerRespectsRemoteAbilityCancellation = true;
+	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ClientOrServer;
+	
     AbilityTags.AddTag(D1GameplayTags::Ability_ADS_Bow);
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_ADS_Bow);
 	ActivationBlockedTags.AddTag(D1GameplayTags::Status_Attack);
+	ActivationBlockedTags.AddTag(D1GameplayTags::Status_Reload);
+	ActivationBlockedTags.AddTag(D1GameplayTags::Status_Skill);
 }
 
 void UD1GameplayAbility_Bow_ADS::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

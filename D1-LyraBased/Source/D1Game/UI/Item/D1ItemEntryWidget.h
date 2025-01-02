@@ -54,6 +54,9 @@ protected:
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Icon;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Icon_Disable;
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Hover;

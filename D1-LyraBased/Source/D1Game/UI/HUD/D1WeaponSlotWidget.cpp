@@ -58,6 +58,11 @@ void UD1WeaponSlotWidget::NativeConstruct()
 	EquipStateChangedDelegateHandle = EquipManager->OnEquipStateChanged.AddUObject(this, &ThisClass::OnEquipStateChanged);
 }
 
+void UD1WeaponSlotWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+}
+
 void UD1WeaponSlotWidget::NativeDestruct()
 {
 	if (EquipmentManager)

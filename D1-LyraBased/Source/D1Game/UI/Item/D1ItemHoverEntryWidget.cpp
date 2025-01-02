@@ -5,6 +5,7 @@
 #include "Components/Image.h"
 #include "Components/RichTextBlock.h"
 #include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
 #include "Data/D1ClassData.h"
 #include "Data/D1ItemData.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
@@ -12,9 +13,7 @@
 #include "Item/Fragments/D1ItemFragment_Equipable_Armor.h"
 #include "Item/Fragments/D1ItemFragment_Equipable_Utility.h"
 #include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetStringLibrary.h"
-#include "Player/LyraPlayerState.h"
 #include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemHoverEntryWidget)
@@ -62,6 +61,7 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	Text_AttributeModifiers->SetVisibility(ESlateVisibility::Collapsed);
 	Text_AdditionalAttributeModifiers->SetVisibility(ESlateVisibility::Collapsed);
 	Text_Description->SetVisibility(ESlateVisibility::Collapsed);
+	VerticalBox_EquipableClasses->SetVisibility(ESlateVisibility::Collapsed);
 	
 	// Display Name
 	Text_DisplayName->SetText(ItemTemplate.DisplayName);
@@ -84,6 +84,8 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 	Text_ItemRarity->SetColorAndOpacity(RarityColor);
 
 	// Item Specifics
+	FString DescriptionString = ItemTemplate.Description.ToString();
+	
 	if (const UD1ItemFragment_Equipable* EquipableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable>())
 	{
 		if (EquipableFragment->EquipmentType == EEquipmentType::Armor)
@@ -132,8 +134,7 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 			}
 			Text_ItemType->SetText(UtilityTypeText);
 
-			// Description
-			FString DescriptionString = ItemTemplate.Description.ToString();
+			// Description for Drink
 			if (UtilityFragment->UtilityType == EUtilityType::Drink)
 			{
 				if (TSubclassOf<UGameplayEffect> UtilityEffectClass = UtilityFragment->UtilityEffectClass)
@@ -173,9 +174,6 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 					}
 				}
 			}
-			
-			Text_Description->SetText(FText::FromString(DescriptionString));
-			Text_Description->SetVisibility(ESlateVisibility::Visible);
 		}
 
 		// Attribute Modifiers
@@ -198,7 +196,7 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 
 		// Equipable Class List
 		FString EquipableClassString;
-
+		
 		if (EquipableFragment->EquipableClassFlags >= ((1 << (uint32)ECharacterClassType::Count) - 1))
 		{
 			EquipableClassString.Append(TEXT("<Hover.Class.Valid>") + LOCTEXT("EquipableClass-All", "All Classes").ToString() + TEXT(" </>"));
@@ -222,11 +220,18 @@ void UD1ItemHoverEntryWidget::RefreshUI(const UD1ItemInstance* ItemInstance)
 		}
 		
 		Text_UsableClassList->SetText(FText::FromString(EquipableClassString));
+		VerticalBox_EquipableClasses->SetVisibility(ESlateVisibility::Visible);
 	}
 
 	if (Text_ItemType->GetText().IsEmpty())
 	{
 		Text_ItemType->SetText(LOCTEXT("ItemType-Miscellaneous", "Miscellaneous"));
+	}
+
+	if (DescriptionString.IsEmpty() == false)
+	{
+		Text_Description->SetText(FText::FromString(DescriptionString));
+		Text_Description->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 

@@ -3,6 +3,7 @@
 #include "Blueprint/UserWidget.h"
 #include "D1ItemHoverEntryWidget.generated.h"
 
+class UVerticalBox;
 class UImage;
 class UTextBlock;
 class UHorizontalBox;
@@ -47,10 +48,13 @@ protected:
 	TObjectPtr<UTextBlock> Text_AdditionalAttributeModifiers;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Text_Description;
+	TObjectPtr<URichTextBlock> Text_Description;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<URichTextBlock> Text_UsableClassList;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UVerticalBox> VerticalBox_EquipableClasses;
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_Gold;

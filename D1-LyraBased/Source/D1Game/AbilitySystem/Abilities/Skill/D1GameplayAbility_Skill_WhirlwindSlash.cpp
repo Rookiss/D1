@@ -20,6 +20,7 @@ UD1GameplayAbility_Skill_WhirlwindSlash::UD1GameplayAbility_Skill_WhirlwindSlash
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
 	
 	FD1EquipmentInfo EquipmentInfo;
+	EquipmentInfo.EquipmentType = EEquipmentType::Weapon;
 	EquipmentInfo.WeaponHandType = EWeaponHandType::TwoHand;
 	EquipmentInfo.RequiredWeaponType = EWeaponType::TwoHandSword;
 	EquipmentInfos.Add(EquipmentInfo);

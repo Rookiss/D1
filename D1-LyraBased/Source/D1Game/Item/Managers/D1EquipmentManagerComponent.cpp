@@ -609,6 +609,9 @@ int32 UD1EquipmentManagerComponent::CanAddEquipment(int32 ItemTemplateID, EItemR
 
 	if (ToItemInstance)
 	{
+		if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon || FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
+			return 0;
+		
 		const int32 ToTemplateID = ToItemInstance->GetItemTemplateID();
 		if (ItemTemplateID != ToTemplateID)
 			return 0;
@@ -616,13 +619,20 @@ int32 UD1EquipmentManagerComponent::CanAddEquipment(int32 ItemTemplateID, EItemR
 		if (ItemRarity != ToItemInstance->GetItemRarity())
 			return 0;
 		
-		if (ItemTemplate.MaxStackCount < 2)
+		if (ItemTemplate.MaxStackCount <= 1)
 			return 0;
 
 		return FMath::Min(ItemCount + ToItemCount, ItemTemplate.MaxStackCount) - ToItemCount;
 	}
 	else
 	{
+		ALyraPlayerState* LyraPlayerState = GetPlayerState<ALyraPlayerState>();
+		if (LyraPlayerState == nullptr)
+			return 0;
+
+		if (FromEquippableFragment->IsEquipableClassType(LyraPlayerState->CharacterClassType) == false)
+			return 0;
+		
 		if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
 		{
 			const UD1ItemFragment_Equipable_Weapon* FromWeaponFragment = Cast<UD1ItemFragment_Equipable_Weapon>(FromEquippableFragment);
@@ -672,8 +682,8 @@ void UD1EquipmentManagerComponent::AddUnarmedEquipments(TSubclassOf<UD1ItemTempl
 {
 	check(HasAuthority());
 
-	SetEquipment(EEquipmentSlotType::Unarmed_LeftHand, LeftHandClass, EItemRarity::Poor, 1);
-	SetEquipment(EEquipmentSlotType::Unarmed_RightHand, RightHandClass, EItemRarity::Poor, 1);
+	SetEquipment(EEquipmentSlotType::Unarmed_LeftHand, LeftHandClass, EItemRarity::Poor, 1, false);
+	SetEquipment(EEquipmentSlotType::Unarmed_RightHand, RightHandClass, EItemRarity::Poor, 1, false);
 }
 
 void UD1EquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount)
@@ -706,7 +716,7 @@ void UD1EquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType Equipm
 	}
 }
 
-void UD1EquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass, EItemRarity ItemRarity, int32 ItemCount)
+void UD1EquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UD1ItemTemplate> ItemTemplateClass, EItemRarity ItemRarity, int32 ItemCount, bool bCheckCharacterClass)
 {
 	check(HasAuthority());
 
@@ -722,6 +732,16 @@ void UD1EquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlot
 	if (EquippableFragment == nullptr)
 		return;
 
+	if (bCheckCharacterClass)
+	{
+		ALyraPlayerState* LyraPlayerState = GetPlayerState<ALyraPlayerState>();
+		if (LyraPlayerState == nullptr)
+			return;
+	
+		if (EquippableFragment->IsEquipableClassType(LyraPlayerState->CharacterClassType) == false)
+			return;
+	}
+	
 	FD1EquipmentEntry& Entry = EquipmentList.Entries[(int32)EquipmentSlotType];
 	Entry.Reset();
 	

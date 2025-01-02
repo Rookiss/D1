@@ -7,7 +7,7 @@ class UD1ItemTemplate;
 class ULyraAbilitySet;
 
 USTRUCT(BlueprintType)
-struct FD1DefaultItemEntry
+struct FD1DefaultEquipmentEntry
 {
 	GENERATED_BODY()
 
@@ -15,6 +15,22 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UD1ItemTemplate> ItemTemplateClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	EItemRarity ItemRarity = EItemRarity::Poor;
+
+	UPROPERTY(EditDefaultsOnly)
+	int32 ItemCount = 1;
+};
+
+USTRUCT(BlueprintType)
+struct FD1DefaultInventoryEntry
+{
+	GENERATED_BODY()
+
+public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UD1ItemTemplate> ItemTemplateClass;
 
@@ -35,7 +51,10 @@ public:
 	FText ClassName;
 
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FD1DefaultItemEntry> DefaultItemEntries;
+	TArray<FD1DefaultEquipmentEntry> DefaultEquipmentEntries;
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FD1DefaultInventoryEntry> DefaultInventoryEntries;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<ULyraAbilitySet> ClassAbilitySet;

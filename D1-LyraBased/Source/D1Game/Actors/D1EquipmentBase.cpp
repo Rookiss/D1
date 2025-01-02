@@ -46,9 +46,6 @@ AD1EquipmentBase::AD1EquipmentBase(const FObjectInitializer& ObjectInitializer)
 void AD1EquipmentBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (bOnlyUseForLocal)
-		return;
 	
 	if (HasAuthority())
 	{
@@ -60,12 +57,12 @@ void AD1EquipmentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	if (bOnlyUseForLocal)
-		return;
-	
-	DOREPLIFETIME(ThisClass, ItemTemplateID);
-	DOREPLIFETIME(ThisClass, EquipmentSlotType);
-	DOREPLIFETIME(ThisClass, bCanBlock);
+	if (bOnlyUseForLocal == false)
+	{
+		DOREPLIFETIME(ThisClass, ItemTemplateID);
+		DOREPLIFETIME(ThisClass, EquipmentSlotType);
+		DOREPLIFETIME(ThisClass, bCanBlock);
+	}
 }
 
 void AD1EquipmentBase::Destroyed()
@@ -95,18 +92,15 @@ void AD1EquipmentBase::Destroyed()
 
 void AD1EquipmentBase::Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSlotType)
 {
-	if (bOnlyUseForLocal)
-		return;
-	
-	ItemTemplateID = InTemplateID;
-	EquipmentSlotType = InEquipmentSlotType;
+	if (bOnlyUseForLocal == false)
+	{
+		ItemTemplateID = InTemplateID;
+		EquipmentSlotType = InEquipmentSlotType;
+	}
 }
 
 void AD1EquipmentBase::ChangeBlockState(bool bShouldBlock)
 {
-	if (bOnlyUseForLocal)
-		return;
-	
 	if (HasAuthority())
 	{
 		bCanBlock = bShouldBlock;
@@ -116,9 +110,6 @@ void AD1EquipmentBase::ChangeBlockState(bool bShouldBlock)
 
 void AD1EquipmentBase::OnRep_CanBlock()
 {
-	if (bOnlyUseForLocal)
-		return;
-	
 	MeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Projectile, bCanBlock ? ECR_Block : ECR_Ignore);
 }
 
@@ -138,11 +129,10 @@ UAbilitySystemComponent* AD1EquipmentBase::GetAbilitySystemComponent() const
 	{
 		return LyraCharacter->GetAbilitySystemComponent();
 	}
-	
 	return nullptr;
 }
 
-void AD1EquipmentBase::ProcessEquip()
+void AD1EquipmentBase::ProcessEquip_Implementation(UD1ItemInstance* ItemInstance)
 {
 	ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetOwner());
 	if (LyraCharacter == nullptr)
@@ -207,11 +197,15 @@ void AD1EquipmentBase::CheckPropertyInitialization()
 		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 		if (EquipManager && ASC)
 		{
-			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
-			Entries[(int32)EquipmentSlotType].SetEquipmentActor(this);
-			ProcessEquip();
-			bInitialized = true;
-			return;
+			if (UD1ItemInstance* ItemInstance = EquipManager->GetEquippedItemInstance(EquipmentSlotType))
+			{
+				TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
+				Entries[(int32)EquipmentSlotType].SetEquipmentActor(this);
+			
+				ProcessEquip(ItemInstance);
+				bInitialized = true;
+				return;
+			}
 		}
 	}
 	

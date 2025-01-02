@@ -20,6 +20,7 @@
 #include "Character/LyraCharacter.h"
 #include "Data/D1ClassData.h"
 #include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "Item/Managers/D1InventoryManagerComponent.h"
 #include "Messages/LyraNotificationMessage.h"
 #include "Messages/LyraVerbMessage.h"
 #include "Net/UnrealNetwork.h"
@@ -291,9 +292,17 @@ void ALyraPlayerState::Server_SelectClass_Implementation(ECharacterClassType Cla
 	{
 		if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->GetComponentByClass<UD1EquipmentManagerComponent>())
 		{
-			for (const FD1DefaultItemEntry& DefaultItemEntry : ClassEntry.DefaultItemEntries)
+			for (const FD1DefaultEquipmentEntry& DefaultItemEntry : ClassEntry.DefaultEquipmentEntries)
 			{
 				EquipmentManager->SetEquipment(DefaultItemEntry.EquipmentSlotType, DefaultItemEntry.ItemTemplateClass, DefaultItemEntry.ItemRarity, DefaultItemEntry.ItemCount);
+			}
+		}
+
+		if (UD1InventoryManagerComponent* InventoryManager = LyraCharacter->GetComponentByClass<UD1InventoryManagerComponent>())
+		{
+			for (const FD1DefaultInventoryEntry& DefaultItemEntry : ClassEntry.DefaultInventoryEntries)
+			{
+				InventoryManager->TryAddItemByRarity(DefaultItemEntry.ItemTemplateClass, DefaultItemEntry.ItemRarity, DefaultItemEntry.ItemCount);
 			}
 		}
 	}

@@ -36,9 +36,6 @@ struct FD1UIInfo
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UTexture2D> Icon;
-	
-	UPROPERTY(EditDefaultsOnly)
 	FText Title;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -58,6 +55,7 @@ public:
 	UTexture2D* GetHoverRarityTexture(EItemRarity ItemRarity) const;
 	FColor GetRarityColor(EItemRarity ItemRarity) const;
 
+	UTexture2D* GetDisableEntryTexture() const { return DisableEntryTexture; }
 	const FD1UIInfo& GetTagUIInfo(FGameplayTag Tag) const;
 
 public:
@@ -90,6 +88,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta=(ArraySizeEnum="EItemRarity"))
 	FD1ItemRarityInfoEntry RarityInfoEntries[(int32)EItemRarity::Count];
 
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UTexture2D> DisableEntryTexture;
+	
 	UPROPERTY(EditDefaultsOnly, meta=(DisplayName="Tag UI Infos"))
 	TMap<FGameplayTag, FD1UIInfo> TagUIInfos;
 };

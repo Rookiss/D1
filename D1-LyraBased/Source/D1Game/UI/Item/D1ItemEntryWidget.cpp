@@ -8,6 +8,8 @@
 #include "D1ItemHoverWidget.h"
 #include "Components/TextBlock.h"
 #include "Data/D1UIData.h"
+#include "Item/Fragments/D1ItemFragment_Equipable.h"
+#include "Player/LyraPlayerState.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemEntryWidget)
 
@@ -124,12 +126,30 @@ void UD1ItemEntryWidget::RefreshUI(UD1ItemInstance* NewItemInstance, int32 NewIt
 	
 	ItemInstance = NewItemInstance;
 	ItemCount = NewItemCount;
-
+	
 	const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
+	
 	Image_Icon->SetBrushFromTexture(ItemTemplate.IconTexture, true);
 	Text_Count->SetText(ItemCount <= 1 ? FText::GetEmpty() : FText::AsNumber(ItemCount));
 
-	UTexture2D* RarityTexture = UD1UIData::Get().GetEntryRarityTexture(ItemInstance->GetItemRarity());
+	UTexture2D* RarityTexture = nullptr;
+
+	if (const UD1ItemFragment_Equipable* EquipableFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable>())
+	{
+		ALyraPlayerState* PlayerState = GetOwningPlayerState<ALyraPlayerState>();
+		if (PlayerState && EquipableFragment->IsEquipableClassType(PlayerState->CharacterClassType) == false)
+		{
+			RarityTexture = UD1UIData::Get().GetDisableEntryTexture();
+			Image_Icon_Disable->SetVisibility(ESlateVisibility::HitTestInvisible);
+		}
+	}
+	
+	if (RarityTexture == nullptr)
+	{
+		RarityTexture = UD1UIData::Get().GetEntryRarityTexture(ItemInstance->GetItemRarity());
+		Image_Icon_Disable->SetVisibility(ESlateVisibility::Hidden);
+	}
+	
 	Image_RarityCover->SetBrushFromTexture(RarityTexture, true);
 }
 

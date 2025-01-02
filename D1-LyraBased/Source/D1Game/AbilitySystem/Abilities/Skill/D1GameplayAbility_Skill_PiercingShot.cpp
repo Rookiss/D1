@@ -21,6 +21,7 @@ UD1GameplayAbility_Skill_PiercingShot::UD1GameplayAbility_Skill_PiercingShot(con
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
 
 	FD1EquipmentInfo EquipmentInfo;
+	EquipmentInfo.EquipmentType = EEquipmentType::Weapon;
 	EquipmentInfo.WeaponHandType = EWeaponHandType::TwoHand;
 	EquipmentInfo.RequiredWeaponType = EWeaponType::Bow;
 	EquipmentInfos.Add(EquipmentInfo);

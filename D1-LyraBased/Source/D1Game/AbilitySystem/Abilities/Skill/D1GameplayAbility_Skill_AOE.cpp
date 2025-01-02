@@ -20,6 +20,7 @@ UD1GameplayAbility_Skill_AOE::UD1GameplayAbility_Skill_AOE(const FObjectInitiali
 	ActivationOwnedTags.AddTag(D1GameplayTags::Status_Skill);
 
 	FD1EquipmentInfo EquipmentInfo;
+	EquipmentInfo.EquipmentType = EEquipmentType::Weapon;
 	EquipmentInfo.WeaponHandType = EWeaponHandType::TwoHand;
 	EquipmentInfo.RequiredWeaponType = EWeaponType::Staff;
 	EquipmentInfos.Add(EquipmentInfo);
