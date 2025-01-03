@@ -5,13 +5,14 @@
 #include "Item/D1ItemInstance.h"
 #include "D1WeaponSlotWidget.generated.h"
 
-class UD1InventoryManagerComponent;
+class UD1ItemTemplate;
 class UImage;
 class UOverlay;
 class UTextBlock;
 class UCommonVisibilitySwitcher;
 class UD1EquipManagerComponent;
 class UD1EquipmentManagerComponent;
+class UD1InventoryManagerComponent;
 
 UCLASS()
 class UD1WeaponSlotWidget : public UUserWidget
@@ -24,12 +25,12 @@ public:
 protected:
 	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	virtual void NativeDestruct() override;
 
 private:
 	void OnEquipmentEntryChanged(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance, int32 ItemCount);
 	void OnEquipStateChanged(EEquipState PrevEquipState, EEquipState NewEquipState);
+	void RefreshAmmoCount();
 	
 public:
 	UPROPERTY(EditAnywhere)
@@ -64,6 +65,9 @@ private:
 
 private:
 	UPROPERTY()
+	TObjectPtr<UD1InventoryManagerComponent> InventoryManager;
+	
+	UPROPERTY()
 	TObjectPtr<UD1EquipmentManagerComponent> EquipmentManager;
 	
 	UPROPERTY()
@@ -72,4 +76,13 @@ private:
 private:
 	FDelegateHandle EntryChangedDelegateHandle;
 	FDelegateHandle EquipStateChangedDelegateHandle;
+
+	FTimerHandle TimerHandle;
+
+private:
+	UPROPERTY()
+	TWeakObjectPtr<UD1ItemInstance> WeaponItemInstance;
+
+	UPROPERTY()
+	TSubclassOf<UD1ItemTemplate> AmmoItemTemplateClass;
 };

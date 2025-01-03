@@ -24,6 +24,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	EWeaponType WeaponType = EWeaponType::Count;
 
+	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="WeaponType == EWeaponType::Bow", EditConditionHides))
+	TSubclassOf<UD1ItemTemplate> AmmoItemTemplateClass;
+	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USoundBase> AttackSwingSound;
 	
