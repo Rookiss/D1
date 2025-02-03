@@ -49,7 +49,6 @@ ALyraPlayerState::ALyraPlayerState(const FObjectInitializer& ObjectInitializer)
 	NetUpdateFrequency = 100.0f;
 
 	MyTeamID = FGenericTeamId::NoTeam;
-	MySquadID = INDEX_NONE;
 
 	bUseCustomPlayerNames = true;
 }
@@ -139,7 +138,6 @@ void ALyraPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, PawnData, SharedParams);
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MyPlayerConnectionType, SharedParams)
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MyTeamID, SharedParams);
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, MySquadID, SharedParams);
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, StatTags, SharedParams);
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CharacterClassType, SharedParams);
 
@@ -232,15 +230,6 @@ void ALyraPlayerState::SetPlayerConnectionType(ELyraPlayerConnectionType NewType
 	MyPlayerConnectionType = NewType;
 }
 
-void ALyraPlayerState::SetSquadID(int32 NewSquadId)
-{
-	if (HasAuthority())
-	{
-		MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, MySquadID, this);
-		MySquadID = NewSquadId;
-	}
-}
-
 void ALyraPlayerState::SetGenericTeamId(const FGenericTeamId& NewTeamID)
 {
 	if (HasAuthority())
@@ -270,11 +259,6 @@ FOnD1TeamIndexChangedDelegate* ALyraPlayerState::GetOnTeamIndexChangedDelegate()
 void ALyraPlayerState::OnRep_MyTeamID(FGenericTeamId OldTeamID)
 {
 	ConditionalBroadcastTeamChanged(this, OldTeamID, MyTeamID);
-}
-
-void ALyraPlayerState::OnRep_MySquadID()
-{
-	//@TODO: Let the squad subsystem know (once that exists)
 }
 
 void ALyraPlayerState::Server_SelectClass_Implementation(ECharacterClassType ClassType)

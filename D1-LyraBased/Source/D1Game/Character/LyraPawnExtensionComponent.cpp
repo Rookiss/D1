@@ -309,4 +309,3 @@ void ULyraPawnExtensionComponent::OnAbilitySystemUninitialized_Register(FSimpleM
 		OnAbilitySystemUninitialized.Add(Delegate);
 	}
 }
-

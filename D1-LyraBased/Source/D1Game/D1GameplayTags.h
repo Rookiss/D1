@@ -205,6 +205,7 @@ namespace D1GameplayTags
 	
 	// HUD
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(HUD_Slot_Reticle);
+	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(HUD_Slot_TeamInfo);
 	
 	D1GAME_API	extern const TMap<uint8, FGameplayTag> MovementModeTagMap;
 	D1GAME_API	extern const TMap<uint8, FGameplayTag> CustomMovementModeTagMap;

@@ -1,49 +1,45 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 
 #include "Subsystems/WorldSubsystem.h"
+#include "D1TeamSubsystem.generated.h"
 
-#include "LyraTeamSubsystem.generated.h"
-
-class AActor;
+class ID1TeamAgentInterface;
+class AD1TeamPublicInfo;
+class AD1TeamPrivateInfo;
+class UD1TeamDisplayAsset;
 class ALyraPlayerState;
-class ALyraTeamInfoBase;
-class ALyraTeamPrivateInfo;
-class ALyraTeamPublicInfo;
+class AD1TeamInfoBase;
 class FSubsystemCollectionBase;
-class ULyraTeamDisplayAsset;
-struct FFrame;
 struct FGameplayTag;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLyraTeamDisplayAssetChangedDelegate, const ULyraTeamDisplayAsset*, DisplayAsset);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnD1TeamDisplayAssetChangedDelegate, const UD1TeamDisplayAsset*, DisplayAsset);
 
 USTRUCT()
-struct FLyraTeamTrackingInfo
+struct FD1TeamTrackingInfo
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY()
-	TObjectPtr<ALyraTeamPublicInfo> PublicInfo = nullptr;
-
-	UPROPERTY()
-	TObjectPtr<ALyraTeamPrivateInfo> PrivateInfo = nullptr;
-
-	UPROPERTY()
-	TObjectPtr<ULyraTeamDisplayAsset> DisplayAsset = nullptr;
-
-	UPROPERTY()
-	FOnLyraTeamDisplayAssetChangedDelegate OnTeamDisplayAssetChanged;
-
+	void SetTeamInfo(AD1TeamInfoBase* Info);
+	void RemoveTeamInfo(AD1TeamInfoBase* Info);
+	
 public:
-	void SetTeamInfo(ALyraTeamInfoBase* Info);
-	void RemoveTeamInfo(ALyraTeamInfoBase* Info);
+	UPROPERTY()
+	TObjectPtr<AD1TeamPublicInfo> PublicInfo = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<AD1TeamPrivateInfo> PrivateInfo = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UD1TeamDisplayAsset> DisplayAsset = nullptr;
+
+	UPROPERTY()
+	FOnD1TeamDisplayAssetChangedDelegate OnTeamDisplayAssetChanged;
 };
 
 // Result of comparing the team affiliation for two actors
 UENUM(BlueprintType)
-enum class ELyraTeamComparison : uint8
+enum class ED1TeamComparison : uint8
 {
 	// Both actors are members of the same team
 	OnSameTeam,
@@ -55,14 +51,20 @@ enum class ELyraTeamComparison : uint8
 	InvalidArgument
 };
 
-/** A subsystem for easy access to team information for team-based actors (e.g., pawns or player states) */
+
+// Team Subsystem의 목적
+// - UI 및 각종 Info 공유(월드맵/미니맵/나침반/TeamInfo)
+// - 같은 팀원들의 스폰 장소 일치
+// - 탈출에 대한 델리게이트 알림
+// 데미지는 몬스터끼리만 면역, 나머지 경우는 모두 가능 (팀킬 가능)
+
 UCLASS()
-class D1GAME_API ULyraTeamSubsystem : public UWorldSubsystem
+class D1GAME_API UD1TeamSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
 
 public:
-	ULyraTeamSubsystem();
+	UD1TeamSubsystem();
 
 	//~USubsystem interface
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
@@ -70,10 +72,10 @@ public:
 	//~End of USubsystem interface
 
 	// Tries to registers a new team
-	bool RegisterTeamInfo(ALyraTeamInfoBase* TeamInfo);
+	bool RegisterTeamInfo(AD1TeamInfoBase* TeamInfo);
 
 	// Tries to unregister a team, will return false if it didn't work
-	bool UnregisterTeamInfo(ALyraTeamInfoBase* TeamInfo);
+	bool UnregisterTeamInfo(AD1TeamInfoBase* TeamInfo);
 
 	// Changes the team associated with this actor if possible
 	// Note: This function can only be called on the authority
@@ -81,32 +83,34 @@ public:
 	bool ChangeTeamForActor(AActor* ActorToChange, int32 NewTeamId);
 
 	// Returns the team this object belongs to, or INDEX_NONE if it is not part of a team
-	int32 FindTeamFromObject(const UObject* TestObject) const;
+	int32 FindTeamIDFromObject(const UObject* TestObject) const;
+
+	const ID1TeamAgentInterface* FindTeamAgentFromObject(const UObject* TestObject) const;
 
 	// Returns the associated player state for this actor, or INDEX_NONE if it is not associated with a player
 	const ALyraPlayerState* FindPlayerStateFromActor(const AActor* PossibleTeamActor) const;
 
 	// Returns the team this object belongs to, or INDEX_NONE if it is not part of a team
 	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category=Teams, meta=(Keywords="Get"))
-	void FindTeamFromActor(const UObject* TestActor, bool& bIsPartOfTeam, int32& TeamId) const;
+	void FindTeamIDFromActor(const UObject* TestActor, bool& bIsValidTeam, int32& TeamID) const;
 
 	// Compare the teams of two actors and returns a value indicating if they are on same teams, different teams, or one/both are invalid
 	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category=Teams, meta=(ExpandEnumAsExecs=ReturnValue))
-	ELyraTeamComparison CompareTeams(const UObject* A, const UObject* B, int32& TeamIdA, int32& TeamIdB) const;
+	ED1TeamComparison CompareTeams(const UObject* A, const UObject* B, int32& TeamID_A, int32& TeamID_B) const;
 
 	// Compare the teams of two actors and returns a value indicating if they are on same teams, different teams, or one/both are invalid
-	ELyraTeamComparison CompareTeams(const UObject* A, const UObject* B) const;
+	ED1TeamComparison CompareTeams(const UObject* A, const UObject* B) const;
 
 	// Returns true if the instigator can damage the target, taking into account the friendly fire settings
-	bool CanCauseDamage(const UObject* Instigator, const UObject* Target, bool bAllowDamageToSelf = true) const;
+	bool CanCauseDamage(const AActor* Instigator, const AActor* Target, bool bAllowDamageToSelf = true) const;
 
 	// Adds a specified number of stacks to the tag (does nothing if StackCount is below 1)
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category=Teams)
-	void AddTeamTagStack(int32 TeamId, FGameplayTag Tag, int32 StackCount);
+	void AddTeamTagStack(int32 TeamID, FGameplayTag Tag, int32 StackCount, bool bIsPublicInfo = true);
 
 	// Removes a specified number of stacks from the tag (does nothing if StackCount is below 1)
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category=Teams)
-	void RemoveTeamTagStack(int32 TeamId, FGameplayTag Tag, int32 StackCount);
+	void RemoveTeamTagStack(int32 TeamID, FGameplayTag Tag, int32 StackCount, bool bIsPublicInfo = true);
 
 	// Returns the stack count of the specified tag (or 0 if the tag is not present)
 	UFUNCTION(BlueprintCallable, Category=Teams)
@@ -114,35 +118,35 @@ public:
 
 	// Returns true if there is at least one stack of the specified tag
 	UFUNCTION(BlueprintCallable, Category=Teams)
-	bool TeamHasTag(int32 TeamId, FGameplayTag Tag) const;
+	bool TeamHasTag(int32 TeamID, FGameplayTag Tag) const;
 
 	// Returns true if the specified team exists
 	UFUNCTION(BlueprintCallable, Category=Teams)
-	bool DoesTeamExist(int32 TeamId) const;
+	bool DoesTeamExist(int32 TeamID) const;
 
 	// Gets the team display asset for the specified team, from the perspective of the specified team
 	// (You have to specify a viewer too, in case the game mode is in a 'local player is always blue team' sort of situation)
 	UFUNCTION(BlueprintCallable, Category=Teams)
-	ULyraTeamDisplayAsset* GetTeamDisplayAsset(int32 TeamId, int32 ViewerTeamId);
+	UD1TeamDisplayAsset* GetTeamDisplayAsset(int32 TeamID, int32 ViewerTeamID);
 
 	// Gets the team display asset for the specified team, from the perspective of the specified team
 	// (You have to specify a viewer too, in case the game mode is in a 'local player is always blue team' sort of situation)
 	UFUNCTION(BlueprintCallable, Category = Teams)
-	ULyraTeamDisplayAsset* GetEffectiveTeamDisplayAsset(int32 TeamId, UObject* ViewerTeamAgent);
+	UD1TeamDisplayAsset* GetEffectiveTeamDisplayAsset(int32 TeamID, UObject* ViewerTeamAgent);
 
 	// Gets the list of teams
 	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category=Teams)
 	TArray<int32> GetTeamIDs() const;
 
 	// Called when a team display asset has been edited, causes all team color observers to update
-	void NotifyTeamDisplayAssetModified(ULyraTeamDisplayAsset* ModifiedAsset);
+	void NotifyTeamDisplayAssetModified(UD1TeamDisplayAsset* ModifiedAsset);
 
 	// Register for a team display asset notification for the specified team ID
-	FOnLyraTeamDisplayAssetChangedDelegate& GetTeamDisplayAssetChangedDelegate(int32 TeamId);
+	FOnD1TeamDisplayAssetChangedDelegate& GetTeamDisplayAssetChangedDelegate(int32 TeamID);
 
 private:
 	UPROPERTY()
-	TMap<int32, FLyraTeamTrackingInfo> TeamMap;
+	TMap<int32, FD1TeamTrackingInfo> TeamMap;
 
 	FDelegateHandle CheatManagerRegistrationHandle;
 };

@@ -10,17 +10,17 @@ template <typename InterfaceType> class TScriptInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnD1TeamIndexChangedDelegate, UObject*, ObjectChangingTeam, int32, OldTeamID, int32, NewTeamID);
 
-inline int32 GenericTeamIdToInteger(FGenericTeamId ID)
+inline int32 GenericTeamIDToInteger(FGenericTeamId ID)
 {
 	return (int32)ID;
 }
 
-inline FGenericTeamId IntegerToGenericTeamId(int32 ID)
+inline FGenericTeamId IntegerToGenericTeamID(int32 ID)
 {
-	return (ID == INDEX_NONE) ? FGenericTeamId::NoTeam : FGenericTeamId((uint8)ID);
+	return (ID < 0) ? FGenericTeamId::NoTeam : FGenericTeamId((uint8)ID);
 }
 
-inline FGenericTeamId EnumToGenericTeamId(ED1TeamID ID)
+inline FGenericTeamId EnumToGenericTeamID(ED1TeamID ID)
 {
 	return (ID == ED1TeamID::NoTeam) ? FGenericTeamId::NoTeam : FGenericTeamId((uint8)ID);
 }

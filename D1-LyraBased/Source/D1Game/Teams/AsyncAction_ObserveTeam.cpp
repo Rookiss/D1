@@ -1,14 +1,13 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+#include "AsyncAction_ObserveTeam.h"
 
-#include "Teams/AsyncAction_ObserveTeam.h"
-
-#include "Teams/D1TeamAgentInterface.h"
+#include "D1TeamAgentInterface.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AsyncAction_ObserveTeam)
 
 UAsyncAction_ObserveTeam::UAsyncAction_ObserveTeam(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	
 }
 
 UAsyncAction_ObserveTeam* UAsyncAction_ObserveTeam::ObserveTeam(UObject* TeamAgent)
@@ -20,7 +19,7 @@ UAsyncAction_ObserveTeam* UAsyncAction_ObserveTeam::InternalObserveTeamChanges(T
 {
 	UAsyncAction_ObserveTeam* Action = nullptr;
 
-	if (TeamActor != nullptr)
+	if (TeamActor)
 	{
 		Action = NewObject<UAsyncAction_ObserveTeam>();
 		Action->TeamInterfacePtr = TeamActor;
@@ -33,8 +32,7 @@ UAsyncAction_ObserveTeam* UAsyncAction_ObserveTeam::InternalObserveTeamChanges(T
 void UAsyncAction_ObserveTeam::SetReadyToDestroy()
 {
 	Super::SetReadyToDestroy();
-
-	// If we're being canceled we need to unhook everything we might have tried listening to.
+	
 	if (ID1TeamAgentInterface* TeamInterface = TeamInterfacePtr.Get())
 	{
 		TeamInterface->GetTeamChangedDelegateChecked().RemoveAll(this);
@@ -48,18 +46,14 @@ void UAsyncAction_ObserveTeam::Activate()
 
 	if (ID1TeamAgentInterface* TeamInterface = TeamInterfacePtr.Get())
 	{
-		CurrentTeamIndex = GenericTeamIdToInteger(TeamInterface->GetGenericTeamId());
-
+		CurrentTeamIndex = GenericTeamIDToInteger(TeamInterface->GetGenericTeamId());
 		TeamInterface->GetTeamChangedDelegateChecked().AddDynamic(this, &ThisClass::OnWatchedAgentChangedTeam);
-
 		bCouldSucceed = true;
 	}
-
-	// Broadcast once so users get the current state
+	
 	OnTeamChanged.Broadcast(CurrentTeamIndex != INDEX_NONE, CurrentTeamIndex);
-
-	// We weren't able to bind to a delegate so we'll never get any additional updates
-	if (!bCouldSucceed)
+	
+	if (bCouldSucceed == false)
 	{
 		SetReadyToDestroy();
 	}
@@ -69,4 +63,3 @@ void UAsyncAction_ObserveTeam::OnWatchedAgentChangedTeam(UObject* TeamAgent, int
 {
 	OnTeamChanged.Broadcast(NewTeam != INDEX_NONE, NewTeam);
 }
-

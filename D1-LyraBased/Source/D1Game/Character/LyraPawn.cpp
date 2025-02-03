@@ -101,7 +101,7 @@ FOnD1TeamIndexChangedDelegate* ALyraPawn::GetOnTeamIndexChangedDelegate()
 void ALyraPawn::OnControllerChangedTeam(UObject* TeamAgent, int32 OldTeam, int32 NewTeam)
 {
 	const FGenericTeamId MyOldTeamID = MyTeamID;
-	MyTeamID = IntegerToGenericTeamId(NewTeam);
+	MyTeamID = IntegerToGenericTeamID(NewTeam);
 	ConditionalBroadcastTeamChanged(this, MyOldTeamID, MyTeamID);
 }
 

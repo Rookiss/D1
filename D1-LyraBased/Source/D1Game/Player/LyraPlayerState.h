@@ -90,22 +90,13 @@ public:
 	void SetPlayerConnectionType(ELyraPlayerConnectionType NewType);
 	ELyraPlayerConnectionType GetPlayerConnectionType() const { return MyPlayerConnectionType; }
 
-	/** Returns the Squad ID of the squad the player belongs to. */
-	UFUNCTION(BlueprintCallable)
-	int32 GetSquadId() const
-	{
-		return MySquadID;
-	}
-
 	/** Returns the Team ID of the team the player belongs to. */
 	UFUNCTION(BlueprintCallable)
-	int32 GetTeamId() const
+	int32 GetTeamID() const
 	{
-		return GenericTeamIdToInteger(MyTeamID);
+		return GenericTeamIDToInteger(MyTeamID);
 	}
-
-	void SetSquadID(int32 NewSquadID);
-
+	
 	// Adds a specified number of stacks to the tag (does nothing if StackCount is below 1)
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category=Teams)
 	void AddStatTagStack(FGameplayTag Tag, int32 StackCount);
@@ -168,9 +159,6 @@ private:
 	UPROPERTY(ReplicatedUsing=OnRep_MyTeamID)
 	FGenericTeamId MyTeamID;
 
-	UPROPERTY(ReplicatedUsing=OnRep_MySquadID)
-	int32 MySquadID;
-
 	UPROPERTY(Replicated)
 	FGameplayTagStackContainer StatTags;
 
@@ -180,9 +168,6 @@ private:
 private:
 	UFUNCTION()
 	void OnRep_MyTeamID(FGenericTeamId OldTeamID);
-
-	UFUNCTION()
-	void OnRep_MySquadID();
 
 public:
 	UFUNCTION(Server, Reliable)

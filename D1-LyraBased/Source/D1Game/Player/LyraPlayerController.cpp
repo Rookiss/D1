@@ -205,7 +205,7 @@ bool ALyraPlayerController::ShouldRecordClientReplay()
 
 void ALyraPlayerController::OnPlayerStateChangedTeam(UObject* TeamAgent, int32 OldTeam, int32 NewTeam)
 {
-	ConditionalBroadcastTeamChanged(this, IntegerToGenericTeamId(OldTeam), IntegerToGenericTeamId(NewTeam));
+	ConditionalBroadcastTeamChanged(this, IntegerToGenericTeamID(OldTeam), IntegerToGenericTeamID(NewTeam));
 }
 
 void ALyraPlayerController::OnPlayerStateChanged()

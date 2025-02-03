@@ -1,51 +1,38 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 
 #include "Engine/CancellableAsyncAction.h"
 #include "UObject/ScriptInterface.h"
 #include "UObject/WeakInterfacePtr.h"
-
 #include "AsyncAction_ObserveTeam.generated.h"
 
 class ID1TeamAgentInterface;
-struct FFrame;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTeamObservedAsyncDelegate, bool, bTeamSet, int32, TeamId);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTeamObservedAsyncDelegate, bool, bTeamSet, int32, TeamID);
 
-/**
- * Watches for team changes in the specified object
- */
 UCLASS()
 class UAsyncAction_ObserveTeam : public UCancellableAsyncAction
 {
 	GENERATED_UCLASS_BODY()
 
 public:
-	// Watches for team changes on the specified team agent
-	//  - It will will fire once immediately to give the current team assignment
-	//  - For anything that can ever belong to a team (implements ILyraTeamAgentInterface),
-	//    it will also listen for team assignment changes in the future
+	// 실행하자마자 현재 팀 ID를 알려주고, 그 이후에는 팀이 변경될 때마다 알려준다
 	UFUNCTION(BlueprintCallable, meta=(BlueprintInternalUseOnly="true", Keywords="Watch"))
 	static UAsyncAction_ObserveTeam* ObserveTeam(UObject* TeamAgent);
 
-	//~UBlueprintAsyncActionBase interface
+protected:
 	virtual void Activate() override;
 	virtual void SetReadyToDestroy() override;
-	//~End of UBlueprintAsyncActionBase interface
 
 public:
-	// Called when the team is set or changed
 	UPROPERTY(BlueprintAssignable)
 	FTeamObservedAsyncDelegate OnTeamChanged;
 
 private:
-	// Watches for team changes on the specified team actor
 	static UAsyncAction_ObserveTeam* InternalObserveTeamChanges(TScriptInterface<ID1TeamAgentInterface> TeamActor);
-
-private:
+	
 	UFUNCTION()
 	void OnWatchedAgentChangedTeam(UObject* TeamAgent, int32 OldTeam, int32 NewTeam);
 
+private:
 	TWeakInterfacePtr<ID1TeamAgentInterface> TeamInterfacePtr;
 };

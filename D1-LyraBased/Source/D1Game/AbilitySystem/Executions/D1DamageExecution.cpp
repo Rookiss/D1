@@ -5,7 +5,7 @@
 #include "AbilitySystem/Attributes/D1CombatSet.h"
 #include "AbilitySystem/LyraGameplayEffectContext.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Teams/LyraTeamSubsystem.h"
+#include "Teams/D1TeamSubsystem.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(D1DamageExecution)
 
@@ -103,7 +103,7 @@ void UD1DamageExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 	float DamageInteractionAllowedMultiplier = 0.0f;
 	if (HitActor)
 	{
-		ULyraTeamSubsystem* TeamSubsystem = HitActor->GetWorld()->GetSubsystem<ULyraTeamSubsystem>();
+		UD1TeamSubsystem* TeamSubsystem = HitActor->GetWorld()->GetSubsystem<UD1TeamSubsystem>();
 		if (ensure(TeamSubsystem))
 		{
 			DamageInteractionAllowedMultiplier = TeamSubsystem->CanCauseDamage(EffectCauser, HitActor) ? 1.f : 0.f;

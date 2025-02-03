@@ -1,6 +1,7 @@
-#include "Teams/D1TeamAgentInterface.h"
+#include "D1TeamAgentInterface.h"
 
 #include "D1LogChannels.h"
+#include "D1TeamSubsystem.h"
 #include "Messages/LyraVerbMessage.h"
 #include "UObject/ScriptInterface.h"
 
@@ -16,8 +17,8 @@ void ID1TeamAgentInterface::ConditionalBroadcastTeamChanged(TScriptInterface<ID1
 {
 	if (OldTeamID != NewTeamID)
 	{
-		const int32 OldTeamIndex = GenericTeamIdToInteger(OldTeamID); 
-		const int32 NewTeamIndex = GenericTeamIdToInteger(NewTeamID);
+		const int32 OldTeamIndex = GenericTeamIDToInteger(OldTeamID); 
+		const int32 NewTeamIndex = GenericTeamIDToInteger(NewTeamID);
 
 		UObject* ThisObj = This.GetObject();
 		UE_LOG(LogD1Team, Verbose, TEXT("[%s] %s assigned team %d"), *GetClientServerContextString(ThisObj), *GetPathNameSafe(ThisObj), NewTeamIndex);
@@ -28,20 +29,21 @@ void ID1TeamAgentInterface::ConditionalBroadcastTeamChanged(TScriptInterface<ID1
 
 ETeamAttitude::Type ID1TeamAgentInterface::GetTeamAttitudeTowards(const AActor& Other) const
 {
-	if (const APawn* OtherPawn = Cast<APawn>(&Other))
+	if (UD1TeamSubsystem* TeamSubsystem = Other.GetWorld()->GetSubsystem<UD1TeamSubsystem>())
 	{
-		if (const ID1TeamAgentInterface* TeamAgent = Cast<ID1TeamAgentInterface>(OtherPawn->GetController()))
+		if (const ID1TeamAgentInterface* OtherTeamAgent = TeamSubsystem->FindTeamAgentFromObject(&Other))
 		{
-			const int32 MyTeamID = GenericTeamIdToInteger(GetGenericTeamId());
-			const int32 OtherTeamID = GenericTeamIdToInteger(TeamAgent->GetGenericTeamId());
-
-			if ((MyTeamID == FGenericTeamId::NoTeam) || (OtherTeamID == FGenericTeamId::NoTeam) || (MyTeamID != OtherTeamID))
+			const int32 MyTeamID = GenericTeamIDToInteger(GetGenericTeamId());
+			const int32 OtherTeamID = GenericTeamIDToInteger(OtherTeamAgent->GetGenericTeamId());
+			const int32 MonsterTeamID = EnumToGenericTeamID(ED1TeamID::Monster);
+			
+			if (MyTeamID == MonsterTeamID && OtherTeamID == MonsterTeamID)
 			{
-				return ETeamAttitude::Hostile;
+				return ETeamAttitude::Friendly;
 			}
 			else
 			{
-				return ETeamAttitude::Friendly;
+				return ETeamAttitude::Hostile;
 			}
 		}
 	}

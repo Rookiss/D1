@@ -161,6 +161,6 @@ void ULyraLocalPlayer::OnCompletedAudioDeviceSwap(const FSwapAudioOutputResult& 
 
 void ULyraLocalPlayer::OnControllerChangedTeam(UObject* TeamAgent, int32 OldTeam, int32 NewTeam)
 {
-	ConditionalBroadcastTeamChanged(this, IntegerToGenericTeamId(OldTeam), IntegerToGenericTeamId(NewTeam));
+	ConditionalBroadcastTeamChanged(this, IntegerToGenericTeamID(OldTeam), IntegerToGenericTeamID(NewTeam));
 }
 

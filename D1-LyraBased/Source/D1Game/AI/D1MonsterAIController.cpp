@@ -42,7 +42,7 @@ void AD1MonsterAIController::InitPlayerState()
 	{
 		if (ALyraPlayerState* LyraPS = Cast<ALyraPlayerState>(PlayerState))
 		{
-			LyraPS->SetGenericTeamId(EnumToGenericTeamId(ED1TeamID::Monster));
+			LyraPS->SetGenericTeamId(EnumToGenericTeamID(ED1TeamID::Monster));
 		}
 	}
 }
@@ -136,7 +136,7 @@ void AD1MonsterAIController::UpdateTeamAttitude(UAIPerceptionComponent* AIPercep
 
 void AD1MonsterAIController::OnPlayerStateChangedTeam(UObject* TeamAgent, int32 OldTeam, int32 NewTeam)
 {
-	ConditionalBroadcastTeamChanged(this, IntegerToGenericTeamId(OldTeam), IntegerToGenericTeamId(NewTeam));
+	ConditionalBroadcastTeamChanged(this, IntegerToGenericTeamID(OldTeam), IntegerToGenericTeamID(NewTeam));
 }
 
 void AD1MonsterAIController::BroadcastOnPlayerStateChanged()

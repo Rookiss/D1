@@ -190,6 +190,10 @@ enum class ECharacterClassType : uint8
 UENUM(BlueprintType)
 enum class ED1TeamID : uint8
 {
-	NoTeam,
-	Monster = 1,
+	Monster = 0,
+	Team1,
+	Team2,
+	Team3,
+	Team4,
+	NoTeam = 255,
 };

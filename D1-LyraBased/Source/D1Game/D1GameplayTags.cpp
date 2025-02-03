@@ -207,6 +207,7 @@ namespace D1GameplayTags
 
 	// HUD
 	UE_DEFINE_GAMEPLAY_TAG(HUD_Slot_Reticle,								"HUD.Slot.Reticle");
+	UE_DEFINE_GAMEPLAY_TAG(HUD_Slot_TeamInfo,								"HUD.Slot.TeamInfo");
 	
 	const TMap<uint8, FGameplayTag> MovementModeTagMap =
 	{
