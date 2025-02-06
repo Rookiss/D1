@@ -146,6 +146,9 @@ int32 UD1TeamCreationComponent::DetermineTeamID() const
 		for (const auto& KVP : TeamMemberCountMap)
 		{
 			const int32 TeamID = KVP.Key;
+			if (TeamID == EnumToGenericTeamID(ED1TeamID::Monster))
+				continue;
+			
 			const uint32 TeamMemberCount = KVP.Value;
 			
 			if (TeamMemberCount < BestTeamMemberCount)
