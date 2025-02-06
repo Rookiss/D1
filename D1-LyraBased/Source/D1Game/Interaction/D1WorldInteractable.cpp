@@ -56,16 +56,16 @@ void AD1WorldInteractable::OnInteractionSuccess(AActor* Interactor)
 		{
 			bWasConsumed = true;
 
-			TArray<TWeakObjectPtr<AActor>> MovedInteractors = MoveTemp(CachedInteractors);
+			TArray<TWeakObjectPtr<AActor>> TargetInteractors = MoveTemp(CachedInteractors);
 		
-			for (TWeakObjectPtr<AActor>& MovedInteractor : MovedInteractors)
+			for (TWeakObjectPtr<AActor>& TargetInteractor : TargetInteractors)
 			{
-				if (ALyraCharacter* MovedCharacter = Cast<ALyraCharacter>(MovedInteractor.Get()))
+				if (ALyraCharacter* TargetCharacter = Cast<ALyraCharacter>(TargetInteractor.Get()))
 				{
-					if (Interactor == MovedCharacter)
+					if (Interactor == TargetCharacter)
 						continue;
 			
-					if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(MovedCharacter))
+					if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetCharacter))
 					{
 						FGameplayTagContainer CancelAbilitiesTag;
 						CancelAbilitiesTag.AddTag(D1GameplayTags::Ability_Interact_Active);
@@ -73,6 +73,10 @@ void AD1WorldInteractable::OnInteractionSuccess(AActor* Interactor)
 					}
 				}
 			}
+		}
+		else
+		{
+			CachedInteractors.Empty();
 		}
 	}
 	
