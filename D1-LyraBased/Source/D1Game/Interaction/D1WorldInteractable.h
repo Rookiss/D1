@@ -36,11 +36,11 @@ public:
 	
 protected:
 	UPROPERTY(EditDefaultsOnly)
-	bool bCanUsed = false;
+	bool bShouldConsume = false;
 	
 	UPROPERTY(BlueprintReadWrite, Replicated)
-	bool bIsUsed = false;
+	bool bWasConsumed = false;
 
 	UPROPERTY()
-	TSet<TWeakObjectPtr<AActor>> CachedInteractors;
+	TArray<TWeakObjectPtr<AActor>> CachedInteractors;
 };

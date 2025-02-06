@@ -16,7 +16,7 @@ void AD1WorldInteractable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, bIsUsed);
+	DOREPLIFETIME(ThisClass, bWasConsumed);
 }
 
 void AD1WorldInteractable::OnInteractActiveStarted(AActor* Interactor)
@@ -39,7 +39,7 @@ void AD1WorldInteractable::OnInteractActiveEnded(AActor* Interactor)
 	
 	if (HasAuthority())
 	{
-		CachedInteractors.Remove(Interactor);
+		CachedInteractors.RemoveSingleSwap(Interactor);
 	}
 
 	K2_OnInteractActiveEnded(Interactor);
@@ -52,28 +52,28 @@ void AD1WorldInteractable::OnInteractionSuccess(AActor* Interactor)
 	
 	if (HasAuthority())
 	{
-		if (bCanUsed)
+		if (bShouldConsume)
 		{
-			bIsUsed = true;
-		}
+			bWasConsumed = true;
 
-		for (TWeakObjectPtr<AActor> CachedInteractor : CachedInteractors)
-		{
-			if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(CachedInteractor.Get()))
+			TArray<TWeakObjectPtr<AActor>> MovedInteractors = MoveTemp(CachedInteractors);
+		
+			for (TWeakObjectPtr<AActor>& MovedInteractor : MovedInteractors)
 			{
-				if (Interactor == LyraCharacter)
-					continue;
-				
-				if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(LyraCharacter))
+				if (ALyraCharacter* MovedCharacter = Cast<ALyraCharacter>(MovedInteractor.Get()))
 				{
-					FGameplayTagContainer CancelAbilitiesTag;
-					CancelAbilitiesTag.AddTag(D1GameplayTags::Ability_Interact_Active);
-					ASC->CancelAbilities(&CancelAbilitiesTag);
+					if (Interactor == MovedCharacter)
+						continue;
+			
+					if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(MovedCharacter))
+					{
+						FGameplayTagContainer CancelAbilitiesTag;
+						CancelAbilitiesTag.AddTag(D1GameplayTags::Ability_Interact_Active);
+						ASC->CancelAbilities(&CancelAbilitiesTag);
+					}
 				}
 			}
 		}
-		
-		CachedInteractors.Empty();
 	}
 	
 	K2_OnInteractionSuccess(Interactor);
@@ -81,5 +81,5 @@ void AD1WorldInteractable::OnInteractionSuccess(AActor* Interactor)
 
 bool AD1WorldInteractable::CanInteraction(const FD1InteractionQuery& InteractionQuery) const
 {
-	return bCanUsed ? (bIsUsed == false) : true;
+	return bShouldConsume ? (bWasConsumed == false) : true;
 }
