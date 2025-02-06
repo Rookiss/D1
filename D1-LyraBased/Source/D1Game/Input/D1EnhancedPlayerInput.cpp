@@ -48,3 +48,15 @@ void UD1EnhancedPlayerInput::FlushPressedInput(UInputAction* InputAction)
 		}
 	}
 }
+
+FKey UD1EnhancedPlayerInput::GetKeyForAction(UInputAction* InputAction) const
+{
+	const TArray<FEnhancedActionKeyMapping>& KeyMappings = GetEnhancedActionMappings();
+	for (const FEnhancedActionKeyMapping& KeyMapping : KeyMappings)
+	{
+		if (KeyMapping.Action == InputAction)
+			return KeyMapping.Key;
+	}
+
+	return FKey();
+}

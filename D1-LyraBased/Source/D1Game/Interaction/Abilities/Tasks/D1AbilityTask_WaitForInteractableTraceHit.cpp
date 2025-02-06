@@ -120,9 +120,8 @@ void UD1AbilityTask_WaitForInteractableTraceHit::AimWithPlayerController(const A
 	FHitResult HitResult;
 	LineTrace(CameraStart, CameraEnd, Params, HitResult);
 
-	// 1. Hit된 물체가 인터렉션 가능 범위(Sphere) 이내라면, Hit 위치를 TraceEnd 위치로 정한다.
-	// 2. Hit된 물체가 없거나 Hit된 물체가 인터렉션 가능 범위(Sphere)를 벗어 났다면, Hit 위치를 무시하고 CameraEnd를 TraceEnd로 정한다.
-	// - 이후에 플레이어와 CameraEnd 사이의 물체를 체크한다.
+	// 1. Hit된 물체가 인터렉션 가능 범위(Sphere) 이내라면, Hit 위치를 AdjustedEnd로 정한다.
+	// 2. Hit된 물체가 없거나 Hit된 물체가 인터렉션 가능 범위(Sphere)를 벗어 났다면, Hit 위치를 무시하고 Clip된 CameraEnd를 AdjustedEnd로 정한다.
 	const bool bUseTraceResult = HitResult.bBlockingHit && (FVector::DistSquared(TraceStart, HitResult.Location) <= (MaxRange * MaxRange));
 	const FVector AdjustedEnd = bUseTraceResult ? HitResult.Location : CameraEnd;
 
@@ -132,7 +131,7 @@ void UD1AbilityTask_WaitForInteractableTraceHit::AimWithPlayerController(const A
 		AdjustedAimDir = CameraDirection;
 	}
 
-	// TraceEnd를 최대 인터렉션 가능 위치(Sphere의 표면)까지 확장한다.
+	// 플레이어에서 AdjustedAimDir 방향으로 최대 인터렉션 가능 범위(Sphere의 표면)까지 확장한 위치를 TraceEnd로 사용한다.
 	OutTraceEnd = TraceStart + (AdjustedAimDir * MaxRange);
 }
 

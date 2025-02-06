@@ -3,6 +3,8 @@
 #include "CommonActivatableWidget.h"
 #include "D1ActivatableWidget.generated.h"
 
+class UInputAction;
+
 UCLASS()
 class UD1ActivatableWidget : public UCommonActivatableWidget
 {
@@ -15,7 +17,6 @@ protected:
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 protected:
-	// TODO: Switch to InputAction
 	UPROPERTY(EditDefaultsOnly)
-	FKey DeactivateKey;
+	TObjectPtr<UInputAction> DeactivateInputAction;
 };

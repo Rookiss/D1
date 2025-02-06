@@ -13,4 +13,5 @@ public:
 
 public:
 	void FlushPressedInput(UInputAction* InputAction);
+	FKey GetKeyForAction(UInputAction* InputAction) const;
 };
