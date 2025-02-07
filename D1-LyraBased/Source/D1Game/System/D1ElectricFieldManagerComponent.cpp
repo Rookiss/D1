@@ -58,10 +58,7 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 	
 #if WITH_SERVER_CODE
 	if (IsValid(ElectricFieldActor) == false)
-	{
-		RemoveAllDamageEffects();
 		return;
-	}
 	
 	ALyraGameState* LyraGameState = GetGameState<ALyraGameState>();
 	if (LyraGameState == nullptr)
@@ -126,7 +123,18 @@ void UD1ElectricFieldManagerComponent::GetLifetimeReplicatedProps(TArray<class F
 
 void UD1ElectricFieldManagerComponent::CheckCharacterOverlap()
 {
-	float FieldSquardLength = FMath::Pow(ElectricFieldActor->GetActorScale3D().X * 50.f, 2);
+	if (HasAuthority() == false)
+		return;
+	
+#if WITH_SERVER_CODE
+	if (IsValid(ElectricFieldActor) == false)
+	{
+		GetWorldTimerManager().ClearTimer(OverlapCheckTimerHandle);
+		RemoveAllDamageEffects();
+		return;
+	}
+	
+	float RadiusSquard = FMath::Pow(ElectricFieldActor->GetActorScale3D().X * 50.f, 2);
 	
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
@@ -138,7 +146,7 @@ void UD1ElectricFieldManagerComponent::CheckCharacterOverlap()
 				if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(LyraCharacter))
 				{
 					float DistanceSquared = (FVector2D(LyraCharacter->GetActorLocation()) - FVector2D(ElectricFieldActor->GetActorLocation())).SquaredLength();
-					if (DistanceSquared > FieldSquardLength)
+					if (DistanceSquared > RadiusSquard)
 					{
 						if (OutsideCharacters.Contains(LyraCharacter) == false)
 						{
@@ -166,6 +174,7 @@ void UD1ElectricFieldManagerComponent::CheckCharacterOverlap()
 			}
 		}
 	}
+#endif
 }
 
 bool UD1ElectricFieldManagerComponent::SetupNextElectricFieldPhase()
