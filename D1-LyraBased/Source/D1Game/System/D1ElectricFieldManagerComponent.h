@@ -25,6 +25,7 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 private:
+	void CheckCharacterOverlap();
 	bool SetupNextElectricFieldPhase();
 	void RemoveAllDamageEffects();
 
@@ -54,6 +55,8 @@ private:
 	
 	float RemainTime = 0.f;
 
+	float OverlapCheckInterval = 1.f;
+	FTimerHandle OverlapCheckTimerHandle;
 private:
 	UPROPERTY()
 	TMap<TWeakObjectPtr<ALyraCharacter>, FActiveGameplayEffectHandle> OutsideCharacters;

@@ -44,6 +44,8 @@ void UD1ElectricFieldManagerComponent::Initialize()
 	ElectricFieldActor->SetActorScale3D(FVector(Scale, Scale, ElectricFieldActor->GetActorScale3D().Z));
     	
 	SetupNextElectricFieldPhase();
+	
+	GetWorldTimerManager().SetTimer(OverlapCheckTimerHandle, this, &ThisClass::CheckCharacterOverlap, OverlapCheckInterval, true);
 #endif
 }
 
@@ -108,6 +110,24 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 		}
 	}
 
+	RemainTimeSeconds = FMath::RoundToInt(FMath::Max(0.f, RemainTime));
+#endif
+}
+
+void UD1ElectricFieldManagerComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, TargetPhaseRadius);
+	DOREPLIFETIME(ThisClass, TargetPhasePosition);
+	DOREPLIFETIME(ThisClass, bShouldShow);
+	DOREPLIFETIME(ThisClass, RemainTimeSeconds);
+}
+
+void UD1ElectricFieldManagerComponent::CheckCharacterOverlap()
+{
+	float FieldSquardLength = FMath::Pow(ElectricFieldActor->GetActorScale3D().X * 50.f, 2);
+	
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		APlayerController* PlayerController = Iterator->Get();
@@ -117,8 +137,8 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 			{
 				if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(LyraCharacter))
 				{
-					float Length = (FVector2D(LyraCharacter->GetActorLocation()) - FVector2D(ElectricFieldActor->GetActorLocation())).Length();
-					if (Length > ElectricFieldActor->GetActorScale3D().X * 50.f)
+					float DistanceSquared = (FVector2D(LyraCharacter->GetActorLocation()) - FVector2D(ElectricFieldActor->GetActorLocation())).SquaredLength();
+					if (DistanceSquared > FieldSquardLength)
 					{
 						if (OutsideCharacters.Contains(LyraCharacter) == false)
 						{
@@ -146,19 +166,6 @@ void UD1ElectricFieldManagerComponent::TickComponent(float DeltaTime, ELevelTick
 			}
 		}
 	}
-
-	RemainTimeSeconds = FMath::RoundToInt(FMath::Max(0.f, RemainTime));
-#endif
-}
-
-void UD1ElectricFieldManagerComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ThisClass, TargetPhaseRadius);
-	DOREPLIFETIME(ThisClass, TargetPhasePosition);
-	DOREPLIFETIME(ThisClass, bShouldShow);
-	DOREPLIFETIME(ThisClass, RemainTimeSeconds);
 }
 
 bool UD1ElectricFieldManagerComponent::SetupNextElectricFieldPhase()

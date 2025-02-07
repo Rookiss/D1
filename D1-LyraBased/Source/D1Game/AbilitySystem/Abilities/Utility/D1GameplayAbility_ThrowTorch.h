@@ -56,6 +56,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="D1|Utility Throw")
 	TSubclassOf<AD1PickupableItemBase> ThrowableItemClass;
 
+	UPROPERTY(EditDefaultsOnly, Category="D1|Utility Throw")
+	FRotator DesiredLocalRotation = FRotator(0.f, 180.f, 90.f);
+	
 private:
 	UPROPERTY()
 	TObjectPtr<UAbilityTask_WaitInputRelease> InputReleaseTask;

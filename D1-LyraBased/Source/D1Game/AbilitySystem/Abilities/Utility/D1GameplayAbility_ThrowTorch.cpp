@@ -150,11 +150,11 @@ FTransform UD1GameplayAbility_ThrowTorch::GetSpawnTransform()
 		if (const UD1ItemFragment_Equipable_Utility* UtilityFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Utility>())
 		{
 			SpawnTransform = UtilityFragment->WeaponAttachInfo.AttachTransform;
+
 			const FTransform& SocketTransform = LyraCharacter->GetMesh()->GetSocketTransform(UtilityFragment->WeaponAttachInfo.AttachSocket);
 			SpawnTransform *= SocketTransform;
-			
-			FRotator LocalRotation = FRotator(0.f, 180.f, 90.f);
-			SpawnTransform.SetRotation(UKismetMathLibrary::TransformRotation(LyraCharacter->GetTransform(), LocalRotation).Quaternion());
+
+			SpawnTransform.SetRotation(UKismetMathLibrary::TransformRotation(LyraCharacter->GetTransform(), DesiredLocalRotation).Quaternion());
 		}
 	}
 

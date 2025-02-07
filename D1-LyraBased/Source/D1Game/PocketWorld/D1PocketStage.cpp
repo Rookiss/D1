@@ -142,11 +142,11 @@ void AD1PocketStage::RefreshRenderTargetSize(FViewport* InViewport, uint32 InVal
 	
 	if (ViewportAspectRatio < CameraAspectRatio)
 	{
-		RenderTargetSize = FVector2D(ViewportSize.X, ViewportSize.X * (1.f / CameraAspectRatio));
+		RenderTargetSize = FVector2D(ViewportSize.X, ViewportSize.X / CameraAspectRatio);
 	}
 	else
 	{
-		RenderTargetSize = FVector2D(ViewportSize.Y / (1.f / CameraAspectRatio), ViewportSize.Y);
+		RenderTargetSize = FVector2D(ViewportSize.Y * CameraAspectRatio, ViewportSize.Y);
 	}
 
 	if (PocketCapture)

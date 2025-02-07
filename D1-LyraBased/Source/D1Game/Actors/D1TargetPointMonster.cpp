@@ -27,11 +27,11 @@ void AD1TargetPointMonster::InitializeSpawningActor(AActor* InSpawningActor)
 		return;
 
 	AAIController* NewController = GetWorld()->SpawnActor<AAIController>(SpawningPawn->AIControllerClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParameters);
-	if (NewController)
-	{
-		NewController->Possess(SpawningPawn);
-	}
+	if (NewController == nullptr)
+		return;
 	
+	NewController->Possess(SpawningPawn);
+
 	if (APawn* ControlledPawn = NewController->GetPawn())
 	{
 		if (ULyraPawnExtensionComponent* PawnExtensionComponent = ControlledPawn->FindComponentByClass<ULyraPawnExtensionComponent>())
