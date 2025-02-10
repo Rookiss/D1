@@ -65,9 +65,6 @@ void UD1DamageScreenWidget::OnHealthChanged(ULyraHealthComponent* HealthComponen
 		}
 
 		int32 SelectedIndex = FMath::RandRange(0, ScreenMaterials.Num() - 1);
-		if (ScreenMaterials.IsValidIndex(SelectedIndex) == false)
-			return;
-		
 		UMaterialInterface* SelectedMaterial = ScreenMaterials[SelectedIndex];
 		Image_Blood->SetBrushFromMaterial(SelectedMaterial);
 		

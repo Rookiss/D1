@@ -31,7 +31,7 @@ void UD1ClassEntryWidget::InitializeUI(UD1ClassSelectionWidget* OwnerWidget, ECh
 	if (ULyraAbilitySet* AbilitySet = ClassEntry.ClassAbilitySet)
 	{
 		const TArray<FLyraAbilitySet_GameplayAbility>& AbilitySetAbilities = AbilitySet->GetGrantedGameplayAbilities();
-		for (int i = 0; i < 2; i++)
+		for (int32 i = 0; i < 2; i++)
 		{
 			if (AbilitySetAbilities.IsValidIndex(i))
 			{

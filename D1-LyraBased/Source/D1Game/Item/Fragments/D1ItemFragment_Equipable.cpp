@@ -58,7 +58,7 @@ void UD1ItemFragment_Equipable::AddStatTagStack(UD1ItemInstance* ItemInstance, c
 
 bool UD1ItemFragment_Equipable::IsEquipableClassType(ECharacterClassType ClassType) const
 {
-	return (EquipableClassFlags & (1 << (uint32)ClassType)) != 0;
+	return (EquipableClassFlags & (1 << (uint32)ClassType)) > 0;
 }
 
 float UD1ItemFragment_Equipable::GetDistanceAttenuation(float Distance, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags) const

@@ -280,7 +280,7 @@ void UD1GameplayAbility_Spell_Projectile::SpawnProjectile()
 	if (SelectedProjectileClasses == nullptr)
 		return;
 	
-	for (int i = 0; i < SelectedProjectileClasses->Num(); i++)
+	for (int32 i = 0; i < SelectedProjectileClasses->Num(); i++)
 	{
 		const TSubclassOf<AD1ProjectileBase>& ProjectileClass = (*SelectedProjectileClasses)[i];
 		if (ProjectileClass == nullptr)

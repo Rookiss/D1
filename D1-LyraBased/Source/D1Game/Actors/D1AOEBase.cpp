@@ -59,13 +59,6 @@ void AD1AOEBase::TickAOE()
 	
 		FVector SpawnLocation = SphereLocation + (RandDir * FMath::RandRange(0.f, SphereRadius));
 		GetWorld()->SpawnActor<AActor>(AOEElementClass, SpawnLocation, FRotator::ZeroRotator, SpawnParameters);
-		CurrentAttackCount++;
-	
-		if (CurrentAttackCount == TargetAttackCount)
-		{
-			GetWorld()->GetTimerManager().ClearTimer(AOETimerHandle);
-			Destroy();
-		}
 	}
 	else
 	{
@@ -82,5 +75,13 @@ void AD1AOEBase::TickAOE()
 				}
 			}
 		}
+	}
+	
+	CurrentAttackCount++;
+
+	if (CurrentAttackCount == TargetAttackCount)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(AOETimerHandle);
+		return;
 	}
 }
